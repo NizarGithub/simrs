@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script type="text/javascript">
+	window.onload = function() {
+		var chart = new CanvasJS.Chart("chartContainer_add", {
+			title: {
+				text: "Line Chart"
+			},
+
+			data: [{
+				type: "line",
+				dataPoints: [
+				  { label: "asd2", y: 14 },
+				  { label: "asd4", y: 20 },
+				  { label: "asd5", y: 60 },
+				  { label: "asd6", y: 50 },
+				  { label: "asd7", y: 80 },
+				  { label: "asd8", y: 40 },
+				  { label: "asd9", y: 60 },
+				]
+			}]
+		});
+		chart.render();
+	}
+	</script>
+
+
+	<script src="../../canvasjs.min.js"></script>
+	<title>CanvasJS Example</title>
+</head>
+
+<body>
+	<div id="chartContainer_add" style="height: 400px; width: 100%;"></div>
+</body>
+
+</html>
