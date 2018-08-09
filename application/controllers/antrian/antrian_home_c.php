@@ -5,11 +5,11 @@ class Antrian_home_c extends CI_Controller {
 	function __construct()  
 	{ 
 		parent::__construct();
-		$sess_user = $this->session->userdata('masuk_rs');
-		$id_user = $sess_user['id'];
-		if($id_user == "" || $id_user == null){
-	        redirect(base_url());
-	    }
+		// $sess_user = $this->session->userdata('masuk_rs');
+		// $id_user = $sess_user['id'];
+		// if($id_user == "" || $id_user == null){
+	 //        redirect(base_url());
+	 //    }
 
 	    $this->load->model("antrian/antrian_home_m", "model");
 	} 
@@ -18,10 +18,10 @@ class Antrian_home_c extends CI_Controller {
 	{
 		$data = array(
 			'page' => '',
-			'title' => 'Pengaturan',
-			'subtitle' => 'Pengaturan',
-			'master_menu' => 'home',
-			'view' => 'home',
+			'title' => 'Antrian Pasien',
+			'subtitle' => 'Antrian',
+			'master_menu' => 'antrian',
+			'view' => 'antrian',
 			'msg' => '',
 			'dtAntrian' => $this->model->getDataAntrian(),
 			'dtAntrian_last' => $this->model->getDataAntrian_last(),

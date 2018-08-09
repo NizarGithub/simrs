@@ -24,9 +24,9 @@ class Login_pengguna_m extends CI_Model {
 		return $this->db->query($sql)->result();
 	}
 
-	function simpan_login_user($id_pegawai, $status, $username){
+	function simpan_login_user($id_pegawai, $status, $username, $level){
 		$sql = "
-		UPDATE kepeg_pegawai SET STS_AKUN = $status, USERNAME = '$username'
+		UPDATE kepeg_pegawai SET STS_AKUN = $status, USERNAME = '$username', LEVEL = '$level'
 		WHERE ID = $id_pegawai
 		";
 

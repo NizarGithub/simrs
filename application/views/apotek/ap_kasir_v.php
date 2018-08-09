@@ -1,8 +1,9 @@
 <?PHP 
 $sess_user = $this->session->userdata('masuk_rs');
-$id_user = $sess_user['id']; 
+$id_user = $sess_user['id'];  //ID PEGAWAI
 
 $user_detail = $this->model->get_user_detail($id_user);
+
 ?>
 
 <!DOCTYPE html>
@@ -16,7 +17,7 @@ $user_detail = $this->model->get_user_detail($id_user);
 <head>
 <!-- BEGIN META SECTION -->
 <meta charset="utf-8">
-<title>Kasir Apotek</title>
+<title>Kasir Rajal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta content="" name="description" />
 <meta content="themes-lab" name="author" />
@@ -59,7 +60,10 @@ $user_detail = $this->model->get_user_detail($id_user);
     font-family: Arial;
 }
 
-#msg_kosong{
+#msg_kosong,
+#view_non_tunai,
+#view_notif_bayar,
+#notif_sukses{
     display: none;
 }
 
@@ -73,30 +77,11 @@ $user_detail = $this->model->get_user_detail($id_user);
     z-index: 9999;
     display: none;
 }
-
-#popup_resep {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    background: rgba(0,0,0,.7);
-    top: 0;
-    left: 0;
-    z-index: 9999;
-    display: none;
-}
-.window_resep {
-    width:50%;
-    height:auto;
-    position: relative;
-    padding: 10px;
-    margin: 2% auto;
-    background-color: #fff;
-}
 </style>
 
 </head>
 
-<body data-page="medias">
+<body data-page="medias" onload="startTime();">
     <!-- BEGIN TOP MENU -->
     <input type="hidden" id="sts_edit" value="0" />
     <input type="hidden" id="sts_lunas" value="0" />
@@ -113,7 +98,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                     <i class="glyphicon glyphicon-fullscreen"></i>
                 </a>
             </div>
-            <div class="navbar-center"> Kasir Apotek </div>
+            <div class="navbar-center"> Kasir Rajal </div>
             <div class="navbar-collapse collapse">
                 <!-- BEGIN TOP NAVIGATION MENU -->
                 <ul class="nav navbar-nav pull-right header-menu">
@@ -121,12 +106,12 @@ $user_detail = $this->model->get_user_detail($id_user);
                         <button onclick="$('#modal-12').addClass('md-show');" style="margin-top: 6px;" class="btn btn-warning btn-sm" type="button"> <i class="fa fa-question-circle"></i> Bantuan </button>
                     </li>
 
-                    <li class="dropdown" id="user-header">
+                    <!-- <li class="dropdown" id="user-header">
                         <a href="javascript:void(0);" style="color:#fff;">
-                            <img src="<?php echo base_url(); ?>files/foto_pegawai/<?=$user_detail->FOTO;?>" alt="user avatar" width="30" class="p-r-5">
+                            <img src="<?php //echo base_url(); ?>files/foto_pegawai/<?=$user_detail->FOTO;?>" alt="user avatar" width="30" class="p-r-5">
                             <span class="username"> <?=$user_detail->NAMA;?> </span>
                         </a>
-                    </li>
+                    </li> -->
 
                     <li style="margin-right: 25px;">
                         <a href="<?=base_url();?>logout" style="color:#fff;">
@@ -148,42 +133,32 @@ $user_detail = $this->model->get_user_detail($id_user);
             <button id="noti-btn_bayar" style="display:none;"  type="button" class="btn btn-default notification" data-type="info" data-message="<center><h2>Transaksi Sukses !!</h2><p style='font-size:18px'>Pembayaran dan Pesanan telah berhasil tersimpan pada sistem. </p></center>" data-horiz-pos="center" data-verti-pos="center" data-min-width="600">I am large</button>
             <center>
             <div class="control-bar sandbox-control-bar">
-                <div id="kategori_head" class="btn-group m-b-20" style="display:none;">
-                    <span id="kategori_0" onclick="get_makanan_by_kat(0);" class="btn btn-primary filter" data-filter="all">All</span>
-                    <?PHP 
-                        $get_jenis_obat = $this->model->get_jenis_obat();
-                        foreach ($get_jenis_obat as $key => $jns) { 
-                    ?>
-                    <span id="kategori_<?php echo $jns->ID;?>" onclick="get_makanan_by_kat(<?php echo $jns->ID;?>);" class="btn btn-default filter" data-filter=".category-1"><?php echo $jns->NAMA_JENIS;?></span>
-                    <?PHP 
-                        }
-                    ?>
-                </div>
+                <button type="button" id="notif_sukses" class="btn btn-success notification" data-type="success" data-message="<i class='fa fa-check-square-o' style='padding-right:6px'></i> Transaksi sukses dilakukan!" data-horiz-pos="left" data-verti-pos="bottom">Success</button>
 
                 <div id="nama_menu_cari_head">
                     <div class="form-group">
                         <!-- <label class="form-label"><strong>Pencarian</strong> Obat</label> -->
                         <div class="controls">
-                            <input type="text" id="cari_nama_menu" class="glowing form-control" value="" placeholder="Ketikkan obat yang ingin dicari ...">
+                            <input type="text" id="cari_nama_menu" class="glowing form-control" value="" placeholder="Ketikkan pasien yang ingin dicari ...">
                         </div>
                     </div>
                 </div>
             </div>
-           </center>
+            </center>
             <div class="panel-content">
                 <div class="row media-manager">   
                     <div class="margin-bottom-30"></div>
                     <div class="col-sm-7">
                         <div class="panel panel-default">
                             <div class="scroll-y">
-                                <table class="table table-hover" id="tabel_obat">
+                                <table class="table table-hover" id="tabel_pasien">
                                     <thead>
                                         <tr class="success">
                                             <th style="text-align:center;">No</th>
-                                            <th style="text-align:center;">Nama Obat</th>
-                                            <th style="text-align:center;">Jenis Obat</th>
-                                            <th style="text-align:center;">Harga</th>
-                                            <th style="text-align:center;">Stok</th>
+                                            <th style="text-align:center;">Nama</th>
+                                            <th style="text-align:center;">Poli</th>
+                                            <th style="text-align:center;">Resep</th>
+                                            <th style="text-align:center;">Total Biaya</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -218,104 +193,88 @@ $user_detail = $this->model->get_user_detail($id_user);
                             </form> -->
 
                             <div id="mid_head" style="margin-top: 10px; margin-bottom: 10px;">
-                                <center> 
-                                    <span id="label_atas_nama" style="padding-bottom: 6px; padding-top: 6px; display:none;" class="label label-success">a/n : </span>
-                                    <span id="invoice_txt_label" style="padding-bottom: 6px; padding-top: 6px;" class="label label-success" style="">Invoice : #<?=$get_invoice;?></span>
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="window.location='<?=base_url();?>apotek/ap_beli_obat_c';">Reset</button>
-                                    <!-- <a class="btn btn-warning btn-sm" target="_blank" href="<?php //echo base_url();?>apotek/ap_beli_obat_c/struk/20161216001">Struk</a> -->
-                                </center>
-                            </div>           
-
-                            <!-- TABEL -->
-                            <div style="max-height: 315px; overflow-y: scroll; margin-bottom: 15px; border-bottom: 1px solid rgb(255, 255, 255);">
-                                <input type="hidden" name="invoice_hidden" id="invoice_txt" value="<?php echo $get_invoice;?>">
                                 <input type="hidden" name="ppn_hidden" id="ppn_hidden" value="">
                                 <input type="hidden" name="jml_tr_baru" id="jml_tr_baru" value="0">
                                 <input type="hidden" name="tmp_sts_pesnaan" id="tmp_sts_pesnaan" value="0">
                                 <input type="hidden" name="jenis_bayar" id="jenis_bayar" value="">
+                                <center> 
+                                    <span id="label_atas_nama" style="padding-bottom: 6px; padding-top: 6px; display:none;" class="label label-success">a/n : </span>
+                                    <span style="padding-bottom: 6px; padding-top: 6px;" class="label label-success" style="">
+                                        Invoice : #<b id="invoice_txt"></b>
+                                    </span>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="window.location='<?=base_url();?>apotek/ap_kasir_rajal_c';">Reset</button>
+                                    <!-- <a class="btn btn-warning btn-sm" target="_blank" href="<?php //echo base_url();?>apotek/ap_kasir_rajal_c/struk/20161216001">Struk</a> -->
+                                </center>
+                            </div>           
 
-                                <table id="head_tbl_pesanan1" class="table" style="background:#FFF;">
-                                    <tbody>
-                                        <tr>
-                                            <td align="center"> Silahkan pilih obat terlebih dahulu </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                
-                                <table style="background:#FFF; display:none;" id="head_tbl_pesanan2" class="table">
-                                    <tbody id="tes">
-                                        
-                                    </tbody>
-                                </table>
-
-                                <div id="popup_pembayaran">
-                                    <div class="md-modal md-effect-10" id="modal-11">
-                                        <div class="md-content">
-                                            <h3 style="color:#FFF;"> Proses Pembayaran </h3>
-                                            <div>
-                                                <div id="warning_kelebihan" class="alert alert-danger fade in" style="width:100%; display:none;">
-                                                    <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
-                                                    <strong>Maaf, </strong> Jumlah bayar kurang dari total tagihan, Silahkan cek kembali
-                                                </div>
-                                                <p>
-                                                    <center>
-                                                        <button type="button" id="tunai_btn" onclick="get_tunai();" style="margin-top: -22px; float: left; margin-left: 125px;" class="btn btn-warning">Tunai</button>
-                                                        <button type="button" id="non_tunai_btn" onclick="get_non_tunai();" style="margin-top: -22px; float: left; margin-left: 50px;" class="btn btn-default">Debit/Credit Card</button>
-                                                    </center>
-                                                </p>
-                                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                                    <div class="form-group">
-                                                        <label class="form-label"><strong>Atas Nama</strong></label>
-                                                        <div class="controls">
-                                                            <input type="text" name="b_atas_nama" id="b_atas_nama" class="form-control" style="font-weight: bold;">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-group">
-                                                        <label class="form-label"><strong> Total Tagihan </strong></label>
-                                                        <div class="controls">
-                                                            <input readonly type="text" name="b_total_tagihan" id="b_total_tagihan" class="form-control" style="font-size: 15px; font-weight: bold;">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-group tunai_grp">
-                                                        <label class="form-label"><strong> Bayar </strong></label>
-                                                        <div class="controls">
-                                                            <input type="text" name="b_bayar" id="b_bayar" onkeyup="FormatCurrency(this); hitung_kembali();" class="form-control" style="font-size: 15px; font-weight: bold;">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-group tunai_grp">
-                                                        <label class="form-label"><strong> Kembali </strong></label>
-                                                        <div class="controls">
-                                                            <input type="text" readonly name="b_kembali" id="b_kembali" class="form-control" style="font-weight: bold; font-size: 20px; color: red;">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-group non_tunai_grp">
-                                                        <label class="form-label"><strong> Card / Kartu </strong></label>
-                                                        <div class="controls">
-                                                            <select id="kartu_provider" name="kartu_provider" data-width="300px" class="form-control" data-style="btn-default">
-                                                                <option value="BCA Debit Card"> BCA Debit Card</option>
-                                                                <option value="BCA Kredit Card"> BCA Kredit Card</option>
-                                                                <option value="Mandiri Debit Card"> Mandiri Debit Card</option>
-                                                                <option value="Mandiri VISA Card">  Mandiri VISA Card </option>
-                                                                <option value="VISA Card">  VISA Card </option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="form-group non_tunai_grp">
-                                                        <label class="form-label"><strong> Nomor Kartu </strong></label>
-                                                        <div class="controls">
-                                                            <input type="text" name="no_kartu" id="no_kartu" class="form-control" style="font-weight: bold; font-size: 15px;">
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <button type="button" class="btn btn-default" onclick="$('#modal-11').removeClass('md-show'); $('#popup_pembayaran').fadeOut();" style="float: left; margin-left: 160px;">Batal</button>
-                                                <button type="button" class="btn btn-success" onclick="simpan_pembayaran();" id="btn-proses-byr" style="margin-right: 175px;">Proses</button>
+                            <!-- TABEL -->
+                            <div id="popup_pembayaran">
+                                <div class="md-modal md-effect-10" id="modal-11">
+                                    <div class="md-content">
+                                        <h3 style="color:#FFF;"> Proses Pembayaran </h3>
+                                        <div>
+                                            <div id="warning_kelebihan" class="alert alert-danger fade in" style="width:100%; display:none;">
+                                                <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                                                <strong>Maaf, </strong> Jumlah bayar kurang dari total tagihan, Silahkan cek kembali
                                             </div>
+                                            <p>
+                                                <center>
+                                                    <button type="button" id="tunai_btn" onclick="get_tunai();" style="margin-top: -22px; float: left; margin-left: 125px;" class="btn btn-warning">Tunai</button>
+                                                    <button type="button" id="non_tunai_btn" onclick="get_non_tunai();" style="margin-top: -22px; float: left; margin-left: 50px;" class="btn btn-default">Debit/Credit Card</button>
+                                                </center>
+                                            </p>
+                                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                                <div class="form-group">
+                                                    <label class="form-label"><strong>Atas Nama</strong></label>
+                                                    <div class="controls">
+                                                        <input type="text" name="b_atas_nama" id="b_atas_nama" class="form-control" style="font-weight: bold;">
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="form-label"><strong> Total Tagihan </strong></label>
+                                                    <div class="controls">
+                                                        <input readonly type="text" name="b_total_tagihan" id="b_total_tagihan" class="form-control" style="font-size: 15px; font-weight: bold;">
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group tunai_grp">
+                                                    <label class="form-label"><strong> Bayar </strong></label>
+                                                    <div class="controls">
+                                                        <input type="text" name="b_bayar" id="b_bayar" onkeyup="FormatCurrency(this); hitung_kembali();" class="form-control" style="font-size: 15px; font-weight: bold;">
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group tunai_grp">
+                                                    <label class="form-label"><strong> Kembali </strong></label>
+                                                    <div class="controls">
+                                                        <input type="text" readonly name="b_kembali" id="b_kembali" class="form-control" style="font-weight: bold; font-size: 20px; color: red;">
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group non_tunai_grp">
+                                                    <label class="form-label"><strong> Card / Kartu </strong></label>
+                                                    <div class="controls">
+                                                        <select id="kartu_provider" name="kartu_provider" data-width="300px" class="form-control" data-style="btn-default">
+                                                            <option value="BCA Debit Card"> BCA Debit Card</option>
+                                                            <option value="BCA Kredit Card"> BCA Kredit Card</option>
+                                                            <option value="Mandiri Debit Card"> Mandiri Debit Card</option>
+                                                            <option value="Mandiri VISA Card">  Mandiri VISA Card </option>
+                                                            <option value="VISA Card">  VISA Card </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group non_tunai_grp">
+                                                    <label class="form-label"><strong> Nomor Kartu </strong></label>
+                                                    <div class="controls">
+                                                        <input type="text" name="no_kartu" id="no_kartu" class="form-control" style="font-weight: bold; font-size: 15px;">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <button type="button" class="btn btn-default" onclick="$('#modal-11').removeClass('md-show'); $('#popup_pembayaran').fadeOut();" style="float: left; margin-left: 160px;">Batal</button>
+                                            <button type="button" class="btn btn-success" onclick="simpan_pembayaran();" id="btn-proses-byr" style="margin-right: 175px;">Proses</button>
                                         </div>
                                     </div>
                                 </div>
@@ -359,66 +318,95 @@ $user_detail = $this->model->get_user_detail($id_user);
                                     </table>
                                 </span>
                             </div>
-                        
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <input type="text" placeholder="Cari resep..." class="form-control" id="cari_resep" value="">
-                                    <span class="input-group-addon bg-blue">
-                                        <span class="arrow"></span><i class="fa fa-search"></i> 
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="panel panel-default">
-                                    <div class="scroll-y-resep">
-                                        <table class="table table-hover" id="tabel_resep">
-                                            <thead>
-                                                <tr class="danger">
-                                                    <th style="text-align:center;">No</th>
-                                                    <th style="text-align:center;">Kode Resep</th>
-                                                    <th style="text-align:center;">Pasien</th>
-                                                    <th style="text-align:center;">#</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-
-                                            </tbody>
-                                        </table>
+                        </form>
+                        <hr>
+                        <div class="row m-t-20">
+                            <div class="col-lg-6 col-md-6">
+                                <div class="panel panel-icon no-bd bg-blue hover-effect">
+                                    <div class="panel-body bg-blue">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="icon"><i class="fa fa-user"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-footer bg-blue">
+                                        <h4><strong>Shift <b id="shift_user">0</b></strong></h4>
+                                        <p><?=$user_detail->NAMA;?></p>
                                     </div>
                                 </div>
                             </div>
-
-                            <div id="popup_resep">
-                                <div class="window_resep">
-                                    <table class="table table-hover" id="tabel_obat_resep">
-                                        <thead>
-                                            <tr class="info">
-                                                <th style="text-align:center;">No</th>
-                                                <th style="text-align:center;">Nama Obat</th>
-                                                <th style="text-align:center;">Harga</th>
-                                                <th style="text-align:center;">Jumlah</th>
-                                                <th style="text-align:center;">Subtotal</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                        </tbody>
-                                    </table>
-                                    <button type="button" class="btn btn-dark" id="tutup_or">Tutup</button>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="panel panel-icon no-bd bg-purple hover-effect">
+                                    <div class="panel-body bg-purple">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="icon"><i class="fa fa-files-o"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-footer bg-purple">
+                                        <h4><strong>Nota Poli</strong></h4>
+                                        <p>Input Nota Poli</p>
+                                    </div>
                                 </div>
                             </div>
-                        </form>
+                        </div>
+                        <div class="row m-t-20">
+                            <div class="col-lg-6 col-md-6">
+                                <div class="panel panel-icon no-bd bg-green hover-effect">
+                                    <div class="panel-body bg-green">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="icon"><i class="fa fa-file-text"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-footer bg-green">
+                                        <h4><strong>Rekap Pendapatan</strong></h4>
+                                        <p>Harian, Bulanan dan Tahunan</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="panel panel-icon no-bd bg-dark hover-effect">
+                                    <div class="panel-body bg-dark">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="icon"><i class="fa fa-clock-o"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-footer bg-dark">
+                                    <?php
+                                        $bulan_arr = array(
+                                            1 =>    "Januari", 2  =>"Februari", 3  =>"Maret", 4 =>"April",
+                                            5 =>    "Mei", 6  =>"Juni", 7  =>"Juli", 8 =>"Agustus",
+                                            9 =>    "September", 10 =>"Oktober", 11 =>"November", 12 =>"Desember"
+                                        );
+                                        $tgl = date('d');
+                                        $bln = $bulan_arr[date('n')];
+                                        $thn = date('Y');
+                                        $tanggal = $tgl." ".$bln." ".$thn;
+                                    ?>
+                                        <h4><strong><?php echo $tanggal; ?></strong></h4>
+                                        <p id="waktu_txt">00.00</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
             </div>
         </div>
-        <!-- END MAIN CONTENT -->
     </div>
     <!-- END WRAPPER -->
     
     <button style="display:none;" id="popup_pesanan_btn" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#panel-modal">Panel in Modal</button>
-
     <div id="panel-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
         <div class="modal-dialog">
             <div class="modal-content p-0 b-0">
@@ -550,6 +538,159 @@ $user_detail = $this->model->get_user_detail($id_user);
         </div>
     </div>
 
+    <button id="popup_bayar" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target=".bs-example-modal-lg" style="display: none;">Large modal</button>
+    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form class="form-horizontal" method="post" action="" id="form_pembayaran2">
+                    <input type="hidden" name="invoice" id="invoice" value="">
+                    <input type="hidden" name="id_rj" id="id_rj" value="">
+                    <input type="hidden" name="id_pasien" id="id_pasien" value="">
+                    <input type="hidden" name="id_poli" id="id_poli" value="">
+                    <input type="hidden" name="id_pegawai" id="id_pegawai" value="<?php echo $id_user; ?>">
+                    <input type="hidden" name="shift" id="shift" value="">
+                    <input type="hidden" name="tanggal" id="tanggal" value="<?php echo date('d-m-Y'); ?>">
+                    <input type="hidden" name="waktu" id="waktu" value="">
+                    <input type="hidden" name="jenis_pembayaran" id="jenis_pembayaran" value="">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title" id="myLargeModalLabel">
+                            <strong>Form</strong> Pembayaran Pasien : <button type="button" class="btn btn-success" id="nama_pasien_txt"></button>
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="tabcordion">
+                            <ul id="myTab" class="nav nav-tabs">
+                                <li class="active"><a href="#tab1_1" data-toggle="tab">Detail Pembayaran</a></li>
+                                <li><a href="#tab1_2" data-toggle="tab">Detail Tindakan</a></li>
+                                <li><a href="#tab1_3" data-toggle="tab">Detail Resep</a></li>
+                                <li><a href="#tab1_4" data-toggle="tab">Detail Laborat</a></li>
+                            </ul>
+                            <div id="myTabContent" class="tab-content">
+                                <div class="tab-pane fade active in" id="tab1_1">
+                                    <div class="row">
+                                        <div class="col-md-2" style="margin-right: 10px;">
+                                            <div class="form-group">
+                                                <label class="form-label"><strong>BIAYA POLI</strong></label>
+                                                <div class="controls">
+                                                    <input type="text" class="form-control" name="biaya_poli" id="biaya_poli" value="" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3" style="margin-right: 10px;">
+                                            <div class="form-group">
+                                                <label class="form-label"><strong>BIAYA TINDAKAN</strong></label>
+                                                <div class="controls">
+                                                    <input type="text" class="form-control" name="biaya_tindakan" id="biaya_tindakan" value="" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3" style="margin-right: 10px;">
+                                            <div class="form-group">
+                                                <label class="form-label"><strong>BIAYA RESEP</strong></label>
+                                                <div class="controls">
+                                                    <input type="text" class="form-control" name="biaya_resep" id="biaya_resep" value="" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="form-label"><strong>BIAYA LABORAT</strong></label>
+                                                <div class="controls">
+                                                    <input type="text" class="form-control" name="biaya_lab" id="biaya_lab" value="0" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-10">
+                                            <div class="form-group">
+                                                <label class="form-label"><strong>TOTAL</strong></label>
+                                                <div class="controls">
+                                                    <input type="text" class="form-control" name="grandtotal2" id="grandtotal2" value="" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <label class="form-label"><strong>PEMBAYARAN</strong></label>
+                                                <div class="controls">
+                                                    <button class="btn btn-primary btn-transparent" id="btn_tunai" type="button">Tunai</button>
+                                                    <button class="btn btn-primary btn-transparent" id="btn_non_tunai" type="button">Non Tunai</button>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" id="view_non_tunai">
+                                                <div class="controls">
+                                                    <button class="btn btn-success btn-transparent" id="btn_transfer" type="button">Transfer</button>
+                                                    <button class="btn btn-primary btn-transparent" id="btn_wallet" type="button">Wallet</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-10" style="margin-right: 10px;">
+                                            <div class="form-group">
+                                                <label class="form-label"><strong>BAYAR</strong></label>
+                                                <div class="controls">
+                                                    <input type="text" class="form-control" name="bayar2" id="bayar2" value="" onkeyup="get_bayar(); FormatCurrency(this);" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" id="view_notif_bayar">
+                                                <div class="alert alert-danger" style="width: 100%;">
+                                                    <p id="text_notif"></p> <strong id="text_total_notif">0</strong>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label"><strong>KEMBALI</strong></label>
+                                                <div class="controls">
+                                                    <input type="text" class="form-control" name="kembali2" id="kembali2" value="" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="tab1_2">
+                                    <table class="table table-bordered" id="tabel_tindakan">
+                                        <thead>
+                                            <tr class="danger">
+                                                <th style="text-align: center;">NO</th>
+                                                <th style="text-align: center;">TINDAKAN</th>
+                                                <th style="text-align: center;">BIAYA</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="tab-pane fade" id="tab1_3">
+                                    <table class="table table-bordered" id="tabel_resep2">
+                                        <thead>
+                                            <tr class="info">
+                                                <th style="text-align: center;">KODE RESEP</th>
+                                                <th style="text-align: center;">TANGGAL</th>
+                                                <th style="text-align: center;">TOTAL</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="tab-pane fade" id="tab1_4">
+                                    Proses
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="btn_tutup" data-dismiss="modal">Tutup</button>
+                        <button type="button" class="btn btn-success" id="btn_bayar" disabled="disabled">Bayar</button>
+                    </div>
+                </form>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
     <div class="modal fade" id="modal-basic" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog" style="width: 25%;">
             <div class="modal-content">
@@ -591,9 +732,10 @@ $user_detail = $this->model->get_user_detail($id_user);
 <script src="<?=base_url();?>kasir-apotek/assets/plugins/numerator/jquery-numerator.js"></script>
 <!-- END MANDATORY SCRIPTS -->
 <!--
-<script src="<?=base_url();?>kasir-apotek/assets/plugins/modal/js/classie.js"></script>
-<script src="<?=base_url();?>kasir-apotek/assets/plugins/modal/js/modalEffects.js"></script>
+<script src="<? //base_url();?>kasir-apotek/assets/plugins/modal/js/classie.js"></script>
+<script src="<? //base_url();?>kasir-apotek/assets/plugins/modal/js/modalEffects.js"></script>
 -->
+
 <script src="<?=base_url();?>kasir-apotek/assets/js/application.js"></script>
 <script src="<?=base_url();?>kasir-apotek/assets/js/form.js"></script>
 <script src="<?=base_url();?>kasir-apotek/assets/plugins/icheck/custom.js"></script>
@@ -646,8 +788,6 @@ $(window).keydown(function(e){
       $('#modal-10').removeClass('md-show');
       $('#modal-11').removeClass('md-show');
       $('#modal-12').removeClass('md-show');
-      
-      $('#korang').click();
 
     }
     else if(e.keyCode == 115){
@@ -682,9 +822,13 @@ $(window).keydown(function(e){
 });
 
 $(document).ready(function(){
-    
-    data_obat();
-    data_resep();
+    get_pasien();
+
+    setInterval(function () {
+        get_pasien();
+    }, 5000);
+
+    get_invoice();
 
     $('.non_tunai_grp').hide();
 
@@ -708,11 +852,6 @@ $(document).ready(function(){
         }
     });
 
-    $('#korang').click(function(){
-        get_popup_barang();
-        ajax_barang();
-    });
-
     $('#ok_trx').click(function(){
         var id = $('#id_obat_trx').val();
 
@@ -724,7 +863,7 @@ $(document).ready(function(){
         var qty2  = $('#jumlah_beli_trx').val();
 
         $.ajax({
-            url : '<?=base_url();?>apotek/ap_beli_obat_c/data_obat_id',
+            url : '<?=base_url();?>apotek/ap_kasir_rajal_c/data_obat_id',
             data : {id:id},
             type : "POST",
             dataType : "json",
@@ -778,19 +917,101 @@ $(document).ready(function(){
         // hitung_diskon();
     });
 
-    $('#tutup_or').click(function(){
-        $('#popup_resep').fadeOut();
+    $('#btn_tunai').click(function(){
+        $('#btn_tunai').removeAttr('class');
+        $('#btn_tunai').attr('class','btn btn-primary');
+        $('#btn_non_tunai').removeAttr('class');
+        $('#btn_non_tunai').attr('class','btn btn-primary btn-transparent');
+        $('#view_non_tunai').hide();
+        $('#bayar2').removeAttr('readonly');
+        $('#bayar2').focus();
+        $('#jenis_pembayaran').val('Tunai');
+    });
+
+    $('#btn_non_tunai').click(function(){
+        $('#btn_non_tunai').removeAttr('class');
+        $('#btn_non_tunai').attr('class','btn btn-primary');
+        $('#btn_tunai').removeAttr('class');
+        $('#btn_tunai').attr('class','btn btn-primary btn-transparent');
+        $('#view_non_tunai').show();
+        $('#bayar2').attr('readonly');
+        $('#bayar2').val("");
+        $('#kembali2').val("");
+        $('#jenis_pembayaran').val('Non Tunai');
+    });
+
+    $('#btn_bayar').click(function(){
+        $.ajax({
+            url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_pembayaran',
+            data : $('#form_pembayaran2').serialize(),
+            type : "POST",
+            dataType : "json",
+            success : function(res){
+                $('#btn_tutup').click();
+                $('#notif_sukses').click();
+                $('#id_pasien').val("");
+                $('#id_poli').val("");
+                $('#jenis_pembayaran').val("");
+                get_invoice();
+            }
+        });
     });
 
 });
 
-function data_obat(){
+function startTime() {
+    var today = new Date();
+    var h = today.getHours();
+    var m = today.getMinutes();
+    var s = today.getSeconds();
+    m = checkTime(m);
+    s = checkTime(s);
+    document.getElementById('waktu_txt').innerHTML = h + ":" + m + ":" + s;
+    $('#waktu').val(h + ":" + m + ":" + s);
+    var t = setTimeout(startTime, 500);
+
+    if(h >= 7 && h < 14){
+        $('#shift_user').html('1');
+        $('#shift').val('1');
+    }else if(h >= 14 && h < 23){
+        $('#shift_user').html('2');
+        $('#shift').val('2');
+    }else{
+        $('#shift_user').html('Tutup');
+        $('#shift').val('0');
+    }
+}
+
+function checkTime(i) {
+    if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+    return i;
+}
+
+function cetak_resi(){
+    var invoice = $('#invoice').val();
+    var prt = window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk/'+invoice, '_blank');
+    prt.print();
+}
+
+function get_invoice(){
+    $.ajax({
+        url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/get_invoice',
+        type : "POST",
+        dataType : "json",
+        success : function(res){
+            $('#invoice').val(res);
+            $('#invoice_txt').html(res);
+        }
+    });
+}
+
+function get_pasien(){
     var keyword = $('#cari_nama_menu').val();
 
     $.ajax({
-        url : '<?php echo base_url(); ?>apotek/ap_beli_obat_c/get_data_obat',
+        url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/get_pasien',
         data : {keyword:keyword},
-        type : "POST",
+        type : "GET",
         dataType : "json",
         success : function(result){
             $tr = "";
@@ -801,35 +1022,168 @@ function data_obat(){
                 var no = 0;
                 for(var i=0; i<result.length; i++){
                     no++;
+                    var aksi = '';
 
-                    $tr += "<tr style='cursor:pointer;' onclick='popup_pesanan("+result[i].ID+");'>"+
-                                "<input type='hidden' class='menu_qty' value='0' id='menu_qty_"+result[i].ID+"'>"+
-                                "<input type='hidden' value='"+result[i].HARGA_JUAL+"' id='rego_"+result[i].ID+"'>"+
+                    if(result[i].STS_BAYAR == '0'){
+                        aksi = "<button class='btn btn-info' type='button' onclick='klik_pasien("+result[i].ID+","+result[i].ID_PASIEN+","+result[i].TOTAL+");'>"+formatNumber(result[i].TOTAL)+"</button>";
+                    }else{
+                        aksi = '<i class="fa fa-check-square-o"></i> '+formatNumber(result[i].TOTAL);
+                    }
+
+                    $tr += "<tr>"+
                                 "<td style='text-align:center;'>"+no+"</td>"+
-                                "<td>"+
-                                    result[i].NAMA_OBAT+"<br>"+"<small><b>"+result[i].KODE_OBAT+"</b></small>"+
-                                "</td>"+
-                                "<td style='text-align:center;'>"+result[i].NAMA_JENIS+"</td>"+
-                                "<td style='text-align:right;'>"+formatNumber(result[i].HARGA_JUAL)+"</td>"+
-                                "<td style='text-align:center;'>"+result[i].TOTAL+"</td>"+
+                                "<td>"+result[i].NAMA+"</td>"+
+                                "<td style='text-align:center;'>"+result[i].NAMA_POLI+"</td>"+
+                                "<td style='text-align:center;'>"+result[i].KODE_RESEP+"</td>"+
+                                "<td style='text-align:right;'>"+aksi+"</td>"+
                             "</tr>";
                 }
             }
 
-            $('#tabel_obat tbody').html($tr);
+            $('#tabel_pasien tbody').html($tr);
         }
     });
 
     $('#cari_nama_menu').off('keyup').keyup(function(){
-        data_obat();
+        get_pasien();
     });
+}
+
+function klik_pasien(id,id_pasien,total){
+    $('#popup_bayar').click();
+
+    $.ajax({
+        url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/get_poli_by_rj',
+        data : {id:id},
+        type : "POST",
+        dataType : "json",
+        success : function(row){
+            $('#id_rj').val(id);
+            $('#id_pasien').val(id_pasien);
+            $('#id_poli').val(row['ID_POLI']);
+            $('#nama_pasien_txt').html(row['NAMA_PASIEN']);
+            $('#biaya_poli').val(formatNumber(row['BIAYA']));
+            $('#grandtotal2').val(formatNumber(total));
+
+            get_tindakan(id_pasien);
+            get_resep(id_pasien);
+        }
+    });
+}
+
+function get_resep(id_pasien){
+    $.ajax({
+        url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/get_resep2',
+        data : {id_pasien:id_pasien},
+        type : "POST",
+        dataType : "json",
+        success : function(res){
+            $tr = '';
+            $tr2 = '';
+            var total_resep = 0;
+
+            if(res['ind'] == null || res['ind'] == ""){
+                $tr = '<tr><td colspan="4" style="text-align:center;">Data Tidak Ada</td></tr>';
+            }else{
+                $tr = '<tr>'+
+                        '<td>'+res['ind']['KODE_RESEP']+'</td>'+
+                        '<td style="text-align:center;">'+res['ind']['TANGGAL']+'</td>'+
+                        '<td style="text-align:right;"><b>'+formatNumber(res['ind']['TOTAL'])+'</b></td>'+
+                      '</tr>'+
+                      '<tr class="info">'+
+                        '<td style="text-align:center; font-weight:bold;">NAMA OBAT</td>'+
+                        '<td style="text-align:center; font-weight:bold;">JUMLAH</td>'+
+                        '<td style="text-align:center;">&nbsp;</td>'+
+                      '</tr>';
+
+                for(var i=0; i<res['det'].length; i++){
+                    total_resep += parseFloat(res['det'][i].SUBTOTAL);
+
+                    $tr2 += '<tr>'+
+                                '<td>'+res['det'][i].NAMA_OBAT+'</td>'+
+                                '<td style="text-align:center;">'+formatNumber(res['det'][i].JUMLAH_BELI)+'</td>'+
+                                '<td style="text-align:right;">'+formatNumber(res['det'][i].SUBTOTAL)+'</td>'+
+                            '</tr>';
+                }
+
+                $('#biaya_resep').val(formatNumber(total_resep));
+            }
+
+            $('#tabel_resep2 tbody').html($tr+$tr2);
+        }
+    });
+}
+
+function get_tindakan(id_pasien){
+    $.ajax({
+        url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/get_tindakan',
+        data : {id_pasien:id_pasien},
+        type : "POST",
+        dataType : "json",
+        success : function(res){
+            $tr = '';
+            $tr2 = '';
+            var tot = 0;
+
+            if(res == null || res == ""){
+                $tr = '<tr><td colspan="3" style="text-align:center;">Data Tidak Ada</td></tr>';
+            }else{
+                var no = 0;
+
+                for(var i=0; i<res.length; i++){
+                    no++;
+                    tot += parseFloat(res[i].TARIF);
+
+                    $tr +=  '<tr>'+
+                                '<td style="text-align:center;">'+no+'</td>'+
+                                '<td>'+res[i].NAMA_TINDAKAN+'</td>'+
+                                '<td style="text-align:right;">'+formatNumber(res[i].TARIF)+'</td>'+
+                            '</tr>';
+                }
+
+                $tr2 = '<tr>'+
+                        '   <td colspan="2" style="text-align:center;"><b>TOTAL</b></td>'+
+                        '   <td style="text-align:right;"><b>'+formatNumber(tot)+'</b></td>'+
+                        '</tr>';
+
+                $('#biaya_tindakan').val(formatNumber(tot));
+            }
+
+            $('#tabel_tindakan tbody').html($tr+$tr2);
+        }
+    });
+}
+
+function get_bayar(){
+    var grandtotal = $('#grandtotal2').val();
+    var bayar = $('#bayar2').val();
+    grandtotal = grandtotal.split(',').join('');
+    bayar = bayar.split(',').join('');
+
+    if(bayar == ""){
+        bayar = 0;
+    }
+
+    if(parseFloat(bayar) < parseFloat(grandtotal)){
+        var kembali = parseFloat(bayar) - parseFloat(grandtotal);
+        $('#text_notif').html('Pembayaran kurang ');
+        $('#text_total_notif').html(formatNumber(kembali));
+        $('#kembali2').val(formatNumber(kembali));
+        $('#view_notif_bayar').show();
+        $('#btn_bayar').attr('disabled','disabled');
+    }else{
+        var kembali = parseFloat(bayar) - parseFloat(grandtotal);
+        $('#kembali2').val(formatNumber(kembali));
+        $('#view_notif_bayar').hide();
+        $('#btn_bayar').removeAttr('disabled');
+    }
 }
 
 function popup_pesanan(id){
     $('#popup_pesanan_btn').click();
 
     $.ajax({
-        url : '<?php echo base_url(); ?>apotek/ap_beli_obat_c/data_obat_id',
+        url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/data_obat_id',
         data : {id:id},
         type : "POST",
         dataType : "json",
@@ -943,7 +1297,7 @@ function simpan_pembayaran(){
         $('#warning_kelebihan').hide();
         
         $.ajax({
-            url : '<?=base_url();?>apotek/ap_beli_obat_c/simpan_trx',
+            url : '<?=base_url();?>apotek/ap_kasir_rajal_c/simpan_trx',
             data : $('#form_pembayaran').serialize(),
             type : "POST",
             dataType : "json",
@@ -951,16 +1305,10 @@ function simpan_pembayaran(){
                 $('#modal-11').removeClass('md-show');
                 $('#popup_pembayaran').fadeOut();
                 cetak_resi();
-                window.location = "<?php echo base_url(); ?>apotek/ap_beli_obat_c";
+                window.location = "<?php echo base_url(); ?>apotek/ap_kasir_rajal_c";
             }
         });
     }
-}
-
-function cetak_resi(){
-    var invoice = $('#invoice_txt').val();
-    var prt = window.open('<?php echo base_url(); ?>apotek/ap_beli_obat_c/struk/'+invoice, '_blank');
-    prt.print();
 }
 
 function hitung_diskon(){
@@ -1016,82 +1364,10 @@ function get_non_tunai(){
     $('#jenis_bayar').val('Kartu Kredit');
 }
 
-function data_resep(){
-    var keyword = $('#cari_resep').val();
-
-    $.ajax({
-        url : '<?=base_url();?>apotek/ap_beli_obat_c/get_resep',
-        data : {keyword:keyword},
-        type : "POST",
-        dataType : "json",
-        success : function(result){
-            $tr = "";
-
-            if(result == null || result == ""){
-                $tr = "<tr><td colspan='4' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
-            }else{
-                var no = 0;
-
-                for(var i=0; i<result.length; i++){
-                    no++;
-
-                    var aksi = "<button type='button' class='btn btn-success btn-sm' onclick='deleteRow(this);'><i class='fa fa-check'></i></button>";
-
-                    $tr += "<tr style='cursor:pointer;' onclick='get_detail_resep("+result[i].ID+","+result[i].DARI+");'>"+
-                                "<td style='text-align:center;'>"+no+"</td>"+
-                                "<td style='text-align:center;'>"+result[i].KODE_RESEP+"</td>"+
-                                "<td>"+result[i].NAMA_PASIEN+"</td>"+
-                                "<td align='center'>"+aksi+"</td>"+
-                            "</tr>";
-                }
-            }
-
-            $('#tabel_resep tbody').html($tr);
-        }
-    });
-
-    $('#cari_resep').off('keyup').keyup(function(){
-        data_resep();
-    });
-}
-
 function deleteRow(btn){
     var row = btn.parentNode.parentNode;
     row.parentNode.removeChild(row);
 }
-
-function get_detail_resep(id_resep,dari){ 
-    $('#popup_resep').show();
-
-    $.ajax({
-        url : '<?=base_url();?>apotek/ap_beli_obat_c/get_resep_id',
-        data : {id_resep:id_resep,dari:dari},
-        type : "POST",
-        dataType : "json",
-        success : function(result){                 
-            $tr = "";
-
-            var no = 0;
-
-            for(var i=0; i<result.length; i++){
-                no++;
-
-                var aksi = "<button type='button' class='btn btn-success btn-sm' onclick='deleteRow(this);'><i class='fa fa-check'></i></button>";
-
-                $tr += "<tr style='cursor:pointer;' onclick='get_detail_resep("+result[i].ID+","+result[i].DARI+");'>"+
-                            "<td style='text-align:center;'>"+no+"</td>"+
-                            "<td>"+result[i].NAMA_OBAT+"</td>"+
-                            "<td style='text-align:right;'>"+formatNumber(result[i].HARGA)+"</td>"+
-                            "<td style='text-align:center;'>"+result[i].JUMLAH_BELI+"</td>"+
-                            "<td style='text-align:right;'>"+formatNumber(result[i].SUBTOTAL)+"</td>"+
-                        "</tr>";
-            }
-
-            $('#tabel_obat_resep tbody').html($tr);
-        }
-    });
-}
-
 </script>
 
 

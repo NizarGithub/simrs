@@ -91,8 +91,8 @@
                         <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#4d81a9;">
                             <li>
                                 <form role="search" class="navbar-left app-search pull-left hidden-xs" style="margin-right:0px;">
-                                    <h5 style="color:#5cc3e8; font-size: 14px; font-weight:bold;"><?=strtoupper($user->NAMA);?></h5>
-                                    <h6 style="color:#FFF; font-size: 13px;"> <?=$user->JABATAN;?> </h6>
+                                    <h5 style="color:#fff;"><b><?php echo strtoupper($user->NAMA_DIV);?></b></h5>
+                                    <h6 style="color:#fff;"><b><?php echo $user->NAMA;?></b></h6>
                                 </form>
                             </li>
                             <li class="dropdown user-box">

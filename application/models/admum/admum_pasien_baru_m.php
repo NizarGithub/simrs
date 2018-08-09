@@ -11,6 +11,7 @@ class Admum_pasien_baru_m extends CI_Model {
 	function simpan(
 		$kode_pasien,
 		$tanggal_daftar,
+		$waktu_daftar,
 		$nama,
 		$jenis_kelamin,
 		$pendidikan,
@@ -20,6 +21,9 @@ class Admum_pasien_baru_m extends CI_Model {
 		$tempat_lahir, 
 		$tanggal_lahir,
 		$umur,
+		$umur_bulan,
+		$nama_ortu,
+		$telepon,
 		$kelurahan,
 		$kecamatan,
 		$kota,
@@ -29,6 +33,7 @@ class Admum_pasien_baru_m extends CI_Model {
 			INSERT INTO rk_pasien(
 				KODE_PASIEN,
 				TANGGAL_DAFTAR,
+				WAKTU_DAFTAR,
 				NAMA,
 				JENIS_KELAMIN,
 				PENDIDIKAN,
@@ -38,6 +43,9 @@ class Admum_pasien_baru_m extends CI_Model {
 				TEMPAT_LAHIR,
 				TANGGAL_LAHIR,
 				UMUR,
+				UMUR_BULAN,
+				NAMA_ORTU,
+				TELEPON,
 				KELURAHAN,
 				KECAMATAN,
 				KOTA,
@@ -46,6 +54,7 @@ class Admum_pasien_baru_m extends CI_Model {
 			) VALUES (
 				'$kode_pasien',
 				'$tanggal_daftar',
+				'$waktu_daftar',
 				'$nama',
 				'$jenis_kelamin',
 				'$pendidikan',
@@ -55,6 +64,9 @@ class Admum_pasien_baru_m extends CI_Model {
 				'$tempat_lahir',
 				'$tanggal_lahir',
 				'$umur',
+				'$umur_bulan',
+				'$nama_ortu',
+				'$telepon',
 				'$kelurahan',
 				'$kecamatan',
 				'$kota',
@@ -382,6 +394,21 @@ class Admum_pasien_baru_m extends CI_Model {
 		return $this->db->query($sql)->result();
 	}
 
+	function ubah_sts_pasien_lama($id_pasien){
+
+	}
+
+	function simpanAntrian($kode_antrian, $jml_antrian, $id_antrian){
+		$tgl = date('d-m-Y');
+		$sql = "
+		INSERT INTO kepeg_antrian
+		(ID_KODE, KODE, URUT, TGL)
+		VALUES 
+		($id_antrian, '$kode_antrian', $jml_antrian, '$tgl')
+		";
+
+		$this->db->query($sql);
+	}
 
 }
 

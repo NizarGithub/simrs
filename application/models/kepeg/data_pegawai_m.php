@@ -130,8 +130,8 @@ class Data_pegawai_m extends CI_Model {
 	function ubah_data_pegawai($id, $id_dep, $id_div, $nip, $nama, $kota_lahir, $tgl_lahir, $alamat, $telpon, $status, $id_jabatan, $id_pangkat){
 		$sql = "
 		UPDATE kepeg_pegawai SET 
-			ID_DEPARTEMEN = $id_dep,
-			ID_DIVISI = $id_div,
+			ID_DEPARTEMEN = '$id_dep',
+			ID_DIVISI = '$id_div',
 			NIP = '$nip',
 			NAMA = '$nama',
 			KOTA_LAHIR = '$kota_lahir',
@@ -139,9 +139,9 @@ class Data_pegawai_m extends CI_Model {
 			ALAMAT = '$alamat',
 			TELPON = '$telpon',
 			STATUS = '$status',
-			ID_JABATAN = $id_jabatan,
-			ID_PANGKAT = $id_pangkat
-		WHERE ID = $id
+			ID_JABATAN = '$id_jabatan',
+			ID_PANGKAT = '$id_pangkat'
+		WHERE ID = '$id'
 		";
 
 		$this->db->query($sql);

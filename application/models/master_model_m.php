@@ -13,11 +13,44 @@ class Master_model_m extends CI_Model
 		LEFT JOIN kepeg_kel_jabatan b ON a.ID_JABATAN = b.ID 
 		LEFT JOIN kepeg_departemen c ON a.ID_DEPARTEMEN = c.ID 
 		LEFT JOIN kepeg_divisi d ON a.ID_DIVISI = d.ID 
-		WHERE a.ID = $id_user
+		WHERE a.ID = '$id_user'
 		ORDER BY a.ID ASC
 		";
 
 		return $this->db->query($sql)->row();
+	}
+
+	function is_operator($id_user, $menu){
+		$sql = "
+		SELECT a.* FROM kepeg_loket_operator a
+		JOIN kepeg_loket_akses b ON a.ID_LOKET = b.ID_LOKET
+		WHERE a.ID_PEGAWAI = '$id_user' AND b.AKSES = '$menu'
+		";
+
+		return $this->db->query($sql)->result();
+	}
+
+	function getLoket($id_user, $akses){
+		$sql = "
+		SELECT b.*, c.KODE FROM kepeg_loket_operator a
+		JOIN kepeg_loket b ON a.ID_LOKET = b.ID
+		JOIN kepeg_setup_antrian c ON b.KODE_ANTRIAN = c.ID
+		JOIN kepeg_loket_akses d ON b.ID = d.ID_LOKET
+		WHERE a.ID_PEGAWAI = '$id_user' AND d.AKSES = '$akses'
+		";
+
+		return $this->db->query($sql)->row();
+	}
+
+	function getJmlAntrian($id_kode_antrian){
+		$tgl = date('d-m-Y');
+
+		$sql = "
+		SELECT * FROM kepeg_antrian
+		WHERE ID_KODE = $id_kode_antrian AND TGL = '$tgl'
+		";
+
+		return $this->db->query($sql)->result();
 	}
 
 	function get_menu_2($id_pegawai, $id_menu1){
@@ -48,39 +81,6 @@ class Master_model_m extends CI_Model
 		return $this->db->query($sql)->result();
 	}
 
-	function is_operator($id_user, $menu){
-		$sql = "
-		SELECT a.* FROM kepeg_loket_operator a
-		JOIN kepeg_loket_akses b ON a.ID_LOKET = b.ID_LOKET
-		WHERE a.ID_PEGAWAI = $id_user AND b.AKSES = '$menu'
-		";
-
-		return $this->db->query($sql)->result();
-	}
-
-	function getLoket($id_user, $akses){
-		$sql = "
-		SELECT b.*, c.KODE FROM kepeg_loket_operator a
-		JOIN kepeg_loket b ON a.ID_LOKET = b.ID
-		JOIN kepeg_setup_antrian c ON b.KODE_ANTRIAN = c.ID
-		JOIN kepeg_loket_akses d ON b.ID = d.ID_LOKET
-		WHERE a.ID_PEGAWAI = $id_user AND d.AKSES = '$akses'
-		";
-
-		return $this->db->query($sql)->row();
-	}
-
-	function getJmlAntrian($id_kode_antrian){
-		$tgl = date('d-m-Y');
-
-		$sql = "
-		SELECT * FROM kepeg_antrian
-		WHERE ID_KODE = $id_kode_antrian AND TGL = '$tgl'
-		";
-
-		return $this->db->query($sql)->result();
-	}
-
 	function get_data_asuransi(){
 		$sql = "
 		SELECT * FROM asr_setup_asuransi
@@ -88,6 +88,23 @@ class Master_model_m extends CI_Model
 		";
 
 		return $this->db->query($sql)->result();
+	}
+
+	function simpan_log($id_pegawai,$tanggal,$waktu,$keterangan){
+		$sql = "
+			INSERT INTO kepeg_log_aktifitas(
+				ID_PEGAWAI,
+				TANGGAL,
+				WAKTU,
+				KETERANGAN
+			) VALUES (
+				'$id_pegawai',
+				'$tanggal',
+				'$waktu',
+				'$keterangan'
+			)
+		";
+		$this->db->query($sql);
 	}
 
 }

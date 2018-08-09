@@ -31,12 +31,13 @@ class Login_pengguna_c extends CI_Controller {
 			$new_pass1      = addslashes($this->input->post('new_pass1')); 
 			$new_pass2      = addslashes($this->input->post('new_pass2'));
 
-			$sts_pass_awal      = addslashes($this->input->post('sts_pass_awal')); 
-			$sts_pass_edit      = addslashes($this->input->post('sts_pass_edit')); 
+			$sts_pass_awal  = addslashes($this->input->post('sts_pass_awal')); 
+			$sts_pass_edit  = addslashes($this->input->post('sts_pass_edit'));
+			$level       	= addslashes($this->input->post('level'));
 
 			if($sts_pass_awal == 0){
 				if($pass1 == $pass2){
-					$this->model->simpan_login_user($id_pegawai, $status, $username);
+					$this->model->simpan_login_user($id_pegawai, $status, $username, $level);
 					$this->model->simpan_password_user($id_pegawai, $pass2);
 					$msg = 1;
 				} else {
@@ -47,14 +48,14 @@ class Login_pengguna_c extends CI_Controller {
 				if($sts_pass_edit == 1){
 					if($new_pass1 == $new_pass2){
 						$msg = 1;
-						$this->model->simpan_login_user($id_pegawai, $status, $username);
+						$this->model->simpan_login_user($id_pegawai, $status, $username, $level);
 						$this->model->simpan_password_user($id_pegawai, $new_pass2);						
 					} else {
 						$warning = 1;
 					}
 				} else {
 					$msg = 1;
-					$this->model->simpan_login_user($id_pegawai, $status, $username);
+					$this->model->simpan_login_user($id_pegawai, $status, $username, $level);
 				}
 			}
 

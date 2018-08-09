@@ -8,7 +8,7 @@ class Portal extends CI_Controller {
 		$sess_user = $this->session->userdata('masuk_rs');
 		$id_user = $sess_user['id'];
 		if($id_user == "" || $id_user == null){
-	        redirect(base_url());
+	        redirect('login_c');
 	    }
 	}
 
@@ -22,7 +22,7 @@ class Portal extends CI_Controller {
 		SELECT a.* FROM kepeg_menu_1 a
 		JOIN kepeg_hak_akses b ON a.ID = b.ID_MENU
 		WHERE b.ID_PEGAWAI = $id_user AND b.KET = 'MENU_PORTAL'
-		ORDER BY a.ID ASC
+		ORDER BY a.URUT ASC
 		";
 
 		$dt_menu = $this->db->query($sql_menu)->result();

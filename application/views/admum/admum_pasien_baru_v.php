@@ -130,6 +130,46 @@ $(document).ready(function(){
     });
 });
 
+function hitung_umur(){
+    // Here are the two dates to compare
+    var tgl = $('#tanggal_lahir').val(); //10-07-2018
+    var d = tgl.substr(0,2);
+    var m = tgl.substr(3,2);
+    var y = tgl.substr(6);
+    var date2 = "<?php echo date('Y-m-d'); ?>";
+    var date1 = y+'-'+m+'-'+d;
+
+    // First we split the values to arrays date1[0] is the year, [1] the month and [2] the day
+    date1 = date1.split('-');
+    date2 = date2.split('-');
+
+    // Now we convert the array to a Date object, which has several helpful methods
+    date1 = new Date(date1[0], date1[1], date1[2]);
+    date2 = new Date(date2[0], date2[1], date2[2]);
+
+    // We use the getTime() method and get the unixtime (in milliseconds, but we want seconds, therefore we divide it through 1000)
+    date1_unixtime = parseInt(date1.getTime() / 1000);
+    date2_unixtime = parseInt(date2.getTime() / 1000);
+
+    // This is the calculated difference in seconds
+    var timeDifference = date2_unixtime - date1_unixtime;
+
+    // in Hours
+    var timeDifferenceInHours = timeDifference / 60 / 60;
+
+    // and finaly, in days :)
+    var timeDifferenceInDays = timeDifferenceInHours  / 24;
+
+    //in month
+    var timeDifferenceInMonth = (date2.getMonth() - date1.getMonth());
+
+    //in year
+    var timeDifferenceInYear = (date2.getFullYear() - date1.getFullYear());
+
+    $('#umur').val(timeDifferenceInYear);
+    $('#umur_bulan').val(timeDifferenceInMonth);
+}
+
 function get_kode_pasien(){
     $.ajax({
         url : '<?php echo base_url(); ?>admum/admum_pasien_baru_c/kode_pasien',
@@ -263,180 +303,180 @@ function klik_pasien(id){
     });
 }
 
-function get_history_medik(){
-    $('.cari_tgl').val(''); 
-    $('#ord_tmp').val(''); 
-    $('#isi_history_rj').html(''); 
-    $('#isi_history_igd').html(''); 
-    $('#isi_history_ri').html(''); 
-    var id_pasien = $('#id_pasien2').val();
-    $.ajax({
-        url : '<?php echo base_url(); ?>admum/admum_pasien_baru_c/get_history_medik',
-        data : {id_pasien:id_pasien},
-        type : "POST",
-        dataType : "json",
-        success : function(result){
-            var isine = "";
-            var isine_igd = "";
-            var isine_ri = "";
-            var no = 0;
-            var det_RJ = result['detail_RJ'];
+// function get_history_medik(){
+//     $('.cari_tgl').val(''); 
+//     $('#ord_tmp').val(''); 
+//     $('#isi_history_rj').html(''); 
+//     $('#isi_history_igd').html(''); 
+//     $('#isi_history_ri').html(''); 
+//     var id_pasien = $('#id_pasien2').val();
+//     $.ajax({
+//         url : '<?php //echo base_url(); ?>admum/admum_pasien_baru_c/get_history_medik',
+//         data : {id_pasien:id_pasien},
+//         type : "POST",
+//         dataType : "json",
+//         success : function(result){
+//             var isine = "";
+//             var isine_igd = "";
+//             var isine_ri = "";
+//             var no = 0;
+//             var det_RJ = result['detail_RJ'];
 
-            var det_IGD = result['detail_IGD'];
+//             var det_IGD = result['detail_IGD'];
 
-            var det_RI = result['detail_RI'];            
-            var dataDetVisite_RI = result['dataDetVisite_RI'];
-            var dataDetGizi_RI = result['dataDetGizi_RI'];
-            var dataDetOksigen_RI = result['dataDetOksigen_RI'];
-            var dataDetDiagnosa_RI = result['dataDetDiagnosa_RI'];
-            var dataDetResep_RI = result['dataDetResep_RI'];
+//             var det_RI = result['detail_RI'];            
+//             var dataDetVisite_RI = result['dataDetVisite_RI'];
+//             var dataDetGizi_RI = result['dataDetGizi_RI'];
+//             var dataDetOksigen_RI = result['dataDetOksigen_RI'];
+//             var dataDetDiagnosa_RI = result['dataDetDiagnosa_RI'];
+//             var dataDetResep_RI = result['dataDetResep_RI'];
 
-            // RAWAT JALAN
-            if(det_RJ.length > 0){
-                var ord2 = $('#ord_tmp').val(); 
-                $.each(det_RJ,function(i,RJ){                    
-                    var ord  = RJ.ORD;
-                    var ord2 = $('#ord_tmp').val(); 
+//             // RAWAT JALAN
+//             if(det_RJ.length > 0){
+//                 var ord2 = $('#ord_tmp').val(); 
+//                 $.each(det_RJ,function(i,RJ){                    
+//                     var ord  = RJ.ORD;
+//                     var ord2 = $('#ord_tmp').val(); 
 
-                    if(ord != ord2){
-                        isine += '<tr><td colspan="3"> <b>'+ord+'</b> </td></tr>';
-                        no = 0;
-                    }
+//                     if(ord != ord2){
+//                         isine += '<tr><td colspan="3"> <b>'+ord+'</b> </td></tr>';
+//                         no = 0;
+//                     }
 
-                    no++;
-                    isine += '<tr>'+
-                                '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
-                                '<td>'+RJ.TANGGAL+'</td>'+
-                                '<td>'+RJ.KET+'</td>'+
-                             '</tr>';
+//                     no++;
+//                     isine += '<tr>'+
+//                                 '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
+//                                 '<td>'+RJ.TANGGAL+'</td>'+
+//                                 '<td>'+RJ.KET+'</td>'+
+//                              '</tr>';
 
-                    $('#ord_tmp').val(RJ.ORD);     
-                });
-            } else {
-                isine = '<tr><td colspan="3" align="center" style="text-align:center;"> <b>Tidak ada history / info medik pada pasien ini </b> </td></tr>';
-            } 
+//                     $('#ord_tmp').val(RJ.ORD);     
+//                 });
+//             } else {
+//                 isine = '<tr><td colspan="3" align="center" style="text-align:center;"> <b>Tidak ada history / info medik pada pasien ini </b> </td></tr>';
+//             } 
 
-            $('#isi_history_rj').html(isine);             
-            // END OF RAWAT JALAN 
+//             $('#isi_history_rj').html(isine);             
+//             // END OF RAWAT JALAN 
 
-            // IGD
-            if(det_IGD.length > 0){
-                var ord2 = $('#ord_tmp').val(); 
-                $.each(det_IGD,function(i,IGD){                    
-                    var ord  = IGD.ORD;
-                    var ord2 = $('#ord_tmp').val(); 
+//             // IGD
+//             if(det_IGD.length > 0){
+//                 var ord2 = $('#ord_tmp').val(); 
+//                 $.each(det_IGD,function(i,IGD){                    
+//                     var ord  = IGD.ORD;
+//                     var ord2 = $('#ord_tmp').val(); 
 
-                    if(ord != ord2){
-                        isine_igd += '<tr><td colspan="3"> <b>'+ord+'</b> </td></tr>';
-                        no = 0;
-                    }
+//                     if(ord != ord2){
+//                         isine_igd += '<tr><td colspan="3"> <b>'+ord+'</b> </td></tr>';
+//                         no = 0;
+//                     }
 
-                    no++;
-                    isine_igd += '<tr>'+
-                                '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
-                                '<td>'+IGD.TANGGAL+'</td>'+
-                                '<td>'+IGD.KET+'</td>'+
-                             '</tr>';
+//                     no++;
+//                     isine_igd += '<tr>'+
+//                                 '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
+//                                 '<td>'+IGD.TANGGAL+'</td>'+
+//                                 '<td>'+IGD.KET+'</td>'+
+//                              '</tr>';
 
-                    $('#ord_tmp').val(IGD.ORD);     
-                });
-            } else {
-                isine_igd = '<tr><td colspan="3" align="center" style="text-align:center;"> <b>Tidak ada history / info medik pada pasien ini </b> </td></tr>';
-            }
-            $('#isi_history_igd').html(isine_igd); 
-            // END OF IGD
+//                     $('#ord_tmp').val(IGD.ORD);     
+//                 });
+//             } else {
+//                 isine_igd = '<tr><td colspan="3" align="center" style="text-align:center;"> <b>Tidak ada history / info medik pada pasien ini </b> </td></tr>';
+//             }
+//             $('#isi_history_igd').html(isine_igd); 
+//             // END OF IGD
 
-            // RAWAT INAP
-            if(dataDetDiagnosa_RI.length > 0){
-                isine_ri += '<tr><td colspan="3"> <b>DIAGNOSA</b> </td></tr>';
-                no = 0;
-                $.each(dataDetDiagnosa_RI,function(i,D_RI){                    
-                    no++;
-                    isine_ri += '<tr>'+
-                                    '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
-                                    '<td>'+D_RI.TANGGAL+'</td>'+
-                                    '<td>'+D_RI.DIAGNOSA+'</td>'+
-                                '</tr>';
+//             // RAWAT INAP
+//             if(dataDetDiagnosa_RI.length > 0){
+//                 isine_ri += '<tr><td colspan="3"> <b>DIAGNOSA</b> </td></tr>';
+//                 no = 0;
+//                 $.each(dataDetDiagnosa_RI,function(i,D_RI){                    
+//                     no++;
+//                     isine_ri += '<tr>'+
+//                                     '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
+//                                     '<td>'+D_RI.TANGGAL+'</td>'+
+//                                     '<td>'+D_RI.DIAGNOSA+'</td>'+
+//                                 '</tr>';
     
-                });
-            }
+//                 });
+//             }
 
-            if(det_RI.length > 0){
-                isine_ri += '<tr><td colspan="3"> <b>TINDAKAN</b> </td></tr>';
-                no = 0;
-                $.each(det_RI,function(i,RI){
-                    no++;
-                    isine_ri += '<tr>'+
-                                    '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
-                                    '<td>'+RI.TANGGAL+'</td>'+
-                                    '<td>'+RI.KET+'</td>'+
-                                '</tr>';
+//             if(det_RI.length > 0){
+//                 isine_ri += '<tr><td colspan="3"> <b>TINDAKAN</b> </td></tr>';
+//                 no = 0;
+//                 $.each(det_RI,function(i,RI){
+//                     no++;
+//                     isine_ri += '<tr>'+
+//                                     '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
+//                                     '<td>'+RI.TANGGAL+'</td>'+
+//                                     '<td>'+RI.KET+'</td>'+
+//                                 '</tr>';
     
-                });
-            }
+//                 });
+//             }
 
-            if(dataDetVisite_RI.length > 0){
-                isine_ri += '<tr><td colspan="3"> <b>VISITE</b> </td></tr>';
-                no = 0;
-                $.each(dataDetVisite_RI,function(i,V_RI){
-                    no++;
-                    isine_ri += '<tr>'+
-                                    '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
-                                    '<td>'+V_RI.TANGGAL+'</td>'+
-                                    '<td>'+V_RI.NAMA_VISITE+' <br> <b>(Dokter : '+V_RI.NAMA_DOKTER+')</b> </td>'+
-                                '</tr>';
+//             if(dataDetVisite_RI.length > 0){
+//                 isine_ri += '<tr><td colspan="3"> <b>VISITE</b> </td></tr>';
+//                 no = 0;
+//                 $.each(dataDetVisite_RI,function(i,V_RI){
+//                     no++;
+//                     isine_ri += '<tr>'+
+//                                     '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
+//                                     '<td>'+V_RI.TANGGAL+'</td>'+
+//                                     '<td>'+V_RI.NAMA_VISITE+' <br> <b>(Dokter : '+V_RI.NAMA_DOKTER+')</b> </td>'+
+//                                 '</tr>';
     
-                });
-            }
+//                 });
+//             }
 
-            if(dataDetGizi_RI.length > 0){
-                isine_ri += '<tr><td colspan="3"> <b>GIZI</b> </td></tr>';
-                no = 0;
-                $.each(dataDetGizi_RI,function(i,Gizi_RI){
-                    no++;
-                    isine_ri += '<tr>'+
-                                    '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
-                                    '<td>'+Gizi_RI.TANGGAL+'</td>'+
-                                    '<td>'+Gizi_RI.NAMA_GIZI+'</td>'+
-                                '</tr>';
+//             if(dataDetGizi_RI.length > 0){
+//                 isine_ri += '<tr><td colspan="3"> <b>GIZI</b> </td></tr>';
+//                 no = 0;
+//                 $.each(dataDetGizi_RI,function(i,Gizi_RI){
+//                     no++;
+//                     isine_ri += '<tr>'+
+//                                     '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
+//                                     '<td>'+Gizi_RI.TANGGAL+'</td>'+
+//                                     '<td>'+Gizi_RI.NAMA_GIZI+'</td>'+
+//                                 '</tr>';
     
-                });
-            } 
+//                 });
+//             } 
 
-            if(dataDetOksigen_RI.length > 0){
-                isine_ri += '<tr><td colspan="3"> <b>OKSIGEN</b> </td></tr>';
-                no = 0;
-                $.each(dataDetOksigen_RI,function(i,Oks_RI){
-                    no++;
-                    isine_ri += '<tr>'+
-                                    '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
-                                    '<td>'+Oks_RI.TANGGAL+'</td>'+
-                                    '<td>'+Oks_RI.KETERANGAN+' <br> <b>('+Oks_RI.JUMLAH+' Tabung)</b> </td>'+
-                                '</tr>';
+//             if(dataDetOksigen_RI.length > 0){
+//                 isine_ri += '<tr><td colspan="3"> <b>OKSIGEN</b> </td></tr>';
+//                 no = 0;
+//                 $.each(dataDetOksigen_RI,function(i,Oks_RI){
+//                     no++;
+//                     isine_ri += '<tr>'+
+//                                     '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
+//                                     '<td>'+Oks_RI.TANGGAL+'</td>'+
+//                                     '<td>'+Oks_RI.KETERANGAN+' <br> <b>('+Oks_RI.JUMLAH+' Tabung)</b> </td>'+
+//                                 '</tr>';
     
-                });
-            }              
+//                 });
+//             }              
 
-            if(dataDetResep_RI.length > 0){
-                isine_ri += '<tr><td colspan="3"> <b>OBAT / RESEP</b> </td></tr>';
-                no = 0;
-                $.each(dataDetResep_RI,function(i,Resep_RI){
-                    no++;
-                    isine_ri += '<tr>'+
-                                    '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
-                                    '<td>'+Resep_RI.TANGGAL+'</td>'+
-                                    '<td>'+Resep_RI.NAMA_OBAT+'</td>'+
-                                '</tr>';
+//             if(dataDetResep_RI.length > 0){
+//                 isine_ri += '<tr><td colspan="3"> <b>OBAT / RESEP</b> </td></tr>';
+//                 no = 0;
+//                 $.each(dataDetResep_RI,function(i,Resep_RI){
+//                     no++;
+//                     isine_ri += '<tr>'+
+//                                     '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
+//                                     '<td>'+Resep_RI.TANGGAL+'</td>'+
+//                                     '<td>'+Resep_RI.NAMA_OBAT+'</td>'+
+//                                 '</tr>';
     
-                });
-            } 
+//                 });
+//             } 
 
-            $('#isi_history_ri').html(isine_ri); 
-            // END OF RAWAT INAP
-        }
-    });
+//             $('#isi_history_ri').html(isine_ri); 
+//             // END OF RAWAT INAP
+//         }
+//     });
 
-}
+// }
 
 function Search_tgl_RJ(tgl){
     $('#ord_tmp').val(''); 
@@ -738,17 +778,6 @@ function Search_tgl_RI(tgl){
                             <textarea rows="5" class="form-control" name="alamat" id="alamat" required="required"></textarea>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label"></label>
-                        <div class="col-md-9">
-                            <button type="button" id="btn_history" onclick="get_history_medik();" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target=".bs-example-modal-lg">
-                               <i class="fa fa-history"></i> History Rekam Medik
-                            </button>
-                        </div>
-                    </div>
-        		</div>
-
-        		<div class="col-lg-6">
                     <div class="form-group" id="view_goldar1">
                         <label class="col-md-3 control-label">Golongan Darah</label>
                         <div class="col-md-9">
@@ -761,6 +790,17 @@ function Search_tgl_RI(tgl){
                             </select>
                         </div>
                     </div>
+                    <!-- <div class="form-group">
+                        <label class="col-md-3 control-label"></label>
+                        <div class="col-md-9">
+                            <button type="button" id="btn_history" onclick="get_history_medik();" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target=".bs-example-modal-lg">
+                               <i class="fa fa-history"></i> History Rekam Medik
+                            </button>
+                        </div>
+                    </div> -->
+        		</div>
+
+        		<div class="col-lg-6">
                     <div class="form-group" id="view_goldar2">
                         <label class="col-md-3 control-label">Golongan Darah</label>
                         <div class="col-md-9">
@@ -778,7 +818,7 @@ function Search_tgl_RI(tgl){
                         <div class="col-md-9">
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                <input type="text" class="form-control datepicker-here" name="tanggal_lahir" id="tanggal_lahir" value="" data-language="en" data-date-format="dd-mm-yyyy" readonly>
+                                <input type="text" class="form-control" name="tanggal_lahir" id="tanggal_lahir" data-mask="99-99-9999" value="" placeholder="dd-mm-yyyy" onchange="hitung_umur();">
                             </div>
                         </div>
                     </div>
@@ -790,13 +830,33 @@ function Search_tgl_RI(tgl){
                     </div>
                     <div class="form-group">
                         <label class="col-md-3 control-label">Umur</label>
-                        <div class="col-md-9">
+                        <div class="col-md-3">
                             <div class="input-group">
-                                <input type="text" class="form-control num_only" name="umur" id="umur" value="" required="required" maxlength="3">
+                                <input type="text" class="form-control num_only" name="umur" id="umur" value="" maxlength="3" readonly>
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-warning" style="cursor:default;">Tahun</button>
                                 </span>
                             </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control num_only" name="umur_bulan" id="umur_bulan" value="" maxlength="3" readonly>
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-warning" style="cursor:default;">Bulan</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">Nama Orang Tua</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" name="nama_ortu" id="nama_ortu" value="" required="required">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">Telepon</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control num_only" name="telepon" id="telepon" value="" maxlength="13" required="required">
                         </div>
                     </div>
                     <div class="form-group">
@@ -926,7 +986,7 @@ function Search_tgl_RI(tgl){
 <!-- // -->
 
 <!--  MODAL HISTORY REKAM MEDIK -->
-<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="display: none;">
+<!-- <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -1032,6 +1092,6 @@ function Search_tgl_RI(tgl){
                     </div>
                 </div>                
             </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+        </div>
+    </div>
+</div> -->

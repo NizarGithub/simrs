@@ -8,7 +8,7 @@ class Admum_data_pasien_m extends CI_Model {
 		$this->load->database();
 	}
 
-	function data_pasien($id_klien,$keyword,$urutkan,$pilih_umur,$status){
+	function data_pasien($id_klien,$keyword,$urutkan,$pilih_umur,$sts_byr,$now){
 		$where = "1 = 1";
 		$order = "";
 
@@ -40,9 +40,25 @@ class Admum_data_pasien_m extends CI_Model {
 				$where = $where." AND PSN.UMUR > 50";
 			}
 			$order = "ORDER BY PSN.UMUR ASC";
+		}else if($urutkan == 'Status'){
+			$where = $where." AND STS_BAYAR = '$sts_byr'";
+			$order = "ORDER BY PSN.ID DESC";
 		}
 
-		$sql = "SELECT PSN.* FROM rk_pasien PSN WHERE $where AND PSN.STATUS = '$status' $order";
+		if($now != ""){
+			$where = $where." AND b.TANGGAL = '$now'";
+		}else{
+			$where = $where;
+		}
+
+		$sql = "
+			SELECT 
+				PSN.* 
+			FROM  admum_rawat_jalan b
+			LEFT JOIN rk_pasien PSN ON PSN.ID = b.ID_PASIEN
+			WHERE $where
+			$order
+		";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
@@ -145,6 +161,11 @@ class Admum_data_pasien_m extends CI_Model {
 		";
 		$query = $this->db->query($sql);
 		return $query->row();
+	}
+
+	function simpan_permintaan($id_pegawai,$id_pasien,$permintaan){
+		$sql = "INSERT INTO kepeg_permintaan(ID_PEGAWAI,ID_PASIEN,PERMINTAAN) VALUES ('$id_pegawai','$id_pasien','$permintaan')";
+		$this->db->query($sql);
 	}
 
 }

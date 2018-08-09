@@ -19,98 +19,99 @@ $(document).ready(function(){
         notif_simpan();
     <?php } ?>
 
+    get_barcode();
     // get_kode_pasien();
     
-    $('#baru').click(function(){
-        var cek = $('#baru').is(":checked");
-        if(cek == true){
-            get_kode_pasien();
-            $('#btn_history').hide();
-            $('.btn_pasien').attr('disabled','disabled');
+    // $('#baru').click(function(){
+    //     var cek = $('#baru').is(":checked");
+    //     if(cek == true){
+    //         get_kode_pasien();
+    //         $('#btn_history').hide();
+    //         $('.btn_pasien').attr('disabled','disabled');
 
-            $('#nama').removeAttr('readonly');
-            $('#alamat').removeAttr('readonly');
-            $('#tempat_lahir').removeAttr('readonly');
-            $('#umur').removeAttr('readonly');
-            $('#kelurahan').removeAttr('readonly');
-            $('#kecamatan').removeAttr('readonly');
-            $('#nama').focus();
+    //         $('#nama').removeAttr('readonly');
+    //         $('#alamat').removeAttr('readonly');
+    //         $('#tempat_lahir').removeAttr('readonly');
+    //         $('#umur').removeAttr('readonly');
+    //         $('#kelurahan').removeAttr('readonly');
+    //         $('#kecamatan').removeAttr('readonly');
+    //         $('#nama').focus();
 
-            $('#id_pasien').val("");
-            $('#nama').val("");
-            $('#alamat').val("");
-            $('#tempat_lahir').val("");
-            $('#tanggal_lahir').val("");
-            $('#umur').val("");
-            $('#kelurahan').val("");
-            $('#kecamatan').val("");
-            var now = "<?php echo date('d-m-Y'); ?>";
-            $('#tanggal').val(now);
+    //         $('#id_pasien').val("");
+    //         $('#nama').val("");
+    //         $('#alamat').val("");
+    //         $('#tempat_lahir').val("");
+    //         $('#tanggal_lahir').val("");
+    //         $('#umur').val("");
+    //         $('#kelurahan').val("");
+    //         $('#kecamatan').val("");
+    //         var now = "<?php echo date('d-m-Y'); ?>";
+    //         $('#tanggal').val(now);
 
-            $('#view_jk1').show();
-            $('#view_pendidikan1').show();
-            $('#view_agama1').show();
-            $('#view_goldar1').show();
-            $('#view_tgl_lahir1').show();
-            $('#view_kec1').show();
-            $('#view_kab_kota1').show();
-            $('#view_prov1').show();
+    //         $('#view_jk1').show();
+    //         $('#view_pendidikan1').show();
+    //         $('#view_agama1').show();
+    //         $('#view_goldar1').show();
+    //         $('#view_tgl_lahir1').show();
+    //         $('#view_kec1').show();
+    //         $('#view_kab_kota1').show();
+    //         $('#view_prov1').show();
 
-            $('#view_jk2').hide();
-            $('#view_pendidikan2').hide();
-            $('#view_agama2').hide();
-            $('#view_goldar2').hide();
-            $('#view_tgl_lahir2').hide();
-            $('#view_kec2').hide();
-            $('#view_kab_kota2').hide();
-            $('#view_prov2').hide();
-        }else{
-            $('#btn_history').show();
-            $('#id_pasien').val("");
-            $('#kode_pasien').val("");
-            $('#nama').val("");
-            $('#alamat').val("");
-            $('#tempat_lahir').val("");
-            $('#tanggal_lahir').val("");
-            $('#umur').val("");
-            $('#kelurahan').val("");
-            $('#kecamatan').val("");
+    //         $('#view_jk2').hide();
+    //         $('#view_pendidikan2').hide();
+    //         $('#view_agama2').hide();
+    //         $('#view_goldar2').hide();
+    //         $('#view_tgl_lahir2').hide();
+    //         $('#view_kec2').hide();
+    //         $('#view_kab_kota2').hide();
+    //         $('#view_prov2').hide();
+    //     }else{
+    //         $('#btn_history').show();
+    //         $('#id_pasien').val("");
+    //         $('#kode_pasien').val("");
+    //         $('#nama').val("");
+    //         $('#alamat').val("");
+    //         $('#tempat_lahir').val("");
+    //         $('#tanggal_lahir').val("");
+    //         $('#umur').val("");
+    //         $('#kelurahan').val("");
+    //         $('#kecamatan').val("");
 
-            $('#jenis_kelamin_txt').val("");
-            $('#jenis_kelamin_show').val("");
-            $('#pendidikan_txt').val("");
-            $('#agama_txt').val("");
-            $('#goldar_txt').val("");
-            $('#tanggal_txt').val("");
-            $('#kecamatan_txt').val("");
+    //         $('#jenis_kelamin_txt').val("");
+    //         $('#jenis_kelamin_show').val("");
+    //         $('#pendidikan_txt').val("");
+    //         $('#agama_txt').val("");
+    //         $('#goldar_txt').val("");
+    //         $('#tanggal_txt').val("");
+    //         $('#kecamatan_txt').val("");
 
-            $('#nama').attr('readonly','readonly');
-            $('#alamat').attr('readonly','readonly');
-            $('#tempat_lahir').attr('readonly','readonly');
-            $('#umur').attr('readonly','readonly');
-            $('#kelurahan').attr('readonly','readonly');
-            $('#kecamatan').attr('readonly','readonly');
-            $('.btn_pasien').removeAttr('disabled');
+    //         $('#nama').attr('readonly','readonly');
+    //         $('#alamat').attr('readonly','readonly');
+    //         $('#tempat_lahir').attr('readonly','readonly');
+    //         $('#umur').attr('readonly','readonly');
+    //         $('#kelurahan').attr('readonly','readonly');
+    //         $('#kecamatan').attr('readonly','readonly');
+    //         $('.btn_pasien').removeAttr('disabled');
 
-            $('#view_jk1').hide();
-            $('#view_pendidikan1').hide();
-            $('#view_agama1').hide();
-            $('#view_goldar1').hide();
-            $('#view_tgl_lahir1').hide();
-            $('#view_kec1').hide();
-            $('#view_kab_kota1').hide();
-            $('#view_prov1').hide();
+    //         $('#view_jk1').hide();
+    //         $('#view_pendidikan1').hide();
+    //         $('#view_agama1').hide();
+    //         $('#view_goldar1').hide();
+    //         $('#view_tgl_lahir1').hide();
+    //         $('#view_kec1').hide();
+    //         $('#view_kab_kota1').hide();
+    //         $('#view_prov1').hide();
 
-            $('#view_jk2').show();
-            $('#view_pendidikan2').show();
-            $('#view_agama2').show();
-            $('#view_goldar2').show();
-            $('#view_tgl_lahir2').show();
-            $('#view_kec2').show();
-            $('#view_kab_kota2').show();
-            $('#view_prov2').show();
-        }
-    });
+    //         $('#view_jk2').show();
+    //         $('#view_pendidikan2').show();
+    //         $('#view_agama2').show();
+    //         $('#view_goldar2').show();
+    //         $('#view_tgl_lahir2').show();
+    //         $('#view_kec2').show();
+    //         $('#view_kab_kota2').show();
+    //         $('#view_prov2').show();
+    //     }
+    // });
 
     $('#batal').click(function(){
         window.location = "<?php echo base_url(); ?>admum/admum_pasien_rj_c";
@@ -154,6 +155,17 @@ function get_kode_pasien(){
     });
 }
 
+function get_barcode(){
+    $.ajax({
+        url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/get_barcode',
+        type : "POST",
+        dataType : "json",
+        success : function(res){
+            $('#barcode').val(res);
+        }
+    });
+}
+
 function data_provinsi(){
     var id_kota_kab = $('#kota').val();
     $.ajax({
@@ -190,19 +202,15 @@ function load_data_pasien(){
                 for(var i=0; i<result.length; i++){
                     no++; 
 
-                    var jk = "";
-                    if(result[i].JENIS_KELAMIN == "L"){
-                        jk = "Laki - Laki";
-                    }else{
-                        jk = "Perempuan";
-                    }
+                    result[i].NAMA_ORTU = result[i].NAMA_ORTU==null?"-":result[i].NAMA_ORTU;
 
                     $tr += "<tr style='cursor:pointer;' onclick='klik_pasien("+result[i].ID+");'>"+
                                 "<td style='text-align:center;'>"+no+"</td>"+
                                 "<td>"+result[i].KODE_PASIEN+"</td>"+
                                 "<td>"+result[i].NAMA+"</td>"+
-                                "<td style='text-align:center;'>"+jk+"</td>"+
-                                "<td style='text-align:center;'>"+result[i].UMUR+" Tahun</td>"+
+                                "<td style='text-align:center;'>"+result[i].JENIS_KELAMIN+"</td>"+
+                                "<td>"+result[i].NAMA_ORTU+"</td>"+
+                                "<td>"+result[i].UMUR+" Tahun</td>"+
                             "</tr>";
                 }
             }
@@ -225,26 +233,7 @@ function klik_pasien(id){
         type : "POST",
         dataType : "json",
         success : function(row){
-            $('#view_jk1').hide();
-            $('#view_pendidikan1').hide();
-            $('#view_agama1').hide();
-            $('#view_goldar1').hide();
-            $('#view_tgl_lahir1').hide();
-            $('#view_kec1').hide();
-            $('#view_kab_kota1').hide();
-            $('#view_prov1').hide();
-
-            $('#view_jk2').show();
-            $('#view_pendidikan2').show();
-            $('#view_agama2').show();
-            $('#view_goldar2').show();
-            $('#view_tgl_lahir2').show();
-            $('#view_kec2').show();
-            $('#view_kab_kota2').show();
-            $('#view_prov2').show();
-
             $('#id_pasien').val(id);
-            $('#id_pasien2').val(id);
             $('#kode_pasien').val(row['KODE_PASIEN']);
             $('#nama').val(row['NAMA']);
             row['PENDIDIKAN'] = (row['PENDIDIKAN']==null?"-":row['PENDIDIKAN']);
@@ -264,18 +253,15 @@ function klik_pasien(id){
             $('#alamat').val(row['ALAMAT']);
             $('#goldar_txt').val(row['GOLONGAN_DARAH']);
             $('#tempat_lahir').val(row['TEMPAT_LAHIR']);
-            $('#tanggal_txt').val(row['TANGGAL_LAHIR']);
+            $('#tanggal_lahir').val(row['TANGGAL_LAHIR']);
             $('#umur').val(row['UMUR']);
+            $('#umur_bulan').val(row['UMUR_BULAN']);
+            $('#nama_ortu').val(row['NAMA_ORTU']);
+            $('#telepon').val(row['TELEPON']);
             $('#kelurahan').val(row['KELURAHAN']);
-            $('#kecamatan_txt').val(row['KECAMATAN']);
-            $('#kota_txt').val(row['KOTA']);
-            $('#provinsi_txt').val(row['PROVINSI']);
-
-            $('#nama').attr('readonly','readonly');
-            $('#alamat').attr('readonly','readonly');
-            $('#tempat_lahir').attr('readonly','readonly');
-            $('#umur').attr('readonly','readonly');
-            $('#kelurahan').attr('readonly','readonly');
+            $('#kecamatan').val(row['KECAMATAN']);
+            $('#kota').val(row['KOTA']);
+            $('#provinsi').val(row['PROVINSI']);
         }
     });
 }
@@ -305,6 +291,7 @@ function load_poli(){
                                 "<td style='text-align:center;'>"+no+"</td>"+
                                 "<td>"+result[i].NAMA_POLI+"</td>"+
                                 "<td>"+result[i].NAMA_DOKTER+"</td>"+
+                                "<td style='text-align:right;'>"+formatNumber(result[i].BIAYA)+"</td>"+
                             "</tr>";
                 }
             }
@@ -330,6 +317,7 @@ function klik_poli(id){
             $('#id_poli').val(id);
             $('#poli_tujuan').val(row['NAMA_POLI']);
             $('#dokter').val(row['NAMA_DOKTER']);
+            $('#biaya').val(formatNumber(row['BIAYA']));
         }
     });
 }
@@ -722,83 +710,51 @@ function Search_tgl_RI(tgl){
 <input type="hidden" id="ord_tmp" value="" />
 <div class="col-sm-12">
     <form class="form-horizontal" role="form" action="<?php echo $url_simpan; ?>" method="post" id="form_pasien_baru">
+        <input type="hidden" class="jml_antrian_now" name="jumlah_antrian" value="">
+        <input type="hidden" id="barcode" name="barcode" value="">
         <div class="card-box">
             <div class="row">
         		<div class="col-lg-6">
                     <div class="form-group">
-                        <label class="col-md-3 control-label">No. RM</label>
-                        <div class="col-md-5">
-                            <input type="hidden" name="id_pasien" id="id_pasien" value="">
-                            <input type="hidden" class="form-control" name="id_pasien2" id="id_pasien2" value="" readonly>
-                            <input type="text" class="form-control" name="kode_pasien" id="kode_pasien" value="" readonly>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="checkbox checkbox-primary">
-                                <input id="baru" type="checkbox" name="baru" value="1">
-                                <label for="baru">
-                                    Baru
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
                         <label class="col-md-3 control-label">Nama Lengkap</label>
                         <div class="col-md-9">
                             <div class="input-group">
-                                <input type="text" class="form-control" name="nama" id="nama" value="" required="required">
+                                <input type="text" class="form-control" name="nama" id="nama" value="" placeholder="klik disini..." readonly required>
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-success btn_pasien"><i class="fa fa-search"></i></button>
                                 </span>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group" id="view_jk1">
-                        <label class="col-md-3 control-label">Jenis Kelamin</label>
-                        <div class="col-md-9">
-                            <select class="form-control select2" name="jenis_kelamin">
-                                <option value="L">Laki - Laki</option>
-                                <option value="P">Perempuan</option>
-                            </select>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">No. RM</label>
+                        <div class="col-md-5">
+                            <input type="hidden" name="id_pasien" id="id_pasien" value="">
+                            <input type="text" class="form-control" name="kode_pasien" id="kode_pasien" value="" readonly>
                         </div>
+                        <!-- <div class="col-md-3">
+                            <div class="checkbox checkbox-primary">
+                                <input id="baru" type="checkbox" name="baru" value="1">
+                                <label for="baru">
+                                    Baru
+                                </label>
+                            </div>
+                        </div> -->
                     </div>
-                    <div class="form-group" id="view_jk2">
+                    <div class="form-group">
                         <label class="col-md-3 control-label">Jenis Kelamin</label>
                         <div class="col-md-9">
                             <input type="hidden" class="form-control" name="jenis_kelamin_txt" id="jenis_kelamin_txt" value="">
                             <input type="text" class="form-control" id="jenis_kelamin_show" value="" readonly>
                         </div>
                     </div>
-                    <div class="form-group" id="view_pendidikan1">
-                        <label class="col-md-3 control-label">Pendidikan</label>
-                        <div class="col-md-9">
-                            <select class="form-control select2" name="pendidikan">
-                                <option value="SD">SD</option>
-                                <option value="SMP">SMP</option>
-                                <option value="SMK/SMA">SMK / SMA</option>
-                                <option value="Kuliah">Kuliah</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group" id="view_pendidikan2">
+                    <div class="form-group">
                         <label class="col-md-3 control-label">Pendidikan</label>
                         <div class="col-md-9">
                             <input type="text" class="form-control" name="pendidikan_txt" id="pendidikan_txt" value="" readonly>
                         </div>
                     </div>
-                    <div class="form-group" id="view_agama1">
-                        <label class="col-md-3 control-label">Agama</label>
-                        <div class="col-md-9">
-                            <select class="form-control select2" name="agama" id="agama">
-                                <option value="Islam">Islam</option>
-                                <option value="Kristen Katolik">Kristen Katolik</option>
-                                <option value="Kristen Protestan">Kristen Protestan</option>
-                                <option value="Hindu">Hindu</option>
-                                <option value="Budha">Budha</option>
-                                <option value="Konghucu">Konghucu</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group" id="view_agama2">
+                    <div class="form-group">
                         <label class="col-md-3 control-label">Agama</label>
                         <div class="col-md-9">
                             <input type="text" class="form-control" name="agama_txt" id="agama_txt" value="" readonly>
@@ -807,138 +763,94 @@ function Search_tgl_RI(tgl){
                     <div class="form-group">
                         <label class="col-md-3 control-label">Alamat</label>
                         <div class="col-md-9">
-                            <textarea rows="5" class="form-control" name="alamat" id="alamat" required="required"></textarea>
+                            <textarea rows="5" class="form-control" name="alamat" id="alamat" readonly></textarea>
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="col-md-3 control-label">Golongan Darah</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" name="goldar_txt" id="goldar_txt" value="" readonly>
+                        </div>
+                    </div>
+                    <!-- <div class="form-group">
                         <label class="col-md-3 control-label"></label>
                         <div class="col-md-9">
                             <button type="button" id="btn_history" onclick="get_history_medik();" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target=".bs-example-modal-lg">
                                <i class="fa fa-history"></i> History Rekam Medik
                             </button>
                         </div>
-                    </div>
+                    </div> -->
         		</div>
 
         		<div class="col-lg-6">
-                    <div class="form-group" id="view_goldar1">
-                        <label class="col-md-3 control-label">Golongan Darah</label>
-                        <div class="col-md-9">
-                            <select class="form-control select2" name="golongan_darah">
-                                <option value="A">A</option>
-                                <option value="B">B</option>
-                                <option value="O">O</option>
-                                <option value="AB">AB</option>
-                                <option value="Tidak Tahu">-</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group" id="view_goldar2">
-                        <label class="col-md-3 control-label">Golongan Darah</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="goldar_txt" id="goldar_txt" value="" readonly>
-                        </div>
-                    </div>
                     <div class="form-group">
                         <label class="col-md-3 control-label">Tempat Lahir</label>
                         <div class="col-md-9">
-                            <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" value="" required="required">
+                            <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" value="" readonly>
                         </div>
                     </div>
-                    <div class="form-group" id="view_tgl_lahir1">
+                    <div class="form-group">
                         <label class="col-md-3 control-label">Tanggal Lahir</label>
                         <div class="col-md-9">
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                <input type="text" class="form-control datepicker-here" name="tanggal_lahir" id="tanggal_lahir" value="" required="required" data-language="en" data-date-format="dd-mm-yyyy" readonly>
+                                <input type="text" class="form-control" name="tanggal_lahir" id="tanggal_lahir" value="" readonly>
                             </div>
-                        </div>
-                    </div>
-                    <div class="form-group" id="view_tgl_lahir2">
-                        <label class="col-md-3 control-label">Tanggal Lahir</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="tanggal_txt" id="tanggal_txt" value="" readonly>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-3 control-label">Umur</label>
-                        <div class="col-md-9">
+                        <div class="col-md-3">
                             <div class="input-group">
-                                <input type="text" class="form-control num_only" name="umur" id="umur" value="" required="required" maxlength="3">
+                                <input type="text" class="form-control num_only" name="umur" id="umur" value="" maxlength="3" readonly>
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-warning" style="cursor:default;">Tahun</button>
                                 </span>
                             </div>
                         </div>
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control num_only" name="umur_bulan" id="umur_bulan" value="" maxlength="3" readonly>
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-warning" style="cursor:default;">Bulan</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">Nama Orang Tua</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" name="nama_ortu" id="nama_ortu" value="" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">Telepon</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control num_only" name="telepon" id="telepon" value="" maxlength="13" readonly>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-3 control-label">Kelurahan</label>
                         <div class="col-md-9">
-                            <input type="text" class="form-control" name="kelurahan" id="kelurahan" value="" required="required">
+                            <input type="text" class="form-control" name="kelurahan" id="kelurahan" value="" readonly>
                         </div>
                     </div>
-                    <div class="form-group" id="view_kec1">
+                    <div class="form-group">
                         <label class="col-md-3 control-label">Kecamatan</label>
                         <div class="col-md-9">
-                            <input type="text" class="form-control" name="kecamatan" id="kecamatan" value="">
+                            <input type="text" class="form-control" name="kecamatan" id="kecamatan" value="" readonly>
                         </div>
                     </div>
-                    <div class="form-group" id="view_kec2">
-                        <label class="col-md-3 control-label">Kecamatan</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="kecamatan_txt" id="kecamatan_txt" value="" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group" id="view_kab_kota1">
+                    <div class="form-group">
                         <label class="col-md-3 control-label">Kabupaten / Kota</label>
                         <div class="col-md-9">
-                            <select class="form-control select2" name="kota" id="kota" onchange="data_provinsi();">
-                            <?php
-                            $dt = $this->model->default_lokasi();
-                            $data_kota = $this->model->kota_kab();
-                            $id_prov_default = "";
-                            $prov_default = "";
-
-                            if($dt == null || $dt == ""){
-
-                            }else{
-                                foreach ($dt as $value) {
-                                    foreach ($data_kota as $val_kota) {
-                                        $selected = "";
-                                        if(($val_kota->lokasi_propinsi == $value->ID_PROVINSI) && ($val_kota->lokasi_kabupatenkota == $value->ID_KOTA_KAB)){
-                                            $selected = "selected='selected'";
-                                            $id_prov_default = $val_kota->lokasi_propinsi;
-                                            $prov_default = $val_kota->PROV;
-                                        }else{
-                                            $selected = "";
-                                        }
-                            ?>
-                                <option value="<?php echo $val_kota->KOTA; ?>" <?php echo $selected;?> ><?php echo $val_kota->KOTA; ?></option>
-                            <?php
-                                    }
-                                }
-                            }
-                            ?>
-                            </select>
+                            <input type="text" class="form-control" name="kota" id="kota" value="" readonly>
                         </div>
                     </div>
-                    <div class="form-group" id="view_kab_kota2">
-                        <label class="col-md-3 control-label">Kabupaten / Kota</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="kota_txt" id="kota_txt" value="" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group" id="view_prov1">
+                    <div class="form-group">
                         <label class="col-md-3 control-label">Provinsi</label>
                         <div class="col-md-9">
-                            <input type="hidden" name="id_provinsi" id="id_provinsi" value="<?php echo $id_prov_default; ?>">
-                            <input type="text" class="form-control" name="provinsi" id="provinsi" value="<?php echo $prov_default; ?>" readonly="readonly">
-                        </div>
-                    </div>
-                    <div class="form-group" id="view_prov2">
-                        <label class="col-md-3 control-label">Provinsi</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="provinsi_txt" id="provinsi_txt" value="" readonly>
+                            <input type="text" class="form-control" name="provinsi" id="provinsi" value="" readonly>
                         </div>
                     </div>
         		</div>
@@ -963,13 +875,26 @@ function Search_tgl_RI(tgl){
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-3 control-label">Tanggal</label>
+                        <label class="col-md-3 control-label">Tanggal Datang</label>
                         <div class="col-md-9">
                             <input type="text" class="form-control" name="tanggal" id="tanggal" value="<?php echo date('d-m-Y'); ?>" readonly>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">&nbsp;</label>
+                        <div class="col-md-9">
+                            <div class="radio radio-success radio-inline">
+                                <input type="radio" id="inlineRadio1" value="1" name="pilihan" checked>
+                                <label for="inlineRadio1"> Poli </label>
+                            </div>
+                            <div class="radio radio-success radio-inline">
+                                <input type="radio" id="inlineRadio2" value="2" name="pilihan">
+                                <label for="inlineRadio2"> Laborat </label>
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="col-md-3 control-label">Poli Tujuan</label>
                         <div class="col-md-9">
@@ -989,21 +914,16 @@ function Search_tgl_RI(tgl){
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-3 control-label">Sistem Bayar</label>
+                        <label class="col-md-3 control-label">Biaya</label>
                         <div class="col-md-9">
-                            <select class="form-control select2" name="sistem_bayar">
-                                <option value="Umum">Umum</option>
-                                <option value="BPJS">BPJS Kesehatan</option>
-                                <option value="PJKA">PJKA</option>
-                                <option value="JAMKESDA">JAMKESDA</option>
-                            </select>
+                            <input type="text" class="form-control" id="biaya" value="" readonly>
                         </div>
                     </div>
                 </div>
             </div>
             <hr>
             <center>
-                <input type="submit" class="btn btn-success m-b-5" value="daftar"><i class="fa fa-check"></i> <span><b>Daftar</b></span></button>
+                <button type="submit" class="btn btn-success m-b-5" value="daftar"><i class="fa fa-check"></i> <span><b>Daftar</b></span></button>
                 <button type="button" class="btn btn-danger m-b-5" id="batal"><i class="fa fa-times"></i> <span><b>Batal</b></span></button>
             </center>
         </div>
@@ -1011,9 +931,9 @@ function Search_tgl_RI(tgl){
 </div>
 
 <!-- //LOAD PASIEN -->
-<button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal1" id="popup_pasien" style="display:none;">Standard Modal</button>
-<div id="myModal1" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal" id="popup_pasien" style="display:none;">Standard Modal</button>
+<div id="myModal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -1043,6 +963,7 @@ function Search_tgl_RI(tgl){
                                     <th style="text-align:center; color: #fff;">No. RM</th>
                                     <th style="text-align:center; color: #fff;">Nama Pasien</th>
                                     <th style="text-align:center; color: #fff;">Jenis Kelamin</th>
+                                    <th style="text-align:center; color: #fff;">Nama Orang Tua</th>
                                     <th style="text-align:center; color: #fff;">Umur</th>
                                 </tr>
                             </thead>
@@ -1093,6 +1014,7 @@ function Search_tgl_RI(tgl){
                                     <th style="text-align:center; color: #fff;" width="50">No</th>
                                     <th style="text-align:center; color: #fff;">Nama Poli</th>
                                     <th style="text-align:center; color: #fff;">Dokter</th>
+                                    <th style="text-align:center; color: #fff;">Biaya</th>
                                 </tr>
                             </thead>
                             <tbody>

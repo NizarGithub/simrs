@@ -8,7 +8,7 @@
 
         <link rel="shortcut icon" href="<?php echo base_url(); ?>picture/favicon.png"> 
 
-        <title> ANTRIAN </title>
+        <title> <?php echo $title; ?> </title>
 
         <!-- form Uploads -->
         <link href="<?php echo base_url(); ?>assets/plugins/fileuploads/css/dropify.min.css" rel="stylesheet" type="text/css" />
@@ -48,9 +48,7 @@
         <link href="<?php echo base_url(); ?>css-devan/warna.css" rel="stylesheet" type="text/css" />
         <link href="<?php echo base_url(); ?>css-devan/style-devan.css" rel="stylesheet" type="text/css" />
         <script src="<?php echo base_url(); ?>assets/js/modernizr.min.js"></script>
-
     </head>
-
 
     <body onload="startTime()">
         <div class="wrapper" style="margin-top: 30px; background-color:#2B82AD;">

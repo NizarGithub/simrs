@@ -6,7 +6,7 @@
         <meta name="description" content="A fully featured admin theme which can be used to build CRM, CMS, etc.">
         <meta name="author" content="Coderthemes">
 
-        <link rel="shortcut icon" href="<?php echo base_url(); ?>picture/portal/logoBPJS.ico">
+        <link rel="shortcut icon" href="<?php echo base_url(); ?>picture/Indonesian_Red_Cross_Society_logo.png">
 
         <title><?php echo $title; ?></title>
 
@@ -53,7 +53,30 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
+        <style type="text/css">
+        #ketap_ketip{
+            display: none;
+        }
 
+        #popup_pasien_baru {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            background: rgba(0,0,0,.7);
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            display: none;
+        }
+        .window_pasien_baru {
+            width:50%;
+            height:auto;
+            position: relative;
+            padding: 10px;
+            margin: 2% auto;
+            background-color: #fff;
+        }
+        </style>
         <script src="<?php echo base_url(); ?>assets/js/modernizr.min.js"></script>
     </head>
 
@@ -61,13 +84,14 @@
         $sess_user = $this->session->userdata('masuk_rs');
         $id_user = $sess_user['id'];
         $user = $this->master_model_m->get_user_info($id_user);
+        $level = $user->LEVEL;
     ?>
 
     <body>
 
         <!-- Navigation Bar-->
         <header id="topnav">
-            <div class="topbar-main" style="background-color:#a26eea; height:60px;">
+            <div class="topbar-main" style="background-color:#3be8b0; height:60px;">
                 <div class="container">
 
                     <!-- LOGO -->
@@ -79,26 +103,47 @@
                     <!-- End Logo container-->
 
                     <div class="menu-extras">                        
-                        <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#954a97;">
+                        <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#11862f;">
                             <li>
                                 <form role="search" class="navbar-left app-search pull-left hidden-xs" style="margin-right:0px;">
-                                    <h5 style="color:#5cc3e8; font-size: 14px; font-weight:bold;"><?=strtoupper($user->NAMA);?></h5>
-                                    <h6 style="color:#FFF; font-size: 13px;"> <?=$user->JABATAN;?> </h6>
+                                    <h5 style="color:#fff;"><b><?php echo strtoupper($user->NAMA_DIV);?></b></h5>
+                                    <h6 style="color:#fff;"><b><?php echo $user->NAMA;?></b></h6>
+                                    <!-- <h6 style="color:#fff;"><b><?php //echo $user->JABATAN;?></b></h6> -->
                                 </form>
                             </li>
                             <li class="dropdown user-box">
                                 <a href="" class="dropdown-toggle waves-effect waves-light profile " data-toggle="dropdown" aria-expanded="true">
                                     <img src="<?php echo base_url(); ?>files/foto_pegawai/<?=$user->FOTO;?>" alt="user-img" class="img-circle user-img">
-                                    <div class="user-status away"><i class="zmdi zmdi-dot-circle"></i></div>
                                 </a>
 
                                 <ul class="dropdown-menu">
+                                    <?php if($level == null){ ?>
                                     <li><a href="<?php echo base_url(); ?>portal"><i class="fa fa-th m-r-5"></i> Portal Depan</a></li>
+                                    <?php } ?>
                                     <li><a href="javascript:void(0)"><i class="ti-user m-r-5"></i> Profile</a></li>
                                     <li><a href="javascript:void(0)"><i class="ti-settings m-r-5"></i> Settings</a></li>
                                     <li><a href="javascript:void(0)"><i class="ti-lock m-r-5"></i> Lock screen</a></li>
                                     <li><a href="<?=base_url();?>logout"><i class="ti-power-off m-r-5"></i> Logout</a></li>
                                 </ul>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <!-- Notification -->
+                                <div class="notification-box">
+                                    <ul class="list-inline m-b-0">
+                                        <li>
+                                            <a class="right-bar-toggle" href="javascript:void(0);" onclick="$('#popup_pasien_baru').show();">
+                                                <i class="fa fa-bell-o"></i>
+                                            </a>
+                                            <span class="badge badge-danger" id="tot_pasien">0</span>
+                                            <div class="noti-dot">
+                                                <span class="dot" id="ketap_ketip"></span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- End Notification bar -->
                             </li>
                         </ul>
                         <div class="menu-item">
@@ -129,7 +174,7 @@
                             </li>
 
                             <?PHP 
-                            $get_menu2 = $this->master_model_m->get_menu_2($id_user, 13);
+                            $get_menu2 = $this->master_model_m->get_menu_2($id_user, 17);
                             foreach ($get_menu2 as $key => $menu2) {
                             ?>
 
@@ -172,12 +217,7 @@
 
         <div class="wrapper">
             <div class="container">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <h4 class="page-title"><?php echo $subtitle; ?></h4>
-                    </div>
-                </div>
-
+                <br>
                 <div class="row">
                     <?php $this->load->view($page); ?>
                 </div>
@@ -191,9 +231,9 @@
                             </div>
                             <div class="col-xs-6">
                                 <ul class="pull-right list-inline m-b-0">
-                                    <li>
-                                        <a href="<?php echo base_url(); ?>portal" style="color:#887d59;"><i class="fa fa-th"></i> Portal Depan</a>
-                                    </li>
+                                    <?php if($level == null){ ?>
+                                    <li><a href="<?php echo base_url(); ?>portal"><i class="fa fa-th m-r-5"></i> Portal Depan</a></li>
+                                    <?php } ?>
                                     <li>
                                         <a href="#" style="color:#887d59;"><i class="fa fa-info-circle"></i> Tentang</a>
                                     </li>
@@ -213,82 +253,31 @@
             </div>
             <!-- end container -->
 
-
-
-            <!-- Right Sidebar -->
-            <div class="side-bar right-bar">
-                <a href="javascript:void(0);" class="right-bar-toggle">
-                    <i class="zmdi zmdi-close-circle-o"></i>
-                </a>
-                <h4 class="">T`H`E`M`E`L`O`C`K`.`C`O`M`</h4>
-                <div class="notification-list nicescroll">
-                    <ul class="list-group list-no-border user-list">
-                        <li class="list-group-item">
-                            <a href="#" class="user-list-item">
-                                <div class="avatar">
-                                    <img src="assets/images/users/avatar-2.jpg" alt="">
-                                </div>
-                                <div class="user-desc">
-                                    <span class="name">Michael Zenaty</span>
-                                    <span class="desc">There are new settings available</span>
-                                    <span class="time">2 hours ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="#" class="user-list-item">
-                                <div class="icon bg-info">
-                                    <i class="zmdi zmdi-account"></i>
-                                </div>
-                                <div class="user-desc">
-                                    <span class="name">New Signup</span>
-                                    <span class="desc">There are new settings available</span>
-                                    <span class="time">5 hours ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="#" class="user-list-item">
-                                <div class="icon bg-pink">
-                                    <i class="zmdi zmdi-comment"></i>
-                                </div>
-                                <div class="user-desc">
-                                    <span class="name">New Message received</span>
-                                    <span class="desc">There are new settings available</span>
-                                    <span class="time">1 day ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="list-group-item active">
-                            <a href="#" class="user-list-item">
-                                <div class="avatar">
-                                    <img src="assets/images/users/avatar-3.jpg" alt="">
-                                </div>
-                                <div class="user-desc">
-                                    <span class="name">James Anderson</span>
-                                    <span class="desc">There are new settings available</span>
-                                    <span class="time">2 days ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="list-group-item active">
-                            <a href="#" class="user-list-item">
-                                <div class="icon bg-warning">
-                                    <i class="zmdi zmdi-settings"></i>
-                                </div>
-                                <div class="user-desc">
-                                    <span class="name">Settings</span>
-                                    <span class="desc">There are new settings available</span>
-                                    <span class="time">1 day ago</span>
-                                </div>
-                            </a>
-                        </li>
-
-                    </ul>
+            <div id="popup_pasien_baru">
+                <div class="window_pasien_baru">
+                    <div class="table-responsive">
+                        <table id="tabel_pasien_home" class="table table-hover table-bordered">
+                            <thead>
+                                <tr class="kuning_popup">
+                                    <th style="color:#fff; text-align:center;">#</th>
+                                    <th style="color:#fff; text-align:center;">No</th>
+                                    <th style="color:#fff; text-align:center;">No. RM</th>
+                                    <th style="color:#fff; text-align:center;">Tgl / Waktu</th>
+                                    <th style="color:#fff; text-align:center;">Nama Pasien</th>
+                                    <th style="color:#fff; text-align:center;">JK</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>
+                <center>
+                    <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal" id="tutup_pas">Tutup</button>
+                </center>
                 </div>
             </div>
-            <!-- /Right-bar -->
-
         </div>
 
         <!-- jQuery  -->
@@ -356,26 +345,32 @@
         <!-- Include English language -->
         <script src="<?php echo base_url(); ?>dist/js/i18n/datepicker.en.js"></script>
         <script type="text/javascript">
+        var snd = new Audio("<?php echo base_url(); ?>sound/nokia_tune_new.mp3"); // buffers automatically when created
+        var timer = 0;
+        var level = "<?php echo $level; ?>";
+
         jQuery(document).ready(function() {
-
-            <?PHP if($msg == 1){?>
-                notif_simpan(); 
-            <?PHP } ?> 
-
-            <?PHP if($msg == 2){?>
-                notif_ubah();
-            <?PHP } ?>
-
-            <?PHP if($msg == 3){?>
-                notif_hapus();
-            <?PHP } ?>
-
             $('#datatable').dataTable();
             $('#datatable-keytable').DataTable( { keys: true } );
             $('#datatable-responsive').DataTable();
             $('#datatable-scroller').DataTable( { ajax: "<?php echo base_url(); ?>assets/plugins/datatables/json/scroller-demo.json", deferRender: true, scrollY: 380, scrollCollapse: true, scroller: true } );
             var table = $('#datatable-fixed-header').DataTable( { fixedHeader: true } );
             $(".select2").select2();
+
+            get_notif_pasien();
+
+            if(level == null || level == ""){
+                
+            }else{
+                get_notif_pasien();
+                timer = setInterval(function () {
+                    get_notif_pasien();
+                }, 5000);
+            }
+
+            $('#tutup_pas').click(function(){
+                $('#popup_pasien_baru').fadeOut();
+            });
         });
 
         TableManageButtons.init();
@@ -391,6 +386,100 @@
                 'fileSize': 'The file size is too big (1M max).'
             }
         });
+
+        function get_notif_pasien(){
+            var keyword = "";
+
+            $.ajax({
+                url : '<?php echo base_url(); ?>lab/lab_home_c/data_pasien',
+                data : {keyword:keyword},
+                type : "GET",
+                dataType : "json",
+                success : function(res){
+                    if(res.length == 0){
+                        $('#ketap_ketip').hide();
+                    }else{
+                        for(var i=0; i<res.length; i++){
+                            if(res[i].STS_TERIMA == '1'){
+                                $('#ketap_ketip').show();
+                                snd.play();
+                                notif_pasien_baru();
+                                $('#popup_pasien_baru').show();
+                                data_pasien_baru();
+                            }else{
+                                $('#ketap_ketip').hide();
+                            }
+                        }
+                    }
+
+                    $('#tot_pasien').html(res.length);
+                }
+            });
+        }
+
+        function data_pasien_baru(){
+            var keyword = "";
+            var urutkan = "";
+            var pilih_umur = "";
+            var pilih_status = "";
+
+            $.ajax({
+                url : '<?php echo base_url(); ?>lab/lab_home_c/data_pasien',
+                data : {
+                    keyword:keyword,
+                    urutkan:urutkan,
+                    pilih_umur:pilih_umur,
+                    pilih_status:pilih_status
+                },
+                type : "GET",
+                dataType : "json",
+                success : function(result){
+                    $tr = "";
+
+                    if(result == "" || result == null){
+                        $tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+                    }else{
+                        var no = 0;
+
+                        for(var i=0; i<result.length; i++){
+                            no++;
+                            
+                            var aksi = '<div class="checkbox checkbox-primary">'+
+                                        '    <input id="checkbox'+result[i].ID+'" type="checkbox" name="centang[]" value="'+result[i].ID+'" onclick="terima_pasien('+result[i].ID+');">'+
+                                        '    <label for="checkbox'+result[i].ID+'">&nbsp;</label>'+
+                                        '</div>';
+
+                            $tr +=  '<tr>'+
+                                    '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].KODE_PASIEN+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].TANGGAL_DAFTAR+' - '+result[i].WAKTU_DAFTAR+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
+                                    '</tr>';
+                        }
+                    }
+
+                    $('#tabel_pasien_home tbody').html($tr);
+                }
+            });
+        }
+
+        function terima_pasien(id){
+            $.ajax({
+                url : '<?php echo base_url(); ?>lab/lab_home_c/terima_pasien',
+                data : {id:id},
+                type : "POST",
+                dataType : "json",
+                success : function(res){
+                    snd.pause();
+                    $('#popup_pasien_baru').fadeOut();
+                    // console.log(res);
+                    data_pasien();
+                    get_notif_pasien();
+                }
+            });
+        }
         </script>
     </body>
 </html>

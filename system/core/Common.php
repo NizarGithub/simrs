@@ -305,6 +305,14 @@
 		$_error->show_404($page, $log_error);
 		exit;
 	}
+	
+	// function show_404(){
+	  // $ci = get_instance();
+	  // $ci->output->set_status_header(404);
+	  // $ci->load->view('page_not_found_v');
+	  // echo $ci->output->get_output();
+	  // exit(4);
+	// }
 
 // ------------------------------------------------------------------------
 

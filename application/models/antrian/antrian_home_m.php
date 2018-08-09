@@ -18,10 +18,9 @@ class Antrian_home_m extends CI_Model
 	function getDataAntrian(){
 		$tgl = date('d-m-Y');
 		$sql =  "
-		SELECT a.KODE, MAX(a.URUT) AS URUT, b.NAMA_LOKET FROM kepeg_antrian a
-		JOIN kepeg_loket b ON a.ID_KODE = b.KODE_ANTRIAN		
+		SELECT a.KODE, MAX(a.URUT) AS URUT, 'Admission' AS NAMA_LOKET FROM kepeg_antrian a
 		WHERE a.TGL LIKE '%$tgl%'
-		GROUP BY a.KODE, b.NAMA_LOKET
+		GROUP BY a.KODE
 		";
 
 		return $this->db->query($sql)->result();
@@ -30,10 +29,9 @@ class Antrian_home_m extends CI_Model
 	function getDataAntrian_last(){
 		$tgl = date('d-m-Y');
 		$sql =  "
-		SELECT a.KODE, MAX(a.URUT) AS URUT, b.NAMA_LOKET FROM kepeg_antrian a
-		JOIN kepeg_loket b ON a.ID_KODE = b.KODE_ANTRIAN		
+		SELECT a.KODE, MAX(a.URUT) AS URUT, 'Admission' AS NAMA_LOKET FROM kepeg_antrian a
 		WHERE a.TGL LIKE '%$tgl%'
-		GROUP BY a.KODE, b.NAMA_LOKET
+		GROUP BY a.KODE
 		ORDER BY a.ID DESC
 		";
 

@@ -38,8 +38,8 @@
 |
 */
 
-$route['default_controller'] = "login_c";
-$route['404_override'] = '';
+$route['default_controller'] = "portal_pasien";
+$route['404_override'] = 'page_not_found';
 
 
 /* End of file routes.php */

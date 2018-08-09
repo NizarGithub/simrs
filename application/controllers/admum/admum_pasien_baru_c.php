@@ -125,9 +125,23 @@ class Admum_pasien_baru_c extends CI_Controller {
 		}
 	}
 
+	function next_antri(){
+		$kode_antrian = $this->input->post('kode_antrian');
+		$jml_antrian  = $this->input->post('jml_antrian');
+		$id_antrian   = $this->input->post('id_antrian');
+
+		$this->model->simpanAntrian($kode_antrian, $jml_antrian, $id_antrian);
+
+		echo json_encode(1);
+	}
+
 	function simpan(){
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
 		$kode_pasien = $this->input->post('kode_pasien');
 		$tanggal_daftar = date('d-m-Y');
+		$waktu_daftar = $format->format('H:i:s');
 		$nama = addslashes($this->input->post('nama'));
 		$jenis_kelamin = $this->input->post('jenis_kelamin');
 		$pendidikan = $this->input->post('pendidikan');
@@ -137,6 +151,9 @@ class Admum_pasien_baru_c extends CI_Controller {
 		$tempat_lahir = addslashes($this->input->post('tempat_lahir'));
 		$tanggal_lahir = $this->input->post('tanggal_lahir');
 		$umur = $this->input->post('umur');
+		$umur_bulan = $this->input->post('umur_bulan');
+		$nama_ortu = $this->input->post('nama_ortu');
+		$telepon = $this->input->post('telepon');
 		$kelurahan = addslashes($this->input->post('kelurahan'));
 		$kecamatan = addslashes($this->input->post('kecamatan'));
 		$kota = addslashes($this->input->post('kota'));
@@ -145,6 +162,7 @@ class Admum_pasien_baru_c extends CI_Controller {
 		$this->model->simpan(
 			$kode_pasien,
 			$tanggal_daftar,
+			$waktu_daftar,
 			$nama,
 			$jenis_kelamin,
 			$pendidikan,
@@ -154,6 +172,9 @@ class Admum_pasien_baru_c extends CI_Controller {
 			$tempat_lahir,
 			$tanggal_lahir,
 			$umur,
+			$umur_bulan,
+			$nama_ortu,
+			$telepon,
 			$kelurahan,
 			$kecamatan,
 			$kota,
@@ -195,8 +216,6 @@ class Admum_pasien_baru_c extends CI_Controller {
 		$data['dataDetOksigen_RI'] = $this->model->dataDetOksigen_RI($id_pasien, '');
 		$data['dataDetDiagnosa_RI'] = $this->model->dataDetDiagnosa_RI($id_pasien, '');
 		$data['dataDetResep_RI'] = $this->model->dataDetResep_RI($id_pasien, '');
-
-		
 
 		echo json_encode($data);
 	}

@@ -48,9 +48,8 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
                     <img src="<?php echo $base_url2; ?>picture/jtech-logo.png" style="max-height:150px; max-width:290px;">
                 </div>
                 <div class="panel-body">
-                    <form class="form-horizontal m-t-20" action="<?=base_url();?>" method="post">
-
-                        <?PHP if($msg == 1){ ?>
+                    <form class="form-horizontal m-t-20" action="<?=base_url();?>login_c/login" method="post">
+                        <?PHP if($this->session->flashdata('gagal')){ ?>
                         <div class="alert alert-danger alert-dismissable" style="color: #b96463; font-size: 15px;">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                             Maaf, Username atau Password salah.

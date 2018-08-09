@@ -57,8 +57,11 @@
             $sess_user = $this->session->userdata('masuk_rs');
             $id_user = $sess_user['id'];
             $user = $this->master_model_m->get_user_info($id_user);
+            $level = $user->LEVEL;
+            $nama_div = $user->NAMA_DIV;
+            $nama = $user->NAMA;
 
-            $is_operator = $this->master_model_m->is_operator($id_user, 'admum');
+            $is_operator = $this->master_model_m->is_operator($id_user, 'admission');
         ?>
     </head>
 
@@ -67,7 +70,6 @@
         <header id="topnav">
             <div class="topbar-main" style="background-color:#00a4e4; height:60px;">
                 <div class="container">
-
                     <!-- LOGO -->
                     <div class="topbar-left">
                         <a href="<?php echo base_url(); ?>portal" class="logo" style="margin-top:4px;">
@@ -77,45 +79,33 @@
                     <!-- End Logo container-->
 
                     <!-- LOKET -->
-                    <?PHP 
-                    if(count($is_operator) > 0){ 
-                        $get_loket = $this->master_model_m->getLoket($id_user, 'admum');
-                        $get_jml_antrian = $this->master_model_m->getJmlAntrian($get_loket->KODE_ANTRIAN);
-                    ?>
-                    <center>
-                    <div style="width: 87%; position: absolute; float: left; margin-top: 7px;">
-                        <button type="button" class="btn btn-warning waves-effect waves-light w-md m-b-5" style="padding-top: 10px; padding-bottom: 10px;"> 
-                            <b id="nama_loket_antrian_txt"> <?=strtoupper($get_loket->NAMA_LOKET);?> </b> 
-                        </button>
+                    <center id="view_antrian">
+                        <div style="width: 87%; position: absolute; float: left; margin-top: 7px;">
+                            <button type="button" class="btn btn-danger" style="margin-left: 100px; font-size: 32px; margin-top: -8px;"> 
+                                <b><font id="jml_antrian_txt"></font></b> 
 
-                        <button type="button" class="btn btn-danger" style="margin-left: 100px; font-size: 32px; margin-top: -8px;"> 
-                            <b><?=$get_loket->KODE;?>-<font id="jml_antrian_txt"><?=count($get_jml_antrian) + 0;?></font></b> 
+                                <input type="hidden" id="id_antrian_now" value="">
+                                <input type="hidden" class="kode_antrian_now" value="">
+                                <input type="hidden" class="jml_antrian_now" value="">
+                            </button>
 
-                            <input type="hidden" id="kode_antrian_now" value="<?=$get_loket->KODE;?>" />
-                            <input type="hidden" id="jml_antrian_now" value="<?=count($get_jml_antrian) + 0;?>" />
-                            <input type="hidden" id="id_antrian_now" value="<?=$get_loket->KODE_ANTRIAN;?>" />
-                        </button>
+                            <button class="btn btn-purple waves-effect waves-light m-b-5" style="margin-left: 40px;" onclick="panggil_antrian();"> 
+                               <i class="fa fa-bullhorn m-r-5"></i>   <span> Panggil </span> 
+                            </button>
 
-                        <button class="btn btn-purple waves-effect waves-light m-b-5" style="margin-left: 40px;" onclick="panggil_antrian();"> 
-                           <i class="fa fa-bullhorn m-r-5"></i>   <span> Panggil </span> 
-                        </button>
-
-                        <button class="btn btn-success waves-effect waves-light m-b-5" style="margin-left: 10px;" data-toggle="modal" data-target="#next_antrian"> 
-                            <span> Berikutnya </span> <i class="fa fa-chevron-circle-right m-r-5"></i>  
-                        </button>
-
-                        
-                    </div>
+                            <button class="btn btn-success waves-effect waves-light m-b-5" style="margin-left: 10px;" data-toggle="modal" data-target="#next_antrian"> 
+                                <span> Berikutnya </span> <i class="fa fa-chevron-circle-right m-r-5"></i>  
+                            </button>
+                        </div>
                     </center>
-                    <?PHP } ?>
                     <!-- END OF LOKET -->
 
                     <div class="menu-extras">                        
                         <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#0a4d8c; height:60px;">
                             <li>
                                 <form role="search" class="navbar-left app-search pull-left hidden-xs" style="margin-right:0px; margin-top:0px;">
-                                    <h5 style="color:#fff;"><b><?php echo strtoupper($user->NAMA);?></b></h5>
-                                    <h6 style="color:#fff;"><b><?php echo $user->JABATAN;?></b></h6>
+                                    <h5 style="color:#fff;"><b><?php echo strtoupper($nama_div);?></b></h5>
+                                    <h6 style="color:#fff;"><b><?php echo $nama;?></b></h6>
                                 </form>
                             </li>
                             <li class="dropdown user-box">
@@ -123,7 +113,9 @@
                                     <img src="<?php echo base_url(); ?>files/foto_pegawai/<?php echo $user->FOTO;?>" alt="user-img" class="img-circle user-img">
                                 </a>
                                 <ul class="dropdown-menu">
+                                    <?php if($level == null){ ?>
                                     <li><a href="<?php echo base_url(); ?>portal"><i class="fa fa-th m-r-5"></i> Portal Depan</a></li>
+                                    <?php } ?>
                                     <li><a href="javascript:void(0)"><i class="ti-user m-r-5"></i> Profile</a></li>
                                     <li><a href="javascript:void(0)"><i class="ti-settings m-r-5"></i> Settings</a></li>
                                     <li><a href="javascript:void(0)"><i class="ti-lock m-r-5"></i> Lock screen</a></li>
@@ -203,7 +195,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-sm-12">
-                        <h4 class="page-title"><?php echo $subtitle; ?>&nbsp;<small><u><?php echo $childtitle; ?></u></small></h4>
+                        <h4 class="page-title"><?php echo $subtitle; ?></h4>
                     </div>
                 </div>
 
@@ -221,9 +213,11 @@
                             </div>
                             <div class="col-xs-6">
                                 <ul class="pull-right list-inline m-b-0">
+                                    <?php if($level == null){ ?>
                                     <li>
                                         <a href="<?php echo base_url(); ?>portal" style="color:#887d59;"><i class="fa fa-th"></i> Portal Depan</a>
                                     </li>
+                                    <?php } ?>
                                     <li>
                                         <a href="#" style="color:#887d59;"><i class="fa fa-info-circle"></i> Tentang</a>
                                     </li>
@@ -259,9 +253,9 @@
                         </div>
                         <div class="panel-footer">
                             <center>
-                                <button type="button" class="btn btn-inverse " data-dismiss="modal" id="close_next_antrian">Tidak</button>
+                                <button type="button" class="btn btn-inverse" data-dismiss="modal" id="close_next_antrian">Tidak</button>
                                  &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button onclick="next_antri();" type="button" class="btn btn-danger"> Ya </button>
+                                <button type="button" class="btn btn-danger" onclick="next_antri();"> Ya </button>
                             </center>                        
                         </div>
                     </div>
@@ -313,6 +307,7 @@
         <script src="<?php echo base_url(); ?>js-devan/alert.js"></script>
         <script src="<?php echo base_url(); ?>js-devan/js-form.js"></script>
         <script src="<?php echo base_url(); ?>js-devan/pagination.js"></script>
+        <script src="<?php echo base_url(); ?>js-devan/JsBarcode.all.min.js"></script>
 
         <!-- Plugins Js -->
         <script src="<?php echo base_url(); ?>assets/plugins/bootstrap-inputmask/bootstrap-inputmask.min.js" type="text/javascript"></script>
@@ -344,23 +339,39 @@
         <script src="http://code.responsivevoice.org/responsivevoice.js"></script>
 
         <script type="text/javascript">
+        var id_user = "<?php echo $id_user; ?>";
         jQuery(document).ready(function() {
             $('#datatable').dataTable();
             $('#datatable-keytable').DataTable( { keys: true } );
             $('#datatable-responsive').DataTable();
             $('#datatable-scroller').DataTable( { ajax: "<?php echo base_url(); ?>assets/plugins/datatables/json/scroller-demo.json", deferRender: true, scrollY: 380, scrollCollapse: true, scroller: true } );
             var table = $('#datatable-fixed-header').DataTable( { fixedHeader: true } );
-            $(".select2").select2(); 
+            $(".select2").select2();
+
+            ini_jumlah_antri();
         });
 
+        function ini_jumlah_antri(){
+            $.ajax({
+                url : '<?php echo base_url(); ?>admum/admum_home_c/is_jumlah_antri',
+                type : "POST",
+                dataType : "json",
+                success : function(res){
+                    $('.kode_antrian_now').val(res['kode']);
+                    $('.jml_antrian_now').val(res['no']);
+                    $('#jml_antrian_txt').html(res['tampil']);
+                }
+            });
+        }
+
         function next_antri(){
-            var kode_antrian = $('#kode_antrian_now').val();
-            var jml_antrian  = $('#jml_antrian_now').val();
+            var kode_antrian = $('.kode_antrian_now').val();
+            var jml_antrian  = $('.jml_antrian_now').val();
             var id_antrian   = $('#id_antrian_now').val();
             var nama_loket_antrian_txt   = $('#nama_loket_antrian_txt').html();
 
             $.ajax({
-                url : '<?php echo base_url(); ?>billing/billing_home_c/next_antri',
+                url : '<?php echo base_url(); ?>admum/admum_home_c/next_antri',
                 data : {
                     kode_antrian:kode_antrian,
                     jml_antrian:parseInt(jml_antrian) + 1,
@@ -372,7 +383,7 @@
                     if(row == 1){
                         var jml_antrian_next = parseInt(jml_antrian) + 1;
                         $('#jml_antrian_txt').html(jml_antrian_next);
-                        $('#jml_antrian_now').val(jml_antrian_next);
+                        $('.jml_antrian_now').val(jml_antrian_next);
 
                         $('#close_next_antrian').click();
 
@@ -392,9 +403,9 @@
         }
 
         function panggil_antrian(){
-            var kode_antrian = $('#kode_antrian_now').val();
-            var jml_antrian  = $('#jml_antrian_now').val();
-            var nama_loket_antrian_txt   = $('#nama_loket_antrian_txt').html();
+            var kode_antrian = $('.kode_antrian_now').val();
+            var jml_antrian  = $('.jml_antrian_now').val();
+            var nama_loket_antrian_txt = "<?php echo $nama_div; ?>";
 
             responsiveVoice.speak(
               "Pengunjung dengan nomor antrian, "+kode_antrian+","+jml_antrian+", silahkan menuju ke "+nama_loket_antrian_txt+". Terima kasih. ",
@@ -402,7 +413,7 @@
               {
                pitch: 1, 
                rate: 1, 
-               volume: 1
+               volume: 3
               }
              );
         }

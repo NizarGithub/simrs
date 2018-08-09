@@ -125,34 +125,57 @@ class Admum_pasien_rj_c extends CI_Controller {
 		}
 	}
 
+	function randomNumber($length) {
+	    $result = '';
+
+	    for($i = 0; $i < $length; $i++) {
+	        $result .= mt_rand(0, 9);
+	    }
+
+	    return $result;
+	}
+
+	function get_barcode(){
+		$barcode = $this->randomNumber(12);
+		echo json_encode($barcode);
+	}
+
+	function simpan_antrian(){
+		$tanggal = date('d-m-Y');
+		$sql = "SELECT * FROM kepeg_antrian WHERE TGL = '$tanggal'";
+		$qry = $this->db->query($sql);
+		$urut = '';
+		if($qry->num_rows() > 0){
+			$data = $qry->row()->URUT;
+			$urut = $data+1;
+			$s = "UPDATE kepeg_antrian SET URUT = '$urut' WHERE TGL = '$tanggal'";
+			$this->db->query($s);
+		}else{
+			$kode = 'A';
+			$urut = '1';
+			$s = "INSERT INTO kepeg_antrian(KODE,URUT,TGL) VALUES('$kode','$urut','$tanggal')";
+			$this->db->query($s);
+		}
+	}
+
 	function simpan(){
-		$id_pasien_new = "";
-		$baru = $this->input->post('baru');
-
-		$kode_pasien = $this->input->post('kode_pasien');
-		$tanggal_daftar = date('d-m-Y');
-		$nama = addslashes($this->input->post('nama'));
-		$jenis_kelamin = $this->input->post('jenis_kelamin');
-		$pendidikan = $this->input->post('pendidikan');
-		$agama = $this->input->post('agama');
-		$alamat = addslashes($this->input->post('alamat'));
-		$golongan_darah = $this->input->post('golongan_darah');
-		$tempat_lahir = addslashes($this->input->post('tempat_lahir'));
-		$tanggal_lahir = $this->input->post('tanggal_lahir');
-		$umur = $this->input->post('umur');
-		$kelurahan = addslashes($this->input->post('kelurahan'));
-		$kecamatan = addslashes($this->input->post('kecamatan'));
-		$kota = addslashes($this->input->post('kota'));
-		$provinsi = $this->input->post('provinsi');
-
+		$id_pasien_new = $this->input->post('id_pasien');
 		$asal_rujukan = $this->input->post('asal_rujukan');
 		$h = date('l');
 		$tanggal = date('d-m-Y');
 		$bulan = date('n');
 		$tahun = date('Y');
+		$pilihan = $this->input->post('pilihan');
 		$id_poli = $this->input->post('id_poli');
-		$sistem_bayar = $this->input->post('sistem_bayar');
 		$hari = "";
+
+		//NOMOR ANTRIAN
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu = $format->format('H:i:s');
+		$barcode = $this->input->post('barcode');
+		$nomor_antrian = $this->input->post('jumlah_antrian');
 
 		if($h == 'Monday'){
 			$hari = "Senin";
@@ -170,34 +193,9 @@ class Admum_pasien_rj_c extends CI_Controller {
 			$hari = "Minggu";
 		}
 
-		if($baru){
-			$this->model->simpan(
-				$kode_pasien,
-				$tanggal_daftar,
-				$nama,
-				$jenis_kelamin,
-				$pendidikan,
-				$agama,
-				$alamat,
-				$golongan_darah,
-				$tempat_lahir,
-				$tanggal_lahir,
-				$umur,
-				$kelurahan,
-				$kecamatan,
-				$kota,
-				$provinsi);
-
-			$id_pasien = $this->db->insert_id();
-			$id_pasien_new = $id_pasien;
-
-			$this->model->simpan_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$id_poli,$sistem_bayar);
-
-			$this->insert_kode_pasien();
-		}else{
-			$id_pasien_new = $this->input->post('id_pasien');
-			$this->model->simpan_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$id_poli,$sistem_bayar);
-		}
+		$this->model->simpan_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$id_poli,$pilihan);
+		$this->model->simpan_antrian($tanggal,$waktu,$id_pasien_new,$barcode,$nomor_antrian);
+		$this->simpan_antrian();
 
 		$this->session->set_flashdata('sukses','1');
 		redirect('admum/admum_pasien_rj_c');

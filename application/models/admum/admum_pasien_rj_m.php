@@ -120,7 +120,14 @@ class Admum_pasien_rj_m extends CI_Model {
 		$where = "1 = 1";
 
 		if($keyword != ""){
-			$where = $where." AND (NAMA LIKE '%$keyword%' OR NIK LIKE '%$keyword%' OR KODE_PASIEN LIKE '%$keyword%')";
+			$where = $where." AND (
+				NAMA LIKE '%$keyword%' OR 
+				NIK LIKE '%$keyword%' OR 
+				KODE_PASIEN LIKE '%$keyword%' OR 
+				NAMA_ORTU LIKE '%$keyword%' OR 
+				ALAMAT LIKE '%$keyword%'
+			)
+			";
 		}else{
 			$where = $where;
 		}
@@ -132,12 +139,11 @@ class Admum_pasien_rj_m extends CI_Model {
 				NAMA,
 				JENIS_KELAMIN,
 				UMUR,
+				NAMA_ORTU,
 				SUBSTR(KODE_PASIEN,4,3) AS KODE,
 				SUBSTR(TANGGAL_DAFTAR,4,2) AS BULAN
 			FROM rk_pasien WHERE $where
-			ORDER BY
-				BULAN ASC,
-				KODE ASC
+			ORDER BY ID DESC
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -162,6 +168,7 @@ class Admum_pasien_rj_m extends CI_Model {
 				POLI.NAMA AS NAMA_POLI,
 				POLI.INITIAL_POLI,
 				POLI.ID_PEG_DOKTER,
+				POLI.BIAYA,
 				PEG.NAMA_DOKTER
 			FROM admum_poli POLI
 			LEFT JOIN(
@@ -184,6 +191,7 @@ class Admum_pasien_rj_m extends CI_Model {
 				POLI.NAMA AS NAMA_POLI,
 				POLI.INITIAL_POLI,
 				POLI.ID_PEG_DOKTER,
+				POLI.BIAYA,
 				PEG.NAMA_DOKTER
 			FROM admum_poli POLI
 			LEFT JOIN(
@@ -198,7 +206,7 @@ class Admum_pasien_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_rj($id_pasien,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$id_poli,$sistem_bayar){
+	function simpan_rj($id_pasien,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$id_poli,$posisi){
 		$sql = "
 			INSERT INTO admum_rawat_jalan(
 				ID_PASIEN,
@@ -208,7 +216,7 @@ class Admum_pasien_rj_m extends CI_Model {
 				BULAN,
 				TAHUN,
 				ID_POLI,
-				SISTEM_BAYAR
+				STS_POSISI
 			) VALUES(
 				'$id_pasien',
 				'$asal_rujukan',
@@ -217,7 +225,7 @@ class Admum_pasien_rj_m extends CI_Model {
 				'$bulan',
 				'$tahun',
 				'$id_poli',
-				'$sistem_bayar'
+				'$posisi'
 			)
 		";
 		$this->db->query($sql);
@@ -227,6 +235,25 @@ class Admum_pasien_rj_m extends CI_Model {
 		$sql = "SELECT * FROM admum_lokasi ORDER BY ID DESC LIMIT 1";
 		$query = $this->db->query($sql);
 		return $query->result();
+	}
+
+	function simpan_antrian($tanggal,$waktu,$id_pasien,$barcode,$nomor_antrian){
+		$sql = "
+			INSERT INTO rk_antrian_pasien(
+				TANGGAL,
+				WAKTU,
+				ID_PASIEN,
+				BARCODE,
+				NOMOR_ANTRIAN
+			)VALUES(
+				'$tanggal',
+				'$waktu',
+				'$id_pasien',
+				'$barcode',
+				'$nomor_antrian'
+			)
+		";
+		$this->db->query($sql);
 	}
 
 

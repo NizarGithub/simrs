@@ -6,11 +6,12 @@ class Admum_data_pasien_c extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->model('admum/admum_data_pasien_m','model');
+		$this->load->model('master_model_m','m_master');
 		$sess_user = $this->session->userdata('masuk_rs');
     	$id_user = $sess_user['id'];
 	    if($id_user == "" || $id_user == null){
 	        redirect('portal');
-	    } 
+	    }
 	}
 
 	function index()
@@ -28,6 +29,34 @@ class Admum_data_pasien_c extends CI_Controller {
 		);
 
 		$this->load->view('admum/admum_home_v',$data); 
+	}
+
+	function simpan_log($aksi){
+		$sess_user = $this->session->userdata('masuk_rs');
+    	$id_pegawai = $sess_user['id'];
+    	$sql = "SELECT
+					a.ID,
+					a.NAMA,
+					b.NAMA_DEP,
+					c.NAMA_DIV
+				FROM kepeg_pegawai a
+				LEFT JOIN kepeg_departemen b ON b.ID = a.ID_DEPARTEMEN
+				LEFT JOIN kepeg_divisi c ON c.ID = a.ID_DIVISI
+				WHERE a.ID = '$id_pegawai'
+    	";
+    	$qry = $this->db->query($sql);
+    	$row = $qry->row();
+    	$nama = $row->NAMA;
+    	$dep = $row->NAMA_DEP;
+    	$div = $row->NAMA_DIV;
+		$tanggal = date('d-m-Y');
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu = $format->format('H:i:s');
+		$keterangan = "User ".strtoupper($nama)." Departemen ".strtoupper($dep)." Divisi ".strtoupper($div)." telah melakukan ".strtoupper($aksi)." data";
+
+		$this->m_master->simpan_log($id_pegawai,$tanggal,$waktu,$keterangan);
 	}
 
 	function pasien_rj()
@@ -102,14 +131,27 @@ class Admum_data_pasien_c extends CI_Controller {
 		redirect('admum/admum_data_pasien_c');
 	}
 
+	function kirim_permintaan(){
+		$this->simpan_log('Permintaan Hapus');
+		$id_pegawai = $this->input->post('id_pegawai');
+		$id_pasien = $this->input->post('id_pasien_kirim');
+		$permintaan = 'Permintaan Hapus Data Pasien';
+		$this->model->simpan_permintaan($id_pegawai,$id_pasien,$permintaan);
+
+		$this->session->set_flashdata('kirim','1');
+		redirect('admum/admum_data_pasien_c');
+	}
+
 	//PASIEN UMUM
 	function data_pasien(){
 		$id_klien = "";
 		$keyword = $this->input->get('keyword');
 		$urutkan = $this->input->get('urutkan');
 		$pilih_umur = $this->input->get('pilih_umur');
-		$status = "Umum";
-		$data = $this->model->data_pasien($id_klien,$keyword,$urutkan,$pilih_umur,$status);
+		$pilih_status = $this->input->get('pilih_status');
+		$now = $this->input->get('now');
+
+		$data = $this->model->data_pasien($id_klien,$keyword,$urutkan,$pilih_umur,$pilih_status,$now);
 		echo json_encode($data);
 	}
 
@@ -337,13 +379,13 @@ class Admum_data_pasien_c extends CI_Controller {
 		$urutkan = $this->input->post('urutkan');
 		$pilih_umur = $this->input->post('pilih_umur');
 		$status = "Umum";
-		$now = str_replace('-','_',date('d-m-Y'));
+		$now = date('dmY');
 
 		$data = array(
 			'title' => 'Data Pasien',
 			'subtitle' => 'Data Pasien',
 			'dt' => $this->model->data_pasien($id_klien,$keyword,$urutkan,$pilih_umur,$status),
-			'filename' => 'laporan_data_pasien_umum_'.$now,
+			'filename' => $now.'_laporan_data_pasien',
 		);
 
 		$this->load->view('admum/excel/excel_data_pasien_umum',$data); 

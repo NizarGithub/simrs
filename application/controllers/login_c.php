@@ -14,53 +14,72 @@ class Login_c extends CI_Controller {
 
 	function index()
 	{
-
-		$msg = "";
-
-		if($this->input->post('username')){
-			$user = $this->input->post('username');
-			$pass = md5(md5($this->input->post('password')));
-			$tabel = "kepeg_pegawai";
-			$uspa = array(
-				'USERNAME'	=> $user,
-				'PASSWORD'	=> $pass
-			);
-			$cek_uspa = $this->cek_uspa($tabel,$uspa);
-			$jumlah = $cek_uspa->num_rows();
-			
-			if($jumlah != 0){
-				$data = $cek_uspa->row();
-				$sess_array = array(
-					'id'		 => $data->ID,
-					'username'	 => $data->USERNAME,
-					'id_klien'	 => 13,
-				);
-				$this->session->set_userdata('masuk_rs', $sess_array);
-				$session_data = $this->session->userdata('masuk_rs');
-				redirect('portal');
-			}else{
-				$msg = 1;
-			}
-		}
-
 		$data = array(
 			'title' => 'Login',
 			'subtitle' => 'Login',
-			'msg' => $msg,
+			'msg' => '',
 		);
 
 		$this->load->view('login_v',$data);
 	}
 
-	function cek_uspa($tabel = '', $uspa = array()){
-        $where = '';
-        foreach($uspa as $key => $value){
-            $where .= " AND $key = '$value'";
-        }
-        $data = $this->db->query("SELECT u.* FROM $tabel u WHERE 1=1 $where AND STS_AKUN = 1");
+	function login(){
+		$user = $this->input->post('username');
+		$pass = md5(md5($this->input->post('password')));
+		$msg = '';
 
-        return $data;
-    }
+		$sql = "
+			SELECT
+				a.*,
+				b.NAMA AS JABATAN,
+				c.NAMA_DEP,
+				d.NAMA_DIV 
+			FROM kepeg_pegawai a
+			LEFT JOIN kepeg_kel_jabatan b ON a.ID_JABATAN = b.ID
+			LEFT JOIN kepeg_departemen c ON a.ID_DEPARTEMEN = c.ID
+			LEFT JOIN kepeg_divisi d ON a.ID_DIVISI = d.ID
+			WHERE a.USERNAME = '$user' AND a.PASSWORD = '$pass'
+		";
+		$qry = $this->db->query($sql);
+		$jumlah = $qry->num_rows();
+		
+		if($jumlah != 0){
+			$data = $qry->row();
+			$sess_array = array(
+				'id'		 => $data->ID,
+				'username'	 => $data->USERNAME,
+				'id_klien'	 => 13,
+				'id_departemen'	=> $data->ID_DEPARTEMEN,
+				'id_divisi'	 => $data->ID_DIVISI,
+				'departemen' => $data->NAMA_DEP,
+				'divisi' => $data->NAMA_DIV,
+				'level' => $data->LEVEL
+			);
+
+			$this->session->set_userdata('masuk_rs', $sess_array);
+			$session_data = $this->session->userdata('masuk_rs');
+
+			if($data->LEVEL == 'Admission'){
+				redirect('admum/admum_home_c');
+			}else if($data->LEVEL == 'Poli'){
+				redirect('poli/poli_home_c');
+			}else if($data->LEVEL == 'Laborat'){
+				redirect('lab/lab_home_c');
+			}else if($data->LEVEL == 'Kasir AA'){
+				
+			}else if($data->LEVEL == 'Kasir Rajal'){
+				redirect('apotek/ap_kasir_rajal_c');
+			}else if($data->LEVEL == 'Kasir Ranap'){
+
+			}else if($data->LEVEL == null){
+				redirect('portal');
+			}
+
+		}else{
+			$this->session->set_flashdata('gagal','1');
+			redirect('login_c');
+		}
+	}
 
 }
 

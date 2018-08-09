@@ -3,7 +3,6 @@
     background: #21AFDA !important;
     color: #fff !important;
 }
-
 </style> 
   
 <?PHP if($dt_pegawai != ""){ ?> 
@@ -49,7 +48,7 @@
                                     <?PHP } ?>
                                     
                                     <span class="input-group-btn">
-                                    <button type="button" class="btn waves-effect waves-light btn-primary" onclick="show_pop_pegawai();">Cari Pegawai</button>
+                                    <button type="button" class="btn waves-effect waves-light btn-primary" id="cari_peg">Cari Pegawai</button>
                                     </span>
                                 </div>
 
@@ -70,134 +69,167 @@
 </div>
 
 <form class="form-horizontal" role="form" method="post" action="<?=base_url().$post_url;?>">
-<div class="row">
-    <div class="col-lg-12">
-        <div class="card-box">
-            <div class="row">
-               <div class="col-lg-12">
-                    <ul class="nav nav-tabs coba">
-                        <?PHP 
-                        $no_1 = 0;
-                        foreach ($get_menu_1 as $key => $menu_1) { 
-                            $no_1++;
-                        ?>
-                            <li role="presentation" class="<?PHP if($no_1 == 1){ echo "active"; }?>">
-                                <a style="background:#f4f8fb;" href="#data_menu<?=$menu_1->ID;?>" role="tab" data-toggle="tab"> <?=$menu_1->NAMA;?> </a>
-                            </li>
-                        <?PHP } ?>
-                    </ul>
-                    <div class="tab-content">
-                        <?PHP 
-                            $no = 0;
-                            $check_1 = "";
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card-box">
+                <div class="row">
+                   <div class="col-lg-12">
+                        <ul class="nav nav-tabs coba">
+                            <?PHP 
+                            $no_1 = 0;
                             foreach ($get_menu_1 as $key => $menu_1) { 
-                                if($menu_1->STS == 0){
-                                    $check_1 = "";
-                                } else {
-                                    $check_1 = "checked"; 
-                                }
+                                $no_1++;
+                            ?>
+                                <li role="presentation" class="<?PHP if($no_1 == 1){ echo "active"; }?>">
+                                    <a style="background:#f4f8fb;" href="#data_menu<?=$menu_1->ID;?>" role="tab" data-toggle="tab"> <?=$menu_1->NAMA;?> </a>
+                                </li>
+                            <?PHP } ?>
+                        </ul>
+                        <div class="tab-content">
+                            <?PHP 
+                                $no = 0;
+                                $check_1 = "";
+                                foreach ($get_menu_1 as $key => $menu_1) { 
+                                    if($menu_1->STS == 0){
+                                        $check_1 = "";
+                                    } else {
+                                        $check_1 = "checked"; 
+                                    }
 
-                                $no++;
-                        ?>
-                            <div role="tabpanel" class="tab-pane fade <?PHP if($no == 1){ echo "in active"; }?>" id="data_menu<?=$menu_1->ID;?>">
-                                <div class="row">
+                                    $no++;
+                            ?>
+                                <div role="tabpanel" class="tab-pane fade <?PHP if($no == 1){ echo "in active"; }?>" id="data_menu<?=$menu_1->ID;?>">
+                                    <div class="row">
 
-                                    <div class="col-lg-12">
-                                        <center>
-                                            <div class="checkbox checkbox-success">
-                                                <input id="ck_portal_<?=$menu_1->ID;?>" name="menu_portal[]" value="<?=$menu_1->ID;?>" type="checkbox" <?=$check_1;?> >
-                                                <label for="ck_portal_<?=$menu_1->ID;?>">
-                                                   <b> Menu Portal <?=strtoupper($menu_1->NAMA);?> </b>
-                                                </label>
-                                            </div>
-                                        </center>
+                                        <div class="col-lg-12">
+                                            <center>
+                                                <div class="checkbox checkbox-success">
+                                                    <input id="ck_portal_<?=$menu_1->ID;?>" name="menu_portal[]" value="<?=$menu_1->ID;?>" type="checkbox" <?=$check_1;?> >
+                                                    <label for="ck_portal_<?=$menu_1->ID;?>">
+                                                       <b> Menu Portal <?=strtoupper($menu_1->NAMA);?> </b>
+                                                    </label>
+                                                </div>
+                                            </center>
 
-                                        <ul class="treeview">
-                                            <?PHP 
-                                            $get_menu_2 = $this->model->get_data_menu_2($menu_1->ID, $id_pegawai);
-                                            $check_2 = "";
-                                            $check_2_cus = "";
-                                            foreach ($get_menu_2 as $key => $menu_2) {
-                                                if($menu_2->STS == 0){
-                                                    $check_2 = "";
-                                                    $check_2_cus = "custom-unchecked";
-                                                } else {
-                                                    $check_2 = "checked";
-                                                    $check_2_cus = "custom-checked";
-                                                }
-                                            ?>
-                                            <div class="col-lg-3" style="margin-top: 35px;">
-                                                <?PHP if($menu_2->LINK != "" || $menu_2->LINK != null){ ?>
-                                                    
-                                                        <li>
-                                                            <input type="checkbox" name="ch_menu2[]" id="<?=$menu_2->NAMA;?>" value="<?=$menu_2->ID;?>" <?=$check_2;?> >
-                                                            <label for="<?=$menu_2->NAMA;?>" class="<?=$check_2_cus;?>"> <i class="<?=$menu_2->ICON;?>"></i> <?=$menu_2->NAMA;?> </label>
-                                                        </li>
-                                                    <?PHP } else { ?>
-                                                        <li>
-                                                            <input type="checkbox" name="ch_menu2[]" id="menu2-<?=$menu_2->ID;?>" value="<?=$menu_2->ID;?>" <?=$check_2;?> >
-                                                            <label for="<?=$menu_2->NAMA;?>" class="<?=$check_2_cus;?>"> <i class="<?=$menu_2->ICON;?>"></i> <?=$menu_2->NAMA;?> </label>
-                                                            
-                                                            <ul>
-                                                                <?PHP 
-                                                                    $check_3 = "";
-                                                                    $check_3_cus = "";
-                                                                    $get_menu_3 = $this->model->get_data_menu_3($menu_2->ID, $id_pegawai);
-                                                                    foreach ($get_menu_3 as $key => $menu_3) {
-                                                                        if($menu_3->STS == 0){
-                                                                            $check_3 = "";
-                                                                            $check_3_cus = "custom-unchecked";
-                                                                        } else {
-                                                                            $check_3 = "checked";
-                                                                            $check_3_cus = "custom-checked";
-                                                                        }
-                                                                ?>
-                                                                <li>
-                                                                    <input  type="checkbox" name="ch_menu3[]" id="menu3-<?=$menu_3->ID;?>" value="<?=$menu_3->ID;?>" <?=$check_3;?>>
-                                                                    <label for="tall-1" class="<?=$check_3_cus;?>"> <i class="fa fa-caret-right"></i> <?=$menu_3->NAMA;?> </label>
-                                                                </li>
-                                                                <?PHP } ?>
-                                                            </ul>
-                                                        </li>
-                                                    
-                                                <?PHP } ?>
-                                            </div>
+                                            <ul class="treeview">
+                                                <?PHP 
+                                                $get_menu_2 = $this->model->get_data_menu_2($menu_1->ID, $id_pegawai);
+                                                $check_2 = "";
+                                                $check_2_cus = "";
+                                                foreach ($get_menu_2 as $key => $menu_2) {
+                                                    if($menu_2->STS == 0){
+                                                        $check_2 = "";
+                                                        $check_2_cus = "custom-unchecked";
+                                                    } else {
+                                                        $check_2 = "checked";
+                                                        $check_2_cus = "custom-checked";
+                                                    }
+                                                ?>
+                                                <div class="col-lg-3" style="margin-top: 35px;">
+                                                    <?PHP if($menu_2->LINK != "" || $menu_2->LINK != null){ ?>
+                                                        
+                                                            <li>
+                                                                <input type="checkbox" name="ch_menu2[]" id="<?=$menu_2->NAMA;?>" value="<?=$menu_2->ID;?>" <?=$check_2;?> >
+                                                                <label for="<?=$menu_2->NAMA;?>" class="<?=$check_2_cus;?>"> <i class="<?=$menu_2->ICON;?>"></i> <?=$menu_2->NAMA;?> </label>
+                                                            </li>
+                                                        <?PHP } else { ?>
+                                                            <li>
+                                                                <input type="checkbox" name="ch_menu2[]" id="menu2-<?=$menu_2->ID;?>" value="<?=$menu_2->ID;?>" <?=$check_2;?> >
+                                                                <label for="<?=$menu_2->NAMA;?>" class="<?=$check_2_cus;?>"> <i class="<?=$menu_2->ICON;?>"></i> <?=$menu_2->NAMA;?> </label>
+                                                                
+                                                                <ul>
+                                                                    <?PHP 
+                                                                        $check_3 = "";
+                                                                        $check_3_cus = "";
+                                                                        $get_menu_3 = $this->model->get_data_menu_3($menu_2->ID, $id_pegawai);
+                                                                        foreach ($get_menu_3 as $key => $menu_3) {
+                                                                            if($menu_3->STS == 0){
+                                                                                $check_3 = "";
+                                                                                $check_3_cus = "custom-unchecked";
+                                                                            } else {
+                                                                                $check_3 = "checked";
+                                                                                $check_3_cus = "custom-checked";
+                                                                            }
+                                                                    ?>
+                                                                    <li>
+                                                                        <input  type="checkbox" name="ch_menu3[]" id="menu3-<?=$menu_3->ID;?>" value="<?=$menu_3->ID;?>" <?=$check_3;?>>
+                                                                        <label for="tall-1" class="<?=$check_3_cus;?>"> <i class="fa fa-caret-right"></i> <?=$menu_3->NAMA;?> </label>
+                                                                    </li>
+                                                                    <?PHP } ?>
+                                                                </ul>
+                                                            </li>
+                                                        
+                                                    <?PHP } ?>
+                                                </div>
 
 
-                                            <?PHP } ?>                                            
-                                        </ul>
+                                                <?PHP } ?>                                            
+                                            </ul>
+                                        </div>
+
+
                                     </div>
-
-
                                 </div>
-                            </div>
-                        <?PHP } ?>
+                            <?PHP } ?>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row" style="margin-top: 20px;">
-                <div class="col-lg-12">
-                    <center>
-                        <div class="form-group m-b-0">
-                              <input type="submit" class="btn btn-info" value="Simpan Hak Akses" name="simpan"/>
-                        </div>
-                    </center>
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-lg-12">
+                        <center>
+                            <div class="form-group m-b-0">
+                                  <input type="submit" class="btn btn-info" value="Simpan Hak Akses" name="simpan"/>
+                            </div>
+                        </center>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<?PHP if($dt_pegawai == ""){ ?>
-    <input name="id_pegawai2" id="id_pegawai2" class="form-control" value="" type="hidden">
-<?PHP } else { ?>
-    <input name="id_pegawai2" id="id_pegawai2" class="form-control" value="<?=$dt_pegawai->ID;?>" type="hidden">
-<?PHP } ?>
-
+    <?PHP if($dt_pegawai == ""){ ?>
+        <input name="id_pegawai2" id="id_pegawai2" class="form-control" value="" type="hidden">
+    <?PHP } else { ?>
+        <input name="id_pegawai2" id="id_pegawai2" class="form-control" value="<?=$dt_pegawai->ID;?>" type="hidden">
+    <?PHP } ?>
 </form>
 
-
-
+<button class="btn btn-primary waves-effect waves-light" id="popup_pegawai" data-toggle="modal" data-target=".bs-example-modal-lg" style="display: none;">Large modal</button>
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myLargeModalLabel">Large modal</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <input class="form-control" type="text" id="search_koang" value="" placeholder="Cari...">
+                        </div>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <table class="table table-hover2" id="tes5">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center;">NO</th>
+                                <th style="text-align:center;" style="white-space:nowrap;"> NIP </th>
+                                <th style="text-align:center;"> NAMA </th>
+                                <th style="text-align:center;"> USERNAME </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+    
+                        </tbody>
+                    </table>
+                </div>
+                <div id="tablePaging"> </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 <script type="text/javascript" src="<?php echo base_url(); ?>js-devan/jquery-1.11.1.min.js"></script>
 <script type="text/javascript">
@@ -249,58 +281,50 @@ $(function() {
 });
 
 $(document).ready(function(){
-
-   <?PHP if($warning == 1){ ?>
+    <?PHP if($warning == 1){ ?>
     get_data_pegawai(<?=$id_pegawai;?>);
-   <?PHP } ?>
+    <?PHP } ?>
 
-   $('#popup_load').hide();
+    $('#popup_load').hide();
+
+    $('#cari_peg').click(function(){
+        $('#popup_pegawai').click();
+        ajax_pegawai();
+    });
 
 });
 
-function show_pop_pegawai(){
-    get_popup_pegawai();
-    ajax_pegawai();
-}
+function paging($selector){
+    if(typeof $selector == 'undefined')
+    {
+        $selector = $("#tes5 tbody tr");
+    }
 
-function get_popup_pegawai(){
-    var base_url = '<?php echo base_url(); ?>';
-    var $isi = '<div id="popup_koang">'+
-                '<div class="window_koang">'+
-                '    <a href="javascript:void(0);"><img src="'+base_url+'assets/custom/ico/cancel.gif" id="pojok_koang"></a>'+
-                '    <div class="panel-body">'+
-                '    <input style="width: 95%;" type="text" name="search_koang" id="search_koang" class="form-control" value="" placeholder="Cari Pegawai...">'+
-                '    <div class="table-responsive">'+
-                '            <table class="table table-hover2" id="tes5">'+
-                '                <thead>'+
-                '                    <tr>'+
-                '                        <th style="text-align:center;">NO</th>'+
-                '                        <th style="text-align:center;" style="white-space:nowrap;"> NIP </th>'+
-                '                        <th style="text-align:center;"> NAMA </th>'+
-                '                        <th style="text-align:center;"> USERNAME </th>'+
-                '                    </tr>'+
-                '                </thead>'+
-                '                <tbody>'+
-            
-                '                </tbody>'+
-                '            </table>'+
-                '        </div>'+
-                '    </div>'+
-                '</div>'+
-            '</div>';
-    $('body').append($isi);
+    window.tp = new Pagination('#tablePaging', {
+        itemsCount:$selector.length,
+        pageSize : 10,
+        onPageSizeChange: function (ps) {
+            console.log('changed to ' + ps);
+        },
+        onPageChange: function (paging) {
+            //custom paging logic here
+            //console.log(paging);
+            var start = paging.pageSize * (paging.currentPage - 1),
+                end = start + paging.pageSize,
+                $rows = $selector;
 
-    $('#pojok_koang').click(function(){
-        $('#popup_koang').css('display','none');
-        $('#popup_koang').hide();
+            $rows.hide();
+
+            for (var i = start; i < end; i++) {
+                $rows.eq(i).show();
+            }
+        }
     });
-
-    $('#popup_koang').css('display','block');
-    $('#popup_koang').show();
 }
 
 function ajax_pegawai(){
     var keyword = $('#search_koang').val();
+
     $.ajax({
         url : '<?php echo base_url(); ?>setting/login_pengguna_c/get_pegawai',
         type : "POST",
@@ -312,30 +336,33 @@ function ajax_pegawai(){
             var isine = '';
             var no = 0;
             var tipe_data = "";
-            $.each(result,function(i,res){
-                no++;
-                var username = res.USERNAME;
-                if(username == "" || username == null){
-                    username = "(Tanpa username)";
-                }
-
-                isine += '<tr onclick="get_data_pegawai('+res.ID+');" style="cursor:pointer;">'+
-                            '<td align="center">'+no+'</td>'+
-                            '<td align="center">'+res.NIP+'</td>'+
-                            '<td align="left">'+res.NAMA+'</td>'+
-                            '<td align="center">'+username+'</td>'+
-                        '</tr>'; 
-            });
 
             if(result.length == 0){
                 isine = "<tr><td colspan='4' style='text-align:center'><b style='font-size: 15px;'> Data tidak tersedia </b></td></tr>";
+            }else{
+                $.each(result,function(i,res){
+                    no++;
+                    var username = res.USERNAME;
+                    if(username == "" || username == null){
+                        username = "(Tanpa username)";
+                    }
+
+                    isine += '<tr onclick="get_data_pegawai('+res.ID+');" style="cursor:pointer;">'+
+                                '<td align="center">'+no+'</td>'+
+                                '<td align="center">'+res.NIP+'</td>'+
+                                '<td align="left">'+res.NAMA+'</td>'+
+                                '<td align="center">'+username+'</td>'+
+                            '</tr>'; 
+                });
             }
 
-            $('#tes5 tbody').html(isine); 
-            $('#search_koang').off('keyup').keyup(function(){
-                ajax_pegawai();
-            });
+            $('#tes5 tbody').html(isine);
+            paging();
         }
+    });
+
+    $('#search_koang').off('keyup').keyup(function(){
+        ajax_pegawai();
     });
 }
 
