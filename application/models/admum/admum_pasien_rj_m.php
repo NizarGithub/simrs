@@ -206,7 +206,7 @@ class Admum_pasien_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_rj($id_pasien,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$id_poli,$posisi){
+	function simpan_rj($id_pasien,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$posisi){
 		$sql = "
 			INSERT INTO admum_rawat_jalan(
 				ID_PASIEN,
@@ -215,6 +215,7 @@ class Admum_pasien_rj_m extends CI_Model {
 				TANGGAL,
 				BULAN,
 				TAHUN,
+				WAKTU,
 				ID_POLI,
 				STS_POSISI
 			) VALUES(
@@ -224,6 +225,7 @@ class Admum_pasien_rj_m extends CI_Model {
 				'$tanggal',
 				'$bulan',
 				'$tahun',
+				'$waktu',
 				'$id_poli',
 				'$posisi'
 			)

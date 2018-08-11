@@ -193,7 +193,7 @@ class Admum_pasien_rj_c extends CI_Controller {
 			$hari = "Minggu";
 		}
 
-		$this->model->simpan_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$id_poli,$pilihan);
+		$this->model->simpan_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$pilihan);
 		$this->model->simpan_antrian($tanggal,$waktu,$id_pasien_new,$barcode,$nomor_antrian);
 		$this->simpan_antrian();
 

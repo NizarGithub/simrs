@@ -54,7 +54,12 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                             Maaf, Username atau Password salah.
                         </div>
-                        <?PHP } ?>
+                        <?PHP }else if($this->session->flashdata('sudah_login')){ ?>
+                        <div class="alert alert-danger alert-dismissable" style="color: #b96463; font-size: 15px;">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            Maaf, Username ini telah login. Silahkan memakai username sesuai dengan username Anda.
+                        </div>
+                        <?php } ?>
 
                         <div class="form-group ">
                             <div class="col-xs-12">

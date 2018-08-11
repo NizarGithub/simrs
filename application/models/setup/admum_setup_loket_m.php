@@ -102,7 +102,13 @@ class Admum_setup_loket_m extends CI_Model {
 
 	function getDataLoket(){
 		$sql = "
-		SELECT a.*, b.KODE, b.UNTUK FROM kepeg_loket a 
+		SELECT 
+			a.ID, 
+			a.NAMA_LOKET, 
+			a.KODE_ANTRIAN, 
+			b.KODE, 
+			b.UNTUK, 
+			b.STS FROM kepeg_loket a 
 		JOIN kepeg_setup_antrian b ON a.KODE_ANTRIAN = b.ID
 		ORDER BY a.ID ASC
 		";

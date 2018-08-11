@@ -21,13 +21,21 @@ class Admum_kode_antrian_c extends CI_Controller {
 			$kode = $this->input->post('kode_antrian');
 			$untuk = $this->input->post('untuk');
 			$antrian_max = $this->input->post('antrian_max');
+			$status = $this->input->post('status');
 
-			$this->model->simpan_antrian($kode, $untuk, $antrian_max);
+			$this->model->simpan_antrian($kode, $untuk, $antrian_max, $status);
 
 		} else if($this->input->post('hapus')){
-			$msg = 3;
 			$id_hapus = $this->input->post('id_hapus');
-			$this->model->hapusAntrian($id_hapus);
+			$sql = "SELECT COUNT(*) AS TOTAL FROM kepeg_loket WHERE KODE_ANTRIAN = '$id_hapus'";
+			$qry = $this->db->query($sql)->row();
+			$total = $qry->TOTAL;
+			if($total != 0){
+				$msg = 2;
+			}else{
+				$msg = 3;
+				$this->model->hapusAntrian($id_hapus);
+			}
 		}
 
 		$data = array(

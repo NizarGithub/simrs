@@ -64,7 +64,6 @@ class Admum_setup_loket_c extends CI_Controller {
 	}
 
 	function edit($id){
-
 		if($this->input->post('nama_loket')){
 			$msg = 1;
 			$nama_loket   = $this->input->post('nama_loket');

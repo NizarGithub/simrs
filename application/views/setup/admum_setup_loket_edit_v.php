@@ -131,6 +131,7 @@ function deleteRow(btn){
 	                    </div>
 
 	                    <?PHP 
+	                    $beranda = "";
 	                    $billing = "";
 	                    $admum = "";
 	                    $rekam_medik = "";
@@ -144,6 +145,8 @@ function deleteRow(btn){
 	                    		$rekam_medik = "checked";
 	                    	} else if($aks->AKSES == "apotek"){
 	                    		$apotek = "checked";
+	                    	}else if($aks->AKSES == "pasien"){
+	                    		$beranda = "checked";
 	                    	}
 	                    }
 	                    ?>
@@ -151,6 +154,10 @@ function deleteRow(btn){
 	                    <div class="form-group">
 	                        <label class="col-md-2 control-label"> Akses Loket </label>
 	                        <div class="col-md-10">
+	                            <div class="checkbox checkbox-purple">
+	                                <input type="checkbox" <?=$beranda;?> name="akses[]" id="inlineCheckbox1" value="pasien">
+	                                <label for="inlineCheckbox1"> Beranda Pasien </label>
+	                            </div>
 	                            <div class="checkbox checkbox-warning">
 	                                <input type="checkbox" <?=$billing;?> name="akses[]" id="inlineCheckbox1" value="billing">
 	                                <label for="inlineCheckbox1"> Billing </label>

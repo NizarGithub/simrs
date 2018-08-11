@@ -591,6 +591,7 @@ function klik_perawat_tambah(id){
 										    <th style="color:#fff; text-align:center;">No</th>
 										    <th style="color:#fff; text-align:center;">Nama Loket</th>
 										    <th style="color:#fff; text-align:center;">Kode Antrian</th>
+										    <th style="color:#fff; text-align:center;">Status</th>
 										    <th style="color:#fff; text-align:center;">Operator</th>
 										    <th style="color:#fff; text-align:center;">Akses Menu</th>
 										    <th style="color:#fff; text-align:center;">Aksi</th>
@@ -607,6 +608,7 @@ function klik_perawat_tambah(id){
 					                		<td style="vertical-align:middle;" align="center"> <?=$no;?> </td>
 					                		<td style="vertical-align:middle;" align="left"> <?=$row->NAMA_LOKET;?> </td>
 					                		<td style="vertical-align:middle;" align="center"> <?=$row->KODE;?> - <?=strtoupper($row->UNTUK);?> </td>
+					                		<td style="vertical-align:middle;" align="center"> <?=strtoupper($row->STS);?> </td>
 					                		<td style="vertical-align:middle;" align="center"> 
 					                			<button class="btn btn-info btn-sm m-b-5" type="button" onclick="detail_operator('<?=$row->ID;?>','<?=$row->NAMA_LOKET;?>');">
 					                				<i class="fa fa-users"></i> Operator
@@ -618,18 +620,20 @@ function klik_perawat_tambah(id){
 					                				if($aks->AKSES == "billing"){
 					                					$akses = "Billing";
 					                				} else if($aks->AKSES == "admum"){
-					                					$akses = "Administrasi Umum";
+					                					$akses = "Admission";
 					                				} else if($aks->AKSES == "rekam_medik"){
 					                					$akses = "Rekam Medik";
 					                				} else if($aks->AKSES == "apotek"){
 					                					$akses = "Apotek";
+					                				} else if($aks->AKSES == "pasien"){
+					                					$akses = "Beranda Pasien";
 					                				}
 
 					                				echo " - ".$akses."<br>";
 					                			} ?>
 					                		</td>
 					                		<td style="vertical-align:middle;" align="center"> 
-					                			<button type="button" class="btn btn-success btn-sm m-b-5" onclick="window.location='<?=base_url();?>setup/admum_setup_loket_c/edit/<?=$row->ID;?>';">
+					                			<button type="button" class="btn btn-success btn-sm m-b-5" onclick="window.location='<?=base_url();?>setup/admum_setup_loket_c/edit/<?php echo $row->ID;?>';">
 				                                    <i class="fa fa-pencil"></i>
 				                                </button>&nbsp;
 				                                <button type="button" class="btn btn-danger btn-sm m-b-5" onclick="hapus_loket(<?=$row->ID;?>);">
@@ -681,7 +685,7 @@ function klik_perawat_tambah(id){
 			                            </div>
 			                            <div class="checkbox checkbox-primary">
 			                                <input type="checkbox" name="akses[]" id="inlineCheckbox2" value="admum">
-			                                <label for="inlineCheckbox2"> Administrasi Umum </label>
+			                                <label for="inlineCheckbox2"> Admission </label>
 			                            </div>
 			                            <div class="checkbox checkbox-danger">
 			                                <input type="checkbox" name="akses[]" id="inlineCheckbox3" value="rekam_medik">

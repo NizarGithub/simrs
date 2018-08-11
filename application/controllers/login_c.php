@@ -53,26 +53,42 @@ class Login_c extends CI_Controller {
 				'id_divisi'	 => $data->ID_DIVISI,
 				'departemen' => $data->NAMA_DEP,
 				'divisi' => $data->NAMA_DIV,
-				'level' => $data->LEVEL
+				'level' => $data->LEVEL,
+				'sts_login' => $data->STS_LOGIN
 			);
 
 			$this->session->set_userdata('masuk_rs', $sess_array);
 			$session_data = $this->session->userdata('masuk_rs');
 
-			if($data->LEVEL == 'Admission'){
-				redirect('admum/admum_home_c');
-			}else if($data->LEVEL == 'Poli'){
-				redirect('poli/poli_home_c');
-			}else if($data->LEVEL == 'Laborat'){
-				redirect('lab/lab_home_c');
-			}else if($data->LEVEL == 'Kasir AA'){
-				
-			}else if($data->LEVEL == 'Kasir Rajal'){
-				redirect('apotek/ap_kasir_rajal_c');
-			}else if($data->LEVEL == 'Kasir Ranap'){
+			$id_login = $data->ID;
+			$tanggal = date('d-m-Y');
+			$tz_object = new DateTimeZone('Asia/Jakarta');
+			$datetime = new DateTime();
+			$format = $datetime->setTimezone($tz_object);
+			$waktu = $format->format('H:i:s');
 
-			}else if($data->LEVEL == null){
-				redirect('portal');
+			$sql_log = "UPDATE kepeg_pegawai SET STS_LOGIN = '1',DATE_LOG = '$tanggal',TIME_LOG = '$waktu' WHERE ID = '$id_login'";
+			$this->db->query($sql_log);
+
+			if($data->STS_LOGIN == 1){
+				$this->session->set_flashdata('sudah_login','1');
+				redirect('login_c');
+			}else{
+				if($data->LEVEL == 'Admission'){
+					redirect('admum/admum_home_c');
+				}else if($data->LEVEL == 'Poli'){
+					redirect('poli/poli_home_c');
+				}else if($data->LEVEL == 'Laborat'){
+					redirect('lab/lab_home_c');
+				}else if($data->LEVEL == 'Kasir AA'){
+					
+				}else if($data->LEVEL == 'Kasir Rajal'){
+					redirect('apotek/ap_kasir_rajal_c');
+				}else if($data->LEVEL == 'Kasir Ranap'){
+
+				}else if($data->LEVEL == null){
+					redirect('portal');
+				}
 			}
 
 		}else{

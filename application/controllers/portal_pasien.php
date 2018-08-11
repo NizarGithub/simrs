@@ -14,7 +14,8 @@ class Portal_pasien extends CI_Controller {
 		$data = array(
 			'title' => 'Sistem Informasi Rumah Sakit',
 			'master_menu' => 'dashboard',
-			'subtitle' => 'Dashboard'
+			'subtitle' => 'Dashboard',
+			'page' => 'beranda_pasien_v'
 		);
 
 		$this->load->view('portal_pasien_v',$data);
@@ -34,6 +35,33 @@ class Portal_pasien extends CI_Controller {
 			$id_offline = $excel->val($i,15);
 			$this->model->update_offline($tahun_offline,$isi_a,$isi_b,$isi_c,$isi_d,$isi_e,$id_offline);
 		}
+	}
+
+	function get_dokter(){
+		$data = $this->master_model_m->get_dokter();
+		echo json_encode($data);
+	}
+
+	function get_tracking_pasien(){
+		$tanggal = date('d-m-Y');
+		$data = $this->master_model_m->get_tracking_pasien($tanggal);
+		echo json_encode($data);
+	}
+
+	function get_antrian(){
+		$akses = 'pasien';
+		$data = $this->master_model_m->get_akses_antrian($akses);
+
+		echo json_encode($data);
+	}
+
+	function get_total_pasien(){
+		$tanggal = date('d-m-Y');
+		$data['all'] = $this->master_model_m->get_total_all_pasien($tanggal);
+		$data['poli'] = $this->master_model_m->get_total_pasien_poli($tanggal);
+		$data['lab'] = $this->master_model_m->get_total_pasien_lab($tanggal);
+
+		echo json_encode($data);
 	}
 
 }

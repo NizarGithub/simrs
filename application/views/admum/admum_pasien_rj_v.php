@@ -142,6 +142,15 @@ $(document).ready(function(){
         $('#popup_poli').click();
         load_poli();
     });
+
+    $("input[name='pilihan']").click(function(){
+        var rd = $("input[name='pilihan']:checked").val();
+        if(rd == '1'){
+            $('.view_poli').show();
+        }else{
+            $('.view_poli').hide();
+        }
+    });
 });
 
 function get_kode_pasien(){
@@ -895,7 +904,7 @@ function Search_tgl_RI(tgl){
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group view_poli">
                         <label class="col-md-3 control-label">Poli Tujuan</label>
                         <div class="col-md-9">
                             <div class="input-group">
@@ -907,13 +916,13 @@ function Search_tgl_RI(tgl){
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group view_poli">
                         <label class="col-md-3 control-label">Dokter</label>
                         <div class="col-md-9">
                             <input type="text" class="form-control" id="dokter" value="" readonly>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group view_poli">
                         <label class="col-md-3 control-label">Biaya</label>
                         <div class="col-md-9">
                             <input type="text" class="form-control" id="biaya" value="" readonly>

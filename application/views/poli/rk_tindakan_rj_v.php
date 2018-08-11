@@ -70,6 +70,27 @@ $(document).ready(function(){
 
     data_tindakan();
 
+    $('#simpanTindakan').click(function(){
+    	var tr = $('#tabel_tambah_tindakan tbody tr').length;
+		if(tr == 0){
+			toastr["error"]("Perhatian! Pilih tindakan dahulu", "Notifikasi");
+		}else{
+	    	$.ajax({
+				url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/simpan_tindakan',
+				data : $('#view_tindakan_tambah').serialize(),
+				type : "POST",
+				dataType : "json",
+				success : function(res){
+					$('#view_tindakan').show();
+					$('#view_tindakan_tambah').hide();
+					data_tindakan();
+					notif_simpan();
+				}
+			});
+		}
+				
+    });
+
 	$('#btn_kembali').click(function(){
 		window.location = "<?php echo base_url(); ?>poli/poli_home_c";
 	});
@@ -94,11 +115,6 @@ $(document).ready(function(){
 
 	//LABORATURIUM
 
-	$('.btn_pemeriksaan').click(function(){
-		$('#popup_pemeriksaan').click();
-		load_pemeriksaan();
-	});
-
 	$('#btn_kirim_data').click(function(){
 		$('#popup_lab_baru').click();
 	});
@@ -114,20 +130,6 @@ $(document).ready(function(){
 			success : function(res){
 				toastr["success"]("Data Pasien telah dikirim ke Laborat!", "Notifikasi");
 				$('#btn_tutup_lab').click();
-			}
-		});
-	});
-
-	$('#ya_lab').click(function(){
-		$.ajax({
-			url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/hapus_laborat',
-			data : $('#form_hapus_lab').serialize(),
-			type : "POST",
-			dataType : "json",
-			success : function(result){
-				$('#tidak_lab').click();
-				data_laborat();
-				notif_hapus();
 			}
 		});
 	});
@@ -539,7 +541,7 @@ function klik_tindakan(id){
 						var jumlah = $('#jumlah_'+result[i].ID).val();
 						$('#jumlah_'+result[i].ID).val(parseInt(jumlah)+1);
 					}else{
-						$tr = "<tr id='tr_"+result[i].ID+"'>"+
+						$tr = "<tr class='trIkiBosTdk' id='tr_"+result[i].ID+"'>"+
 								"<input type='hidden' name='id_tindakan[]' value='"+result[i].ID+"'>"+
 								"<input type='hidden' id='tarif_"+result[i].ID+"' value='"+result[i].TARIF+"'>"+
 								"<input type='hidden' name='subtotal[]' id='subtotal_"+result[i].ID+"' value=''>"+
@@ -721,208 +723,6 @@ function hitung_jumlah2(){
 
 	var subtotal = parseFloat(tarif) * parseFloat(jumlah);
 	$('#subtotal_ubah').val(formatNumber(subtotal));
-}
-
-//LABORATURIUM
-
-function load_pemeriksaan(){
-	var keyword = $('#cari_pemeriksaan').val();
-
-	$.ajax({
-		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/load_pemeriksaan',
-		data : {keyword:keyword},
-		type : "POST",
-		dataType : "json",
-		success : function(result){
-			$tr = "";
-
-			if(result == "" || result == null){
-				$tr = "<tr><td colspan='4' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
-			}else{
-				var no = 0;
-
-				for(var i=0; i<result.length; i++){
-					no++;
-
-					$tr += "<tr style='cursor:pointer;' onclick='klik_pemeriksaan("+result[i].ID+");'>"+
-								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td>"+result[i].KODE+"</td>"+
-								"<td>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
-								"<td style='text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
-							"</tr>";
-				}
-			}
-
-			$('#tb_pemeriksaan tbody').html($tr);
-		}
-	});
-}
-
-function klik_pemeriksaan(id){
-	$('#tutup_pemeriksaan').click();
-
-	$.ajax({
-		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/klik_pemeriksaan',
-		data : {id:id},
-		type : "POST",
-		dataType : "json",
-		success : function(result){
-			$tr = "";
-
-			for(var i=0; i<result.length; i++){
-				var jumlah_data = $('#tr2_'+result[i].ID).length;
-
-				var aksi = "<button type='button' class='btn waves-light btn-danger btn-sm' onclick='deleteRow2(this);'><i class='fa fa-times'></i></button>";
-
-				if(jumlah_data > 0){
-					var jumlah = $('#jumlah_pemeriksaan_'+result[i].ID).val();
-					$('#jumlah_pemeriksaan_'+result[i].ID).val(parseInt(jumlah)+1);
-				}else{
-					$tr = "<tr id='tr2_"+result[i].ID+"'>"+
-							"<input type='hidden' name='id_pemeriksaan[]' value='"+result[i].ID+"'>"+
-							"<input type='hidden' name='tarif_pemeriksaan[]' value='"+result[i].TARIF+"'>"+
-							"<td style='vertical-align:middle;'>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
-							"<td align='center'><input type='text' class='form-control' name='hasil_periksa[]' value='' style='width:200px;'></td>"+
-							"<td align='center'><input type='text' class='form-control' name='nilai_rujukan[]' value='' style='width:200px;'></td>"+
-							"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
-							"<td style='vertical-align:middle; text-align:right;'><b>"+formatNumber(result[i].TARIF)+"</b></td>"+
-							"<td align='center'>"+aksi+"</td>"+
-						  "</tr>";
-				}
-			}
-
-			$('#tabel_tambah_pemeriksaan tbody').append($tr);
-			hitung_pemeriksaan();
-		}
-	});
-}
-
-function deleteRow2(btn){
-	var row = btn.parentNode.parentNode;
-	row.parentNode.removeChild(row);
-	hitung_pemeriksaan();
-}
-
-function hitung_pemeriksaan(){
-	var total = 0;
-	$("input[name='tarif_pemeriksaan[]']").each(function(idx,elm){
-		var tarif = elm.value;
-		total += parseFloat(tarif);
-	});
-	$('#total_tarif_pemeriksaan').val(formatNumber(total));
-}
-
-function data_laborat(){
-	$('#popup_load').show();
-	var id = "<?php echo $id; ?>";
-
-	$.ajax({
-		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/data_laborat',
-		data : {id:id},
-		type : "POST",
-		dataType : "json",
-		success : function(result){
-			var id_pelayanan = "<?php echo $id; ?>";
-			$tr = "";
-			var total = 0;
-
-			if(result == "" || result == null){
-				$tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
-			}else{
-				var no = 0;
-
-				for(var i=0; i<result.length; i++){
-					no++;
-
-					total += parseFloat(result[i].TOTAL_TARIF);
-
-					var aksi =  '<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-b-5" onclick="hasil_laborat('+result[i].ID+');">'+
-									'<i class="fa fa-tint"></i>'+
-								'</button>&nbsp;'+
-						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_laborat('+result[i].ID+');">'+
-						   			'<i class="fa fa-trash"></i>'+
-						   		'</button>';
-
-					var cito = "";
-					if(result[i].CITO == '1'){
-						cito = '<span class="label label-success">Aktif</span>';
-					}else{
-						cito = '<span class="label label-danger">Tidak Aktif</span>';
-					}
-
-					var tanggal = formatTanggal(result[i].TANGGAL)+' - '+result[i].WAKTU;
-
-					$tr += "<tr>"+
-								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
-								"<td style='vertical-align:middle;'>"+tanggal+"</td>"+
-								"<td style='vertical-align:middle;'>"+result[i].JENIS_LABORAT+"</td>"+
-								"<td style='vertical-align:middle; text-align:center;'>"+cito+"</td>"+
-								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TOTAL_TARIF)+"</td>"+
-								"<td align='center'>"+
-									"<a href='<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/cetak_laborat/"+result[i].ID+"/"+id_pelayanan+"' class='btn btn-inverse btn-sm' target='_blank'><i class='fa fa-print'></i></a>"+
-								"</td>"+
-								"<td align='center'>"+aksi+"</td>"+
-							"</tr>";
-				}
-			}
-
-			$('#tabel_laborat tbody').html($tr);
-			$('#popup_load').fadeOut();
-			$('#grandtotal_laborat').html(formatNumber(total));
-		}
-	});
-}
-
-function hasil_laborat(id){
-	$('#popup_hasil_lab').click();
-
-	$.ajax({
-		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/data_hasil_pemeriksaan',
-		data : {id:id},
-		type : "POST",
-		dataType : "json",
-		success : function(result){
-			$tr = "";
-			var total = 0;
-
-			if(result == "" || result == null){
-				$tr = "<tr><td colspan='4' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
-			}else{
-				var no = 0;
-
-				for(var i=0; i<result.length; i++){
-					no++;
-					
-					total += parseFloat(result[i].SUBTOTAL);
-
-					$tr += "<tr>"+
-								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
-								"<td style='vertical-align:middle;'>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
-								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
-								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].SUBTOTAL)+"</td>"+
-							"</tr>";
-				}
-			}
-
-			$('#tb_hasil_lab tbody').html($tr);
-			$('#total_laborat').html(formatNumber(total));
-		}
-	});
-}
-
-function hapus_laborat(id){
-	$('#popup_hapus_lab').click();
-	
-	$.ajax({
-		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/data_laborat_id',
-		data : {id:id},
-		type : "POST",
-		dataType : "json",
-		success : function(row){
-			$('#id_hapus_lab').val(id);
-			$('#msg_lab').html('Apakah data <b>'+row['JENIS_LABORAT']+'</b> ingin dihapus?');
-		}
-	});
 }
 
 //DIAGNOSA
@@ -1762,22 +1562,15 @@ function data_surat_dokter_ada(){
             				<td><span style="color:#0066b2;"><?php echo $dt->UMUR; ?> Tahun</span></td>
             			</tr>
             			<tr>
-            				<?php
-	                    		$kerja = "";
-	                    		if($dt->PEKERJAAN=="" || $dt->PEKERJAAN==null){$kerja="-";}else{$kerja=$dt->PEKERJAAN;}
-	                    	?>
             				<td>ALAMAT</td>
             				<td>:</td>
-            				<td>
+            				<td colspan="4">
             					<span style="color:#0066b2;">
             						<?php echo $dt->ALAMAT; ?> Kec. <?php echo $dt->KECAMATAN; ?><br>
             						Kel. <?php echo $dt->KELURAHAN; ?> <br>
             						Kec. <?php echo $dt->KOTA; ?>
             					</span>
             				</td>
-            				<td>PEKERJAAN</td>
-            				<td>:</td>
-            				<td><span style="color:#0066b2;"><?php echo $kerja; ?></span></td>
             			</tr>
             		</tbody>
             	</table>
@@ -1896,7 +1689,7 @@ function data_surat_dokter_ada(){
                     	</div>
                     </form>
 
-					<form class="form-horizontal" id="view_tindakan_tambah" action="<?php echo $url_simpan; ?>" method="post">
+					<form class="form-horizontal" id="view_tindakan_tambah" action="" method="post">
 						<input type="hidden" name="id_rj" id="id_rj" value="<?php echo $id; ?>">
 						<input type="hidden" name="id_poli" value="<?php echo $dt->ID_POLI; ?>">
 						<input type="hidden" name="id_dokter" value="<?php echo $dt->ID_DOKTER; ?>">
@@ -1975,7 +1768,7 @@ function data_surat_dokter_ada(){
 	                    </div>
 	                    <hr>
 	                    <center>
-	                    	<button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <b>Simpan</b></button>
+	                    	<button type="button" class="btn btn-success" id="simpanTindakan"><i class="fa fa-save"></i> <b>Simpan</b></button>
 	                        <button type="button" class="btn btn-danger" id="batal"><i class="fa fa-times"></i> <b>Batal</b></button>
 	                    </center>
 					</form>
@@ -2028,7 +1821,7 @@ function data_surat_dokter_ada(){
 	                    </div>
 	                    <hr>
 	                    <center>
-	                    	<button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <b>Simpan</b></button>
+	                    	<button type="button" class="btn btn-success" id="simpanTindakan_ubah"><i class="fa fa-save"></i> <b>Simpan</b></button>
 	                        <button type="button" class="btn btn-danger" id="batal_ubah"><i class="fa fa-times"></i> <b>Batal</b></button>
 	                    </center>
 					</form>
@@ -2694,118 +2487,6 @@ function data_surat_dokter_ada(){
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div>
-
-<button class="btn btn-primary" data-toggle="modal" data-target="#myModal1_pemeriksaan" id="popup_pemeriksaan" style="display:none;">Standard Modal</button>
-<div id="myModal1_pemeriksaan" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog" style="width:50%;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title" id="myModalLabel">Data Tindakan</h4>
-            </div>
-            <div class="modal-body">
-                <form class="form-horizontal" role="form">
-		            <div class="form-group">
-		                <div class="col-md-12">
-			                <div class="input-group">
-			                    <input type="text" class="form-control" id="cari_pemeriksaan" placeholder="Cari..." value="">
-			                    <span class="input-group-btn">
-			                    	<button type="button" class="btn waves-effect waves-light btn-custom" style="cursor:default;">
-			                    		<i class="fa fa-search"></i>
-			                    	</button>
-			                    </span>
-			                </div>
-		                </div>
-		            </div>
-		        </form>
-            	<div class="table-responsive">
-            		<div class="scroll-y">
-		                <table class="table table-hover table-bordered" id="tb_pemeriksaan">
-		                    <thead>
-		                        <tr class="hijau_popup">
-		                            <th style="text-align:center; color: #fff;" width="50">No</th>
-		                            <th style="text-align:center; color: #fff;">Kode</th>
-		                            <th style="text-align:center; color: #fff;">Pemeriksaan</th>
-		                            <th style="text-align:center; color: #fff;">Tarif</th>
-		                        </tr>
-		                    </thead>
-		                    <tbody>
-		                        
-		                    </tbody>
-		                </table>
-            		</div>
-            	</div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_pemeriksaan">Tutup</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<button class="btn btn-primary" data-toggle="modal" data-target="#myModal1_hasil_lab" id="popup_hasil_lab" style="display:none;">Standard Modal</button>
-<div id="myModal1_hasil_lab" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog" style="width:50%;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title" id="myModalLabel">Hasil Laborat</h4>
-            </div>
-            <div class="modal-body">
-            	<div class="table-responsive">
-            		<div class="scroll-y">
-		                <table class="table table-bordered" id="tb_hasil_lab">
-		                    <thead>
-		                        <tr class="hijau_popup">
-		                            <th style="text-align:center; color: #fff;" width="50">No</th>
-		                            <th style="text-align:center; color: #fff;">Pemeriksaan</th>
-		                            <th style="text-align:center; color: #fff;">Tarif</th>
-		                            <th style="text-align:center; color: #fff;">Subtotal</th>
-		                        </tr>
-		                    </thead>
-		                    <tbody>
-		                        
-		                    </tbody>
-		                    <tfoot>
-		                    	<tr class="active">
-		                    		<td colspan="2">&nbsp;</td>
-		                    		<td style="text-align:right;"><b>TOTAL :</b></td>
-		                    		<td style="text-align:right;"><b id="total_laborat" class="text-danger"></b></td>
-		                    	</tr>
-		                    </tfoot>
-		                </table>
-            		</div>
-            	</div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_hasil_lab">Tutup</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<button id="popup_hapus_lab" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#custom-width-modal2" style="display:none;">Custom width Modal</button>
-<div id="custom-width-modal2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog" style="width:55%;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="custom-width-modalLabel">Konfirmasi Hapus</h4>
-            </div>
-            <div class="modal-body">
-                <p id="msg_lab"></p>
-            </div>
-            <div class="modal-footer">
-            	<form action="" method="post" id="form_hapus_lab">
-            		<input type="hidden" name="id_hapus_lab" id="id_hapus_lab" value="">
-            		<input type="hidden" name="id_pelayanan_lab" value="<?php echo $id; ?>">
-            		<input type="hidden" name="ket_hapus_lab" id="ket_hapus_lab" value="">
-	                <button type="button" class="btn btn-default waves-effect" data-dismiss="modal" id="tidak_lab">Tidak</button>
-	                <button type="button" class="btn btn-danger waves-effect waves-light" id="ya_lab">Ya</button>
-            	</form>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
 
 <!-- DIAGNOSA -->
 <button id="popup_penyakit_dg" class="btn btn-primary" data-toggle="modal" data-target="#myModal2_hasil_dg" style="display:none;">Standard Modal</button>

@@ -273,9 +273,9 @@
                         </table>
                     </div>
                     <hr>
-                <center>
-                    <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal" id="tutup_pas">Tutup</button>
-                </center>
+                    <center>
+                        <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal" id="tutup_pas">Tutup</button>
+                    </center>
                 </div>
             </div>
         </div>
@@ -391,7 +391,7 @@
             var keyword = "";
 
             $.ajax({
-                url : '<?php echo base_url(); ?>lab/lab_home_c/data_pasien',
+                url : '<?php echo base_url(); ?>lab/lab_home_c/get_notif_pasien',
                 data : {keyword:keyword},
                 type : "GET",
                 dataType : "json",
@@ -400,10 +400,9 @@
                         $('#ketap_ketip').hide();
                     }else{
                         for(var i=0; i<res.length; i++){
-                            if(res[i].STS_TERIMA == '1'){
+                            if(res[i].STS_TERIMA == '0'){
                                 $('#ketap_ketip').show();
-                                snd.play();
-                                notif_pasien_baru();
+                                // snd.play();
                                 $('#popup_pasien_baru').show();
                                 data_pasien_baru();
                             }else{
@@ -419,17 +418,11 @@
 
         function data_pasien_baru(){
             var keyword = "";
-            var urutkan = "";
-            var pilih_umur = "";
-            var pilih_status = "";
 
             $.ajax({
                 url : '<?php echo base_url(); ?>lab/lab_home_c/data_pasien',
                 data : {
-                    keyword:keyword,
-                    urutkan:urutkan,
-                    pilih_umur:pilih_umur,
-                    pilih_status:pilih_status
+                    keyword:keyword
                 },
                 type : "GET",
                 dataType : "json",
@@ -445,15 +438,15 @@
                             no++;
                             
                             var aksi = '<div class="checkbox checkbox-primary">'+
-                                        '    <input id="checkbox'+result[i].ID+'" type="checkbox" name="centang[]" value="'+result[i].ID+'" onclick="terima_pasien('+result[i].ID+');">'+
-                                        '    <label for="checkbox'+result[i].ID+'">&nbsp;</label>'+
+                                        '    <input id="checkbox'+result[i].ID_RJ+'" type="checkbox" name="centang[]" value="'+result[i].ID_RJ+'" onclick="terima_pasien('+result[i].ID_RJ+');">'+
+                                        '    <label for="checkbox'+result[i].ID_RJ+'">&nbsp;</label>'+
                                         '</div>';
 
                             $tr +=  '<tr>'+
                                     '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].KODE_PASIEN+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].TANGGAL_DAFTAR+' - '+result[i].WAKTU_DAFTAR+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].TANGGAL+' - '+result[i].WAKTU_RJ+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
                                     '</tr>';

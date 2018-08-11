@@ -87,12 +87,41 @@ class Poli_home_m extends CI_Model {
 				}
 
 				if($tanggal_awal != "" && $tanggal_akhir != ""){
-					$where = $where." AND STR_TO_DATE(b.TANGGAL, '%d-%m-%Y') > '$tanggal_awal' AND STR_TO_DATE(b.TANGGAL, '%d-%m-%Y') < '$tanggal_akhir'";
+					$where = $where." 
+						AND STR_TO_DATE(b.TANGGAL, '%d-%m-%Y') >= STR_TO_DATE('$tanggal_awal', '%d-%m-%Y') 
+						AND STR_TO_DATE(b.TANGGAL, '%d-%m-%Y') <= STR_TO_DATE('$tanggal_akhir', '%d-%m-%Y') 
+						AND b.STS_POSISI = '$posisi'
+					";
 				}else if($bulan != 0 && $tahun != ""){
-					$where = $where." AND b.BULAN = '$bulan' AND b.TAHUN = '$tahun'";
+					$where = $where." 
+						AND b.BULAN = '$bulan' 
+						AND b.TAHUN = '$tahun'
+						AND b.STS_POSISI = '$posisi'
+					";
 				}
 			}else{
-				$where = $where." AND c.ID_DIVISI = '$id_divisi' AND b.STS_POSISI = '$posisi' AND b.TANGGAL = '$now' AND b.STS_TERIMA = '1'";
+				if($tanggal_awal != "" && $tanggal_akhir != ""){
+					$where = $where." 
+						AND STR_TO_DATE(b.TANGGAL, '%d-%m-%Y') >= STR_TO_DATE('$tanggal_awal', '%d-%m-%Y') 
+						AND STR_TO_DATE(b.TANGGAL, '%d-%m-%Y') <= STR_TO_DATE('$tanggal_akhir', '%d-%m-%Y') 
+						AND b.STS_POSISI = '$posisi'
+						AND b.STS_TERIMA = '1'
+					";
+				}else if($bulan != 0 && $tahun != ""){
+					$where = $where." 
+						AND b.BULAN = '$bulan' 
+						AND b.TAHUN = '$tahun'
+						AND b.STS_POSISI = '$posisi'
+						AND b.STS_TERIMA = '1'
+					";
+				}else{
+					$where = $where." 
+						AND b.TANGGAL = '$now'
+						AND c.ID_DIVISI = '$id_divisi' 
+						AND b.STS_POSISI = '$posisi' 
+						AND b.STS_TERIMA = '1'
+					";
+				}
 			}
 		}
 

@@ -107,6 +107,103 @@ class Master_model_m extends CI_Model
 		$this->db->query($sql);
 	}
 
+	function get_dokter(){
+		$sql = "
+			SELECT 
+				a.*,
+				b.NAMA_DIV
+			FROM kepeg_pegawai a
+			LEFT JOIN kepeg_divisi b ON b.ID = a.ID_DIVISI
+			WHERE a.STS_LOGIN = '1'
+			ORDER BY a.ID DESC
+			LIMIT 5
+		";
+		return $this->db->query($sql)->result();
+	}
+
+	function get_tracking_pasien($tanggal){
+		$sql = "
+			SELECT
+				a.*,
+				b.NAMA AS NAMA_PASIEN,
+				b.JENIS_KELAMIN,
+				c.NAMA AS NAMA_POLI
+			FROM admum_rawat_jalan a
+			LEFT JOIN rk_pasien b ON b.ID = a.ID_PASIEN
+			LEFT JOIN admum_poli c ON c.ID = a.ID_POLI
+			WHERE a.TANGGAL = '$tanggal'
+			ORDER BY a.ID DESC
+			LIMIT 5
+		";
+		return $this->db->query($sql)->result();
+	}
+
+	function get_data_dokter(){
+		$sql = "
+			SELECT
+				a.*
+			FROM kepeg_pegawai a
+		";
+		return $this->db->query($sql)->result();
+	}
+
+	function get_dokter_id($id){
+		$sql = "
+			SELECT
+				a.*
+			FROM kepeg_pegawai a
+			WHERE a.ID = '$id' 
+		";
+		return $this->db->query($sql)->row();
+	}
+
+	function get_total_all_pasien($tanggal){
+		$sql = "
+			SELECT
+				a.*
+			FROM admum_rawat_jalan a
+			WHERE a.TANGGAL = '$tanggal'
+		";
+		return $this->db->query($sql)->result();
+	}
+
+	function get_total_pasien_poli($tanggal){
+		$sql = "
+			SELECT
+				a.*
+			FROM admum_rawat_jalan a
+			WHERE a.TANGGAL = '$tanggal'
+			AND a.STS_POSISI = '1'
+		";
+		return $this->db->query($sql)->result();
+	}
+
+	function get_total_pasien_lab($tanggal){
+		$sql = "
+			SELECT
+				a.*
+			FROM admum_rawat_jalan a
+			WHERE a.TANGGAL = '$tanggal'
+			AND a.STS_POSISI = '2'
+		";
+		return $this->db->query($sql)->result();
+	}
+
+	function get_akses_antrian($akses){
+		$sql = "
+			SELECT
+				a.*,
+				b.NAMA_LOKET,
+				c.KODE,
+				c.STS AS STS_LOKET
+			FROM kepeg_loket_akses a
+			LEFT JOIN kepeg_loket b ON b.ID = a.ID_LOKET
+			LEFT JOIN kepeg_setup_antrian c ON c.ID = b.KODE_ANTRIAN
+			WHERE a.AKSES = '$akses'
+		";
+		return $this->db->query($sql)->result();
+	}
+
 }
 
 ?>

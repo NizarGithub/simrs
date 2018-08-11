@@ -14,6 +14,8 @@ $(document).ready(function(){
         notif_ubah();
     <?php }else if($msg == 3){ ?>
         notif_hapus();
+    <?php }else if($msg == 2){ ?>
+    	notif_tidak_boleh_hapus();
     <?php } ?>
 
     data_setup_antrian();
@@ -21,8 +23,6 @@ $(document).ready(function(){
     $('#jumlah_tampil').change(function(){
         data_setup_antrian();
     });
-
-
 
     $("#antrian_max").keydown(function (e) {
         // Allow: backspace, delete, tab, escape, enter and .
@@ -107,10 +107,12 @@ function data_setup_antrian(){
                                     '<i class="fa fa-trash"></i> Hapus'+
                                 '</button>';
 
+                    var untuk = result[i].UNTUK+' - '+result[i].STS;
+
 					$tr += "<tr>"+
 								"<td style='text-align:center; vertical-align:middle;'>"+no+"</td>"+
 								"<td style='text-align:center; vertical-align:middle;'>"+result[i].KODE+"</td>"+
-								"<td style='text-align:center; vertical-align:middle; text-transform:capitalize;'>"+result[i].UNTUK+"</td>"+
+								"<td style='text-align:center; vertical-align:middle; text-transform:capitalize;'><b>"+untuk+"</b></td>"+
 								"<td style='text-align:center; vertical-align:middle;'>"+antrian_max+"</td>"+
 								"<td style='vertical-align:middle;' align='center'>"+aksi+"</td>"+
 							"</tr>";
@@ -269,21 +271,33 @@ function hapus_antrian(id){
 			                            </span>
 			                        </div>
 			                    </div>
-
+			                    <div class="form-group">
+			                        <label class="col-md-2 control-label">Status</label>
+			                        <div class="col-md-5">
+			                        	<div class="radio radio-info radio-inline">
+			                                <input type="radio" id="inlineRadio1" value="online" name="status">
+			                                <label for="inlineRadio1"> Online </label>
+			                            </div>
+			                            <div class="radio radio-inline">
+			                                <input type="radio" id="inlineRadio2" value="offline" name="status">
+			                                <label for="inlineRadio2"> Offline </label>
+			                            </div>
+			                        </div>
+			                    </div>
 			                    <div class="form-group">
 			                        <label class="col-md-2 control-label">Antrian Untuk</label>
 			                        <div class="col-md-5">
 			                            <select class="form-control" name="untuk" id="untuk" required="required">
 	                                        <option value=""> -- Pilih</option>
-	                                        <option value="kasir"> Kasir / Pembayaran </option>
 	                                        <option value="poli"> Poli </option>
+	                                        <option value="lab"> Laborat </option>
+	                                        <option value="apotek"> Apotek </option>
+	                                        <option value="kasir"> Kasir / Pembayaran </option>
 	                                        <option value="konsultasi"> Konsultasi </option>
 	                                        <option value="jenguk"> Jenguk Pasien </option>
-	                                        <option value="apotek"> Aprotek </option>
 	                                    </select>
 			                        </div>
 			                    </div>
-
 			                    <div class="form-group">
 			                        <label class="col-md-2 control-label">Antrian Maksimal</label>
 			                        <div class="col-md-5">
@@ -293,7 +307,6 @@ function hapus_antrian(id){
 			                            </span>
 			                        </div>
 			                    </div>
-
 			                    <div class="form-group">
 			                        <label class="col-md-2 control-label">&nbsp;</label>
 			                        <div class="col-md-5">

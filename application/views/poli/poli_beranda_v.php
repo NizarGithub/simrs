@@ -184,6 +184,10 @@ $(document).ready(function(){
         data_pasien();
         $('#view_tanggal').hide();
         $('#view_bulan').hide();
+
+        $('#tanggal_awal').val("");
+        $('#tanggal_akhir').val("");
+        $('#tahun').val("");
     });
 
     $("input[name='filter']").click(function(){

@@ -117,8 +117,7 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 			$this->model->simpan_detail($id_tindakan_rj,$value,$tanggal,$bulan,$tahun,$jumlah[$key],$subtotal[$key],$waktu);
 		}
 
-		$this->session->set_flashdata('sukses','1');
-		redirect('poli/rk_pelayanan_rj_c/tindakan_rj/'.$id); 
+		echo '1';
 	}
 
 	function ubah_tindakan(){
@@ -143,105 +142,6 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		
 		$this->session->set_flashdata('hapus','1');
 		redirect('poli/rk_pelayanan_rj_c/tindakan_rj/'.$id_pelayanan);
-	}
-
-	//LABORAT
-
-	function update_ke_lab(){
-		$id_pasien = $this->input->post('id_pasien');
-		$this->model->update_ke_lab($id_pasien);
-		echo '1';
-	}
-
-	function load_pemeriksaan(){
-		$keyword = $this->input->post('keyword');
-		$data = $this->model->load_pemeriksaan($keyword);
-		echo json_encode($data);
-	}
-
-	function klik_pemeriksaan(){
-		$id = $this->input->post('id');
-		$data = $this->model->klik_pemeriksaan($id);
-		echo json_encode($data);
-	}
-
-	function simpan_pemeriksaan(){
-		$kode_lab = $this->input->post('kode_lab');
-		$id_pelayanan = $this->input->post('id_rj');
-		$id_poli = $this->input->post('id_poli');
-		$id_peg_dokter = $this->input->post('id_dokter');
-		$id_pasien = $this->input->post('id_pasien');
-		$jenis_laborat = $this->input->post('id_laborat');
-		$total_tarif = str_replace(',', '', $this->input->post('total_tarif_pemeriksaan'));
-		$cito = $this->input->post('cito');
-		$tanggal = date('d-m-Y');
-		$bulan = date('n');
-		$tahun = date('Y');
-
-		$pemeriksaan = $this->input->post('id_pemeriksaan');
-		$subtotal = str_replace(',', '', $this->input->post('tarif_pemeriksaan'));
-
-		$tz_object = new DateTimeZone('Asia/Jakarta');
-		$datetime = new DateTime();
-		$format = $datetime->setTimezone($tz_object);
-		$waktu = $format->format('H:i:s');
-
-		$this->model->simpan_pemeriksaan($kode_lab,$id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$jenis_laborat,$total_tarif,$cito,$tanggal,$bulan,$tahun,$waktu);
-		$id_pemeriksaan_rj = $this->db->insert_id();
-		$hasil = $this->input->post('hasil_periksa');
-		$nilai_rujukan = $this->input->post('nilai_rujukan');
-
-		foreach ($pemeriksaan as $key => $value) {
-			$this->model->simpan_pemeriksaan_detail($id_pemeriksaan_rj,$value,$hasil[$key],$nilai_rujukan[$key],$tanggal,$bulan,$tahun,$subtotal[$key],$waktu);
-		}
-
-		$this->insert_kode_lab();
-
-		echo '1';
-	}
-
-	function data_laborat(){
-		$id = $this->input->post('id');
-		$data = $this->model->data_laborat($id);
-		echo json_encode($data);
-	}
-
-	function data_laborat_id(){
-		$id = $this->input->post('id');
-		$data = $this->model->data_laborat_id($id);
-		echo json_encode($data);
-	}
-
-	function data_hasil_pemeriksaan(){
-		$id_pemeriksaan = $this->input->post('id');
-		$data = $this->model->data_hasil_pemeriksaan($id_pemeriksaan);
-		echo json_encode($data);
-	}
-
-	function hapus_laborat(){
-		$id = $this->input->post('id_hapus_lab');
-
-		$this->model->hapus_laborat($id);
-		$this->model->hapus_laborat_detail($id);
-
-		echo '1';
-	}
-
-	function cetak_laborat($id,$id_pelayanan){
-		$data1 = $this->model->data_rawat_jalan_id($id_pelayanan);
-		$data2 = $this->model->data_hasil_pemeriksaan($id);
-		$data3 = $this->model->data_laborat_id($id);
-
-		$data = array(
-			'settitle' => 'Pelayanan Rawat Jalan',
-			'filename' => 'hasil_laborat',
-			'view'	=> 'rj',
-			'data1' => $data1,
-			'data2' => $data2,
-			'data3' => $data3,
-		);
-
-		$this->load->view('poli/pdf/rk_laporan_hasil_lab_pdf_v',$data);
 	}
 
 	// DIAGNOSA

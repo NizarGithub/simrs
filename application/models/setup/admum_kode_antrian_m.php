@@ -17,12 +17,12 @@ class Admum_kode_antrian_m extends CI_Model {
 		return $this->db->query($sql)->result();
 	}
 
-	function simpan_antrian($kode, $untuk, $antrian_max){
+	function simpan_antrian($kode, $untuk, $antrian_max, $status){
 		$sql = "
 		INSERT INTO kepeg_setup_antrian
-		(KODE, UNTUK, ANTRIAN_MAX)
+		(KODE, UNTUK, ANTRIAN_MAX, STS)
 		VALUES 
-		('$kode', '$untuk', $antrian_max)
+		('$kode', '$untuk', '$antrian_max', '$status')
 		";
 
 		$this->db->query($sql);
