@@ -37,7 +37,7 @@ $(document).ready(function(){
 	});
 
 	$('#batal').click(function(){
-		window.location = "<?php echo base_url(); ?>setup/admum_ambulance_c";
+		window.location = "<?php echo base_url(); ?>setup/admum_setup_loket_c";
 	});
 
 	$('#checkbox2').click(function(){
@@ -617,17 +617,21 @@ function klik_perawat_tambah(id){
 					                		<td style="vertical-align:middle;"align="left"> 
 					                			<?PHP foreach ($data_akses as $key => $aks) { 
 					                				$akses = "";
-					                				if($aks->AKSES == "billing"){
-					                					$akses = "Billing";
-					                				} else if($aks->AKSES == "admum"){
-					                					$akses = "Admission";
-					                				} else if($aks->AKSES == "rekam_medik"){
-					                					$akses = "Rekam Medik";
-					                				} else if($aks->AKSES == "apotek"){
-					                					$akses = "Apotek";
-					                				} else if($aks->AKSES == "pasien"){
-					                					$akses = "Beranda Pasien";
-					                				}
+					                				if($aks->AKSES == "pasien"){
+							                    		$akses = "Beranda Pasien";
+							                    	} else if($aks->AKSES == "admum"){
+							                    		$akses = "Admission";
+							                    	} else if($aks->AKSES == "poli"){
+							                    		$akses = "Poli";
+							                    	} else if($aks->AKSES == "lab"){
+							                    		$akses = "Laborat";
+							                    	}else if($aks->AKSES == "apotek"){
+							                    		$akses = "Apotek";
+							                    	}else if($aks->AKSES == "rekam_medik"){
+							                    		$akses = "Rekam Medik";
+							                    	}else if($aks->AKSES == "billing"){
+							                    		$akses = "Billing";
+							                    	}
 
 					                				echo " - ".$akses."<br>";
 					                			} ?>
@@ -679,21 +683,33 @@ function klik_perawat_tambah(id){
 			                    <div class="form-group">
 			                        <label class="col-md-2 control-label"> Akses Loket </label>
 			                        <div class="col-md-10">
-			                            <div class="checkbox checkbox-warning">
-			                                <input type="checkbox" name="akses[]" id="inlineCheckbox1" value="billing">
-			                                <label for="inlineCheckbox1"> Billing </label>
+			                        	<div class="checkbox checkbox-purple">
+			                                <input type="checkbox" name="akses[]" id="inlineCheckbox0" value="pasien">
+			                                <label for="inlineCheckbox0"> Beranda Pasien </label>
 			                            </div>
 			                            <div class="checkbox checkbox-primary">
 			                                <input type="checkbox" name="akses[]" id="inlineCheckbox2" value="admum">
 			                                <label for="inlineCheckbox2"> Admission </label>
 			                            </div>
-			                            <div class="checkbox checkbox-danger">
-			                                <input type="checkbox" name="akses[]" id="inlineCheckbox3" value="rekam_medik">
-			                                <label for="inlineCheckbox3"> Rekam Medik </label>
+			                            <div class="checkbox checkbox-success">
+			                                <input type="checkbox" name="akses[]" id="inlineCheckbox_poli" value="poli">
+			                                <label for="inlineCheckbox_poli"> Poli </label>
+			                            </div>
+			                            <div class="checkbox checkbox-primary">
+			                                <input type="checkbox" name="akses[]" id="inlineCheckbox_lab" value="lab">
+			                                <label for="inlineCheckbox_lab"> Laborat </label>
 			                            </div>
 			                            <div class="checkbox checkbox-success">
 			                                <input type="checkbox" name="akses[]" id="inlineCheckbox4" value="apotek">
 			                                <label for="inlineCheckbox4"> Apotek </label>
+			                            </div>
+			                            <div class="checkbox checkbox-danger">
+			                                <input type="checkbox" name="akses[]" id="inlineCheckbox3" value="rekam_medik">
+			                                <label for="inlineCheckbox3"> Rekam Medik </label>
+			                            </div>
+			                            <div class="checkbox checkbox-warning">
+			                                <input type="checkbox" name="akses[]" id="inlineCheckbox1" value="billing">
+			                                <label for="inlineCheckbox1"> Billing </label>
 			                            </div>
 			                        </div>
 			                    </div>

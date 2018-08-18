@@ -76,7 +76,8 @@
         }
         </style>
         <script src="<?php echo base_url(); ?>assets/js/modernizr.min.js"></script>
-        <?PHP 
+        <?PHP
+            date_default_timezone_set('Asia/Jakarta');
             $sess_user = $this->session->userdata('masuk_rs');
             $id_user = $sess_user['id'];
             $user = $this->master_model_m->get_user_info($id_user);
@@ -84,10 +85,15 @@
             $id_divisi = $sess_user['id_divisi']; //ID POLI
 
             $is_operator = $this->master_model_m->is_operator($id_user, 'poli');
+            $bulan = array(
+                1 =>    "Januari", 2  =>"Februari", 3  =>"Maret", 4 =>"April",
+                5 =>    "Mei", 6  =>"Juni", 7  =>"Juli", 8 =>"Agustus",
+                9 =>    "September", 10 =>"Oktober", 11 =>"November", 12 =>"Desember"
+            );
         ?>
     </head>
 
-    <body>
+    <body onload="startTime();">
         <!-- Navigation Bar-->
         <header id="topnav">
             <div class="topbar-main" style="background-color:#00a4e4; height:60px;">
@@ -103,34 +109,31 @@
 
                     <!-- LOKET -->
                     <?php 
-                    if(count($is_operator) > 0){ 
-                        $get_loket = $this->master_model_m->getLoket($id_user, 'poli');
-                        $get_jml_antrian = $this->master_model_m->getJmlAntrian($get_loket->KODE_ANTRIAN);
+                    // if(count($is_operator) > 0){ 
+                    //     $get_loket = $this->master_model_m->getLoket($id_user, 'poli');
+                    //     $get_jml_antrian = $this->master_model_m->getJmlAntrian($get_loket->KODE_ANTRIAN);
                     ?>
-                    <center>
-                    <div style="width: 87%; position: absolute; float: left; margin-top: 7px;">
-                        <button type="button" class="btn btn-warning waves-effect waves-light w-md m-b-5" style="padding-top: 10px; padding-bottom: 10px;"> 
-                            <b id="nama_loket_antrian_txt"> <?=strtoupper($get_loket->NAMA_LOKET);?> </b> 
-                        </button>
+                    <!-- <center>
+                        <div style="width: 87%; position: absolute; float: left; margin-top: 7px;">
+                            <button type="button" class="btn btn-warning waves-effect waves-light w-md m-b-5" style="padding-top: 10px; padding-bottom: 10px;"> 
+                                <b id="nama_loket_antrian_txt"> <?=strtoupper($get_loket->NAMA_LOKET);?> </b> 
+                            </button>
 
-                        <button type="button" class="btn btn-danger" style="margin-left: 100px; font-size: 32px; margin-top: -8px;"> 
-                            <b><?=$get_loket->KODE;?>-<font id="jml_antrian_txt"><?=count($get_jml_antrian) + 0;?></font></b> 
+                            <button type="button" class="btn btn-danger" style="margin-left: 100px; font-size: 32px; margin-top: -8px;"> 
+                                <b><?=$get_loket->KODE;?>-<font id="jml_antrian_txt"><?=count($get_jml_antrian) + 0;?></font></b> 
 
-                            <input type="hidden" id="kode_antrian_now" value="<?=$get_loket->KODE;?>" />
-                            <input type="hidden" id="jml_antrian_now" value="<?=count($get_jml_antrian) + 0;?>" />
-                            <input type="hidden" id="id_antrian_now" value="<?=$get_loket->KODE_ANTRIAN;?>" />
-                        </button>
+                            </button>
 
-                        <button class="btn btn-purple waves-effect waves-light m-b-5" style="margin-left: 40px;" onclick="panggil_antrian();"> 
-                           <i class="fa fa-bullhorn m-r-5"></i>   <span> Panggil </span> 
-                        </button>
+                            <button class="btn btn-purple waves-effect waves-light m-b-5" style="margin-left: 40px;" onclick="panggil_antrian();"> 
+                               <i class="fa fa-bullhorn m-r-5"></i>   <span> Panggil </span> 
+                            </button>
 
-                        <button class="btn btn-success waves-effect waves-light m-b-5" style="margin-left: 10px;" data-toggle="modal" data-target="#next_antrian"> 
-                            <span> Berikutnya </span> <i class="fa fa-chevron-circle-right m-r-5"></i>  
-                        </button>
-                    </div>
-                    </center>
-                    <?PHP } ?>
+                            <button class="btn btn-success waves-effect waves-light m-b-5" style="margin-left: 10px;" data-toggle="modal" data-target="#next_antrian"> 
+                                <span> Berikutnya </span> <i class="fa fa-chevron-circle-right m-r-5"></i>  
+                            </button>
+                        </div>
+                    </center> -->
+                    <?PHP //} ?>
                     <!-- END OF LOKET -->
 
                     <div class="menu-extras">
@@ -170,7 +173,7 @@
                                 <!-- Notification -->
                                 <div class="notification-box">
                                     <ul class="list-inline m-b-0">
-                                        <li>
+                                        <li id="li_notif">
                                             <a class="right-bar-toggle" href="javascript:void(0);">
                                                 <i class="fa fa-bell-o"></i>
                                             </a>
@@ -222,8 +225,68 @@
             <div class="container">
                 <br>
                 <div class="row">
-                    <?php $this->load->view($page); ?>
+                    <input type="hidden" id="id_antrian_now" value="">
+                    <input type="hidden" id="kode_antrian_now" value="">
+                    <input type="hidden" id="jml_antrian_now" value="">
+                    <input type="hidden" id="id_antrian_now_on" value="">
+                    <input type="hidden" id="kode_antrian_now_on" value="">
+                    <input type="hidden" id="jml_antrian_now_on" value="">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card-box widget-user">
+                            <div>
+                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/antri_online.png">
+                                <div class="wid-u-info">
+                                    <h4 class="m-t-0 m-b-5">Antrian Online</h4>
+                                    <button type="button" class="btn btn-info waves-effect waves-light m-b-5"><b id="loket_online"></b></button>
+                                    <button type="button" class="btn btn-purple waves-effect waves-light m-b-5" onclick="panggil_antrian('online');"><i class="fa fa-bullhorn m-r-5"></i><b id="nomor_online">-</b></button>
+                                    <button type="button" class="btn btn-success waves-effect waves-light m-b-5" onclick="next_antri('online');"><b>Berikutnya</b> <i class="fa fa-arrow-circle-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card-box widget-user">
+                            <div>
+                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/small-queue-management.png">
+                                <div class="wid-u-info">
+                                    <h4 class="m-t-0 m-b-5"> Antrian Offline</h4>
+                                    <button type="button" class="btn btn-danger waves-effect waves-light m-b-5"><b id="loket_offline"></b></button>
+                                    <button type="button" class="btn btn-purple waves-effect waves-light m-b-5" onclick="panggil_antrian('offline');"><i class="fa fa-bullhorn m-r-5"></i><b id="nomor_offline">-</b></button>
+                                    <button type="button" class="btn btn-success waves-effect waves-light m-b-5" onclick="next_antri('offline');"><b>Berikutnya</b> <i class="fa fa-arrow-circle-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card-box widget-user">
+                            <div>
+                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/Clock-Icon-Image.png">
+                                <div class="wid-u-info">
+                                    <h4 class="m-t-0 m-b-5">Waktu</h4>
+                                    <button type="button" class="btn btn-info waves-effect waves-light m-b-5"><b id="waktu_txt"></b></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card-box widget-user">
+                            <div>
+                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/kisspng-calendar-date-computer-icons-time-calendar-icon-5ac41db68edb81.1459769815228021025852.jpg">
+                                <div class="wid-u-info">
+                                    <h4 class="m-t-0 m-b-5">Tanggal</h4>
+                                    <button type="button" class="btn btn-danger waves-effect waves-light m-b-5">
+                                        <b><?php echo date('d'); ?> <?php echo $bulan[date('n')]; ?> <?php echo date('Y'); ?></b>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <?php $this->load->view($page); ?>
 
                 <br/>
                 <!-- Footer -->
@@ -410,59 +473,146 @@
             if(level == null || level == ""){
                 
             }else{
+                get_antrian_offline();
+                get_antrian_online();
                 get_notif_pasien();
                 timer = setInterval(function () {
                     get_notif_pasien();
                 }, 5000);
             }
 
+
+            $('#li_notif').click(function(){
+                $('#popup_pasien_baru').show();
+            });
+
             $('#tutup_pas').click(function(){
                 $('#popup_pasien_baru').hide();
+                snd.pause();
+                clearInterval(timer);
             });
         });
 
-        function next_antri(){
-            var kode_antrian = $('#kode_antrian_now').val();
-            var jml_antrian  = $('#jml_antrian_now').val();
-            var id_antrian   = $('#id_antrian_now').val();
-            var nama_loket_antrian_txt   = $('#nama_loket_antrian_txt').html();
+        function startTime() {
+            var today = new Date();
+            var h = today.getHours();
+            var m = today.getMinutes();
+            var s = today.getSeconds();
+            m = checkTime(m);
+            s = checkTime(s);
+            document.getElementById('waktu_txt').innerHTML = h + ":" + m + ":" + s;
+            var t = setTimeout(startTime, 500);
+        }
+
+        function checkTime(i) {
+            if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+            return i;
+        }
+
+        function get_antrian_offline(){
+            var id_user = "<?php echo $id_user; ?>";
 
             $.ajax({
-                url : '<?php echo base_url(); ?>billing/billing_home_c/next_antri',
-                data : {
-                    kode_antrian:kode_antrian,
-                    jml_antrian:parseInt(jml_antrian) + 1,
-                    id_antrian:id_antrian,
-                },
+                url : '<?php echo base_url(); ?>poli/poli_home_c/get_antrian_offline',
+                data : {id_user:id_user},
                 type : "POST",
                 dataType : "json",
-                success : function(row){
-                    if(row == 1){
-                        var jml_antrian_next = parseInt(jml_antrian) + 1;
-                        $('#jml_antrian_txt').html(jml_antrian_next);
-                        $('#jml_antrian_now').val(jml_antrian_next);
-
-                        $('#close_next_antrian').click();
-
-                        responsiveVoice.speak(
-                          "Pengunjung dengan nomor antrian, "+kode_antrian+","+jml_antrian_next+", silahkan menuju ke "+nama_loket_antrian_txt+". Terima kasih. ",
-                          "Indonesian Female",
-                          {
-                           pitch: 1, 
-                           rate: 1, 
-                           volume: 1
-                          }
-                         );
-
+                success : function(res){
+                    if(res['cek'].length != 0){
+                        $('#loket_offline').html(res['data']['NAMA_LOKET']);
+                        var id_kode_antrian = res['data']['KODE_ANTRIAN'];
+                        get_nomor_offline(id_kode_antrian);
+                        // console.log(id_kode_antrian);
                     }
                 }
             });
         }
 
-        function panggil_antrian(){
-            var kode_antrian = $('#kode_antrian_now').val();
-            var jml_antrian  = $('#jml_antrian_now').val();
-            var nama_loket_antrian_txt   = $('#nama_loket_antrian_txt').html();
+        function get_nomor_offline(id_kode_antrian){
+            var id_user = "<?php echo $id_user; ?>";
+
+            $.ajax({
+                url : '<?php echo base_url(); ?>poli/poli_home_c/get_nomor_offline',
+                data : {
+                    id_kode_antrian:id_kode_antrian,
+                    id_user:id_user
+                },
+                type : "POST",
+                dataType : "json",
+                success : function(res){
+                    $('#id_antrian_now').val(id_kode_antrian);
+                    if(res == null || res == ""){
+                        $('#kode_antrian_now').val('B');
+                        $('#jml_antrian_now').val('1');
+                        $('#nomor_offline').html('B-1');
+                    }else{
+                        for(var i=0; i<res.length; i++){
+                            $('#kode_antrian_now').val(res[i].KODE);
+                            $('#jml_antrian_now').val(res[i].URUT);
+                            $('#nomor_offline').html(res[i].KODE+'-'+res[i].URUT);
+                        }
+                    }
+                }
+            });
+        }
+
+        function get_antrian_online(){
+            var id_user = "<?php echo $id_user; ?>";
+
+            $.ajax({
+                url : '<?php echo base_url(); ?>poli/poli_home_c/get_antrian_online',
+                data : {id_user:id_user},
+                type : "POST",
+                dataType : "json",
+                success : function(res){
+                    $('#loket_online').html(res['data']['NAMA_LOKET']);
+                    var id_kode_antrian = res['data']['KODE_ANTRIAN'];
+                    get_nomor_online(id_kode_antrian);
+                }
+            });
+        }
+
+        function get_nomor_online(id_kode_antrian){
+            var id_user = "<?php echo $id_user; ?>";
+
+            $.ajax({
+                url : '<?php echo base_url(); ?>poli/poli_home_c/get_nomor_online',
+                data : {
+                    id_kode_antrian:id_kode_antrian,
+                    id_user:id_user
+                },
+                type : "POST",
+                dataType : "json",
+                success : function(res){
+                    $('#id_antrian_now_on').val(id_kode_antrian);
+                    if(res == null || res == ""){
+                        $('#kode_antrian_now_on').val('A');
+                        $('#jml_antrian_now_on').val('1');
+                        $('#nomor_online').html('A-1');
+                    }else{
+                        for(var i=0; i<res.length; i++){
+                            $('#kode_antrian_now_on').val(res[i].KODE);
+                            $('#jml_antrian_now_on').val(res[i].URUT);
+                            $('#nomor_online').html(res[i].KODE+'-'+res[i].URUT);
+                        }
+                    }
+                }
+            });
+        }
+
+        function panggil_antrian(status){
+            var kode_antrian = '';
+            var jml_antrian  = '';
+            var nama_loket_antrian_txt = '';
+            if(status == 'offline'){
+                kode_antrian = $('#kode_antrian_now').val();
+                jml_antrian  = $('#jml_antrian_now').val();
+                nama_loket_antrian_txt = $('#loket_offline').html();
+            }else{
+                kode_antrian = $('#kode_antrian_now_on').val();
+                jml_antrian  = $('#jml_antrian_now_on').val();
+                nama_loket_antrian_txt = $('#loket_online').html();
+            }
 
             responsiveVoice.speak(
               "Pengunjung dengan nomor antrian, "+kode_antrian+","+jml_antrian+", silahkan menuju ke "+nama_loket_antrian_txt+". Terima kasih. ",
@@ -473,6 +623,65 @@
                volume: 1
               }
              );
+        }
+
+        function next_antri(status){
+            var id_antrian   = '';
+            var kode_antrian = '';
+            var jml_antrian  = 0;
+            var nama_loket_antrian_txt = '';
+
+            if(status == 'offline'){
+                id_antrian   = $('#id_antrian_now').val();
+                kode_antrian = $('#kode_antrian_now').val();
+                jml_antrian  = $('#jml_antrian_now').val();
+                nama_loket_antrian_txt = $('#loket_offline').html();
+            }else{
+                id_antrian   = $('#id_antrian_now_on').val();
+                kode_antrian = $('#kode_antrian_now_on').val();
+                jml_antrian  = $('#jml_antrian_now_on').val();
+                nama_loket_antrian_txt = $('#loket_online').html();
+            }
+
+            $.ajax({
+                url : '<?php echo base_url(); ?>poli/poli_home_c/next_antri',
+                data : {
+                    id_antrian:id_antrian,
+                    kode_antrian:kode_antrian,
+                    jml_antrian:jml_antrian,
+                    status:status
+                },
+                type : "POST",
+                dataType : "json",
+                success : function(row){
+                    if(row == 1){
+                        var jml_antrian_next = '';
+                        if(status == 'offline'){
+                            jml_antrian_next = parseInt(jml_antrian) + 1;
+                            $('#nomor_offline').html(kode_antrian+'-'+jml_antrian_next);
+                            $('#jml_antrian_now').val(jml_antrian_next);
+                            get_antrian_offline();
+                        }else{
+                            jml_antrian_next = parseInt(jml_antrian) + 1;
+                            $('#nomor_online').html(kode_antrian+'-'+jml_antrian_next);
+                            $('#jml_antrian_now_on').val(jml_antrian_next);
+                            get_antrian_online();
+                        }
+
+                        // $('#close_next_antrian').click();
+
+                        // responsiveVoice.speak(
+                        //   "Pengunjung dengan nomor antrian, "+kode_antrian+","+jml_antrian+", silahkan menuju ke "+nama_loket_antrian_txt+". Terima kasih. ",
+                        //   "Indonesian Female",
+                        //   {
+                        //    pitch: 1, 
+                        //    rate: 1, 
+                        //    volume: 1
+                        //   }
+                        // );
+                    }
+                }
+            });
         }
 
         function get_notif_pasien(){
@@ -562,6 +771,10 @@
         }
 
         function terima_pasien(id){
+            var keyword = "";
+            var level = "<?php echo $level; ?>";
+            var id_divisi = "<?php echo $id_divisi; ?>";
+
             $.ajax({
                 url : '<?php echo base_url(); ?>poli/poli_home_c/terima_pasien',
                 data : {id:id},
@@ -572,7 +785,35 @@
                     $('#popup_pasien_baru').fadeOut();
                     // console.log(res);
                     data_pasien();
-                    get_notif_pasien();
+                }
+            });
+
+            $.ajax({
+                url : '<?php echo base_url(); ?>poli/poli_home_c/notif_pasien_baru',
+                data : {
+                    keyword:keyword,
+                    level:level,
+                    id_divisi:id_divisi
+                },
+                type : "GET",
+                dataType : "json",
+                success : function(res){
+                    if(res.length == 0){
+                        $('#ketap_ketip').hide();
+                    }else{
+                        for(var i=0; i<res.length; i++){
+                            if(res[i].STS_TERIMA == '0'){
+                                $('#ketap_ketip').show();
+                                notif_pasien_baru();
+                                $('#popup_pasien_baru').show();
+                                data_pasien_baru();
+                            }else{
+                                $('#ketap_ketip').hide();
+                            }
+                        }
+                    }
+
+                    $('#tot_pasien').html(res.length);
                 }
             });
         }

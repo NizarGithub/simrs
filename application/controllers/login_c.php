@@ -75,7 +75,7 @@ class Login_c extends CI_Controller {
 				redirect('login_c');
 			}else{
 				if($data->LEVEL == 'Admission'){
-					redirect('admum/admum_home_c');
+					redirect('admum/admum_pasien_baru_c');
 				}else if($data->LEVEL == 'Poli'){
 					redirect('poli/poli_home_c');
 				}else if($data->LEVEL == 'Laborat'){

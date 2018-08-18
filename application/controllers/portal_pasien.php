@@ -5,6 +5,7 @@ class Portal_pasien extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();
+		date_default_timezone_set('Asia/Jakarta');
 		$this->load->library("Uploader");
 		$this->load->library("excel_reader2");
 	}
@@ -61,6 +62,37 @@ class Portal_pasien extends CI_Controller {
 		$data['poli'] = $this->master_model_m->get_total_pasien_poli($tanggal);
 		$data['lab'] = $this->master_model_m->get_total_pasien_lab($tanggal);
 
+		echo json_encode($data);
+	}
+
+	function getJmlAntrianPasien($id_kode_antrian,$status){
+		$tgl = date('d-m-Y');
+
+		$sql = "
+			SELECT
+				a.*,
+				c.ID_KODE,
+				c.KODE,
+				c.URUT,
+				c.TGL,
+				d.ID_PEGAWAI,
+				b.STS AS STATUS
+			FROM kepeg_loket a
+			LEFT JOIN kepeg_setup_antrian b ON b.ID = a.KODE_ANTRIAN
+			LEFT JOIN kepeg_antrian c ON c.ID_KODE = a.KODE_ANTRIAN
+			LEFT JOIN kepeg_loket_operator d ON d.ID_LOKET = a.ID
+			WHERE c.TGL = '$tgl'
+			AND c.ID_KODE = '$id_kode_antrian'
+			AND b.STS = '$status'
+		";
+
+		return $this->db->query($sql)->result();
+	}
+
+	function get_antri_online(){
+		$id_kode_antrian = $this->input->post('id_kode_antrian');
+		$status = $this->input->post('status');
+		$data = $this->getJmlAntrianPasien($id_kode_antrian,$status);
 		echo json_encode($data);
 	}
 

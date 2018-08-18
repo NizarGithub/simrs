@@ -72,7 +72,7 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
             </div>
             </div>
          </div>
-         <div class="pull-right" style="margin-right: 40px;">
+         <div class="pull-right" style="margin-right: 40px; color: #fff;">
             <div id="top-info" class="pull-right">
             <a id="settings_old" href="#" class="win-command pull-left">
                 <img class="win-commandicon win-commandring" src="<?=$base_url2;?>files/foto_pegawai/<?=$user->FOTO;?>">
@@ -90,7 +90,7 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
          <!--<div class="row">-->
             <!--<div id="hub" class="metro">-->
                <br><br><br>
-               <div class="metro panorama" style="margin: 0 15px; width: 90%;">
+               <div class="metro panorama" style="margin: 0 15px;">
                   <div class="panorama-sections" style="width: auto !important;">   
                      <div class="panorama-section tile-span-12" style="margin-right: 20px;">
    

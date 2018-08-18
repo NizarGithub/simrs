@@ -96,7 +96,7 @@
 
                     <!-- LOGO -->
                     <div class="topbar-left">
-                        <a href="<?php echo base_url(); ?>bpjs/bpjs_c" class="logo" style="margin-top:4px;">
+                        <a href="<?php echo base_url(); ?>lab/lab_home_c" class="logo" style="margin-top:4px;">
                             <img src="<?php echo base_url(); ?>picture/jtech-logo.png" style="max-width:150px; max-height:40px;">
                         </a>
                     </div>

@@ -100,7 +100,7 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
                 <div class="col-sm-12 text-center">
                     <p class="text-muted">
                         <a href="javascript:void(0);" class="text-primary m-l-5" style="cursor:default;">
-                            <b>© 2018 Aplikasi Rumah Sakit</b>
+                            <b style="color: #fff;">© 2018 Aplikasi Rumah Sakit</b>
                         </a>
                     </p>
                 </div>

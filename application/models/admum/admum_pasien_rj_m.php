@@ -206,7 +206,7 @@ class Admum_pasien_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_rj($id_pasien,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$posisi){
+	function simpan_rj($id_pasien,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$posisi,$barcode,$nomor_antrian,$biaya_reg){
 		$sql = "
 			INSERT INTO admum_rawat_jalan(
 				ID_PASIEN,
@@ -217,7 +217,10 @@ class Admum_pasien_rj_m extends CI_Model {
 				TAHUN,
 				WAKTU,
 				ID_POLI,
-				STS_POSISI
+				STS_POSISI,
+				BARCODE,
+				NOMOR_ANTRIAN,
+				BIAYA_REG
 			) VALUES(
 				'$id_pasien',
 				'$asal_rujukan',
@@ -227,7 +230,10 @@ class Admum_pasien_rj_m extends CI_Model {
 				'$tahun',
 				'$waktu',
 				'$id_poli',
-				'$posisi'
+				'$posisi',
+				'$barcode',
+				'$nomor_antrian',
+				'$biaya_reg'
 			)
 		";
 		$this->db->query($sql);
@@ -239,18 +245,20 @@ class Admum_pasien_rj_m extends CI_Model {
 		return $query->result();
 	}
 
-	function simpan_antrian($tanggal,$waktu,$id_pasien,$barcode,$nomor_antrian){
+	function simpan_antrian($tanggal,$waktu,$id_pasien,$id_rj,$barcode,$nomor_antrian){
 		$sql = "
 			INSERT INTO rk_antrian_pasien(
 				TANGGAL,
 				WAKTU,
 				ID_PASIEN,
+				ID_PELAYANAN,
 				BARCODE,
 				NOMOR_ANTRIAN
 			)VALUES(
 				'$tanggal',
 				'$waktu',
 				'$id_pasien',
+				'$id_rj',
 				'$barcode',
 				'$nomor_antrian'
 			)

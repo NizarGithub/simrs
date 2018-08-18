@@ -88,16 +88,6 @@ class Lab_home_c extends CI_Controller {
 		}
 	}
 
-	function next_antri(){
-		$kode_antrian = $this->input->post('kode_antrian');
-		$jml_antrian  = $this->input->post('jml_antrian');
-		$id_antrian   = $this->input->post('id_antrian');
-
-		$this->model->simpanAntrian($kode_antrian, $jml_antrian, $id_antrian);
-
-		echo json_encode(1);
-	}
-
 	function data_provinsi(){
 		$id_kota_kab = $this->input->post('id_kota_kab');
 		$data = $this->model->provinsi($id_kota_kab);
@@ -160,6 +150,41 @@ class Lab_home_c extends CI_Controller {
 		$id = $this->input->post('id');
 		$data = $this->model->data_pasien_id($id);
 		echo json_encode($data);
+	}
+
+	function get_pasien_dr_poli(){
+		$tanggal = $this->input->get('tanggal');
+		$keyword = $this->input->get('keyword');
+		$data = $this->model->get_pasien_dr_poli($tanggal,$keyword);
+		echo json_encode($data);
+	}
+
+	function get_pasien_poli_id(){
+		$id_rj = $this->input->post('id');
+		$data['ind'] = $this->model->get_pasien_poli_id($id_rj);
+		$data['det'] = $this->model->get_detail_lab_poli($id_rj);
+		echo json_encode($data);
+	}
+
+	function ubah_status_lihat(){
+		$tanggal = date('d-m-Y');
+		$this->model->ubah_status_lihat($tanggal);
+		echo '1';
+	}
+
+	function ubah_laborat_detail(){
+		$id_rj = $this->input->post('id_rj_det');
+		$id = $this->input->post('id_detail');
+		$hasil = $this->input->post('hasil');
+		$nilai_rujukan = $this->input->post('nilai_rujukan');
+		foreach ($hasil as $key => $value) {
+			if($value != "" || $nilai_rujukan[$key] != ""){
+				$this->model->ubah_laborat_detail($id[$key],$value,$nilai_rujukan[$key]);
+			}
+		}
+
+		$this->db->query("UPDATE rk_laborat_rj SET STATUS_PENANGANAN = '1' WHERE ID = '$id_rj'");
+		echo '1';
 	}
 
 	function encode($input){
@@ -352,6 +377,46 @@ class Lab_home_c extends CI_Controller {
 		}
 
 		$this->insert_kode_lab();
+
+		echo '1';
+	}
+
+	function simpan_rj(){
+		$id_pasien_new = $this->input->post('id_pasien');
+		$asal_rujukan = $this->input->post('asal_rujukan');
+		$h = date('l');
+		$tanggal = date('d-m-Y');
+		$bulan = date('n');
+		$tahun = date('Y');
+		$pilihan = $this->input->post('pilihan');
+		$id_poli = $this->input->post('id_poli');
+		$hari = "";
+
+		//NOMOR ANTRIAN
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu = $format->format('H:i:s');
+		$barcode = $this->input->post('barcode');
+		$nomor_antrian = $this->input->post('jumlah_antrian');
+
+		if($h == 'Monday'){
+			$hari = "Senin";
+		}else if($h == 'Tuesday'){
+			$hari = "Selasa";
+		}else if($h == 'Wednesday'){
+			$hari = "Rabu";
+		}else if($h == 'Thursday'){
+			$hari = "Kamis";
+		}else if($h == 'Friday'){
+			$hari = "Jumat";
+		}else if($h == 'Saturday'){
+			$hari = "Sabtu";
+		}else if($h == 'Sunday'){
+			$hari = "Minggu";
+		}
+
+		$this->model->simpan_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$pilihan);
 
 		echo '1';
 	}

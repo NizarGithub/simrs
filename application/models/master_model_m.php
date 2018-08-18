@@ -20,6 +20,23 @@ class Master_model_m extends CI_Model
 		return $this->db->query($sql)->row();
 	}
 
+	function cek_user_info($id_user,$akses,$status){
+		$sql = "
+			SELECT 
+				a.*,
+				d.STS AS STATUS
+			FROM kepeg_loket_operator a 
+			JOIN kepeg_loket_akses b ON a.ID_LOKET = b.ID_LOKET 
+			JOIN kepeg_loket c ON c.ID = b.ID_LOKET
+			JOIN kepeg_setup_antrian d ON d.ID = c.KODE_ANTRIAN
+			WHERE a.ID_PEGAWAI = '$id_user' 
+			AND b.AKSES = '$akses'
+			AND d.STS = '$status'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
 	function is_operator($id_user, $menu){
 		$sql = "
 		SELECT a.* FROM kepeg_loket_operator a
@@ -30,24 +47,68 @@ class Master_model_m extends CI_Model
 		return $this->db->query($sql)->result();
 	}
 
-	function getLoket($id_user, $akses){
+	function getLoket($id_user, $akses, $status){
 		$sql = "
-		SELECT b.*, c.KODE FROM kepeg_loket_operator a
-		JOIN kepeg_loket b ON a.ID_LOKET = b.ID
-		JOIN kepeg_setup_antrian c ON b.KODE_ANTRIAN = c.ID
-		JOIN kepeg_loket_akses d ON b.ID = d.ID_LOKET
-		WHERE a.ID_PEGAWAI = '$id_user' AND d.AKSES = '$akses'
+			SELECT
+				a.ID,
+				a.ID_LOKET,
+				a.ID_PEGAWAI,
+				b.*, 
+				c.KODE,
+				c.STS AS STATUS
+			FROM kepeg_loket_operator a
+			JOIN kepeg_loket b ON a.ID_LOKET = b.ID
+			JOIN kepeg_setup_antrian c ON b.KODE_ANTRIAN = c.ID
+			JOIN kepeg_loket_akses d ON b.ID = d.ID_LOKET
+			WHERE a.ID_PEGAWAI = '$id_user'
+			AND d.AKSES = '$akses'
+			AND c.STS = '$status'
 		";
 
 		return $this->db->query($sql)->row();
 	}
 
-	function getJmlAntrian($id_kode_antrian){
+	function getJmlAntrian($id_kode_antrian,$status,$id_user){
 		$tgl = date('d-m-Y');
 
 		$sql = "
-		SELECT * FROM kepeg_antrian
-		WHERE ID_KODE = $id_kode_antrian AND TGL = '$tgl'
+			SELECT
+				a.*,
+				c.ID_KODE,
+				c.KODE,
+				c.URUT,
+				c.TGL,
+				d.ID_PEGAWAI,
+				b.STS AS STATUS
+			FROM kepeg_loket a
+			LEFT JOIN kepeg_setup_antrian b ON b.ID = a.KODE_ANTRIAN
+			LEFT JOIN kepeg_antrian c ON c.ID_KODE = a.KODE_ANTRIAN
+			LEFT JOIN kepeg_loket_operator d ON d.ID_LOKET = a.ID
+			WHERE 1 = 1
+			AND c.ID_KODE = '$id_kode_antrian'
+			AND c.STATUS_CLOSING = '0'
+		";
+
+		return $this->db->query($sql)->result();
+	}
+
+	function getJmlAntrianStruk($id_kode_antrian,$status,$id_user){
+		$tgl = date('d-m-Y');
+
+		$sql = "
+			SELECT
+				a.*,
+				c.ID_KODE,
+				c.KODE,
+				c.URUT,
+				c.TGL,
+				b.STS AS STATUS
+			FROM kepeg_loket a
+			LEFT JOIN kepeg_setup_antrian b ON b.ID = a.KODE_ANTRIAN
+			LEFT JOIN kepeg_antrian c ON c.ID_KODE = a.KODE_ANTRIAN
+			WHERE 1 = 1
+			AND c.ID_KODE = '$id_kode_antrian'
+			AND c.STATUS_CLOSING = '0'
 		";
 
 		return $this->db->query($sql)->result();
@@ -88,6 +149,34 @@ class Master_model_m extends CI_Model
 		";
 
 		return $this->db->query($sql)->result();
+	}
+
+	function simpanAntrian($id_antrian,$kode_antrian,$jml_antrian,$tgl,$status){
+		$sql = "
+			INSERT INTO kepeg_antrian(
+				ID_KODE, 
+				KODE, 
+				URUT, 
+				TGL,
+				STS
+			) VALUES (
+				'$id_antrian', 
+				'$kode_antrian', 
+				'$jml_antrian', 
+				'$tgl',
+				'$status'
+			)
+		";
+		$this->db->query($sql);
+	}
+
+	function ubahAntrian($urut,$tgl,$status){
+		$sql = "
+			UPDATE kepeg_antrian SET
+				URUT = '$urut'
+			WHERE TGL = '$tgl' AND STS = '$status'
+		";
+		$this->db->query($sql);
 	}
 
 	function simpan_log($id_pegawai,$tanggal,$waktu,$keterangan){
@@ -193,13 +282,15 @@ class Master_model_m extends CI_Model
 		$sql = "
 			SELECT
 				a.*,
+				b.KODE_ANTRIAN,
 				b.NAMA_LOKET,
 				c.KODE,
 				c.STS AS STS_LOKET
 			FROM kepeg_loket_akses a
-			LEFT JOIN kepeg_loket b ON b.ID = a.ID_LOKET
+			JOIN kepeg_loket b ON b.ID = a.ID_LOKET
 			LEFT JOIN kepeg_setup_antrian c ON c.ID = b.KODE_ANTRIAN
 			WHERE a.AKSES = '$akses'
+			ORDER BY a.ID_LOKET ASC
 		";
 		return $this->db->query($sql)->result();
 	}

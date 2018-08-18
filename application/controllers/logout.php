@@ -21,7 +21,7 @@ class Logout extends CI_Controller {
 
 		$this->session->unset_userdata('masuk_rs');
 		$this->session->sess_destroy();
-		redirect(base_url());
+		redirect('login_c');
 	}
 
 }

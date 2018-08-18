@@ -5,6 +5,9 @@ class Admum_pasien_rj_c extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();
+		date_default_timezone_set('Asia/Jakarta');
+		$this->load->helper('url');
+		$this->load->library('fpdf/HTML2PDF');
 		$this->load->model('admum/admum_pasien_rj_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
     	$id_user = $sess_user['id'];
@@ -140,20 +143,21 @@ class Admum_pasien_rj_c extends CI_Controller {
 		echo json_encode($barcode);
 	}
 
-	function simpan_antrian(){
+	function simpan_antrian_off(){
+		$id_kode = $this->input->post('id_kode_antrian');
+		$kode = $this->input->post('kode_antrian');
 		$tanggal = date('d-m-Y');
-		$sql = "SELECT * FROM kepeg_antrian WHERE TGL = '$tanggal'";
+		$sql = "SELECT * FROM kepeg_antrian WHERE ID_KODE = '$id_kode' AND STATUS_CLOSING = '0'";
 		$qry = $this->db->query($sql);
 		$urut = '';
 		if($qry->num_rows() > 0){
 			$data = $qry->row()->URUT;
 			$urut = $data+1;
-			$s = "UPDATE kepeg_antrian SET URUT = '$urut' WHERE TGL = '$tanggal'";
+			$s = "UPDATE kepeg_antrian SET URUT = '$urut' WHERE ID_KODE = '$id_kode' AND STATUS_CLOSING = '0'";
 			$this->db->query($s);
 		}else{
-			$kode = 'A';
 			$urut = '1';
-			$s = "INSERT INTO kepeg_antrian(KODE,URUT,TGL) VALUES('$kode','$urut','$tanggal')";
+			$s = "INSERT INTO kepeg_antrian(ID_KODE,KODE,URUT,TGL) VALUES('$id_kode','$kode','$urut','$tanggal')";
 			$this->db->query($s);
 		}
 	}
@@ -176,6 +180,7 @@ class Admum_pasien_rj_c extends CI_Controller {
 		$waktu = $format->format('H:i:s');
 		$barcode = $this->input->post('barcode');
 		$nomor_antrian = $this->input->post('jumlah_antrian');
+		$biaya_reg = str_replace(',', '', $this->input->post('biaya_reg'));
 
 		if($h == 'Monday'){
 			$hari = "Senin";
@@ -193,9 +198,10 @@ class Admum_pasien_rj_c extends CI_Controller {
 			$hari = "Minggu";
 		}
 
-		$this->model->simpan_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$pilihan);
-		$this->model->simpan_antrian($tanggal,$waktu,$id_pasien_new,$barcode,$nomor_antrian);
-		$this->simpan_antrian();
+		$this->model->simpan_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$pilihan,$barcode,$nomor_antrian,$biaya_reg);
+		$id_rj = $this->db->insert_id();
+		$this->model->simpan_antrian($tanggal,$waktu,$id_pasien_new,$id_rj,$barcode,$nomor_antrian);
+		$this->simpan_antrian_off();
 
 		$this->session->set_flashdata('sukses','1');
 		redirect('admum/admum_pasien_rj_c');
@@ -229,6 +235,33 @@ class Admum_pasien_rj_c extends CI_Controller {
 		$id = $this->input->post('id');
 		$data = $this->model->klik_poli($id);
 		echo json_encode($data);
+	}
+
+	function get_biaya_reg(){
+		$status = $this->input->post('status');
+		$sql = "SELECT * FROM admum_biaya_reg_pasien WHERE STATUS = '$status'";
+		$qry = $this->db->query($sql);
+		$row = $qry->row();
+		echo json_encode($row);
+	}
+
+	function struk_antrian(){
+		$sess_user = $this->session->userdata('masuk_rs');
+    	$id_user = $sess_user['id'];
+    	$akses = 'admum';
+    	$status = 'offline';
+    	$loket = $this->master_model_m->getLoket($id_user, $akses, $status);
+
+		$data = array(
+			'settitle' => 'Struk Antrian',
+			'filename' => 'strukAntrian',
+			'loket'	=> $loket->KODE,
+			'kode_antrian' => $loket->KODE_ANTRIAN,
+			'status' => 'offline',
+			'id_user' => $id_user
+		);
+
+		$this->load->view('admum/struk_antrian_v',$data);
 	}
 
 }

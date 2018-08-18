@@ -188,9 +188,7 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <?php $this->load->view($page); ?>
-                </div>
+                <?php $this->load->view($page); ?>
 
                 <!-- Footer -->
                 <footer class="footer text-right" style="position:relative;">

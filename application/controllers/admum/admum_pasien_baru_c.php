@@ -5,6 +5,7 @@ class Admum_pasien_baru_c extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();
+		date_default_timezone_set('Asia/Jakarta');
 		$this->load->model('admum/admum_pasien_baru_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
     	$id_user = $sess_user['id'];
@@ -17,11 +18,11 @@ class Admum_pasien_baru_c extends CI_Controller {
 	{
 		$data = array(
 			'page' => 'admum/admum_pasien_baru_v', 
-			'title' => 'Pasien Baru',
-			'subtitle' => 'Pasien Baru',
+			'title' => 'Daftar Pasien Baru',
+			'subtitle' => 'Daftar Pasien Baru',
 			'childtitle' => 'Umum',
 			'master_menu' => 'pasien',
-			'view' => 'tambah_pasien',
+			'view' => 'pasien',
 			'url_simpan' => base_url().'admum/admum_pasien_baru_c/simpan'
 		);
 

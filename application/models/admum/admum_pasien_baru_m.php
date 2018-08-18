@@ -50,7 +50,8 @@ class Admum_pasien_baru_m extends CI_Model {
 				KECAMATAN,
 				KOTA,
 				PROVINSI,
-				STATUS
+				STATUS,
+				JENIS_PASIEN
 			) VALUES (
 				'$kode_pasien',
 				'$tanggal_daftar',
@@ -71,7 +72,8 @@ class Admum_pasien_baru_m extends CI_Model {
 				'$kecamatan',
 				'$kota',
 				'$provinsi',
-				'Umum'
+				'Umum',
+				'Baru'
 			)
 		";
 		$this->db->query($sql);

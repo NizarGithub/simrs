@@ -25,7 +25,14 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
     <link href="<?php echo $base_url2; ?>front_pasien/css/main.css?version=2.6" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo $base_url2; ?>slider/css/style.css">
   </head>
-  <body>
+  <body onload="startTime();">
+  <?php
+    $bulan = array(
+        1 =>    "Januari", 2  =>"Februari", 3  =>"Maret", 4 =>"April",
+        5 =>    "Mei", 6  =>"Juni", 7  =>"Juli", 8 =>"Agustus",
+        9 =>    "September", 10 =>"Oktober", 11 =>"November", 12 =>"Desember"
+    );
+  ?>
     <div class="all-wrapper menu-side with-side-panel">
       <div class="layout-w">
         <div class="menu-mobile menu-activated-on-click color-scheme-dark">
@@ -82,12 +89,12 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
           <div class="menu-and-user">
             <div class="logged-user-w">
               <div class="avatar-w">
-                <img alt="" src="<?php echo $base_url2; ?>picture/logosoerya.jpg">
+                <img alt="" src="<?php echo $base_url2; ?>picture/plus.gif">
               </div>
               
               <div class="logged-user-menu">
                 <div class="avatar-w">
-                  <img alt="" src="<?php echo $base_url2; ?>picture/logosoerya.jpg">
+                  <img alt="" src="<?php echo $base_url2; ?>picture/plus.gif">
                 </div>
                 <div class="logged-user-info-w">
                   <div class="logged-user-name">
@@ -121,6 +128,15 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
                 </a>
               </li>
             </ul>
+
+            <div class="side-menu-magic">
+              <h4 id="waktu_txt">
+                00:00:00
+              </h4>
+              <div class="btn-w">
+                <a href="javascript:;" class="btn btn-white btn-rounded"><?php echo date('d');?> <?php echo $bulan[date('n')];?> <?php echo date('Y');?></a>
+              </div>
+            </div>
 
             <div class="side-menu-magic">
               <h4>
@@ -162,13 +178,16 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
                         <div class="slide_viewer">
                           <div class="slide_group">
                             <div class="slide">
-                              <img src="<?php echo base_url(); ?>picture/bg.jpg">
+                              <img src="<?php echo base_url(); ?>picture/hospital-wallpaper-12.jpg">
                             </div>
                             <div class="slide">
+                              <img src="<?php echo base_url(); ?>picture/hospital-wallpaper-12.jpg">
                             </div>
                             <div class="slide">
+                              <img src="<?php echo base_url(); ?>picture/hospital-wallpaper-12.jpg">
                             </div>
                             <div class="slide">
+                              <img src="<?php echo base_url(); ?>picture/hospital-wallpaper-12.jpg">
                             </div>
                           </div>
                         </div>
@@ -264,8 +283,52 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
                 <i class="os-icon os-icon-close"></i>
               </div>
 
-              <div class="element-wrapper" id="antrian_pasien" style="padding-bottom: 0px;">
-                
+              <div class="element-wrapper" style="padding-bottom: 0px;">
+                <?php
+                  $dete = $this->master_model_m->get_akses_antrian('pasien');
+                  if($dete == null || $dete == ""){
+
+                  }else{
+                    foreach ($dete as $key => $value) {
+                ?>
+                <div class="element-box">
+                  <div class="padded m-b">
+                    <div class="centered-header">
+                      <h6><?php echo $value->NAMA_LOKET; ?></h6>
+                    </div>
+                    <div class="row">
+                      <div class="col-6 b-r b-b">
+                        <div class="el-tablo centered padded-v-big highlight bigger">
+                          <div class="label">
+                            Kode
+                          </div>
+                          <div class="value"><?php echo $value->KODE; ?></div>
+                        </div>
+                      </div>
+                      <div class="col-6 b-b">
+                        <div class="el-tablo centered padded-v-big highlight bigger">
+                          <div class="label">
+                            Antrian
+                          </div>
+                          <div class="value" id="nomor_<?php echo $value->STS_LOKET; ?>">
+                            -
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="centered-header">
+                    <h6>Antrian <?php echo $value->STS_LOKET; ?></h6>
+                  </div>
+                </div>
+                <?php
+                    }
+                ?>
+                <input type="hidden" id="id_offline" value="<?php echo $value->ID; ?>">
+                <input type="hidden" id="status_offline" value="<?php echo $value->STS_LOKET; ?>">
+                <?php
+                  }
+                ?>
               </div>
 
               <div class="element-wrapper" style="padding-bottom: 0px;">
@@ -305,58 +368,83 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
     <script src="<?php echo $base_url2; ?>slider/js/index.js"></script>
     <script type="text/javascript">
     $(document).ready(function(){
-        get_antrian();
+        get_antri_on();
+        get_antri_off();
+
+        setInterval(function () {
+            get_antri_on();
+        }, 3000);
+
+        setInterval(function () {
+            get_antri_off();
+        }, 4000);
 
         setInterval(function () {
             get_tracking_pasien();
-        }, 4000);
+        }, 5000);
     });
 
-    function get_antrian(){
+    function startTime() {
+        var today = new Date();
+        var h = today.getHours();
+        var m = today.getMinutes();
+        var s = today.getSeconds();
+        m = checkTime(m);
+        s = checkTime(s);
+        document.getElementById('waktu_txt').innerHTML = h + ":" + m + ":" + s;
+        var t = setTimeout(startTime, 500);
+    }
+
+    function checkTime(i) {
+        if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+        return i;
+    }
+
+    function get_antri_on(){
+        var id_kode_antrian = $('#id_online').val();
+        console.log(id_kode_antrian);
+        var status = $('#status_online').val();
+
         $.ajax({
-            url : '<?php echo base_url(); ?>portal_pasien/get_antrian',
-            type : "GET",
+            url : '<?php echo base_url(); ?>portal_pasien/get_antri_online',
+            data : {
+              id_kode_antrian:id_kode_antrian,
+              status:status
+            },
+            type : "POST",
             dataType : "json",
             success : function(res){
-                $div = '';
-
                 if(res == null || res == ""){
-                  $div = '';
+                    $('#nomor_'+status).html('1');
                 }else{
                   for(var i=0; i<res.length; i++){
-                    $div += '<div class="element-box">'+
-                            '  <div class="padded m-b">'+
-                            '    <div class="centered-header">'+
-                            '      <h6>'+
-                            '        Antrian '+res[i].STS_LOKET+
-                            '      </h6>'+
-                            '    </div>'+
-                            '    <div class="row">'+
-                            '      <div class="col-6 b-r b-b">'+
-                            '        <div class="el-tablo centered padded-v-big highlight bigger">'+
-                            '          <div class="label">'+
-                            '            Kode'+
-                            '          </div>'+
-                            '          <div class="value">'+res[i].KODE+'</div>'+
-                            '        </div>'+
-                            '      </div>'+
-                            '      <div class="col-6 b-b">'+
-                            '        <div class="el-tablo centered padded-v-big highlight bigger">'+
-                            '          <div class="label">'+
-                            '            Antrian'+
-                            '          </div>'+
-                            '          <div class="value" id="nomor_'+res[i].STS_LOKET+'">'+
-                            '            -'+
-                            '          </div>'+
-                            '        </div>'+
-                            '      </div>'+
-                            '    </div>'+
-                            '  </div>'+
-                            '</div>';
+                    $('#nomor_'+status).html(res[i].URUT);
                   }
                 }
+            }
+        });
+    }
 
-                $('#antrian_pasien').html($div);
+    function get_antri_off(){
+        var id_kode_antrian = $('#id_offline').val();
+        var status = $('#status_offline').val();
+        
+        $.ajax({
+            url : '<?php echo base_url(); ?>portal_pasien/get_antri_online',
+            data : {
+              id_kode_antrian:id_kode_antrian,
+              status:status
+            },
+            type : "POST",
+            dataType : "json",
+            success : function(res){
+                if(res == null || res == ""){
+                    $('#nomor_'+status).html('1');
+                }else{
+                  for(var i=0; i<res.length; i++){
+                    $('#nomor_'+status).html(res[i].URUT);
+                  }
+                }
             }
         });
     }

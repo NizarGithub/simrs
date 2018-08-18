@@ -81,6 +81,8 @@ class Lab_home_m extends CI_Model {
 				NAMA,
 				JENIS_KELAMIN,
 				UMUR,
+				UMUR_BULAN,
+				NAMA_ORTU,
 				SUBSTR(KODE_PASIEN,4,3) AS KODE,
 				SUBSTR(TANGGAL_DAFTAR,4,2) AS BULAN
 			FROM rk_pasien WHERE $where
@@ -223,6 +225,121 @@ class Lab_home_m extends CI_Model {
 		return $query->row();
 	}
 
+	function get_pasien_dr_poli($tanggal,$keyword){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND (d.NAMA LIKE '%$keyword%' OR d.NAMA_ORTU LIKE '%$keyword%')";
+		}
+
+		$sql = "
+			SELECT
+				a.ID,
+				a.ID_PASIEN,
+				d.KODE_PASIEN,
+				d.NAMA,
+				d.NAMA_ORTU,
+				a.ASAL_RUJUKAN,
+				b.ID AS ID_LAB,
+				b.KODE_LAB,
+				e.JENIS_LABORAT,
+				b.TOTAL_TARIF,
+				a.HARI,
+				a.TANGGAL,
+				a.BULAN,
+				a.TAHUN,
+				a.WAKTU,
+				a.ID_POLI,
+				c.NAMA AS NAMA_POLI,
+				f.NAMA AS NAMA_DOKTER,
+				b.TIPE,
+				b.STATUS_PENANGANAN,
+				b.STATUS_LIHAT
+			FROM admum_rawat_jalan a
+			JOIN rk_laborat_rj b ON b.ID_PELAYANAN = a.ID
+			JOIN admum_poli c ON c.ID = b.ID_POLI
+			JOIN rk_pasien d ON d.ID = a.ID_PASIEN
+			JOIN admum_setup_jenis_laborat e ON e.ID = b.JENIS_LABORAT
+			JOIN kepeg_pegawai f ON f.ID = b.ID_PEG_DOKTER
+			WHERE $where
+			AND b.TIPE = 'Dari Poli'
+			AND b.STATUS_PENANGANAN = '0'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function get_pasien_poli_id($id){
+		$sql = "
+			SELECT
+				a.ID,
+				a.ID_PASIEN,
+				d.KODE_PASIEN,
+				d.NAMA,
+				d.NAMA_ORTU,
+				a.ASAL_RUJUKAN,
+				b.ID AS ID_LAB,
+				b.KODE_LAB,
+				e.JENIS_LABORAT,
+				b.TOTAL_TARIF,
+				a.HARI,
+				a.TANGGAL,
+				a.BULAN,
+				a.TAHUN,
+				a.WAKTU,
+				a.ID_POLI,
+				c.NAMA AS NAMA_POLI,
+				f.NAMA AS NAMA_DOKTER,
+				b.TIPE,
+				b.STATUS_PENANGANAN,
+				b.STATUS_LIHAT
+			FROM admum_rawat_jalan a
+			JOIN rk_laborat_rj b ON b.ID_PELAYANAN = a.ID
+			JOIN admum_poli c ON c.ID = b.ID_POLI
+			JOIN rk_pasien d ON d.ID = a.ID_PASIEN
+			JOIN admum_setup_jenis_laborat e ON e.ID = b.JENIS_LABORAT
+			JOIN kepeg_pegawai f ON f.ID = b.ID_PEG_DOKTER
+			WHERE b.ID = '$id'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function get_detail_lab_poli($id_rj){
+		$sql = "
+			SELECT
+				a.ID,
+				a.ID_PEMERIKSAAN_RJ,
+				a.PEMERIKSAAN,
+				b.NAMA_PEMERIKSAAN,
+				a.HASIL,
+				a.NILAI_RUJUKAN,
+				a.SUBTOTAL,
+				a.TANGGAL,
+				a.WAKTU
+			FROM rk_laborat_rj_detail a
+			JOIN admum_setup_pemeriksaan b ON b.ID = a.PEMERIKSAAN
+			WHERE a.ID_PEMERIKSAAN_RJ = '$id_rj'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function ubah_status_lihat($tanggal){
+		$sql = "UPDATE rk_laborat_rj SET STATUS_LIHAT = '1' WHERE TIPE = 'Dari Poli' AND STATUS_LIHAT = '0' AND TANGGAL = '$tanggal'";
+		$this->db->query($sql);
+	}
+
+	function ubah_laborat_detail($id,$hasil,$nilai_rujukan){
+		$sql = "
+			UPDATE rk_laborat_rj_detail SET
+				HASIL = '$hasil',
+				NILAI_RUJUKAN = '$nilai_rujukan'
+			WHERE ID = '$id'
+		";
+		$this->db->query($sql);
+	}
+
 	function data_rawat_jalan_id($id){
 		$sql = "
 			SELECT
@@ -357,6 +474,33 @@ class Lab_home_m extends CI_Model {
 		$sql = "SELECT * FROM admum_setup_pemeriksaan WHERE ID = '$id'";
 		$query = $this->db->query($sql);
 		return $query->result();
+	}
+
+	function simpan_rj($id_pasien,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$posisi){
+		$sql = "
+			INSERT INTO admum_rawat_jalan(
+				ID_PASIEN,
+				ASAL_RUJUKAN,
+				HARI,
+				TANGGAL,
+				BULAN,
+				TAHUN,
+				WAKTU,
+				ID_POLI,
+				STS_POSISI
+			) VALUES(
+				'$id_pasien',
+				'$asal_rujukan',
+				'$hari',
+				'$tanggal',
+				'$bulan',
+				'$tahun',
+				'$waktu',
+				'$id_poli',
+				'$posisi'
+			)
+		";
+		$this->db->query($sql);
 	}
 
 	function simpan_pemeriksaan($kode_lab,$id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$jenis_laborat,$total_tarif,$cito,$tanggal,$bulan,$tahun,$waktu,$tipe){

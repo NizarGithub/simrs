@@ -153,6 +153,18 @@ $(document).ready(function(){
     });
 });
 
+function get_biaya_reg(status){
+    $.ajax({
+        url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/get_biaya_reg',
+        data : {status:status},
+        type : "POST",
+        dataType : "json",
+        success : function(row){
+            $('#biaya_reg').val(formatNumber(row['BIAYA'])); 
+        }
+    });
+}
+
 function get_kode_pasien(){
     $.ajax({
         url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/kode_pasien',
@@ -271,6 +283,10 @@ function klik_pasien(id){
             $('#kecamatan').val(row['KECAMATAN']);
             $('#kota').val(row['KOTA']);
             $('#provinsi').val(row['PROVINSI']);
+
+            get_biaya_reg(row['JENIS_PASIEN']);
+
+            $('#btn_proses').removeAttr('disabled');
         }
     });
 }
@@ -716,227 +732,242 @@ function Search_tgl_RI(tgl){
     });
 }
 </script>
+
 <input type="hidden" id="ord_tmp" value="" />
-<div class="col-sm-12">
-    <form class="form-horizontal" role="form" action="<?php echo $url_simpan; ?>" method="post" id="form_pasien_baru">
-        <input type="hidden" class="jml_antrian_now" name="jumlah_antrian" value="">
-        <input type="hidden" id="barcode" name="barcode" value="">
-        <div class="card-box">
-            <div class="row">
-        		<div class="col-lg-6">
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Nama Lengkap</label>
-                        <div class="col-md-9">
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="nama" id="nama" value="" placeholder="klik disini..." readonly required>
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-success btn_pasien"><i class="fa fa-search"></i></button>
-                                </span>
+<div class="row">
+    <div class="col-sm-12">
+        <form class="form-horizontal" role="form" action="<?php echo $url_simpan; ?>" method="post" id="form_pasien_baru">
+            <div class="card-box">
+                <div class="row">
+            		<div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Nama Lengkap</label>
+                            <div class="col-md-9">
+                                <div class="input-group">
+                                    <input type="text" class="form-control btn_pasien" name="nama" id="nama" value="" placeholder="klik disini..." readonly required>
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-success btn_pasien"><i class="fa fa-search"></i></button>
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">No. RM</label>
-                        <div class="col-md-5">
-                            <input type="hidden" name="id_pasien" id="id_pasien" value="">
-                            <input type="text" class="form-control" name="kode_pasien" id="kode_pasien" value="" readonly>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">No. RM</label>
+                            <div class="col-md-5">
+                                <input type="hidden" name="id_pasien" id="id_pasien" value="">
+                                <input type="text" class="form-control" name="kode_pasien" id="kode_pasien" value="" readonly>
+                            </div>
+                            <!-- <div class="col-md-3">
+                                <div class="checkbox checkbox-primary">
+                                    <input id="baru" type="checkbox" name="baru" value="1">
+                                    <label for="baru">
+                                        Baru
+                                    </label>
+                                </div>
+                            </div> -->
                         </div>
-                        <!-- <div class="col-md-3">
-                            <div class="checkbox checkbox-primary">
-                                <input id="baru" type="checkbox" name="baru" value="1">
-                                <label for="baru">
-                                    Baru
-                                </label>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Jenis Kelamin</label>
+                            <div class="col-md-9">
+                                <input type="hidden" class="form-control" name="jenis_kelamin_txt" id="jenis_kelamin_txt" value="">
+                                <input type="text" class="form-control" id="jenis_kelamin_show" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Pendidikan</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="pendidikan_txt" id="pendidikan_txt" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Agama</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="agama_txt" id="agama_txt" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Alamat</label>
+                            <div class="col-md-9">
+                                <textarea rows="5" class="form-control" name="alamat" id="alamat" readonly></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Golongan Darah</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="goldar_txt" id="goldar_txt" value="" readonly>
+                            </div>
+                        </div>
+                        <!-- <div class="form-group">
+                            <label class="col-md-3 control-label"></label>
+                            <div class="col-md-9">
+                                <button type="button" id="btn_history" onclick="get_history_medik();" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target=".bs-example-modal-lg">
+                                   <i class="fa fa-history"></i> History Rekam Medik
+                                </button>
                             </div>
                         </div> -->
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Jenis Kelamin</label>
-                        <div class="col-md-9">
-                            <input type="hidden" class="form-control" name="jenis_kelamin_txt" id="jenis_kelamin_txt" value="">
-                            <input type="text" class="form-control" id="jenis_kelamin_show" value="" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Pendidikan</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="pendidikan_txt" id="pendidikan_txt" value="" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Agama</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="agama_txt" id="agama_txt" value="" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Alamat</label>
-                        <div class="col-md-9">
-                            <textarea rows="5" class="form-control" name="alamat" id="alamat" readonly></textarea>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Golongan Darah</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="goldar_txt" id="goldar_txt" value="" readonly>
-                        </div>
-                    </div>
-                    <!-- <div class="form-group">
-                        <label class="col-md-3 control-label"></label>
-                        <div class="col-md-9">
-                            <button type="button" id="btn_history" onclick="get_history_medik();" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target=".bs-example-modal-lg">
-                               <i class="fa fa-history"></i> History Rekam Medik
-                            </button>
-                        </div>
-                    </div> -->
-        		</div>
+            		</div>
 
-        		<div class="col-lg-6">
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Tempat Lahir</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" value="" readonly>
+            		<div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Tempat Lahir</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Tanggal Lahir</label>
+                            <div class="col-md-9">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <input type="text" class="form-control" name="tanggal_lahir" id="tanggal_lahir" value="" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Umur</label>
+                            <div class="col-md-3">
+                                <div class="input-group">
+                                    <input type="text" class="form-control num_only" name="umur" id="umur" value="" maxlength="3" readonly>
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-warning" style="cursor:default;">Tahun</button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group">
+                                    <input type="text" class="form-control num_only" name="umur_bulan" id="umur_bulan" value="" maxlength="3" readonly>
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-warning" style="cursor:default;">Bulan</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Nama Orang Tua</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="nama_ortu" id="nama_ortu" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Telepon</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control num_only" name="telepon" id="telepon" value="" maxlength="13" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Kelurahan</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="kelurahan" id="kelurahan" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Kecamatan</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="kecamatan" id="kecamatan" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Kabupaten / Kota</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="kota" id="kota" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Provinsi</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="provinsi" id="provinsi" value="" readonly>
+                            </div>
+                        </div>
+            		</div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-info">
+                            <i class="fa fa-shield"></i>&nbsp;<strong>Pasien Rawat Jalan</strong>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Tanggal Lahir</label>
-                        <div class="col-md-9">
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                <input type="text" class="form-control" name="tanggal_lahir" id="tanggal_lahir" value="" readonly>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Asal Rujukan</label>
+                            <div class="col-md-9">
+                                <select class="form-control select2" name="asal_rujukan">
+                                    <option value="Sendiri">Datang Sendiri</option>
+                                    <option value="Puskesmas">Puskesmas</option>
+                                    <option value="RS Swasta">RS Swasta</option>
+                                    <option value="Dokter Keluarga">Dokter Keluarga</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Tanggal Datang</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="tanggal" id="tanggal" value="<?php echo date('d-m-Y'); ?>" readonly>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Umur</label>
-                        <div class="col-md-3">
-                            <div class="input-group">
-                                <input type="text" class="form-control num_only" name="umur" id="umur" value="" maxlength="3" readonly>
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-warning" style="cursor:default;">Tahun</button>
-                                </span>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">&nbsp;</label>
+                            <div class="col-md-9">
+                                <div class="radio radio-success radio-inline">
+                                    <input type="radio" id="inlineRadio1" value="1" name="pilihan" checked>
+                                    <label for="inlineRadio1"> Poli </label>
+                                </div>
+                                <div class="radio radio-success radio-inline">
+                                    <input type="radio" id="inlineRadio2" value="2" name="pilihan">
+                                    <label for="inlineRadio2"> Laborat </label>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="input-group">
-                                <input type="text" class="form-control num_only" name="umur_bulan" id="umur_bulan" value="" maxlength="3" readonly>
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-warning" style="cursor:default;">Bulan</button>
-                                </span>
+                        <div class="form-group view_poli">
+                            <label class="col-md-3 control-label">Poli Tujuan</label>
+                            <div class="col-md-9">
+                                <div class="input-group">
+                                    <input type="hidden" name="id_poli" id="id_poli" value="">
+                                    <input type="text" class="form-control" id="poli_tujuan" value="" required="required" readonly>
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary btn_poli"><i class="fa fa-search"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group view_poli">
+                            <label class="col-md-3 control-label">Dokter</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="dokter" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group view_poli">
+                            <label class="col-md-3 control-label">Biaya</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="biaya" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group view_poli">
+                            <label class="col-md-3 control-label">Biaya Reg</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="biaya_reg" id="biaya_reg" value="" readonly>
+                                <input type="hidden" id="id_kode_antrian_off_now" name="id_kode_antrian" value="">
+                                <input type="hidden" id="kode_antrian_off_now" name="kode_antrian" value="">
+                                <input type="hidden" id="jml_antrian_off_now" name="jumlah_antrian" value="">
+                                <input type="hidden" id="barcode" name="barcode" value="">
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Nama Orang Tua</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="nama_ortu" id="nama_ortu" value="" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Telepon</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control num_only" name="telepon" id="telepon" value="" maxlength="13" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Kelurahan</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="kelurahan" id="kelurahan" value="" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Kecamatan</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="kecamatan" id="kecamatan" value="" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Kabupaten / Kota</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="kota" id="kota" value="" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Provinsi</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="provinsi" id="provinsi" value="" readonly>
-                        </div>
-                    </div>
-        		</div>
+                </div>
+                <hr>
+                <center>
+                    <button type="submit" class="btn btn-success m-b-5" value="daftar" id="btn_proses" disabled="disabled">
+                        <i class="fa fa-refresh"></i> <span><b>Proses</b></span>
+                    </button>
+                    <button type="button" class="btn btn-danger m-b-5" id="batal">
+                        <i class="fa fa-times"></i> <span><b>Batal</b></span>
+                    </button>
+                </center>
             </div>
-            <hr>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="alert alert-info">
-                        <i class="fa fa-shield"></i>&nbsp;<strong>Pasien Rawat Jalan</strong>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Asal Rujukan</label>
-                        <div class="col-md-9">
-                            <select class="form-control select2" name="asal_rujukan">
-                                <option value="Sendiri">Datang Sendiri</option>
-                                <option value="Puskesmas">Puskesmas</option>
-                                <option value="RS Swasta">RS Swasta</option>
-                                <option value="Dokter Keluarga">Dokter Keluarga</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">Tanggal Datang</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" name="tanggal" id="tanggal" value="<?php echo date('d-m-Y'); ?>" readonly>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label class="col-md-3 control-label">&nbsp;</label>
-                        <div class="col-md-9">
-                            <div class="radio radio-success radio-inline">
-                                <input type="radio" id="inlineRadio1" value="1" name="pilihan" checked>
-                                <label for="inlineRadio1"> Poli </label>
-                            </div>
-                            <div class="radio radio-success radio-inline">
-                                <input type="radio" id="inlineRadio2" value="2" name="pilihan">
-                                <label for="inlineRadio2"> Laborat </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group view_poli">
-                        <label class="col-md-3 control-label">Poli Tujuan</label>
-                        <div class="col-md-9">
-                            <div class="input-group">
-                                <input type="hidden" name="id_poli" id="id_poli" value="">
-                                <input type="text" class="form-control" id="poli_tujuan" value="" required="required" readonly>
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-primary btn_poli"><i class="fa fa-search"></i></button>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group view_poli">
-                        <label class="col-md-3 control-label">Dokter</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" id="dokter" value="" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group view_poli">
-                        <label class="col-md-3 control-label">Biaya</label>
-                        <div class="col-md-9">
-                            <input type="text" class="form-control" id="biaya" value="" readonly>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <hr>
-            <center>
-                <button type="submit" class="btn btn-success m-b-5" value="daftar"><i class="fa fa-check"></i> <span><b>Daftar</b></span></button>
-                <button type="button" class="btn btn-danger m-b-5" id="batal"><i class="fa fa-times"></i> <span><b>Batal</b></span></button>
-            </center>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 <!-- //LOAD PASIEN -->

@@ -8,7 +8,11 @@ $level = $user->LEVEL;
 <style type="text/css">
 #view_tanggal,
 #view_bulan,
-#form_pasien_baru{
+#view_data_poli_det{
+    display: none;
+}
+
+#view_jk2, #view_pendidikan2, #view_agama2, #view_goldar2, #view_tgl_lahir2, #view_kab_kota2, #view_prov2{
     display: none;
 }
 </style>
@@ -148,91 +152,55 @@ var level = "<?php echo $level; ?>";
 
 $(document).ready(function(){
     data_pasien();
+    data_pasien_dr_poli();
 
     // get_barcode();
 
-    $('#baru').click(function(){
-        var cek = $('#baru').is(":checked");
-        if(cek == true){
-            get_kode_pasien();
-            $('#nama').focus();
-            $('#btn_history').hide();
-            $('.btn_pasien').attr('disabled','disabled');
+    $('#btn_history').show();
+    $('.btn_pasien').removeAttr('disabled');
 
-            $('#id_pasien').val("");
-            $('#nama').val("");
-            $('#alamat').val("");
-            $('#tempat_lahir').val("");
-            $('#tanggal_lahir').val("");
-            $('#umur').val("");
-            $('#kelurahan').val("");
-            $('#kecamatan').val("");
+    $('#kode_pasien').val("");
+    $('#nama').val("");
+    $('#alamat').val("");
+    $('#tempat_lahir').val("");
+    $('#nama_ortu').val("");
+    $('#telepon').val("");
+    $('#tanggal_lahir').val("");
+    $('#umur').val("");
+    $('#kelurahan').val("");
+    $('#kecamatan').val("");
 
-            $('#nama').removeAttr('readonly');
-            $('#alamat').removeAttr('readonly');
-            $('#tempat_lahir').removeAttr('readonly');
-            $('#tanggal_lahir').removeAttr('readonly');
-            $('#umur').removeAttr('readonly');
-            $('#kelurahan').removeAttr('readonly');
-            $('#kecamatan').removeAttr('readonly');
+    $('#jenis_kelamin_txt').val("");
+    $('#jenis_kelamin_show').val("");
+    $('#pendidikan_txt').val("");
+    $('#agama_txt').val("");
+    $('#goldar_txt').val("");
+    $('#tanggal_txt').val("");
+    $('#kecamatan_txt').val("");
 
-            $('#view_jk2').hide();
-            $('#view_pendidikan2').hide();
-            $('#view_agama2').hide();
-            $('#view_goldar2').hide();
-            $('#view_tgl_lahir2').hide();
-            $('#view_kab_kota2').hide();
+    $('#nama').attr('readonly','readonly');
+    $('#alamat').attr('readonly','readonly');
+    $('#tempat_lahir').attr('readonly','readonly');
+    $('#tanggal_lahir').attr('readonly','readonly');
+    $('#nama_ortu').attr('readonly','readonly');
+    $('#telepon').attr('readonly','readonly');
+    $('#umur').attr('readonly','readonly');
+    $('#kelurahan').attr('readonly','readonly');
+    $('#kecamatan').attr('readonly','readonly');
 
-            $('#view_jk1').show();
-            $('#view_pendidikan1').show();
-            $('#view_agama1').show();
-            $('#view_goldar1').show();
-            $('#view_tgl_lahir1').show();
-            $('#view_kab_kota1').show();
-        }else{
-            $('#btn_history').show();
-            $('.btn_pasien').removeAttr('disabled');
+    $('#view_jk2').show();
+    $('#view_pendidikan2').show();
+    $('#view_agama2').show();
+    $('#view_goldar2').show();
+    $('#view_tgl_lahir2').show();
+    $('#view_kab_kota2').show();
 
-            $('#kode_pasien').val("");
-            $('#nama').val("");
-            $('#alamat').val("");
-            $('#tempat_lahir').val("");
-            $('#tanggal_lahir').val("");
-            $('#umur').val("");
-            $('#kelurahan').val("");
-            $('#kecamatan').val("");
-
-            $('#jenis_kelamin_txt').val("");
-            $('#jenis_kelamin_show').val("");
-            $('#pendidikan_txt').val("");
-            $('#agama_txt').val("");
-            $('#goldar_txt').val("");
-            $('#tanggal_txt').val("");
-            $('#kecamatan_txt').val("");
-
-            $('#nama').attr('readonly','readonly');
-            $('#alamat').attr('readonly','readonly');
-            $('#tempat_lahir').attr('readonly','readonly');
-            $('#tanggal_lahir').attr('readonly','readonly');
-            $('#umur').attr('readonly','readonly');
-            $('#kelurahan').attr('readonly','readonly');
-            $('#kecamatan').attr('readonly','readonly');
-
-            $('#view_jk2').show();
-            $('#view_pendidikan2').show();
-            $('#view_agama2').show();
-            $('#view_goldar2').show();
-            $('#view_tgl_lahir2').show();
-            $('#view_kab_kota2').show();
-
-            $('#view_jk1').hide();
-            $('#view_pendidikan1').hide();
-            $('#view_agama1').hide();
-            $('#view_goldar1').hide();
-            $('#view_tgl_lahir1').hide();
-            $('#view_kab_kota1').hide();
-        }
-    });
+    $('#view_jk1').hide();
+    $('#view_pendidikan1').hide();
+    $('#view_agama1').hide();
+    $('#view_goldar1').hide();
+    $('#view_tgl_lahir1').hide();
+    $('#view_kab_kota1').hide();
 
     $('.btn_pasien').click(function(){
         $('#popup_pasien').click();
@@ -245,15 +213,18 @@ $(document).ready(function(){
     });
 
     $('#batal_snd').click(function(){
-        $('#form_data').show();
-        $('#form_pasien_baru').hide();
-        $('.btn_pasien').removeAttr('disabled');
+    $('#btn_history').show();
+
+    $('.btn_pasien').removeAttr('disabled');
         $('#kode_pasien').val("");
         $('#nama').val("");
         $('#alamat').val("");
         $('#tempat_lahir').val("");
+        $('#nama_ortu').val("");
+        $('#telepon').val("");
         $('#tanggal_lahir').val("");
         $('#umur').val("");
+        $('#umur_bulan').val("");
         $('#kelurahan').val("");
         $('#kecamatan').val("");
 
@@ -264,28 +235,7 @@ $(document).ready(function(){
         $('#goldar_txt').val("");
         $('#tanggal_txt').val("");
         $('#kecamatan_txt').val("");
-
-        $('#nama').attr('readonly','readonly');
-        $('#alamat').attr('readonly','readonly');
-        $('#tempat_lahir').attr('readonly','readonly');
-        $('#tanggal_lahir').attr('readonly','readonly');
-        $('#umur').attr('readonly','readonly');
-        $('#kelurahan').attr('readonly','readonly');
-        $('#kecamatan').attr('readonly','readonly');
-
-        $('#view_jk2').show();
-        $('#view_pendidikan2').show();
-        $('#view_agama2').show();
-        $('#view_goldar2').show();
-        $('#view_tgl_lahir2').show();
-        $('#view_kab_kota2').show();
-
-        $('#view_jk1').hide();
-        $('#view_pendidikan1').hide();
-        $('#view_agama1').hide();
-        $('#view_goldar1').hide();
-        $('#view_tgl_lahir1').hide();
-        $('#view_kab_kota1').hide();
+        $('#kota_txt').val("");
     });
 
     $('#jumlah_tampil').change(function(){
@@ -327,6 +277,103 @@ $(document).ready(function(){
             $('#tahun').val("");
         }
     });
+
+    $('#dt_dari_poli').click(function(){
+        // data_pasien_dr_poli();
+
+        $.ajax({
+            url : '<?php echo base_url(); ?>lab/lab_home_c/ubah_status_lihat',
+            type : "POST",
+            dataType : "json",
+            success : function(res){
+                console.log(res);
+                data_pasien_dr_poli();
+            }
+        });
+    });
+
+    $('#btn_simpan_poli').click(function(){
+        toastr.options = {
+          "closeButton": false,
+          "debug": false,
+          "newestOnTop": false,
+          "progressBar": true,
+          "positionClass": "toast-bottom-right",
+          "preventDuplicates": false,
+          "onclick": null,
+          "showDuration": "300",
+          "hideDuration": "1000",
+          "timeOut": "5000",
+          "extendedTimeOut": "1000",
+          "showEasing": "swing",
+          "hideEasing": "linear",
+          "showMethod": "fadeIn",
+          "hideMethod": "fadeOut"
+        }
+
+        var id = $('#id_rj_det').val();
+        var hasil = $('input[name="hasil[]"]').val();
+        var nilai_rujukan = $('input[name="nilai_rujukan[]"]').val();
+
+        if(hasil.length == 0){
+            toastr["error"]("Masukkan hasil laboratnya!", "Notifikasi");
+        }else if(nilai_rujukan.length == 0){
+            toastr["error"]("Masukkan nilai rujukan laboratnya!", "Notifikasi");
+        }else{
+            $.ajax({
+                url : '<?php echo base_url(); ?>lab/lab_home_c/ubah_laborat_detail',
+                data : $('#view_data_poli_det').serialize(),
+                type : "POST",
+                dataType : "json",
+                success : function(res){
+                    toastr["success"]("Data berhasil disimpan!", "Notifikasi");
+                    // detail_pasien_poli(id);
+                    $('#view_data_poli').show();
+                    $('#view_data_poli_det').hide();
+                    data_pasien_dr_poli();
+                }
+            });
+        }
+    });
+
+    $('#btn_proses').click(function(){
+        toastr.options = {
+          "closeButton": false,
+          "debug": false,
+          "newestOnTop": false,
+          "progressBar": true,
+          "positionClass": "toast-bottom-right",
+          "preventDuplicates": false,
+          "onclick": null,
+          "showDuration": "300",
+          "hideDuration": "1000",
+          "timeOut": "5000",
+          "extendedTimeOut": "1000",
+          "showEasing": "swing",
+          "hideEasing": "linear",
+          "showMethod": "fadeIn",
+          "hideMethod": "fadeOut"
+        }
+
+        var id = $('#id_pasien2').val();
+
+        if(id == ""){
+            toastr["error"]("Masukkan data pasien terlebih dahulu!", "Notifikasi");
+        }else{
+            // $.ajax({
+            //     url : '<?php //echo base_url(); ?>lab/lab_home_c/ubah_laborat_detail',
+            //     data : $('#form_pasien_baru').serialize(),
+            //     type : "POST",
+            //     dataType : "json",
+            //     success : function(res){
+            //         toastr["success"]("Data berhasil disimpan!", "Notifikasi");
+            //         $('#form_data').show();
+            //         $('#form_pasien_baru').hide();
+            //     }
+            // });
+        }
+    });
+
 });
 
 function get_kode_pasien(){
@@ -374,26 +421,19 @@ function load_data_pasien(){
                 var no = 0;
 
                 for(var i=0; i<result.length; i++){
-                    no++; 
-
-                    var jk = "";
-                    if(result[i].JENIS_KELAMIN == "L"){
-                        jk = "Laki - Laki";
-                    }else{
-                        jk = "Perempuan";
-                    }
+                    no++;
 
                     $tr += "<tr style='cursor:pointer;' onclick='klik_pasien("+result[i].ID+");'>"+
                                 "<td style='text-align:center;'>"+no+"</td>"+
                                 "<td>"+result[i].KODE_PASIEN+"</td>"+
                                 "<td>"+result[i].NAMA+"</td>"+
-                                "<td style='text-align:center;'>"+jk+"</td>"+
-                                "<td style='text-align:center;'>"+result[i].UMUR+" Tahun</td>"+
+                                "<td style='text-align:center;'>"+result[i].UMUR+" Tahun "+result[i].UMUR_BULAN+" Bulan</td>"+
+                                "<td>"+result[i].NAMA_ORTU+"</td>"+
                             "</tr>";
                 }
             }
 
-            $('#tabel_pasien tbody').html($tr);
+            $('#tabel_pasien_ds tbody').html($tr);
         }
     });
 
@@ -445,8 +485,11 @@ function klik_pasien(id){
             $('#alamat').val(row['ALAMAT']);
             $('#goldar_txt').val(row['GOLONGAN_DARAH']);
             $('#tempat_lahir').val(row['TEMPAT_LAHIR']);
+            $('#nama_ortu').val(row['NAMA_ORTU']);
+            $('#telepon').val(row['TELEPON']);
             $('#tanggal_txt').val(row['TANGGAL_LAHIR']);
             $('#umur').val(row['UMUR']);
+            $('#umur_bulan').val(row['UMUR_BULAN']);
             $('#kelurahan').val(row['KELURAHAN']);
             $('#kecamatan').val(row['KECAMATAN']);
             $('#kota_txt').val(row['KOTA']);
@@ -455,6 +498,8 @@ function klik_pasien(id){
             $('#nama').attr('readonly','readonly');
             $('#alamat').attr('readonly','readonly');
             $('#tempat_lahir').attr('readonly','readonly');
+            $('#nama_ortu').attr('readonly','readonly');
+            $('#telepon').attr('readonly','readonly');
             $('#umur').attr('readonly','readonly');
             $('#kelurahan').attr('readonly','readonly');
             $('#kecamatan').attr('readonly','readonly');
@@ -552,11 +597,11 @@ function data_pasien(){
         hasil_cek = 'False';
     }
 
-    if(ajax){
-        ajax.abort();
-    }
+    // if(ajax){
+    //     ajax.abort();
+    // }
 
-    ajax = $.ajax({
+    $.ajax({
         url : '<?php echo base_url(); ?>lab/lab_home_c/data_pasien_terima',
         data : {
             keyword:keyword,
@@ -574,7 +619,7 @@ function data_pasien(){
             $tr = "";
 
             if(result == "" || result == null){
-                $tr = "<tr><td colspan='8' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+                $tr = "<tr><td colspan='9' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
             }else{
                 var no = 0;
 
@@ -600,6 +645,7 @@ function data_pasien(){
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].ALAMAT+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA_ORTU+'</td>'+
                             '   <td style="vertical-align:middle;" align="center">'+detail+'</td>'+
                             '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
                             '</tr>';
@@ -701,6 +747,121 @@ function detail_pasien(id){
         }
     });
 }
+
+function data_pasien_dr_poli(){
+    $('#popup_load').show();
+    var tanggal = "<?php echo date('d-m-Y'); ?>";
+    var keyword = $('#cari_pasien_poli').val();
+
+    if(ajax){
+        ajax.abort();
+    }
+
+    ajax = $.ajax({
+        url : '<?php echo base_url(); ?>lab/lab_home_c/get_pasien_dr_poli',
+        data : {
+            tanggal:tanggal,
+            keyword:keyword
+        },
+        type : "GET",
+        dataType : "json",
+        success : function(result){
+            $tr = "";
+            var tot = "";
+
+            if(result == "" || result == null){
+                $tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+            }else{
+                var no = 0;
+
+                for(var i=0; i<result.length; i++){
+                    no++;
+
+                    if(result[i].STATUS_LIHAT == '1'){
+                        tot = '0';
+                    }else{
+                        tot = result.length;
+                    }
+                    $('#tot_dari_poli').html(parseInt(tot));
+
+                    var detail = '<button type="button" id="btn_history" onclick="detail_pasien_poli('+result[i].ID_LAB+');" class="btn btn-primary waves-effect waves-light btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg">'+
+                                    '<i class="fa fa-eye"></i>';
+                                 '</button>';
+
+                    $tr +=  '<tr>'+
+                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL+' - '+result[i].WAKTU+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].KODE_PASIEN+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].JENIS_LABORAT+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle; text-align:right;">'+formatNumber(result[i].TOTAL_TARIF)+'</td>'+
+                            '   <td style="vertical-align:middle;" align="center">'+detail+'</td>'+
+                            '</tr>';
+                }
+            }
+
+            $('#tabel_pasien_poli tbody').html($tr);
+            var total_pasien = result.length;
+            $('#total_pasien_poli').html(parseInt(total_pasien));
+            // paging();
+            $('#popup_load').fadeOut();
+        }
+    });
+
+    $('#cari_pasien_poli').off('keyup').keyup(function(){
+        data_pasien_dr_poli();
+    });
+}
+
+function detail_pasien_poli(id){
+    $('#view_data_poli_det').show();
+    $('#view_data_poli').hide();
+
+    $.ajax({
+        url : '<?php echo base_url(); ?>lab/lab_home_c/get_pasien_poli_id',
+        data : {id:id},
+        type : "POST",
+        dataType : "json",
+        success : function(res){
+            $tr = '';
+            var no = 0;
+
+            $('#id_rj_det').val(id);
+            $('#no_rm_poli').val(res['ind']['KODE_PASIEN']);
+            $('#nama_pasien_poli').val(res['ind']['NAMA']);
+            $('#jenis_lab_poli').val(res['ind']['JENIS_LABORAT']);
+
+            for(var i=0; i<res['det'].length; i++){
+                no++;
+
+                res['det'][i].HASIL = res['det'][i].HASIL==null?" ":res['det'][i].HASIL;
+                res['det'][i].NILAI_RUJUKAN = res['det'][i].NILAI_RUJUKAN==null?" ":res['det'][i].NILAI_RUJUKAN;
+
+                $tr += '<tr>'+
+                            '<td style="text-align:center;">'+no+'</td>'+
+                            '<td>'+res['det'][i].NAMA_PEMERIKSAAN+'</td>'+
+                            '<td>'+
+                                '<input type="hidden" name="id_detail[]" value="'+res['det'][i].ID+'">'+
+                                '<input type="text" class="form-control" name="hasil[]" value="'+res['det'][i].HASIL+'">'+
+                            '</td>'+
+                            '<td>'+
+                                '<input type="text" class="form-control" name="nilai_rujukan[]" value="'+res['det'][i].NILAI_RUJUKAN+'">'+
+                            '</td>'+
+                            '<td style="text-align:right;">'+formatNumber(res['det'][i].SUBTOTAL)+'</td>'+
+                        '</tr>';
+            }
+
+            $('#tabel_pasien_poli_det tbody').html($tr);
+        }
+    });
+
+    $('#btn_batal_poli').click(function(){
+        $('#view_data_poli_det').hide();
+        $('#view_data_poli').show();
+        $("input[name='hasil[]']").val("");
+        $("input[name='nilai_rujukan[]']").val("");
+    });
+}
 </script>
 
 <div id="popup_load">
@@ -734,14 +895,20 @@ function detail_pasien(id){
                         <li role="presentation">
                             <a data-toggle="tab" role="tab" href="#profile1"><i class="fa fa-user"></i> Datang Sendiri</a>
                         </li>
+                        <li role="presentation" id="dt_dari_poli">
+                            <a data-toggle="tab" role="tab" href="#profile2">
+                                <i class="fa fa-home"></i> Dari Poli <span class="badge badge-success" id="tot_dari_poli">0</span>
+                            </a>
+                        </li>
                     </ul>
                     <div class="tab-content">
                         <div id="home1" class="tab-pane fade in active" role="tabpanel">
                             <form class="form-horizontal" role="form">
+                                <input type="hidden" name="nomor_antrian" id="nomor_antrian" value="">
                                 <div class="form-group">
-                                    <label class="col-md-1 control-label" style="width: 7%; text-align: left;">Filter :</label>
+                                    <label class="col-md-1 control-label" style="width: 5%; text-align: left;">Filter :</label>
                                     <?php if(count($level) != 0){ ?>
-                                    <div class="col-md-2" style="width: 15%;">
+                                    <div class="col-md-2" style="width: 10%;">
                                         <div class="checkbox checkbox-inline checkbox-success">
                                             <input type="checkbox" id="cek_tampil_semua" value="Semua">
                                             <label for="cek_tampil_semua"> Tampilkan Semua </label>
@@ -838,6 +1005,7 @@ function detail_pasien(id){
                                                         <th style="color:#fff; text-align:center;">Nama Pasien</th>
                                                         <th style="color:#fff; text-align:center;">JK</th>
                                                         <th style="color:#fff; text-align:center;">Alamat</th>
+                                                        <th style="color:#fff; text-align:center;">Nama Org Tua</th>
                                                         <th style="color:#fff; text-align:center;">Detail</th>
                                                         <th style="color:#fff; text-align:center;">Tindakan</th>
                                                     </tr>
@@ -875,79 +1043,10 @@ function detail_pasien(id){
                         </div>
 
                         <div id="profile1" class="tab-pane fade" role="tabpanel">
-                            <form class="form-horizontal" role="form" id="form_data">
-                                <div class="form-group">
-                                    <div class="col-md-6">
-                                        <button class="btn btn-primary m-b-5" type="button" id="btn_tambah_lab_snd">
-                                            <i class="fa fa-plus"></i>&nbsp;<b>Tambah Data</b>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-12">
-                                        <div class="table-responsive">
-                                            <table id="tabel_pasien_snd" class="table table-hover table-bordered">
-                                                <thead>
-                                                    <tr class="merah">
-                                                        <th style="color:#fff; text-align:center;">No</th>
-                                                        <th style="color:#fff; text-align:center;">No. RM</th>
-                                                        <th style="color:#fff; text-align:center;">Tgl / Waktu</th>
-                                                        <th style="color:#fff; text-align:center;">Nama Pasien</th>
-                                                        <th style="color:#fff; text-align:center;">JK</th>
-                                                        <th style="color:#fff; text-align:center;">Alamat</th>
-                                                        <th style="color:#fff; text-align:center;">Detail</th>
-                                                        <th style="color:#fff; text-align:center;">Tindakan</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-10">
-                                        <div id="tablePaging_snd"> </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <h4 class="header-title">Total Pasien : <b id="total_pasien_snd"></b></h4>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-9">
-                                        
-                                    </div>
-                                    <label class="col-md-2 control-label">Jumlah Tampil</label>
-                                    <div class="col-md-1 pull-right">
-                                        <select class="form-control" id="jumlah_tampil_snd">
-                                            <option value="10">10</option>
-                                            <option value="20">20</option>
-                                            <option value="50">50</option>
-                                            <option value="100">100</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </form>
-
                             <form class="form-horizontal" role="form" action="" method="post" id="form_pasien_baru">
                                 <div class="card-box">
                                     <div class="row">
                                         <div class="col-lg-6">
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label">No. RM</label>
-                                                <div class="col-md-5">
-                                                    <input type="text" class="form-control" name="kode_pasien" id="kode_pasien" value="" readonly>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="checkbox checkbox-primary">
-                                                        <input id="baru" type="checkbox" name="baru" value="1">
-                                                        <label for="baru">
-                                                            Baru
-                                                        </label>
-                                                    </div>
-                                                </div> 
-                                            </div>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Nama Lengkap</label>
                                                 <div class="col-md-9">
@@ -959,6 +1058,20 @@ function detail_pasien(id){
                                                         </span>
                                                     </div>
                                                 </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">No. RM</label>
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" name="kode_pasien" id="kode_pasien" value="" readonly>
+                                                </div>
+                                               <!--  <div class="col-md-3">
+                                                    <div class="checkbox checkbox-primary">
+                                                        <input id="baru" type="checkbox" name="baru" value="1">
+                                                        <label for="baru">
+                                                            Baru
+                                                        </label>
+                                                    </div>
+                                                </div> --> 
                                             </div>
                                             <div class="form-group" id="view_jk1">
                                                 <label class="col-md-3 control-label">Jenis Kelamin</label>
@@ -974,6 +1087,40 @@ function detail_pasien(id){
                                                 <div class="col-md-9">
                                                     <input type="hidden" class="form-control" name="jenis_kelamin_txt" id="jenis_kelamin_txt" value="">
                                                     <input type="text" class="form-control" id="jenis_kelamin_show" value="" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" id="view_tgl_lahir1">
+                                                <label class="col-md-3 control-label">Tanggal Lahir</label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                        <input type="text" class="form-control" name="tanggal_lahir" id="tanggal_lahir" data-mask="99-99-9999" value="" placeholder="dd-mm-yyyy" onchange="hitung_umur();">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" id="view_tgl_lahir2">
+                                                <label class="col-md-3 control-label">Tanggal Lahir</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control" name="tanggal_txt" id="tanggal_txt" value="" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Umur</label>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control num_only" name="umur" id="umur" value="" maxlength="3" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-warning" style="cursor:default;">Tahun</button>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control num_only" name="umur_bulan" id="umur_bulan" value="" maxlength="3" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button type="button" class="btn btn-warning" style="cursor:default;">Bulan</button>
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group" id="view_pendidikan1">
@@ -1018,6 +1165,17 @@ function detail_pasien(id){
                                                     <textarea rows="5" class="form-control" name="alamat" id="alamat" required="required"></textarea>
                                                 </div>
                                             </div>
+                                            <!-- <div class="form-group">
+                                                <label class="col-md-3 control-label"></label>
+                                                <div class="col-md-9">
+                                                    <button type="button" id="btn_history" onclick="get_history_medik();" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target=".bs-example-modal-lg">
+                                                       <i class="fa fa-history"></i> History Rekam Medik
+                                                    </button>
+                                                </div>
+                                            </div> -->
+                                        </div>
+
+                                        <div class="col-lg-6">
                                             <div class="form-group" id="view_goldar1">
                                                 <label class="col-md-3 control-label">Golongan Darah</label>
                                                 <div class="col-md-9">
@@ -1030,17 +1188,6 @@ function detail_pasien(id){
                                                     </select>
                                                 </div>
                                             </div>
-                                            <!-- <div class="form-group">
-                                                <label class="col-md-3 control-label"></label>
-                                                <div class="col-md-9">
-                                                    <button type="button" id="btn_history" onclick="get_history_medik();" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target=".bs-example-modal-lg">
-                                                       <i class="fa fa-history"></i> History Rekam Medik
-                                                    </button>
-                                                </div>
-                                            </div> -->
-                                        </div>
-
-                                        <div class="col-lg-6">
                                             <div class="form-group" id="view_goldar2">
                                                 <label class="col-md-3 control-label">Golongan Darah</label>
                                                 <div class="col-md-9">
@@ -1051,40 +1198,6 @@ function detail_pasien(id){
                                                 <label class="col-md-3 control-label">Tempat Lahir</label>
                                                 <div class="col-md-9">
                                                     <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" value="" required="required">
-                                                </div>
-                                            </div>
-                                            <div class="form-group" id="view_tgl_lahir1">
-                                                <label class="col-md-3 control-label">Tanggal Lahir</label>
-                                                <div class="col-md-9">
-                                                    <div class="input-group">
-                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                                        <input type="text" class="form-control" name="tanggal_lahir" id="tanggal_lahir" data-mask="99-99-9999" value="" placeholder="dd-mm-yyyy" onchange="hitung_umur();">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group" id="view_tgl_lahir2">
-                                                <label class="col-md-3 control-label">Tanggal Lahir</label>
-                                                <div class="col-md-9">
-                                                    <input type="text" class="form-control" name="tanggal_txt" id="tanggal_txt" value="" readonly>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label">Umur</label>
-                                                <div class="col-md-3">
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control num_only" name="umur" id="umur" value="" maxlength="3" readonly>
-                                                        <span class="input-group-btn">
-                                                            <button type="button" class="btn btn-warning" style="cursor:default;">Tahun</button>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control num_only" name="umur_bulan" id="umur_bulan" value="" maxlength="3" readonly>
-                                                        <span class="input-group-btn">
-                                                            <button type="button" class="btn btn-warning" style="cursor:default;">Bulan</button>
-                                                        </span>
-                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -1167,12 +1280,173 @@ function detail_pasien(id){
                                     </div>
                                     <hr>
                                     <center>
-                                        <button type="submit" class="btn btn-success m-b-5"><i class="fa fa-check"></i> <span><b>Daftar</b></span></button>
+                                        <button type="button" class="btn btn-success m-b-5" id="btn_proses"><i class="fa fa-refresh"></i> <span><b>Proses</b></span></button>
                                         <button type="button" class="btn btn-danger m-b-5" id="batal_snd"><i class="fa fa-times"></i> <span><b>Batal</b></span></button>
                                     </center>
                                 </div>
                             </form>
 
+                            <form class="form-horizontal" role="form" id="form_data">
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <button class="btn btn-primary m-b-5" type="button" id="btn_tambah_lab_snd">
+                                            <i class="fa fa-plus"></i>&nbsp;<b>Tambah Data</b>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="table-responsive">
+                                            <table id="tabel_pasien_snd" class="table table-hover table-bordered">
+                                                <thead>
+                                                    <tr class="merah">
+                                                        <th style="color:#fff; text-align:center;">No</th>
+                                                        <th style="color:#fff; text-align:center;">No. RM</th>
+                                                        <th style="color:#fff; text-align:center;">Tgl / Waktu</th>
+                                                        <th style="color:#fff; text-align:center;">Nama Pasien</th>
+                                                        <th style="color:#fff; text-align:center;">JK</th>
+                                                        <th style="color:#fff; text-align:center;">Alamat</th>
+                                                        <th style="color:#fff; text-align:center;">Detail</th>
+                                                        <th style="color:#fff; text-align:center;">Tindakan</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-10">
+                                        <div id="tablePaging_snd"> </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <h4 class="header-title">Total Pasien : <b id="total_pasien_snd"></b></h4>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-9">
+                                        
+                                    </div>
+                                    <label class="col-md-2 control-label">Jumlah Tampil</label>
+                                    <div class="col-md-1 pull-right">
+                                        <select class="form-control" id="jumlah_tampil_snd">
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div id="profile2" class="tab-pane fade" role="tabpanel">
+                            <form class="form-horizontal" role="form" id="view_data_poli">
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="cari_pasien_poli" placeholder="Cari..." value="">
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn waves-effect waves-light btn-warning">
+                                                    <i class="fa fa-search"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="table-responsive">
+                                            <table id="tabel_pasien_poli" class="table table-hover table-bordered">
+                                                <thead>
+                                                    <tr class="merah">
+                                                        <th style="color:#fff; text-align:center;">No</th>
+                                                        <th style="color:#fff; text-align:center;">Tgl / Waktu</th>
+                                                        <th style="color:#fff; text-align:center;">No. RM</th>
+                                                        <th style="color:#fff; text-align:center;">Nama Pasien</th>
+                                                        <th style="color:#fff; text-align:center;">Jenis Laborat</th>
+                                                        <th style="color:#fff; text-align:center;">Tarif</th>
+                                                        <th style="color:#fff; text-align:center;">Detail</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-10">
+                                        <div id="tablePagingPoli"> </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <h4 class="header-title">Total Pasien : <b id="total_pasien_poli"></b></h4>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-9">
+                                        
+                                    </div>
+                                    <label class="col-md-2 control-label">Jumlah Tampil</label>
+                                    <div class="col-md-1 pull-right">
+                                        <select class="form-control" id="jumlah_tampil_poli">
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <form class="form-horizontal" role="form" id="view_data_poli_det">
+                                <input type="hidden" id="id_rj_det" name="id_rj_det" value="">
+                                <div class="form-group">
+                                    <div class="col-md-4">
+                                        <label for="no_rm_poli">No. RM</label>
+                                        <input type="text" id="no_rm_poli" class="form-control" value="" readonly>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="no_rm_poli">Nama Pasien</label>
+                                        <input type="text" id="nama_pasien_poli" class="form-control" value="" readonly>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="no_rm_poli">Jenis Laborat</label>
+                                        <input type="text" id="jenis_lab_poli" class="form-control" value="" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="table-responsive">
+                                            <table id="tabel_pasien_poli_det" class="table table-hover table-bordered">
+                                                <thead>
+                                                    <tr class="biru">
+                                                        <th style="color:#fff; text-align:center;">No</th>
+                                                        <th style="color:#fff; text-align:center;">Nama Pemeriksaan</th>
+                                                        <th style="color:#fff; text-align:center;">Hasil</th>
+                                                        <th style="color:#fff; text-align:center;">Nilai Rujukan</th>
+                                                        <th style="color:#fff; text-align:center;">Biaya</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <center>
+                                            <button type="button" class="btn btn-primary" id="btn_simpan_poli">Simpan</button>
+                                            <button type="button" class="btn btn-danger" id="btn_batal_poli">Batal</button>
+                                        </center>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div><!-- end col -->
@@ -1221,7 +1495,7 @@ function detail_pasien(id){
 <!-- //LOAD PASIEN -->
 <button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal1" id="popup_pasien" style="display:none;">Standard Modal</button>
 <div id="myModal1" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -1244,14 +1518,14 @@ function detail_pasien(id){
                 </form>
                 <div class="table-responsive">
                     <div class="scroll-y">
-                        <table class="table table-hover table-bordered" id="tabel_pasien">
+                        <table class="table table-hover table-bordered" id="tabel_pasien_ds">
                             <thead>
                                 <tr class="merah_popup">
                                     <th style="text-align:center; color: #fff;" width="50">No</th>
                                     <th style="text-align:center; color: #fff;">Kode Pasien</th>
                                     <th style="text-align:center; color: #fff;">Nama Pasien</th>
-                                    <th style="text-align:center; color: #fff;">Jenis Kelamin</th>
                                     <th style="text-align:center; color: #fff;">Umur</th>
+                                    <th style="text-align:center; color: #fff;">Nama Org Tua</th>
                                 </tr>
                             </thead>
                             <tbody>

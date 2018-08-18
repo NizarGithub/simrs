@@ -630,182 +630,184 @@ function get_resep(){
     </div>
 </div>
 
-<div class="col-lg-12" id="view_data">
-    <div class="card-box">
-        <h4 class="header-title m-t-0 m-b-30">
-            <?php 
-                $h4 = "";
-                if($level == null){
-                    $h4 = "Data Pasien Per Poli";
-                }else{
-                    $h4 = "Pasien Baru";
-                }
-                echo $h4; 
-            ?>
-        </h4>
-        <form class="form-horizontal" role="form">
-            <div class="form-group">
-                <label class="col-md-1 control-label" style="width: 7%; text-align: left;">Filter :</label>
-                <?php if(count($level) != 0){ ?>
-                <div class="col-md-2" style="width: 15%;">
-                    <div class="checkbox checkbox-inline checkbox-success">
-                        <input type="checkbox" id="cek_tampil_semua" value="Semua">
-                        <label for="cek_tampil_semua"> Tampilkan Semua </label>
-                    </div>
-                </div>
-                <?php } ?>
-                <div class="col-md-4">
-                    <?php if(count($level) == 0){ ?>
-                    <div class="radio radio-info radio-inline">
-                        <input type="radio" id="rd_semua" value="Semua" name="filter">
-                        <label for="rd_semua"> Semua </label>
+<div class="row" id="view_data">
+    <div class="col-md-12">
+        <div class="card-box">
+            <h4 class="header-title m-t-0 m-b-30">
+                <?php 
+                    $h4 = "";
+                    if($level == null){
+                        $h4 = "Data Pasien Per Poli";
+                    }else{
+                        $h4 = "Pasien Baru";
+                    }
+                    echo $h4; 
+                ?>
+            </h4>
+            <form class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label class="col-md-1 control-label" style="width: 4%; text-align: left;">Filter :</label>
+                    <?php if(count($level) != 0){ ?>
+                    <div class="col-md-2" style="width: 10%;">
+                        <div class="checkbox checkbox-inline checkbox-success">
+                            <input type="checkbox" id="cek_tampil_semua" value="Semua">
+                            <label for="cek_tampil_semua"> Tampilkan Semua </label>
+                        </div>
                     </div>
                     <?php } ?>
-                    <div class="radio radio-info radio-inline">
-                        <input type="radio" id="rd_per_tgl" value="Per Tanggal" name="filter">
-                        <label for="rd_per_tgl"> Per Tanggal </label>
+                    <div class="col-md-4">
+                        <?php if(count($level) == 0){ ?>
+                        <div class="radio radio-info radio-inline">
+                            <input type="radio" id="rd_semua" value="Semua" name="filter">
+                            <label for="rd_semua"> Semua </label>
+                        </div>
+                        <?php } ?>
+                        <div class="radio radio-info radio-inline">
+                            <input type="radio" id="rd_per_tgl" value="Per Tanggal" name="filter">
+                            <label for="rd_per_tgl"> Per Tanggal </label>
+                        </div>
+                        <div class="radio radio-info radio-inline">
+                            <input type="radio" id="rd_per_bln" value="Per Bulan" name="filter">
+                            <label for="rd_per_bln"> Per Bulan </label>
+                        </div>
+                        <?php if(count($level) == 0){ ?>
+                        <div class="radio radio-info radio-inline">
+                            <input type="radio" id="rd_poli" value="Poli" name="filter">
+                            <label for="rd_poli"> Poli </label>
+                        </div>
+                        <?php } ?>
                     </div>
-                    <div class="radio radio-info radio-inline">
-                        <input type="radio" id="rd_per_bln" value="Per Bulan" name="filter">
-                        <label for="rd_per_bln"> Per Bulan </label>
-                    </div>
+                </div>
+                <div class="form-group">
                     <?php if(count($level) == 0){ ?>
-                    <div class="radio radio-info radio-inline">
-                        <input type="radio" id="rd_poli" value="Poli" name="filter">
-                        <label for="rd_poli"> Poli </label>
+                    <label class="col-md-1 control-label view_poli" style="text-align: left; width: 6%;">Pilih Poli</label>
+                    <div class="col-md-4">
+                        <select class="form-control select2 view_poli" id="poli" onchange="data_pasien();">
+                            <option value="Semua">Semua</option>
+                            <?php
+                                $poli = $this->model->get_poli();
+                                foreach ($poli as $key => $value) {
+                            ?>
+                            <option value="<?php echo $value->ID; ?>"><?php echo $value->NAMA; ?></option>
+                            <?php
+                                }
+                            ?>
+                        </select>
                     </div>
                     <?php } ?>
                 </div>
-            </div>
-            <div class="form-group">
-                <?php if(count($level) == 0){ ?>
-                <label class="col-md-1 control-label view_poli" style="text-align: left; width: 6%;">Pilih Poli</label>
-                <div class="col-md-4">
-                    <select class="form-control select2 view_poli" id="poli" onchange="data_pasien();">
-                        <option value="Semua">Semua</option>
+                <div class="form-group" id="view_tanggal">
+                    <label class="control-label col-sm-1" style="text-align: left; width: 5%;">Tanggal</label>
+                    <div class="col-sm-4">
+                        <div class="input-daterange input-group" id="date-range">
+                            <input type="text" class="form-control" id="tanggal_awal" data-mask="99-99-9999" value="">
+                            <span class="input-group-addon bg-primary b-0 text-white">s/d</span>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="tanggal_akhir" data-mask="99-99-9999" value="">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn waves-effect waves-light btn-success" onclick="cek_tanggal();">
+                                        <i class="fa fa-arrow-right"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" id="view_bulan">
+                    <label class="control-label col-sm-1" style="text-align: left; width: 5%;">Bulan</label>
+                    <div class="col-sm-2">
+                        <select class="form-control" id="bulan">
                         <?php
-                            $poli = $this->model->get_poli();
-                            foreach ($poli as $key => $value) {
+                            $bulan = date('m');
+                            $bln_arr = array('Pilih','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember');
+                            for($i=0; $i<13; $i++){
+                                $select = "";
+                                if($i == $bulan){
+                                    $select = "selected='selected'";
+                                }else{
+                                    $select = $select;
+                                }
                         ?>
-                        <option value="<?php echo $value->ID; ?>"><?php echo $value->NAMA; ?></option>
+                            <option value="<?php echo $i; ?>" <?php echo $select; ?>><?php echo $bln_arr[$i]; ?></option>
                         <?php
                             }
                         ?>
-                    </select>
-                </div>
-                <?php } ?>
-            </div>
-            <div class="form-group" id="view_tanggal">
-                <label class="control-label col-sm-1" style="text-align: left; width: 5%;">Tanggal</label>
-                <div class="col-sm-4">
-                    <div class="input-daterange input-group" id="date-range">
-                        <input type="text" class="form-control" id="tanggal_awal" data-mask="99-99-9999" value="">
-                        <span class="input-group-addon bg-primary b-0 text-white">s/d</span>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="tanggal_akhir" data-mask="99-99-9999" value="">
+                            <input type="text" class="form-control num_only" id="tahun" value="" maxlength="4" placeholder="Tahun">
                             <span class="input-group-btn">
-                                <button type="button" class="btn waves-effect waves-light btn-success" onclick="cek_tanggal();">
+                                <button type="button" class="btn waves-effect waves-light btn-success" onclick="data_pasien();">
                                     <i class="fa fa-arrow-right"></i>
                                 </button>
                             </span>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="form-group" id="view_bulan">
-                <label class="control-label col-sm-1" style="text-align: left; width: 5%;">Bulan</label>
-                <div class="col-sm-2">
-                    <select class="form-control" id="bulan">
-                    <?php
-                        $bulan = date('m');
-                        $bln_arr = array('Pilih','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember');
-                        for($i=0; $i<13; $i++){
-                            $select = "";
-                            if($i == $bulan){
-                                $select = "selected='selected'";
-                            }else{
-                                $select = $select;
-                            }
-                    ?>
-                        <option value="<?php echo $i; ?>" <?php echo $select; ?>><?php echo $bln_arr[$i]; ?></option>
-                    <?php
-                        }
-                    ?>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <div class="input-group">
-                        <input type="text" class="form-control num_only" id="tahun" value="" maxlength="4" placeholder="Tahun">
-                        <span class="input-group-btn">
-                            <button type="button" class="btn waves-effect waves-light btn-success" onclick="data_pasien();">
-                                <i class="fa fa-arrow-right"></i>
-                            </button>
-                        </span>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="cari_pasien" id="cari_pasien" placeholder="Cari pasien..." value="">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn waves-effect waves-light btn-warning" id="tombol_cari">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <div class="col-md-12">
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="cari_pasien" id="cari_pasien" placeholder="Cari pasien..." value="">
-                        <span class="input-group-btn">
-                            <button type="button" class="btn waves-effect waves-light btn-warning" id="tombol_cari">
-                                <i class="fa fa-search"></i>
-                            </button>
-                        </span>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table id="tabel_pasien" class="table table-hover table-bordered">
+                                <thead>
+                                    <tr class="biru">
+                                        <th style="color:#fff; text-align:center;">No</th>
+                                        <th style="color:#fff; text-align:center;">No. RM</th>
+                                        <th style="color:#fff; text-align:center;">Tgl / Waktu</th>
+                                        <th style="color:#fff; text-align:center;">Nama Pasien</th>
+                                        <th style="color:#fff; text-align:center;">JK</th>
+                                        <th style="color:#fff; text-align:center;">Alamat</th>
+                                        <th style="color:#fff; text-align:center;">Detail</th>
+                                        <th style="color:#fff; text-align:center;">
+                                            <?php 
+                                                echo $level=$level==null?"Rekam Medik":"Tindakan"; 
+                                            ?>  
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <div class="col-md-12">
-                    <div class="table-responsive">
-                        <table id="tabel_pasien" class="table table-hover table-bordered">
-                            <thead>
-                                <tr class="biru">
-                                    <th style="color:#fff; text-align:center;">No</th>
-                                    <th style="color:#fff; text-align:center;">No. RM</th>
-                                    <th style="color:#fff; text-align:center;">Tgl / Waktu</th>
-                                    <th style="color:#fff; text-align:center;">Nama Pasien</th>
-                                    <th style="color:#fff; text-align:center;">JK</th>
-                                    <th style="color:#fff; text-align:center;">Alamat</th>
-                                    <th style="color:#fff; text-align:center;">Detail</th>
-                                    <th style="color:#fff; text-align:center;">
-                                        <?php 
-                                            echo $level=$level==null?"Rekam Medik":"Tindakan"; 
-                                        ?>  
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                
-                            </tbody>
-                        </table>
+                <div class="form-group">
+                    <div class="col-md-10">
+                        <div id="tablePaging"> </div>
+                    </div>
+                    <div class="col-md-2">
+                        <h4 class="header-title">Total Pasien : <b id="total_pasien"></b></h4>
                     </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <div class="col-md-10">
-                    <div id="tablePaging"> </div>
+                <div class="form-group">
+                    <div class="col-md-9">
+                        
+                    </div>
+                    <label class="col-md-2 control-label">Jumlah Tampil</label>
+                    <div class="col-md-1 pull-right">
+                        <select class="form-control" id="jumlah_tampil">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="col-md-2">
-                    <h4 class="header-title">Total Pasien : <b id="total_pasien"></b></h4>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-md-9">
-                    
-                </div>
-                <label class="col-md-2 control-label">Jumlah Tampil</label>
-                <div class="col-md-1 pull-right">
-                    <select class="form-control" id="jumlah_tampil">
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </div>
 

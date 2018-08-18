@@ -14,6 +14,10 @@ $(document).ready(function(){
 		$('#popup_perawat').click();
 		data_perawat();
 	});
+
+	$('#batal').click(function(){
+		window.location = "<?php echo base_url(); ?>setup/admum_setup_loket_c";
+	});
 });
 
 function data_perawat(){
@@ -132,21 +136,27 @@ function deleteRow(btn){
 
 	                    <?PHP 
 	                    $beranda = "";
-	                    $billing = "";
 	                    $admum = "";
-	                    $rekam_medik = "";
+	                    $poli = "";
+	                    $lab = "";
 	                    $apotek = "";
+	                    $rekam_medik = "";
+	                    $billing = "";
 	                    foreach ($dtAkses as $key => $aks) {
-	                    	if($aks->AKSES == "billing"){
-	                    		$billing = "checked";
+	                    	if($aks->AKSES == "pasien"){
+	                    		$beranda = "checked";
 	                    	} else if($aks->AKSES == "admum"){
 	                    		$admum = "checked";
-	                    	} else if($aks->AKSES == "rekam_medik"){
-	                    		$rekam_medik = "checked";
-	                    	} else if($aks->AKSES == "apotek"){
+	                    	} else if($aks->AKSES == "poli"){
+	                    		$poli = "checked";
+	                    	} else if($aks->AKSES == "lab"){
+	                    		$lab = "checked";
+	                    	}else if($aks->AKSES == "apotek"){
 	                    		$apotek = "checked";
-	                    	}else if($aks->AKSES == "pasien"){
-	                    		$beranda = "checked";
+	                    	}else if($aks->AKSES == "rekam_medik"){
+	                    		$rekam_medik = "checked";
+	                    	}else if($aks->AKSES == "billing"){
+	                    		$billing = "checked";
 	                    	}
 	                    }
 	                    ?>
@@ -158,21 +168,29 @@ function deleteRow(btn){
 	                                <input type="checkbox" <?=$beranda;?> name="akses[]" id="inlineCheckbox1" value="pasien">
 	                                <label for="inlineCheckbox1"> Beranda Pasien </label>
 	                            </div>
-	                            <div class="checkbox checkbox-warning">
-	                                <input type="checkbox" <?=$billing;?> name="akses[]" id="inlineCheckbox1" value="billing">
-	                                <label for="inlineCheckbox1"> Billing </label>
-	                            </div>
 	                            <div class="checkbox checkbox-primary">
 	                                <input type="checkbox" <?=$admum;?> name="akses[]" id="inlineCheckbox2" value="admum">
-	                                <label for="inlineCheckbox2"> Administrasi Umum </label>
+	                                <label for="inlineCheckbox2"> Admission </label>
+	                            </div>
+	                            <div class="checkbox checkbox-success">
+	                                <input type="checkbox" <?=$poli;?> name="akses[]" id="inlineCheckbox_poli" value="poli">
+	                                <label for="inlineCheckbox_poli"> Poli </label>
+	                            </div>
+	                            <div class="checkbox checkbox-primary">
+	                                <input type="checkbox" <?=$lab;?> name="akses[]" id="inlineCheckbox_lab" value="lab">
+	                                <label for="inlineCheckbox_lab"> Laborat </label>
+	                            </div>
+	                            <div class="checkbox checkbox-success">
+	                                <input type="checkbox" <?=$apotek;?> name="akses[]" id="inlineCheckbox4" value="apotek">
+	                                <label for="inlineCheckbox4"> Apotek </label>
 	                            </div>
 	                            <div class="checkbox checkbox-danger">
 	                                <input type="checkbox" <?=$rekam_medik;?> name="akses[]" id="inlineCheckbox3" value="rekam_medik">
 	                                <label for="inlineCheckbox3"> Rekam Medik </label>
 	                            </div>
-	                            <div class="checkbox checkbox-success">
-	                                <input type="checkbox" <?=$apotek;?> name="akses[]" id="inlineCheckbox4" value="apotek">
-	                                <label for="inlineCheckbox4"> Apotek </label>
+	                            <div class="checkbox checkbox-warning">
+	                                <input type="checkbox" <?=$billing;?> name="akses[]" id="inlineCheckbox1" value="billing">
+	                                <label for="inlineCheckbox1"> Billing </label>
 	                            </div>
 	                        </div>
 	                    </div>

@@ -342,6 +342,177 @@ class Rk_pelayanan_rj_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
+	// LABORAT
+
+	function load_laborat($keyword){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND JENIS_LABORAT LIKE '%$keyword%'";
+		}else{
+			$where = $where;
+		}
+
+		$sql = "SELECT * FROM admum_setup_jenis_laborat WHERE $where ORDER BY ID DESC";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function klik_laborat($id){
+		$sql = "SELECT * FROM admum_setup_jenis_laborat WHERE ID = '$id'";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function load_pemeriksaan($keyword){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND (NAMA_PEMERIKSAAN LIKE '%$keyword%' OR KODE LIKE '%$keyword%')";
+		}else{
+			$where = $where;
+		}
+
+		$sql = "SELECT * FROM admum_setup_pemeriksaan WHERE $where ORDER BY ID DESC";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function klik_pemeriksaan($id){
+		$sql = "SELECT * FROM admum_setup_pemeriksaan WHERE ID = '$id'";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function simpan_pemeriksaan($kode_lab,$id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$jenis_laborat,$total_tarif,$cito,$tanggal,$bulan,$tahun,$waktu){
+		$sql = "
+			INSERT INTO rk_laborat_rj(
+				KODE_LAB,
+				ID_PELAYANAN,
+				ID_POLI,
+				ID_PEG_DOKTER,
+				ID_PASIEN,
+				JENIS_LABORAT,
+				TOTAL_TARIF,
+				CITO,
+				TANGGAL,
+				BULAN,
+				TAHUN,
+				WAKTU,
+				TIPE
+			) VALUES (
+				'$kode_lab',
+				'$id_pelayanan',
+				'$id_poli',
+				'$id_peg_dokter',
+				'$id_pasien',
+				'$jenis_laborat',
+				'$total_tarif',
+				'$cito',
+				'$tanggal',
+				'$bulan',
+				'$tahun',
+				'$waktu',
+				'Dari Poli'
+			)
+		";
+		$this->db->query($sql);
+	}
+
+	function simpan_pemeriksaan_detail($id_pemeriksaan_rj,$pemeriksaan,$tanggal,$bulan,$tahun,$subtotal,$waktu){
+		$sql = "
+			INSERT INTO rk_laborat_rj_detail(
+				ID_PEMERIKSAAN_RJ,
+				PEMERIKSAAN,
+				TANGGAL,
+				BULAN,
+				TAHUN,
+				SUBTOTAL,
+				WAKTU
+			) VALUES (
+				'$id_pemeriksaan_rj',
+				'$pemeriksaan',
+				'$tanggal',
+				'$bulan',
+				'$tahun',
+				'$subtotal',
+				'$waktu'
+			)
+		";
+		$this->db->query($sql);
+	}
+
+	function data_laborat($id){
+		$sql = "
+			SELECT
+				LAB.ID,
+				SET_LAB.JENIS_LABORAT,
+				LAB.CITO,
+				LAB.TOTAL_TARIF,
+				LAB.TANGGAL,
+				LAB.BULAN,
+				LAB.TAHUN,
+				LAB.WAKTU
+			FROM rk_laborat_rj LAB
+			LEFT JOIN admum_setup_jenis_laborat SET_LAB ON SET_LAB.ID = LAB.JENIS_LABORAT
+			WHERE LAB.ID_PELAYANAN = '$id'
+			ORDER BY LAB.ID DESC
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function data_laborat_id($id){
+		$sql = "
+			SELECT
+				LAB.ID,
+				LAB.KODE_LAB,
+				SET_LAB.JENIS_LABORAT,
+				LAB.CITO,
+				LAB.TOTAL_TARIF,
+				LAB.TANGGAL,
+				LAB.BULAN,
+				LAB.TAHUN
+			FROM rk_laborat_rj LAB
+			LEFT JOIN admum_setup_jenis_laborat SET_LAB ON SET_LAB.ID = LAB.JENIS_LABORAT
+			WHERE LAB.ID = '$id'
+			ORDER BY LAB.ID DESC
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function data_hasil_pemeriksaan($id_pemeriksaan){
+		$sql = "
+			SELECT
+				DET.ID,
+				PRK.KODE,
+				PRK.NAMA_PEMERIKSAAN,
+				DET.HASIL,
+				DET.NILAI_RUJUKAN,
+				PRK.TARIF,
+				DET.SUBTOTAL,
+				DET.TANGGAL,
+				DET.BULAN,
+				DET.TAHUN
+			FROM rk_laborat_rj_detail DET
+			LEFT JOIN admum_setup_pemeriksaan PRK ON PRK.ID = DET.PEMERIKSAAN
+			WHERE DET.ID_PEMERIKSAAN_RJ = '$id_pemeriksaan'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function hapus_laborat($id){
+		$sql = "DELETE FROM rk_laborat_rj WHERE ID = '$id'";
+		$this->db->query($sql);
+	}
+
+	function hapus_laborat_detail($id){
+		$sql = "DELETE FROM rk_laborat_rj_detail WHERE ID_PEMERIKSAAN_RJ = '$id'";
+		$this->db->query($sql);
+	}
+
 	//RESEP
 
 	function load_obat($keyword){
