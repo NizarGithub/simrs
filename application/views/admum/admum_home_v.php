@@ -204,7 +204,7 @@
                         </div>
                     </div> -->
 
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <div class="card-box widget-user">
                             <div class="dropdown pull-right">
                                 <a href="javascript:;" data-original-title="Nomor antrian ini digunakan untuk pasien daftar baru" title="" data-placement="top" data-toggle="tooltip">
@@ -216,34 +216,32 @@
                                 <div class="wid-u-info">
                                     <h4 class="m-t-0 m-b-5"> Nomor Antrian</h4>
                                     <!-- <button type="button" class="btn btn-danger waves-effect waves-light m-b-5"><b id="loket_offline"></b></button> -->
-                                    <h2 class="text-custom" id="nomor_offline">0</h2>
+                                    <h2 class="text-success" id="nomor_offline">0</h2>
                                     <!-- <button type="button" class="btn btn-success waves-effect waves-light m-b-5" onclick="next_antri('offline');"><b>Berikutnya</b> <i class="fa fa-arrow-circle-right"></i></button> -->
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <div class="card-box widget-user">
                             <div>
                                 <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/Clock-Icon-Image.png">
                                 <div class="wid-u-info">
                                     <h4 class="m-t-0 m-b-5">Waktu</h4>
-                                    <button type="button" class="btn btn-info waves-effect waves-light m-b-5"><b id="waktu_txt"></b></button>
+                                    <h2 class="text-info" id="waktu_txt">0</h2>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <div class="card-box widget-user">
                             <div>
                                 <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/kisspng-calendar-date-computer-icons-time-calendar-icon-5ac41db68edb81.1459769815228021025852.jpg">
                                 <div class="wid-u-info">
                                     <h4 class="m-t-0 m-b-5">Tanggal</h4>
-                                    <button type="button" class="btn btn-danger waves-effect waves-light m-b-5">
-                                        <b><?php echo date('d'); ?> <?php echo $bulan[date('n')]; ?> <?php echo date('Y'); ?></b>
-                                    </button>
+                                    <h2 class="text-danger"><?php echo date('d'); ?> <?php echo $bulan[date('n')]; ?> <?php echo date('Y'); ?></h2>
                                 </div>
                             </div>
                         </div>
