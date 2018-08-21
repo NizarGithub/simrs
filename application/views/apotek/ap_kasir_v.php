@@ -1,4 +1,4 @@
-<?PHP 
+<?PHP
 $sess_user = $this->session->userdata('masuk_rs');
 $id_user = $sess_user['id'];  //ID PEGAWAI
 
@@ -10,7 +10,7 @@ $user_detail = $this->model->get_user_detail($id_user);
 <!--[if lt IE 7]> <html class="no-js sidebar-large lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>    <html class="no-js sidebar-large lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>    <html class="no-js sidebar-large lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> 
+<!--[if gt IE 8]><!-->
 <html class="no-js sidebar-thin"> <!--<![endif]-->
 
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
@@ -146,7 +146,7 @@ $user_detail = $this->model->get_user_detail($id_user);
             </div>
             </center>
             <div class="panel-content">
-                <div class="row media-manager">   
+                <div class="row media-manager">
                     <div class="margin-bottom-30"></div>
                     <div class="col-sm-7">
                         <div class="panel panel-default">
@@ -155,6 +155,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                     <thead>
                                         <tr class="success">
                                             <th style="text-align:center;">No</th>
+                                            <th style="text-align:center;">TANGGAL</th>
                                             <th style="text-align:center;">Nama</th>
                                             <th style="text-align:center;">Poli</th>
                                             <th style="text-align:center;">Resep</th>
@@ -197,7 +198,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                 <input type="hidden" name="jml_tr_baru" id="jml_tr_baru" value="0">
                                 <input type="hidden" name="tmp_sts_pesnaan" id="tmp_sts_pesnaan" value="0">
                                 <input type="hidden" name="jenis_bayar" id="jenis_bayar" value="">
-                                <center> 
+                                <center>
                                     <span id="label_atas_nama" style="padding-bottom: 6px; padding-top: 6px; display:none;" class="label label-success">a/n : </span>
                                     <span style="padding-bottom: 6px; padding-top: 6px;" class="label label-success" style="">
                                         Invoice : #<b id="invoice_txt"></b>
@@ -205,7 +206,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                     <button type="button" class="btn btn-danger btn-sm" onclick="window.location='<?=base_url();?>apotek/ap_kasir_rajal_c';">Reset</button>
                                     <!-- <a class="btn btn-warning btn-sm" target="_blank" href="<?php //echo base_url();?>apotek/ap_kasir_rajal_c/struk/20161216001">Struk</a> -->
                                 </center>
-                            </div>           
+                            </div>
 
                             <!-- TABEL -->
                             <div id="popup_pembayaran">
@@ -282,11 +283,11 @@ $user_detail = $this->model->get_user_detail($id_user);
                             <!-- END TABEL -->
 
                             <div id="mid_head2" style="margin-top: -10px; margin-bottom: 10px; display:none;">
-                                <center style="padding-top: 11px; padding-bottom: 11px; background: rgb(255, 250, 205) none repeat scroll 0% 0%;"> 
+                                <center style="padding-top: 11px; padding-bottom: 11px; background: rgb(255, 250, 205) none repeat scroll 0% 0%;">
                                     <!-- <button style="display:none;" id="cetak_resi_btn" onclick="cetak_resi();" class="btn btn-default" type="button">Cetak Resi</button>  -->
                                     <!-- <button onclick="$('#modal-12vcr').addClass('md-show');" id="voucher_btn" class="btn btn-default" type="button"> <i class="fa fa-credit-card "></i> Voucher </button>  -->
                                     <!-- <button onclick="$('#modal-10').addClass('md-show');"  class="btn btn-default hide_bayar" data-modal="modal-10" type="button"> Simpan Resi </button> -->
-                                    <button type="button" class="btn btn-success hide_bayar" style="width:90%;" onclick="$('#modal-11').addClass('md-show'); $('#popup_pembayaran').fadeIn();"> Pembayaran </button> 
+                                    <button type="button" class="btn btn-success hide_bayar" style="width:90%;" onclick="$('#modal-11').addClass('md-show'); $('#popup_pembayaran').fadeIn();"> Pembayaran </button>
                                 </center>
 
                                 <span style="float: right; width:100%; background:#FFFACD;">
@@ -296,7 +297,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                             <td style="text-align: right; font-size: 15px; width: 80px;"> Sub Total </td>
                                             <td style="text-align: center; font-size: 15px; width: 40px;"> : </td>
                                             <td style="text-align: right; font-size: 15px;" id="subtotal_txt" > </td>
-                                        </tr>                                    
+                                        </tr>
 
                                         <tr>
                                             <td style="text-align: right; font-size: 15px; width: 80px;"> PPN (10%) </td>
@@ -405,7 +406,7 @@ $user_detail = $this->model->get_user_detail($id_user);
         </div>
     </div>
     <!-- END WRAPPER -->
-    
+
     <button style="display:none;" id="popup_pesanan_btn" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#panel-modal">Panel in Modal</button>
     <div id="panel-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
         <div class="modal-dialog">
@@ -656,7 +657,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -671,7 +672,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -708,7 +709,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                 <div class="modal-footer">
                     <center>
                         <button onclick="set_pesanan();" id="btn_simpan_jml_pesan" type="button" class="btn btn-success"> Simpan </button>
-                    </center>                            
+                    </center>
                 </div>
             </div>
         </div>
@@ -798,7 +799,7 @@ $(window).keydown(function(e){
         if(b == 0){
             $('#modal-10').addClass('md-show');
         }
-      } 
+      }
 
     }
     else if(e.keyCode == 116){
@@ -810,7 +811,7 @@ $(window).keydown(function(e){
         if(b == 0){
             $('#modal-11').addClass('md-show');
         }
-      } 
+      }
 
     } else if(e.keyCode == 27){
         $('#modal-10').removeClass('md-show');
@@ -858,7 +859,7 @@ $(document).ready(function(){
         $('#head_tbl_pesanan1').hide();
         $('#head_tbl_pesanan2').show();
         $('#mid_head').show();
-        $('#mid_head2').show();       
+        $('#mid_head2').show();
 
         var qty2  = $('#jumlah_beli_trx').val();
 
@@ -867,7 +868,7 @@ $(document).ready(function(){
             data : {id:id},
             type : "POST",
             dataType : "json",
-            success : function(result){    
+            success : function(result){
                 $isi = "";
                 var warna = "";
                 var tot = 0;
@@ -877,7 +878,7 @@ $(document).ready(function(){
                 }
 
                 for(var i=0; i<result.length; i++){
-                    
+
                     var harga = result[i].HARGA_JUAL;
                     var jumlah_data = $('#tr_pesanan_'+result[i].ID).length;
 
@@ -952,7 +953,9 @@ $(document).ready(function(){
                 $('#id_pasien').val("");
                 $('#id_poli').val("");
                 $('#jenis_pembayaran').val("");
+                var id_rj = $('#id_rj').val();
                 get_invoice();
+                window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_resep/'+id_rj, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
             }
         });
     });
@@ -1032,6 +1035,7 @@ function get_pasien(){
 
                     $tr += "<tr>"+
                                 "<td style='text-align:center;'>"+no+"</td>"+
+                                "<td style='text-align:center;'>"+result[i].TANGGAL+"</td>"+
                                 "<td>"+result[i].NAMA+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].NAMA_POLI+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].KODE_RESEP+"</td>"+
@@ -1249,9 +1253,9 @@ function del_pesanan(btn){
 
     if(jml_tr == 0 || jml_tr == null){
         $('#head_tbl_pesanan2').hide();
-        $('#head_tbl_pesanan1').show();  
-        $('#mid_head').hide();         
-        $('#mid_head2').hide(); 
+        $('#head_tbl_pesanan1').show();
+        $('#mid_head').hide();
+        $('#mid_head2').hide();
     }
 
     get_jumlah_sub(id);
@@ -1284,7 +1288,7 @@ function never_zero(){
     if(nilai == "" || nilai == null || nilai == 0){
         $('#btn_simpan_jml_pesan').hide();
     } else {
-        $('#btn_simpan_jml_pesan').show(); 
+        $('#btn_simpan_jml_pesan').show();
     }
 }
 
@@ -1295,13 +1299,13 @@ function simpan_pembayaran(){
         $('#warning_kelebihan').show();
     } else {
         $('#warning_kelebihan').hide();
-        
+
         $.ajax({
             url : '<?=base_url();?>apotek/ap_kasir_rajal_c/simpan_trx',
             data : $('#form_pembayaran').serialize(),
             type : "POST",
             dataType : "json",
-            success : function(result){                 
+            success : function(result){
                 $('#modal-11').removeClass('md-show');
                 $('#popup_pembayaran').fadeOut();
                 cetak_resi();
@@ -1312,7 +1316,7 @@ function simpan_pembayaran(){
 }
 
 function hitung_diskon(){
-   var sts_vcr = $('#sts_vcr').val(); 
+   var sts_vcr = $('#sts_vcr').val();
    if(sts_vcr == 1){
        var tipe  = $('#tipe_vcr').val();
        var nilai = $('#nilai_vcr').val();
@@ -1338,7 +1342,7 @@ function hitung_diskon(){
             $("#total_tagihan").val(NumberToMoney(grandtotal));
             $("#b_total_tagihan").val(NumberToMoney(grandtotal));
        }
-   } 
+   }
 }
 
 function get_tunai(){
@@ -1349,7 +1353,7 @@ function get_tunai(){
     $('#b_kembali').val('');
     $('#b_bayar').val('');
     $('#jenis_bayar').val('Tunai');
-} 
+}
 
 function get_non_tunai(){
     var tagihan = $('#b_total_tagihan').val();
