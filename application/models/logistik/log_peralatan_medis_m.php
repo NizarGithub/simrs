@@ -61,6 +61,21 @@ class Log_peralatan_medis_m extends CI_Model {
 		return $query->row();
 	}
 
+	function get_edit_data($id){
+		$sql = $this->db->query("SELECT
+															*,
+															a.ID AS ID_LOG
+															FROM log_peralatan_medis a
+															LEFT JOIN admum_setup_peralatan_medis b ON a.ID_SETUP_NAMA_ALAT=b.ID
+															LEFT JOIN admum_supplier_barang SUP ON b.ID_MERK=SUP.ID
+															LEFT JOIN kepeg_departemen c ON a.ID_DEPARTEMEN=c.ID
+															LEFT JOIN kepeg_divisi d ON a.ID_DIVISI=d.ID
+															LEFT JOIN obat_satuan e ON a.ID_SATUAN_ALAT=e.ID
+															WHERE a.ID = '$id'
+														");
+		return $sql->row();
+	}
+
 	function data_satuan(){
 		$sql = "SELECT * FROM obat_satuan ORDER BY ID DESC";
 		$query = $this->db->query($sql);
@@ -69,6 +84,30 @@ class Log_peralatan_medis_m extends CI_Model {
 
 	function klik_satuan($id_satuan){
 		$sql = "SELECT * FROM obat_satuan WHERE ID = '$id_satuan'";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function data_departemen(){
+		$sql = "SELECT * FROM kepeg_departemen ORDER BY ID DESC";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function klik_departemen($id_departemen){
+		$sql = "SELECT * FROM kepeg_departemen WHERE ID = '$id_departemen'";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function data_divisi($id_departemen){
+		$sql = "SELECT * FROM kepeg_divisi WHERE ID_DEPARTEMEN = '$id_departemen' ORDER BY ID DESC";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function klik_divisi($id_divisi){
+		$sql = "SELECT * FROM kepeg_divisi WHERE ID = '$id_divisi'";
 		$query = $this->db->query($sql);
 		return $query->row();
 	}
@@ -137,8 +176,14 @@ class Log_peralatan_medis_m extends CI_Model {
 		$aktif,
 		$first_out,
 		$urut_barang,
-		$gambar){
-
+		$gambar,
+		$id_departemen,
+		$id_divisi,
+		$golongan,
+		$total_harga
+	){
+		$bulan = date('m');
+		$tahun = date('Y');
 		$sql = "
 			INSERT INTO log_peralatan_medis(
 				ID_SETUP_NAMA_ALAT,
@@ -154,7 +199,13 @@ class Log_peralatan_medis_m extends CI_Model {
 				AKTIF,
 				FIRST_OUT,
 				URUT_BARANG,
-				GAMBAR
+				GAMBAR,
+				ID_DEPARTEMEN,
+				ID_DIVISI,
+				GOLONGAN,
+				TOTAL_HARGA,
+				BULAN,
+				TAHUN
 			) VALUES(
 				'$id_setup_nama_alat',
 				'$id_satuan',
@@ -169,9 +220,73 @@ class Log_peralatan_medis_m extends CI_Model {
 				'$aktif',
 				'$first_out',
 				'$urut_barang',
-				'$gambar'
+				'$gambar',
+				'$id_departemen',
+				'$id_divisi',
+				'$golongan',
+				'$total_harga',
+				'$bulan',
+				'$tahun'
 			)";
 		$this->db->query($sql);
 	}
+	public function ubah(
+		$id_log,
+		$id_setup_nama_alat,
+		$id_satuan,
+		$pemakaian,
+		$jumlah,
+		$isi,
+		$total,
+		$satuan_isi,
+		$harga_beli,
+		$tanggal_masuk,
+		$waktu_masuk,
+		$aktif,
+		$first_out,
+		$urut_barang,
+		$gambar,
+		$id_departemen,
+		$id_divisi,
+		$golongan,
+		$total_harga
+	){
+			$bulan = date('m');
+			$tahun = date('Y');
+	    $data = array(
+	        'ID_SETUP_NAMA_ALAT' => $id_setup_nama_alat,
+					'ID_SATUAN_ALAT' => $id_satuan,
+					'PEMAKAIAN' => $pemakaian,
+					'JUMLAH' => $jumlah,
+					'ISI' => $isi,
+					'TOTAL' => $total,
+					'SATUAN_ISI' => $satuan_isi,
+					'HARGA_BELI' => $harga_beli,
+					'TANGGAL_MASUK' => $tanggal_masuk,
+					'WAKTU_MASUK' => $waktu_masuk,
+					'AKTIF' => $aktif,
+					'FIRST_OUT' => $first_out,
+					'URUT_BARANG' => $urut_barang,
+					'GAMBAR' => $gambar,
+					'ID_DEPARTEMEN' => $id_departemen,
+					'ID_DIVISI' => $id_divisi,
+					'GOLONGAN' => $golongan,
+					'TOTAL_HARGA' => $total_harga,
+					'BULAN' => $bulan,
+					'TAHUN' => $tahun,
+	      );
 
+	      $this->db->where('ID', $id_log);
+	      $this->db->update('log_peralatan_medis', $data);
+	  }
+	function data_peralatan_id($id){
+		$sql = "SELECT * FROM log_peralatan_medis a INNER JOIN admum_setup_peralatan_medis b ON a.ID_SETUP_NAMA_ALAT=b.ID WHERE a.ID = '$id'";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+	function hapus($id){
+		$this->db->where('ID', $id);
+    $this->db->delete('log_peralatan_medis');
+    return true;
+	}
 }

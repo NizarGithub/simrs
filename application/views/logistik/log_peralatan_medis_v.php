@@ -1,9 +1,10 @@
+
 <script type="text/javascript" src="<?php echo base_url(); ?>js-devan/jquery-1.11.1.min.js"></script>
 
 <style type="text/css">
-#view_tambah, #view_stok, #tombol_reset, #view_gambar, #view_input_pemakaian{
+#view_tambah, #view_stok, #tombol_reset, #view_gambar, #view_input_pemakaian, #view_ubah{
 	display: none;
-}	
+}
 </style>
 
 <script type="text/javascript">
@@ -47,6 +48,10 @@ $(document).ready(function(){
 		window.location = "<?php echo base_url(); ?>logistik/log_peralatan_medis_c";
 	});
 
+	$('#batal_ubah').click(function(){
+		window.location = "<?php echo base_url(); ?>logistik/log_peralatan_medis_c";
+	});
+
 	$('#kode_alat').click(function(){
 		$('#popup_nama_alat').click();
 		load_nama_alat();
@@ -66,8 +71,35 @@ $(document).ready(function(){
 		$('#popup_satuan').click();
 		get_satuan();
 	});
-});
 
+	$('#golongan').click(function(){
+		$('#popup_golongan').click();
+	});
+
+	$('.btn_golongan').click(function(){
+		$('#popup_golongan').click();
+	});
+
+	$('#departemen').click(function(){
+		$('#popup_departemen').click();
+		get_departemen();
+	});
+
+	$('.btn_departemen').click(function(){
+		$('#popup_departemen').click();
+		get_departemen();
+	});
+
+	$('#divisi').click(function(){
+		$('#popup_divisi').click();
+		get_divisi();
+	});
+
+	$('.btn_divisi').click(function(){
+		$('#popup_divisi').click();
+		get_divisi();
+	});
+});
 function load_nama_alat(){
 	var keyword = $('#cari_nama_alat').val();
 
@@ -127,7 +159,8 @@ function klik_nama_alat(id){
 				$('#jenis_alat').val(row['JENIS_ALAT']);
 				$('#id_satuan').val("");
 				$('#satuan').val("");
-				$('#view_select_pemakaian').show();
+				$('#id_golongan').val("");
+				$('#golongan').val("");
 				$('#view_input_pemakaian').hide();
 				$('#jumlah').val("");
 				$('#isi').val("");
@@ -141,9 +174,9 @@ function klik_nama_alat(id){
 				$('#jenis_alat').val(row['JENIS_ALAT']);
 				$('#id_satuan').val(row['ID_SATUAN']);
 				$('#satuan').val(row['NAMA_SATUAN']);
-				$('#view_select_pemakaian').hide();
+				$('#id_golongan').val("");
+				$('#golongan').val("");
 				$('#view_input_pemakaian').show();
-				$('#pemakaian_txt').val(row['PEMAKAIAN']);
 				$('#jumlah').val(NumberToMoney(row['JUMLAH']));
 				$('#isi').val(NumberToMoney(row['ISI']));
 				$('#total').val(NumberToMoney(row['TOTAL']));
@@ -197,6 +230,105 @@ function get_satuan(){
     });
 }
 
+function get_departemen(){
+	var keyword = $('#cari_departemen').val();
+	if(ajax){
+		ajax.abort();
+	}
+	ajax = $.ajax({
+        url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/data_departemen',
+        data : {keyword:keyword},
+        type : "GET",
+        dataType : "json",
+        success : function(result){
+            $tr = "";
+            if(result == "" || result == null){
+            	$tr = "<tr><td colspan='2' style='text-align:center;'><b>Data tidak ditemukan</b></td></tr>";
+            }else{
+	            var no = 0;
+	            for(var i=0; i<result.length; i++){
+	            	no++;
+	             $tr += '<tr style="cursor:pointer;" onclick="klik_departemen('+result[i].ID+');">'+
+	            					'<td style="text-align:center;">'+no+'</td>'+
+	            					'<td style="text-align:center;">'+result[i].NAMA_DEP+'</td>'+
+	            				'</tr>';
+	            }
+            }
+            $('#tabel_departemen tbody').html($tr);
+        }
+    });
+
+    $('#cari_departemen').off('keyup').keyup(function(){
+    	get_departemen();
+    });
+}
+
+function get_divisi(){
+	var keyword = $('#cari_divisi').val();
+	var keterangan = $('#ket').val();
+	if(ajax){
+		ajax.abort();
+	}
+	if(ket == 'Tambah'){
+			var id_departemen = $('#id_departemen').val();
+			ajax = $.ajax({
+		        url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/data_divisi',
+		        data : {
+										keyword:keyword,
+										id_departemen:id_departemen
+									 },
+		        type : "POST",
+		        dataType : "json",
+		        success : function(result){
+		            $tr = "";
+		            if(result == "" || result == null){
+		            	$tr = "<tr><td colspan='2' style='text-align:center;'><b>Data tidak ditemukan</b></td></tr>";
+		            }else{
+			            var no = 0;
+			            for(var i=0; i<result.length; i++){
+			            	no++;
+			             $tr += '<tr style="cursor:pointer;" onclick="klik_divisi('+result[i].ID+');">'+
+			            					'<td style="text-align:center;">'+no+'</td>'+
+			            					'<td style="text-align:center;">'+result[i].NAMA_DIV+'</td>'+
+			            				'</tr>';
+			            }
+		            }
+		            $('#tabel_divisi tbody').html($tr);
+		        }
+		    });
+	}else{
+			var id_departemen = $('#id_departemen_ubah').val();
+			ajax = $.ajax({
+		        url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/data_divisi',
+		        data : {
+										keyword:keyword,
+										id_departemen:id_departemen
+									 },
+		        type : "POST",
+		        dataType : "json",
+		        success : function(result){
+		            $tr = "";
+		            if(result == "" || result == null){
+		            	$tr = "<tr><td colspan='2' style='text-align:center;'><b>Data tidak ditemukan</b></td></tr>";
+		            }else{
+			            var no = 0;
+			            for(var i=0; i<result.length; i++){
+			            	no++;
+			             $tr += '<tr style="cursor:pointer;" onclick="klik_divisi('+result[i].ID+');">'+
+			            					'<td style="text-align:center;">'+no+'</td>'+
+			            					'<td style="text-align:center;">'+result[i].NAMA_DIV+'</td>'+
+			            				'</tr>';
+			            }
+		            }
+		            $('#tabel_divisi tbody').html($tr);
+		        }
+		    });
+	}
+    $('#cari_divisi').off('keyup').keyup(function(){
+    	get_divisi();
+    });
+}
+
 function klik_satuan(id_satuan){
 	$('#tutup_satuan').click();
 
@@ -217,6 +349,77 @@ function klik_satuan(id_satuan){
             }
 		}
 	});
+}
+
+function klik_departemen(id_departemen){
+	$('#tutup_departemen').click();
+
+	$.ajax({
+		url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/klik_departemen',
+		data : {id_departemen:id_departemen},
+		type : "POST",
+		dataType : "json",
+		success : function(row){
+            var ket = $('#ket').val();
+
+            if(ket == 'Tambah'){
+                $('#id_departemen').val(id_departemen);
+                $('#departemen').val(row['NAMA_DEP']);
+            }else{
+                $('#id_departemen_ubah').val(id_departemen);
+                $('#departemen_ubah').val(row['NAMA_DEP']);
+            }
+		}
+	});
+}
+
+function klik_divisi(id_divisi){
+	$('#tutup_divisi').click();
+
+	$.ajax({
+		url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/klik_divisi',
+		data : {id_divisi:id_divisi},
+		type : "POST",
+		dataType : "json",
+		success : function(row){
+            var ket = $('#ket').val();
+
+            if(ket == 'Tambah'){
+                $('#id_divisi').val(id_divisi);
+                $('#divisi').val(row['NAMA_DIV']);
+            }else{
+                $('#id_divisi_ubah').val(id_divisi);
+                $('#divisi_ubah').val(row['NAMA_DIV']);
+            }
+		}
+	});
+}
+
+function klik_golongan(no_golongan){
+	$('#tutup_golongan').click();
+	var ket = $('#ket').val();
+
+	var golongan = {
+										1  : 'Alat Kardiologi',
+										2  : 'Alat Farmasi',
+										3  : 'Alat Sterilisasi Medis',
+										4  : 'Alat THT',
+										5  : 'Alat Kedokteran Umum',
+										6  : 'Alat Kesehatan Paru',
+										7  : 'Alat Medis',
+										8  : 'Alat Bedah',
+										9  : 'Furniture Rumah Sakit',
+										10  : 'Breathalyzer',
+										11 : 'Alat Ginekologi',
+										12 : 'Alat Neurologi',
+										13 : 'Alat Forensik'
+			           }
+								 console.log(golongan[0]);
+	 if(ket == 'Tambah'){
+ 			$('#golongan').val(golongan[no_golongan]);
+ 	}else{
+ 			$('#golongan_ubah').val(golongan[no_golongan]);
+ 	}
 }
 
 function paging($selector){
@@ -370,6 +573,106 @@ function hitung_total(){
         $('#total_ubah').val(NumberToMoney(total));
     }
 }
+function hitung_total_harga(){
+    var ket = $('#ket').val();
+
+    if(ket == 'Tambah'){
+        var total_barang = $('#total').val();
+				var harga_beli = $('#harga_beli').val();
+
+        total_barang = total_barang.split(',').join('');
+        harga_beli = harga_beli.split(',').join('');
+
+        if(total_barang == ""){
+            total_barang = 0;
+        }
+
+        if(harga_beli == ""){
+            harga_beli = 0;
+        }
+
+        var total = parseFloat(total_barang) * parseFloat(harga_beli);
+        $('#total_harga').val(NumberToMoney(total));
+    }else{
+			var total_barang = $('#total_ubah').val();
+			var harga_beli = $('#harga_beli_ubah').val();
+
+			total_barang = total_barang.split(',').join('');
+			harga_beli = harga_beli.split(',').join('');
+
+			if(total_barang == ""){
+					total_barang = 0;
+			}
+
+			if(harga_beli == ""){
+					harga_beli = 0;
+			}
+
+			var total = parseFloat(total_barang) * parseFloat(harga_beli);
+			$('#total_harga_ubah').val(NumberToMoney(total));
+    }
+}
+
+function ubah_alat(id){
+	$('#view_ubah').show();
+	$('#view_data').hide();
+	$('#ket').val('Ubah');
+
+	$.ajax({
+		url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/get_edit_data',
+		data : {id:id},
+		type : "POST",
+		dataType : "json",
+		success : function(row){
+			$('#id_ubah').val(row['ID_LOG']);
+			$('#id_departemen_ubah').val(row['ID_DEPARTEMEN']);
+			$('#departemen_ubah').val(row['NAMA_DEP']);
+
+			$('#id_divisi_ubah').val(row['ID_DIVISI']);
+			$('#divisi_ubah').val(row['NAMA_DIV']);
+
+			$('#id_nama_alat_ubah').val(row['ID_SETUP_NAMA_ALAT']);
+			$('#kode_alat_ubah').val(row['KODE_ALAT']);
+			$('#nama_alat_ubah').val(row['NAMA_ALAT']);
+			$('#merk_ubah').val(row['MERK']);
+			$('#jenis_alat_ubah').val(row['JENIS_ALAT']);
+			$('#jumlah_ubah').val(row['JUMLAH']);
+			$('#isi_ubah').val(row['ISI']);
+			$('#total_ubah').val(row['TOTAL']);
+			$('#harga_beli_ubah').val(NumberToMoney(row['HARGA_BELI']));
+			$('#total_harga_ubah').val(NumberToMoney(row['TOTAL_HARGA']));
+
+			if (row['GAMBAR'] == '' || row['GAMBAR'] == null) {
+			  // $('#view_gambar_ubah').hide();
+				$('#gambar_ubah').attr('style','display:none;');
+			}else {
+			  var link_gambar = "<?php echo base_url(); ?>files/foto_alat/"+row['GAMBAR'];
+	 		  $('#view_gambar_ubah').show();
+	 			$('#gambar_ubah').attr('src',link_gambar);
+	 			$('#file_hidden_ubah').val(row['GAMBAR']);
+			}
+
+				$('#id_satuan_ubah').val(row['ID_SATUAN_ALAT']);
+				$('#satuan_ubah').val(row['NAMA_SATUAN']);
+
+				$('#golongan_ubah').val(row['GOLONGAN']);
+		}
+	})
+}
+function hapus_alat(id){
+    $('#popup_hapus').click();
+    $.ajax({
+        url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/data_peralatan_id',
+        data : {id:id},
+        type : "POST",
+        dataType : "json",
+        success : function(row){
+            $('#id_hapus').val(id);
+            var txt = row['KODE_ALAT']+' - '+row['NAMA_ALAT'];
+            $('#msg').html('Apakah data logistik <b>'+txt+'</b> ingin dihapus?');
+        }
+    });
+}
 </script>
 
 <input type="hidden" id="ket" value="">
@@ -387,6 +690,11 @@ function hitung_total(){
                 <div class="col-md-7">
                     <button type="button" class="btn btn-purple waves-effect w-md waves-light" id="btn_tambah">
                         <i class="fa fa-plus"></i> Tambah
+                    </button>
+                </div>
+								<div class="col-md-2 pull-right">
+                    <button type="button" class="btn btn-success waves-effect w-md waves-light col-md-12" id="btn_tambah">
+                        <i class="fa fa-plus"></i> Input Excel
                     </button>
                 </div>
             </div>
@@ -448,7 +756,7 @@ function hitung_total(){
                 </thead>
 
                 <tbody>
-                    
+
                 </tbody>
             </table>
         </div>
@@ -490,6 +798,34 @@ function hitung_total(){
             <hr/>
             <div class="row">
                 <div class="col-lg-6">
+									<div class="form-group">
+											<label class="col-md-2 control-label">Departemen</label>
+											<div class="col-md-8">
+													<div class="input-group">
+															<input type="hidden" name="id_departemen" id="id_departemen" value="">
+															<input type="text" class="form-control" id="departemen" value="" required="required" readonly>
+															<span class="input-group-btn">
+																	<button class="btn waves-effect waves-light btn-default btn_departemen" type="button">
+																			<i class="fa fa-search"></i>
+																	</button>
+															</span>
+													</div>
+											</div>
+									</div>
+									<div class="form-group">
+											<label class="col-md-2 control-label">Divisi</label>
+											<div class="col-md-8">
+													<div class="input-group">
+															<input type="hidden" name="id_divisi" id="id_divisi" value="">
+															<input type="text" class="form-control" id="divisi" value="" required="required" readonly>
+															<span class="input-group-btn">
+																	<button class="btn waves-effect waves-light btn-default btn_divisi" type="button">
+																			<i class="fa fa-search"></i>
+																	</button>
+															</span>
+													</div>
+											</div>
+									</div>
                     <div class="form-group">
                         <label class="col-md-2 control-label">Kode Alat</label>
                         <div class="col-md-8">
@@ -517,7 +853,7 @@ function hitung_total(){
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-2 control-label">Jenis Obat</label>
+                        <label class="col-md-2 control-label">Jenis Barang</label>
                         <div class="col-md-8">
                             <input type="text" class="form-control" id="jenis_alat" value="" required="required" readonly>
                         </div>
@@ -536,7 +872,20 @@ function hitung_total(){
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+										<div class="form-group">
+                        <label class="col-md-2 control-label">Golongan</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="golongan" id="golongan" value="" required="required" readonly>
+                                <span class="input-group-btn">
+                                	<button class="btn waves-effect waves-light btn-default btn_golongan" type="button">
+                                		<i class="fa fa-search"></i>
+                                	</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="form-group">
                         <label class="col-md-2 control-label">Pemakaian</label>
                         <div class="col-md-6" id="view_select_pemakaian">
 		                    <select name="pemakaian" id="pemakaian" class="form-control">
@@ -547,7 +896,7 @@ function hitung_total(){
 		                <div class="col-md-8" id="view_input_pemakaian">
                             <input type="text" class="form-control" name="pemakaian_txt" id="pemakaian_txt" value="" readonly>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="form-group" id="view_gambar">
                         <label class="col-md-2 control-label">View Gambar</label>
                         <div class="col-md-6">
@@ -576,7 +925,7 @@ function hitung_total(){
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-2 control-label">Total</label>
+                        <label class="col-md-2 control-label">Total Barang</label>
                         <div class="col-md-8">
                             <input type="text" class="form-control" name="total" id="total" value="" readonly>
                         </div>
@@ -586,7 +935,16 @@ function hitung_total(){
                         <div class="col-md-8">
                             <div class="input-group">
                                 <span class="input-group-addon">Rp</span>
-                                <input type="text" class="form-control" name="harga_beli" id="harga_beli" value="" required="required" onkeyup="FormatCurrency(this);">
+                                <input type="text" class="form-control" name="harga_beli" id="harga_beli" value="" required="required" onkeyup="FormatCurrency(this); hitung_total_harga();">
+                            </div>
+                        </div>
+                    </div>
+										<div class="form-group">
+                        <label class="col-md-2 control-label">Total Harga</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-addon">Rp</span>
+                                <input type="text" class="form-control" name="total_harga" id="total_harga" value="" required="required" onkeyup="FormatCurrency(this);" readonly>
                             </div>
                         </div>
                     </div>
@@ -602,6 +960,178 @@ function hitung_total(){
             <center>
                 <button type="submit" class="btn btn-success waves-effect waves-light m-b-5"> <i class="fa fa-save"></i> <span>Simpan</span> </button>
                 <button type="button" class="btn btn-danger waves-effect waves-light m-b-5" id="batal"> <i class="fa fa-times"></i> <span>Batal</span> </button>
+            </center>
+    	</form>
+    </div>
+		<div class="card-box" id="view_ubah">
+    	<form class="form-horizontal" role="form" action="<?php echo $url_ubah; ?>" method="post" enctype="multipart/form-data">
+            <h4 class="header-title m-t-0 m-b-30">Ubah Alat</h4>
+            <hr/>
+            <div class="row">
+                <div class="col-lg-6">
+									<input type="hidden" name="id_log" id="id_ubah" value="">
+									<div class="form-group">
+											<label class="col-md-2 control-label">Departemen</label>
+											<div class="col-md-8">
+													<div class="input-group">
+															<input type="hidden" name="id_departemen" id="id_departemen_ubah" value="">
+															<input type="text" class="form-control" id="departemen_ubah" value="" required="required" readonly>
+															<span class="input-group-btn">
+																	<button class="btn waves-effect waves-light btn-default btn_departemen" type="button">
+																			<i class="fa fa-search"></i>
+																	</button>
+															</span>
+													</div>
+											</div>
+									</div>
+									<div class="form-group">
+											<label class="col-md-2 control-label">Divisi</label>
+											<div class="col-md-8">
+													<div class="input-group">
+															<input type="hidden" name="id_divisi" id="id_divisi_ubah" value="">
+															<input type="text" class="form-control" id="divisi_ubah" value="" required="required" readonly>
+															<span class="input-group-btn">
+																	<button class="btn waves-effect waves-light btn-default btn_divisi" type="button">
+																			<i class="fa fa-search"></i>
+																	</button>
+															</span>
+													</div>
+											</div>
+									</div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">Kode Alat</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="hidden" name="id_nama_alat" id="id_nama_alat_ubah" value="">
+                                <input type="text" class="form-control" id="kode_alat_ubah" value="" required="required" readonly>
+                                <span class="input-group-btn">
+                                    <button class="btn waves-effect waves-light btn-default btn_nama_alat" type="button">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">Nama Alat</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="nama_alat_ubah" value="" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">Merk</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="merk_ubah" value="" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">Jenis Barang</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="jenis_alat_ubah" value="" required="required" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">Satuan</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                            	<input type="hidden" name="id_satuan" id="id_satuan_ubah" value="">
+                                <input type="text" class="form-control" id="satuan_ubah" value="" required="required" readonly>
+                                <span class="input-group-btn">
+                                	<button class="btn waves-effect waves-light btn-default btn_satuan" type="button">
+                                		<i class="fa fa-search"></i>
+                                	</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+										<div class="form-group">
+                        <label class="col-md-2 control-label">Golongan</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="golongan" id="golongan_ubah" value="" required="required" readonly>
+                                <span class="input-group-btn">
+                                	<button class="btn waves-effect waves-light btn-default btn_golongan" type="button">
+                                		<i class="fa fa-search"></i>
+                                	</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="form-group">
+                        <label class="col-md-2 control-label">Pemakaian</label>
+                        <div class="col-md-6" id="view_select_pemakaian">
+		                    <select name="pemakaian" id="pemakaian" class="form-control">
+		                    	<option value="Sekali Pakai">Sekali Pakai</option>
+		                    	<option value="Dipakai Berulang">Dipakai Berulang</option>
+		                    </select>
+		                </div>
+		                <div class="col-md-8" id="view_input_pemakaian">
+                            <input type="text" class="form-control" name="pemakaian_txt" id="pemakaian_txt" value="" readonly>
+                        </div>
+                    </div> -->
+                    <div class="form-group" id="view_gambar_ubah">
+                        <label class="col-md-2 control-label">View Gambar</label>
+                        <div class="col-md-6">
+                        	<input type="hidden" name="file_hidden" id="file_hidden_ubah" value="">
+		                    <img src="" id="gambar_ubah" style="max-width:250px; max-height:125px;">
+		                </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                	<div class="form-group">
+                        <label class="col-md-2 control-label">Jumlah</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" name="jumlah" id="jumlah_ubah" value="" required="required" onkeyup="FormatCurrency(this); hitung_total();">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">Isi</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="isi" id="isi_ubah" value="" required="required" onkeyup="FormatCurrency(this); hitung_total();">
+                                <span class="input-group-btn">
+                                	<button class="btn waves-effect waves-light btn-pink" type="button" style="cursor:default;">buah</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">Total Barang</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" name="total" id="total_ubah" value="" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">Harga Beli</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-addon">Rp</span>
+                                <input type="text" class="form-control" name="harga_beli" id="harga_beli_ubah" value="" required="required" onkeyup="FormatCurrency(this); hitung_total_harga();">
+                            </div>
+                        </div>
+                    </div>
+										<div class="form-group">
+                        <label class="col-md-2 control-label">Total Harga</label>
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-addon">Rp</span>
+                                <input type="text" class="form-control" name="total_harga" id="total_harga_ubah" value="" required="required" onkeyup="FormatCurrency(this);" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">Gambar</label>
+                        <div class="col-md-8">
+                            <input type="file" class="dropify" name="userfile">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+            <center>
+                <button type="submit" class="btn btn-success waves-effect waves-light m-b-5"> <i class="fa fa-save"></i> <span>Simpan</span> </button>
+                <button type="button" class="btn btn-danger waves-effect waves-light m-b-5" id="batal_ubah"> <i class="fa fa-times"></i> <span>Batal</span> </button>
             </center>
     	</form>
     </div>
@@ -643,7 +1173,7 @@ function hitung_total(){
                                 </tr>
                             </thead>
                             <tbody>
-                                
+
                             </tbody>
                         </table>
                     </div>
@@ -662,7 +1192,7 @@ function hitung_total(){
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title" id="myModalLabel">Data Jenis Obat</h4>
+                <h4 class="modal-title" id="myModalLabel">Data Jenis Barang</h4>
             </div>
             <div class="modal-body">
             	<form class="form-horizontal" role="form">
@@ -685,11 +1215,11 @@ function hitung_total(){
 		                    <thead>
 		                        <tr class="merah_popup">
 		                            <th style="text-align:center; color: #fff;" width="50">No</th>
-		                            <th style="text-align:center; color: #fff;">Satuan Obat</th>
+		                            <th style="text-align:center; color: #fff;">Satuan Barang</th>
 		                        </tr>
 		                    </thead>
 		                    <tbody>
-		                        
+
 		                    </tbody>
 		                </table>
             		</div>
@@ -701,3 +1231,174 @@ function hitung_total(){
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal4" id="popup_golongan" style="display:none;">Standard Modal</button>
+<div id="myModal4" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">Data Jenis Golongan</h4>
+            </div>
+            <div class="modal-body">
+            	<div class="table-responsive">
+            		<div class="scroll-y">
+		                <table class="table table-hover">
+		                    <thead>
+		                        <tr class="merah_popup">
+		                            <th style="text-align:center; color: #fff;" width="50">No</th>
+		                            <th style="text-align:center; color: #fff;">Jenis Golongan</th>
+		                        </tr>
+		                    </thead>
+		                    <tbody>
+													<?php
+													$array = array(
+														0 => 'Alat Kardiologi',
+														1 => 'Alat Farmasi',
+														2 => 'Alat Sterilisasi Medis',
+														3 => 'Alat THT',
+														4 => 'Alat Kedokteran Umum',
+														5 => 'Alat Kesehatan Paru',
+														6 => 'Alat Medis',
+														7 => 'Alat Bedah',
+														8 => 'Furniture Rumah Sakit',
+														9 => 'Breathalyzer',
+														10 => 'Alat Ginekologi',
+														11 => 'Alat Neurologi',
+														12 => 'Alat Forensik'
+													);
+													$no = 0;
+
+													for ($i=0; $i < count($array); $i++) {
+													$no++;
+													 ?>
+													<tr style="cursor:pointer;" onclick="klik_golongan(<?php echo $no; ?>);">
+														<td><?php echo $no; ?></td>
+														<td><?php echo $array[$i]; ?></td>
+													</tr>
+													<?php } ?>
+		                    </tbody>
+		                </table>
+            		</div>
+            	</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_golongan">Tutup</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal5" id="popup_departemen" style="display:none;">Standard Modal</button>
+<div id="myModal5" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">Data Departemen</h4>
+            </div>
+            <div class="modal-body">
+            	<form class="form-horizontal" role="form">
+		            <div class="form-group">
+		                <div class="col-md-12">
+			                <div class="input-group">
+			                    <input type="text" class="form-control" id="cari_departemen" placeholder="Cari..." value="">
+			                    <span class="input-group-btn">
+			                    	<button type="button" class="btn waves-effect waves-light btn-custom" style="cursor:default;">
+			                    		<i class="fa fa-search"></i>
+			                    	</button>
+			                    </span>
+			                </div>
+		                </div>
+		            </div>
+		        </form>
+            	<div class="table-responsive">
+            		<div class="scroll-y">
+		                <table class="table table-hover" id="tabel_departemen">
+		                    <thead>
+		                        <tr class="merah_popup">
+		                            <th style="text-align:center; color: #fff;" width="50">No</th>
+		                            <th style="text-align:center; color: #fff;">Departemen</th>
+		                        </tr>
+		                    </thead>
+		                    <tbody>
+
+		                    </tbody>
+		                </table>
+            		</div>
+            	</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_departemen">Tutup</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal6" id="popup_divisi" style="display:none;">Standard Modal</button>
+<div id="myModal6" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">Data Divisi</h4>
+            </div>
+            <div class="modal-body">
+            	<form class="form-horizontal" role="form">
+		            <div class="form-group">
+		                <div class="col-md-12">
+			                <div class="input-group">
+			                    <input type="text" class="form-control" id="cari_divisi" placeholder="Cari..." value="">
+			                    <span class="input-group-btn">
+			                    	<button type="button" class="btn waves-effect waves-light btn-custom" style="cursor:default;">
+			                    		<i class="fa fa-search"></i>
+			                    	</button>
+			                    </span>
+			                </div>
+		                </div>
+		            </div>
+		        </form>
+            	<div class="table-responsive">
+            		<div class="scroll-y">
+		                <table class="table table-hover" id="tabel_divisi">
+		                    <thead>
+		                        <tr class="merah_popup">
+		                            <th style="text-align:center; color: #fff;" width="50">No</th>
+		                            <th style="text-align:center; color: #fff;">Divisi</th>
+		                        </tr>
+		                    </thead>
+		                    <tbody>
+
+		                    </tbody>
+		                </table>
+            		</div>
+            	</div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_divisi">Tutup</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<button id="popup_hapus" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#custom-width-modal" style="display:none;">Custom width Modal</button>
+<div id="custom-width-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog" style="width:55%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="custom-width-modalLabel">Konfirmasi Hapus</h4>
+            </div>
+            <div class="modal-body">
+                <p id="msg"></p>
+            </div>
+            <div class="modal-footer">
+                <form action="<?php echo $url_hapus; ?>" method="post">
+                    <input type="hidden" name="id_hapus" id="id_hapus" value="">
+                    <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Tidak</button>
+                    <button type="submit" class="btn btn-danger waves-effect waves-light">Ya</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

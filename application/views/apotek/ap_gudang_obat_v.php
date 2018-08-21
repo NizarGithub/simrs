@@ -536,7 +536,7 @@ function ubah_obat(id){
             $('#jumlah_butir_ubah').val(NumberToMoney(row['JUMLAH_BUTIR']));
             $('#harga_beli_ubah').val(NumberToMoney(row['HARGA_BELI']));
             $('#harga_jual_ubah').val(NumberToMoney(row['HARGA_JUAL']));
-            
+
             var status_obat = "";
             if(row['STATUS_RACIK'] == 0){
                 status_obat = "Obat Umum";
@@ -663,7 +663,7 @@ function hapus_obat(id){
                 </thead>
 
                 <tbody>
-                    
+
                 </tbody>
             </table>
         </div>
@@ -1082,7 +1082,7 @@ function hapus_obat(id){
                                 </tr>
                             </thead>
                             <tbody>
-                                
+
                             </tbody>
                         </table>
                     </div>
@@ -1128,7 +1128,7 @@ function hapus_obat(id){
 		                        </tr>
 		                    </thead>
 		                    <tbody>
-		                        
+
 		                    </tbody>
 		                </table>
             		</div>
@@ -1174,7 +1174,7 @@ function hapus_obat(id){
 		                        </tr>
 		                    </thead>
 		                    <tbody>
-		                        
+
 		                    </tbody>
 		                </table>
             		</div>

@@ -29,6 +29,12 @@ class Log_peralatan_medis_c extends CI_Controller {
 		$this->load->view('logistik/log_home_v',$data);
 	}
 
+	function get_edit_data(){
+		$id = $this->input->post('id');
+		$data = $this->model->get_edit_data($id);
+		echo json_encode($data);
+	}
+
 	function load_nama_alat(){
 		$keyword = $this->input->get('keyword');
 		$data = $this->model->load_nama_alat($keyword);
@@ -52,6 +58,29 @@ class Log_peralatan_medis_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function data_departemen(){
+		$data = $this->model->data_departemen();
+		echo json_encode($data);
+	}
+
+	function klik_departemen(){
+		$id_departemen = $this->input->post('id_departemen');
+		$data = $this->model->klik_departemen($id_departemen);
+		echo json_encode($data);
+	}
+
+	function data_divisi(){
+		$id_departemen = $this->input->post('id_departemen');
+		$data = $this->model->data_divisi($id_departemen);
+		echo json_encode($data);
+	}
+
+	function klik_divisi(){
+		$id_divisi = $this->input->post('id_divisi');
+		$data = $this->model->klik_divisi($id_divisi);
+		echo json_encode($data);
+	}
+
 	function data_peralatan(){
 		$keyword = $this->input->post('keyword');
 		$urutkan = $this->input->post('urutkan');
@@ -60,7 +89,7 @@ class Log_peralatan_medis_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	private function set_upload_options(){   
+	private function set_upload_options(){
 	    //upload an image options
 	    $config = array();
 	    $config['upload_path'] = './files/foto_alat/';
@@ -71,7 +100,7 @@ class Log_peralatan_medis_c extends CI_Controller {
 	    return $config;
 	}
 
-	function upload($file){   
+	function upload($file){
 	    $this->load->library('upload');
 
 	    $files = $_FILES;
@@ -80,7 +109,7 @@ class Log_peralatan_medis_c extends CI_Controller {
 	        $_FILES[$file]['type'] = $files[$file]['type'];
 	        $_FILES[$file]['tmp_name'] = $files[$file]['tmp_name'];
 	        $_FILES[$file]['error'] = $files[$file]['error'];
-	        $_FILES[$file]['size'] = $files[$file]['size'];    
+	        $_FILES[$file]['size'] = $files[$file]['size'];
 
 	        $this->upload->initialize($this->set_upload_options());
 	        $this->upload->do_upload($file);
@@ -110,6 +139,10 @@ class Log_peralatan_medis_c extends CI_Controller {
 		$first_out = "";
 		$urut_barang = "";
 		$gambar = "";
+		$id_departemen = $this->input->post('id_departemen');
+		$id_divisi = $this->input->post('id_divisi');
+		$golongan = $this->input->post('golongan');
+		$total_harga = str_replace(',', '', $this->input->post('total_harga'));
 
 		if(!empty($_FILES['userfile']['name'])){
 			$gambar = $_FILES['userfile']['name'];
@@ -149,10 +182,98 @@ class Log_peralatan_medis_c extends CI_Controller {
 			$aktif,
 			$first_out,
 			$urut_barang,
-			$gambar);
+			$gambar,
+			$id_departemen,
+			$id_divisi,
+			$golongan,
+			$total_harga
+		);
 
 		$this->session->set_flashdata('sukses','1');
 		redirect('logistik/log_peralatan_medis_c');
 	}
 
+	function ubah(){
+		$id_log = $this->input->post('id_log');
+		$id_setup_nama_alat = $this->input->post('id_nama_alat');
+		$id_satuan = $this->input->post('id_satuan');
+		$pemakaian = $this->input->post('pemakaian');
+		$jumlah = str_replace(',', '', $this->input->post('jumlah'));
+		$isi = str_replace(',', '', $this->input->post('isi'));
+		$total = str_replace(',', '', $this->input->post('total'));
+		$satuan_isi = 'Buah';
+		$harga_beli = str_replace(',', '', $this->input->post('harga_beli'));
+		$tanggal_masuk = date('d-m-Y');
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+	    $datetime = new DateTime();
+	    $format = $datetime->setTimezone($tz_object);
+	    $waktu_masuk = $format->format('H:i:s');
+		$aktif = "";
+		$first_out = "";
+		$urut_barang = "";
+		$gambar = "";
+		$id_departemen = $this->input->post('id_departemen');
+		$id_divisi = $this->input->post('id_divisi');
+		$golongan = $this->input->post('golongan');
+		$total_harga = str_replace(',', '', $this->input->post('total_harga'));
+
+		if(!empty($_FILES['userfile']['name'])){
+			$gambar = $_FILES['userfile']['name'];
+			$this->upload('userfile');
+		}else{
+			$gambar = $this->input->post('file_hidden');
+		}
+
+		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM log_peralatan_medis WHERE ID_SETUP_NAMA_ALAT = '$id_setup_nama_alat'";
+		$qry_cek = $this->db->query($sql_cek)->row();
+		$total_data = $qry_cek->TOTAL;
+
+		if($total_data == 0){
+			$aktif = '1';
+			$urut_barang = '1';
+			$first_out = '1';
+		}else{
+			$aktif = '0';
+			$sql = "SELECT * FROM log_peralatan_medis WHERE ID_SETUP_NAMA_ALAT = '$id_setup_nama_alat' ORDER BY URUT_BARANG DESC LIMIT 1";
+			$qry = $this->db->query($sql)->row();
+			$urut = $qry->URUT_BARANG;
+			$urut_barang = $urut+1;
+			$first_out = $urut_barang;
+		}
+
+		$this->model->ubah(
+			$id_log,
+			$id_setup_nama_alat,
+			$id_satuan,
+			$pemakaian,
+			$jumlah,
+			$isi,
+			$total,
+			$satuan_isi,
+			$harga_beli,
+			$tanggal_masuk,
+			$waktu_masuk,
+			$aktif,
+			$first_out,
+			$urut_barang,
+			$gambar,
+			$id_departemen,
+			$id_divisi,
+			$golongan,
+			$total_harga
+		);
+
+		$this->session->set_flashdata('ubah','1');
+		redirect('logistik/log_peralatan_medis_c');
+	}
+	function data_peralatan_id(){
+		$id = $this->input->post('id');
+		$data = $this->model->data_peralatan_id($id);
+		echo json_encode($data);
+	}
+	function hapus(){
+		$id = $this->input->post('id_hapus');
+		$data = $this->model->hapus($id);
+		redirect('logistik/log_peralatan_medis_c');
+	}
 }
