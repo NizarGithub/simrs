@@ -359,39 +359,56 @@ class Ap_kasir_rajal_m extends CI_Model {
 		";
 		$this->db->query($sql);
 	}
+
 	function struk_resep($id_rj){
-		$sql = $this->db->query("SELECT
-																RJ.ID,
-																RJ.ID_PASIEN,
-																PS.NAMA,
-																PS.UMUR,
-																PS.ALAMAT AS ALAMAT_PASIEN,
-																PS.KODE_PASIEN,
-																PS.TELEPON AS TELEPON_PASIEN,
-																IFNULL(PS.NAMA_ORTU,'-') AS NAMA_ORTU,
-																RJ.TANGGAL,
-																RJ.ID_POLI,
-																IFNULL(PL.NAMA,'-') AS NAMA_POLI,
-																PEG.NAMA AS NAMA_PEGAWAI,
-																RJ.STS_BAYAR,
-																IFNULL(PL.BIAYA,0) AS TOT_POLI,
-																IFNULL(TD.TOTAL,0) AS TOT_TINDAKAN,
-																IFNULL(RS.TOTAL,0) AS TOT_RESEP,
-																IFNULL(LAB.TOTAL_TARIF,0) AS TOT_LAB,
-																RS.ALERGI_OBAT,
-																RS.KODE_RESEP
-															FROM admum_rawat_jalan RJ
-															LEFT JOIN rk_pasien PS ON PS.ID = RJ.ID_PASIEN
-															LEFT JOIN (
-																SELECT * FROM admum_poli
-																WHERE AKTIF = '1'
-															) PL ON PL.ID = RJ.ID_POLI
-															LEFT JOIN kepeg_pegawai PEG ON PEG.ID = PL.ID_PEG_DOKTER
-															LEFT JOIN rk_tindakan_rj TD ON TD.ID_PELAYANAN = RJ.ID
-															LEFT JOIN rk_resep_rj RS ON RS.ID_PELAYANAN = RJ.ID
-															LEFT JOIN rk_laborat_rj LAB ON LAB.ID_PELAYANAN = RJ.ID
-														  WHERE RJ.ID = '$id_rj'
-														");
+		$sql = $this->db->query("
+			SELECT
+				RJ.ID,
+				RJ.ID_PASIEN,
+				PS.NAMA,
+				PS.UMUR,
+				PS.ALAMAT AS ALAMAT_PASIEN,
+				PS.KODE_PASIEN,
+				PS.TELEPON AS TELEPON_PASIEN,
+				IFNULL(PS.NAMA_ORTU,'-') AS NAMA_ORTU,
+				RJ.TANGGAL,
+				RJ.ID_POLI,
+				IFNULL(PL.NAMA,'-') AS NAMA_POLI,
+				PEG.NAMA AS NAMA_PEGAWAI,
+				RJ.STS_BAYAR,
+				IFNULL(PL.BIAYA,0) AS TOT_POLI,
+				IFNULL(TD.TOTAL,0) AS TOT_TINDAKAN,
+				IFNULL(RS.TOTAL,0) AS TOT_RESEP,
+				IFNULL(LAB.TOTAL_TARIF,0) AS TOT_LAB,
+				RS.ID AS ID_RESEP,
+				RS.ALERGI_OBAT,
+				RS.KODE_RESEP
+			FROM admum_rawat_jalan RJ
+			LEFT JOIN rk_pasien PS ON PS.ID = RJ.ID_PASIEN
+			LEFT JOIN (
+				SELECT * FROM admum_poli
+				WHERE AKTIF = '1'
+			) PL ON PL.ID = RJ.ID_POLI
+			LEFT JOIN kepeg_pegawai PEG ON PEG.ID = PL.ID_PEG_DOKTER
+			LEFT JOIN rk_tindakan_rj TD ON TD.ID_PELAYANAN = RJ.ID
+			LEFT JOIN rk_resep_rj RS ON RS.ID_PELAYANAN = RJ.ID
+			LEFT JOIN rk_laborat_rj LAB ON LAB.ID_PELAYANAN = RJ.ID
+		  	WHERE RJ.ID = '$id_rj'
+		");
+
 		return $sql->row_array();
 	}
+
+	function detail_resep($id_resep){
+		$sql = "
+			SELECT
+				a.*,
+				b.NAMA_OBAT
+			FROM rk_resep_detail_rj a
+			JOIN admum_setup_nama_obat b ON b.ID = a.ID_OBAT
+			WHERE a.ID_RESEP = '$id_resep'
+		";
+		return $this->db->query($sql)->result();
+	}
+
 }

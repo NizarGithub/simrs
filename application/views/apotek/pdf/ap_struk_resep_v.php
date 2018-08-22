@@ -39,28 +39,34 @@ table{
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
+
+.footer{
+    position:absolute;
+    left:0;
+    bottom:0;
+}
 </style>
 <div class="struk">
-	<table>
+	<table style="width: 75%;">
     <tr>
       <td style="text-align:center; width: 10%;" rowspan="7">
         <img src="<?php echo base_url(); ?>picture/logosoerya.jpg" style="width: 100px; height: 100px;">
       </td>
     </tr>
     <tr>
-      <td style="text-align:center; font-weight: bold; width: 90%;">Rumah Sakit Ibu & Anak SOERYA</td>
+      <td style="text-align:center; font-weight: bold; width: 100%;">Rumah Sakit Ibu & Anak SOERYA</td>
     </tr>
     <tr>
-      <td style="text-align:center; font-size: 13px; width: 90%;">Jl. Raya Kalijaten 11-15 Taman Sepanjang</td>
+      <td style="text-align:center; font-size: 13px; width: 100%;">Jl. Raya Kalijaten 11-15 Taman Sepanjang</td>
     </tr>
     <tr>
-      <td style="text-align:center; width: 90%;">S I D O A R J O</td>
+      <td style="text-align:center; width: 100%;">S I D O A R J O</td>
     </tr>
     <tr>
-      <td style="text-align:center; font-size: 12px; width: 90%;">Telp : (031) 788 5011 Fax : (031) 787 3633</td>
+      <td style="text-align:center; font-size: 12px; width: 100%;">Telp : (031) 788 5011 Fax : (031) 787 3633</td>
     </tr>
     <tr>
-      <td style="text-align:center; font-size: 12px; width: 90%;">No. Ijin : 442.1/515/111.4/2007</td>
+      <td style="text-align:center; font-size: 12px; width: 100%;">No. Ijin : 442.1/515/111.4/2007</td>
     </tr>
 	</table>
   <br>
@@ -71,8 +77,8 @@ table{
   </table>
 	<table>
 		<tr>
-			<td style="font-size: 18px; font-weight: bold; text-align: center; width: 100%;">
-				Bismillahhirrohmanirrohim
+			<td style="font-size: 18px; font-weight: bold; text-align: center; width: 100%">
+				<i>Bismillahhirrohmanirrohim</i>
 			</td>
 		</tr>
 	</table>
@@ -88,13 +94,13 @@ table{
         <?php
           if ($row['ALERGI_OBAT'] == 'Iya') {
         ?>
-        Ya &nbsp;<div class="square">&nbsp;V&nbsp;&nbsp;</div>&nbsp;
+        Ya &nbsp;<div class="square">&nbsp;v&nbsp;&nbsp;</div>&nbsp;
 				Tidak &nbsp;<div class="square">&nbsp;&nbsp;&nbsp;&nbsp;</div>
         <?php
           }else {
         ?>
         Ya &nbsp;<div class="square">&nbsp;&nbsp;&nbsp;&nbsp;</div>&nbsp;
-				Tidak &nbsp;<div class="square">&nbsp;V&nbsp;&nbsp;</div>
+				Tidak &nbsp;<div class="square">&nbsp;v&nbsp;&nbsp;</div>
         <?php
           }
          ?>
@@ -106,7 +112,7 @@ table{
 	<br>
 	<table>
 		<tr>
-			<td style="text-align: right;">Sidoarjo,
+			<td style="text-align: right; width: 100%;">Sidoarjo,
         <?php
           $tgl = date('d-m-Y');
           $dat = substr($tgl,0,2);
@@ -147,34 +153,54 @@ table{
 			<td>Dokter : <?php echo $row['NAMA_PEGAWAI']; ?></td>
 		</tr>
 	</table>
-	<table>
+  <br>
+	<table style="border-collapse: collapse;">
 		<tbody>
 			<tr>
-				<td style="font-weight: bold;">RI</td>
+				<td style="font-weight: bold; font-size: 16px;"><i>RI</i></td>
 			</tr>
+      <tr><td><br></td></tr>
+      <?php
+        $id_resep = $row['ID_RESEP'];
+        $dt = $this->model->detail_resep($id_resep);
+
+        foreach ($dt as $key => $val) {
+      ?>
+        <tr>
+          <td style="width: 35%; font-size: 14px;"><?php echo $val->NAMA_OBAT; ?></td>
+          <td style="width: 10%; font-size: 14px;">x <?php echo $val->JUMLAH_BELI; ?></td>
+          <td style="width: 20%; font-size: 14px;"><?php echo $val->TAKARAN; ?></td>
+          <td style="width: 20%; font-size: 14px;"><?php echo $val->ATURAN_MINUM; ?></td>
+        </tr>
+      <?php
+        }
+      ?>
 		</tbody>
 	</table>
-	<table>
-		<tr>
-			<td style="width: 20%;">Nama</td>
-			<td style="width: 20%;">: <?php echo $row['NAMA']; ?></td>
-			<td style="width: 20%;">Umur / BB</td>
-			<td style="width: 20%;">: <?php echo $row['UMUR']; ?></td>
-		</tr>
-		<tr>
-			<td style="width: 20%;">Alamat</td>
-			<td style="width: 20%;">: <?php echo $row['ALAMAT_PASIEN']; ?></td>
-			<td style="width: 20%;">No. RM</td>
-			<td style="width: 20%;">: <?php echo $row['KODE_PASIEN']; ?></td>
-		</tr>
-		<tr>
-			<td style="width: 20%;">No. HP</td>
-			<td style="width: 20%;">: <?php echo $row['TELEPON_PASIEN']; ?></td>
-		</tr>
-		<tr>
-			<td style="text-align: center; width: 100%;">Penggantian resep harus seijin dokter</td>
-		</tr>
-	</table>
+</div>
+<div class="footer">
+  <table>
+    <tr>
+      <td>Nama</td>
+      <td style="width: 43%;">: <?php echo $row['NAMA']; ?></td>
+      <td>Umur / BB</td>
+      <td>: <?php echo $row['UMUR']; ?></td>
+    </tr>
+    <tr>
+      <td>Alamat</td>
+      <td>: <?php echo $row['ALAMAT_PASIEN']; ?></td>
+      <td>No. RM</td>
+      <td>: <?php echo $row['KODE_PASIEN']; ?></td>
+    </tr>
+    <tr>
+      <td>No. HP</td>
+      <td>: <?php echo $row['TELEPON_PASIEN']; ?></td>
+    </tr>
+    <tr><td><br></td></tr>
+    <tr>
+      <td style="text-align: center; width: 63%;" colspan="4"><i>Penggantian resep harus seijin dokter</i></td>
+    </tr>
+  </table>
 </div>
 <?PHP
     // ----ukuran kertas dalam inch----//

@@ -60,7 +60,8 @@ class Ap_kasir_rajal_c extends CI_Controller {
 	}
 
 	function get_pasien(){
-		$tanggal = date('d-m-Y');
+		// $tanggal = date('d-m-Y');
+		$tanggal = '21-08-2018';
 		$keyword = $this->input->get('keyword');
 		$data = $this->model->get_pasien($tanggal,$keyword);
 		echo json_encode($data);
@@ -266,9 +267,10 @@ class Ap_kasir_rajal_c extends CI_Controller {
 
 	function struk_resep($id_rj){
 		$model = $this->model->struk_resep($id_rj);
+		
 		$data = array(
 			'settitle' => 'Struk Resep',
-      'filename' => date('dmY').'_struk_resep',
+      		'filename' => date('dmY').'_struk_resep',
 			'title' => 'Struk Resep',
 			'row' => $model
 		);

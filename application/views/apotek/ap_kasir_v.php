@@ -1020,7 +1020,7 @@ function get_pasien(){
             $tr = "";
 
             if(result == null || result == ""){
-                $tr = "<tr><td colspan='5' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+                $tr = "<tr><td colspan='6' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
             }else{
                 var no = 0;
                 for(var i=0; i<result.length; i++){
