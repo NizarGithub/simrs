@@ -265,7 +265,8 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		echo '1';
 	}
 
-	function struk_resep($id_rj){
+	function struk_resep($id){
+		$id_rj = base64_decode($id);
 		$model = $this->model->struk_resep($id_rj);
 		
 		$data = array(
