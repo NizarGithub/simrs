@@ -60,8 +60,8 @@ class Ap_kasir_rajal_c extends CI_Controller {
 	}
 
 	function get_pasien(){
-		// $tanggal = date('d-m-Y');
-		$tanggal = '21-08-2018';
+		$tanggal = date('d-m-Y');
+		// $tanggal = '21-08-2018';
 		$keyword = $this->input->get('keyword');
 		$data = $this->model->get_pasien($tanggal,$keyword);
 		echo json_encode($data);
@@ -258,9 +258,9 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		$total = str_replace(',', '', $this->input->post('grandtotal2'));
 		$jenis_pembayaran = $this->input->post('jenis_pembayaran');
 
-		// $this->model->simpan_pembayaran($invoice,$id_rj,$id_pasien,$id_poli,$id_pegawai,$shift,$tanggal,$waktu,$biaya_poli,$biaya_tindakan,$biaya_resep,$biaya_lab,$total,$jenis_pembayaran);
-		// $this->db->query("UPDATE admum_rawat_jalan SET STS_BAYAR = '1' WHERE ID = '$id_rj'");
-		// $this->insert_kode();
+		$this->model->simpan_pembayaran($invoice,$id_rj,$id_pasien,$id_poli,$id_pegawai,$shift,$tanggal,$waktu,$biaya_poli,$biaya_tindakan,$biaya_resep,$biaya_lab,$total,$jenis_pembayaran);
+		$this->db->query("UPDATE admum_rawat_jalan SET STS_BAYAR = '1' WHERE ID = '$id_rj'");
+		$this->insert_kode();
 
 		echo '1';
 	}
