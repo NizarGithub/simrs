@@ -245,7 +245,7 @@ class Admum_pasien_rj_m extends CI_Model {
 		return $query->result();
 	}
 
-	function simpan_antrian($tanggal,$waktu,$id_pasien,$id_rj,$barcode,$nomor_antrian){
+	function simpan_antrian($tanggal,$waktu,$id_pasien,$id_rj,$barcode,$id_loket,$kode_antrian,$nomor_antrian){
 		$sql = "
 			INSERT INTO rk_antrian_pasien(
 				TANGGAL,
@@ -253,6 +253,8 @@ class Admum_pasien_rj_m extends CI_Model {
 				ID_PASIEN,
 				ID_PELAYANAN,
 				BARCODE,
+				ID_LOKET,
+				KODE_ANTRIAN,
 				NOMOR_ANTRIAN
 			)VALUES(
 				'$tanggal',
@@ -260,7 +262,144 @@ class Admum_pasien_rj_m extends CI_Model {
 				'$id_pasien',
 				'$id_rj',
 				'$barcode',
+				'$id_loket',
+				'$kode_antrian',
 				'$nomor_antrian'
+			)
+		";
+		$this->db->query($sql);
+	}
+
+	//LABORAT
+
+	function load_laborat($keyword){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND JENIS_LABORAT LIKE '%$keyword%'";
+		}else{
+			$where = $where;
+		}
+
+		$sql = "SELECT * FROM admum_setup_jenis_laborat WHERE $where ORDER BY ID DESC";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function klik_laborat($id){
+		$sql = "SELECT * FROM admum_setup_jenis_laborat WHERE ID = '$id'";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function load_pemeriksaan($keyword){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND (NAMA_PEMERIKSAAN LIKE '%$keyword%' OR KODE LIKE '%$keyword%')";
+		}else{
+			$where = $where;
+		}
+
+		$sql = "SELECT * FROM admum_setup_pemeriksaan WHERE $where ORDER BY ID DESC";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function klik_pemeriksaan($id){
+		$sql = "SELECT * FROM admum_setup_pemeriksaan WHERE ID = '$id'";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function get_biaya_lab($jenis){
+		$sql = "SELECT * FROM admum_poli WHERE JENIS = '$jenis'";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function simpan_lab_rj($id_pasien,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$posisi,$biaya_reg){
+		$sql = "
+			INSERT INTO admum_rawat_jalan(
+				ID_PASIEN,
+				ASAL_RUJUKAN,
+				HARI,
+				TANGGAL,
+				BULAN,
+				TAHUN,
+				WAKTU,
+				ID_POLI,
+				STS_POSISI,
+				BIAYA_REG
+			) VALUES(
+				'$id_pasien',
+				'$asal_rujukan',
+				'$hari',
+				'$tanggal',
+				'$bulan',
+				'$tahun',
+				'$waktu',
+				'$id_poli',
+				'$posisi',
+				'$biaya_reg'
+			)
+		";
+		$this->db->query($sql);
+	}
+
+	function simpan_pemeriksaan($kode_lab,$id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$jenis_laborat,$total_tarif,$tanggal,$bulan,$tahun,$waktu,$tipe){
+		$sql = "
+			INSERT INTO rk_laborat_rj(
+				KODE_LAB,
+				ID_PELAYANAN,
+				ID_POLI,
+				ID_PEG_DOKTER,
+				ID_PASIEN,
+				JENIS_LABORAT,
+				TOTAL_TARIF,
+				TANGGAL,
+				BULAN,
+				TAHUN,
+				WAKTU,
+				TIPE,
+				STATUS_PENANGANAN
+			) VALUES (
+				'$kode_lab',
+				'$id_pelayanan',
+				'$id_poli',
+				'$id_peg_dokter',
+				'$id_pasien',
+				'$jenis_laborat',
+				'$total_tarif',
+				'$tanggal',
+				'$bulan',
+				'$tahun',
+				'$waktu',
+				'$tipe',
+				'1'
+			)
+		";
+		$this->db->query($sql);
+	}
+
+	function simpan_pemeriksaan_detail($id_pemeriksaan_rj,$pemeriksaan,$tanggal,$bulan,$tahun,$subtotal,$waktu){
+		$sql = "
+			INSERT INTO rk_laborat_rj_detail(
+				ID_PEMERIKSAAN_RJ,
+				PEMERIKSAAN,
+				TANGGAL,
+				BULAN,
+				TAHUN,
+				SUBTOTAL,
+				WAKTU
+			) VALUES (
+				'$id_pemeriksaan_rj',
+				'$pemeriksaan',
+				'$tanggal',
+				'$bulan',
+				'$tahun',
+				'$subtotal',
+				'$waktu'
 			)
 		";
 		$this->db->query($sql);

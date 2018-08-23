@@ -122,15 +122,32 @@ class Lab_home_m extends CI_Model {
 				b.TANGGAL,
 				b.WAKTU AS WAKTU_RJ,
 				b.STS_POSISI,
-				b.STS_TERIMA
+				b.STS_TERIMA,
+				c.TIPE
 			FROM admum_rawat_jalan b
-			LEFT JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
+			JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
+			JOIN rk_laborat_rj c ON c.ID_PELAYANAN = b.ID
 			WHERE $where
 			AND b.STS_POSISI = '2'
 			AND b.STS_TERIMA = '0'
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
+	}
+
+	function tot_pasien_terima($tanggal,$tipe){
+		$sql = "
+			SELECT
+				COUNT(*) AS TOTAL
+			FROM admum_rawat_jalan a
+			JOIN rk_laborat_rj b ON b.ID_PELAYANAN = a.ID
+			WHERE a.TANGGAL = '$tanggal'
+			AND b.TIPE = '$tipe'
+			AND a.STS_POSISI = '2'
+			AND a.STS_TERIMA = '2'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
 	}
 
 	function terima_pasien($id){
@@ -366,6 +383,7 @@ class Lab_home_m extends CI_Model {
 		$sql = "
 			SELECT
 				LAB.ID,
+				LAB.KODE_LAB,
 				SET_LAB.JENIS_LABORAT,
 				LAB.CITO,
 				LAB.TOTAL_TARIF,
@@ -403,6 +421,46 @@ class Lab_home_m extends CI_Model {
 		return $query->row();
 	}
 
+	function get_data_lab_id($id_lab){
+		$sql = "
+			SELECT
+				a.ID,
+				a.KODE_LAB,
+				b.JENIS_LABORAT,
+				a.CITO,
+				a.TOTAL_TARIF
+			FROM rk_laborat_rj a
+			JOIN admum_setup_jenis_laborat b ON b.ID = a.JENIS_LABORAT
+			WHERE a.ID = '$id_lab'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function get_data_lab_det($id_lab){
+		$sql = "
+			SELECT
+				DET.ID,
+				LAB.ID_PELAYANAN,
+				PRK.ID AS ID_PEMERIKSAAN,
+				PRK.KODE,
+				PRK.NAMA_PEMERIKSAAN,
+				DET.HASIL,
+				DET.NILAI_RUJUKAN,
+				PRK.TARIF,
+				DET.SUBTOTAL,
+				DET.TANGGAL,
+				DET.BULAN,
+				DET.TAHUN
+			FROM rk_laborat_rj_detail DET
+			LEFT JOIN rk_laborat_rj LAB ON LAB.ID = DET.ID_PEMERIKSAAN_RJ
+			LEFT JOIN admum_setup_pemeriksaan PRK ON PRK.ID = DET.PEMERIKSAAN
+			WHERE DET.ID_PEMERIKSAAN_RJ = '$id_lab'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
 	function data_hasil_pemeriksaan($id_pemeriksaan){
 		$sql = "
 			SELECT
@@ -435,6 +493,8 @@ class Lab_home_m extends CI_Model {
 		$sql = "DELETE FROM rk_laborat_rj_detail WHERE ID_PEMERIKSAAN_RJ = '$id'";
 		$this->db->query($sql);
 	}
+
+	//APS
 
 	function load_laborat($keyword){
 		$where = "1 = 1";
@@ -474,6 +534,46 @@ class Lab_home_m extends CI_Model {
 		$sql = "SELECT * FROM admum_setup_pemeriksaan WHERE ID = '$id'";
 		$query = $this->db->query($sql);
 		return $query->result();
+	}
+
+	function hasil_lab_per_pasien($id,$tanggal){
+		$sql = "
+			SELECT 
+				a.*,
+				b.KODE_PASIEN,
+				b.NAMA,
+				b.JENIS_KELAMIN,
+				b.UMUR,
+				b.TANGGAL_LAHIR
+			FROM rk_laborat_rj a
+			JOIN rk_pasien b ON a.ID_PASIEN = b.ID
+			WHERE a.ID_PASIEN = '$id'
+			AND a.TANGGAL = '$tanggal'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function hasil_lab_det_per_pasien($id_pasien,$tanggal){
+		$sql = "
+			SELECT
+				a.*,
+				c.NAMA_PEMERIKSAAN,
+				c.TARIF
+			FROM rk_laborat_rj_detail a
+			JOIN rk_laborat_rj b ON a.ID_PEMERIKSAAN_RJ = b.ID
+			JOIN admum_setup_pemeriksaan c ON a.PEMERIKSAAN = c.ID
+			WHERE b.ID_PASIEN = '$id_pasien'
+			AND b.TANGGAL = '$tanggal'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function hasil_lab_per_pasien_id($id_pasien,$tanggal){
+		$sql = "SELECT * FROM rk_laborat_rj WHERE ID_PASIEN = '$id_pasien' AND TANGGAL = '$tanggal'";
+		$query = $this->db->query($sql);
+		return $query->row();
 	}
 
 	function simpan_rj($id_pasien,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$posisi){
@@ -518,7 +618,8 @@ class Lab_home_m extends CI_Model {
 				BULAN,
 				TAHUN,
 				WAKTU,
-				TIPE
+				TIPE,
+				STATUS_PENANGANAN
 			) VALUES (
 				'$kode_lab',
 				'$id_pelayanan',
@@ -532,7 +633,8 @@ class Lab_home_m extends CI_Model {
 				'$bulan',
 				'$tahun',
 				'$waktu',
-				'$tipe'
+				'$tipe',
+				'1'
 			)
 		";
 		$this->db->query($sql);
@@ -562,6 +664,11 @@ class Lab_home_m extends CI_Model {
 				'$waktu'
 			)
 		";
+		$this->db->query($sql);
+	}
+
+	function hapus_lab_det($id){
+		$sql = "DELETE FROM rk_laborat_rj_detail WHERE ID = '$id'";
 		$this->db->query($sql);
 	}
 

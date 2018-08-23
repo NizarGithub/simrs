@@ -487,8 +487,8 @@ function detail_perawat(id){
 					no++;
 
 					$tr += "<tr>"+
-								"<td>"+no+"</td>"+
-								"<td>"+result[i].NIP+"</td>"+
+								"<td style='text-align:center;'>"+no+"</td>"+
+								"<td style='text-align:center;'>"+result[i].NIP+"</td>"+
 								"<td>"+result[i].NAMA_PEGAWAI+"</td>"+
 								"<td>"+result[i].JABATAN+"</td>"+
 								"<td>"+result[i].NAMA_POLI+"</td>"+
@@ -656,19 +656,8 @@ function hapus_perawat(btn,id){
 	                    				</button>
 	                    			</div>
 	                    		</div>
-					            <div class="form-group">
-					            	<label class="col-md-2 control-label" style="text-align:left;">Cari Berdasarkan</label>
-					            	<div class="col-md-3">
-		                    			<div class="radio radio-purple radio-inline">
-			                                <input type="radio" name="cari_berdasarkan" value="Nama Poli">
-			                                <label for="cari_nama_poli"> Nama Poli </label>
-			                            </div>
-		                                <div class="radio radio-purple radio-inline">
-			                                <input type="radio" name="cari_berdasarkan" value="Jenis">
-			                                <label for="cari_jenis"> Jenis </label>
-			                            </div>
-	                    			</div>
-	                    			<label class="col-md-1 control-label" style="text-align:left;">Urutkan</label>
+	                    		<div class="form-group">
+					            	<label class="col-md-1 control-label" style="text-align:left; width: 9%;">Urutkan</label>
 	                    			<div class="col-md-3">
 		                    			<div class="radio radio-purple radio-inline">
 			                                <input type="radio" name="urutkan" value="Default" id="default" checked="checked">
@@ -677,6 +666,19 @@ function hapus_perawat(btn,id){
 		                    			<div class="radio radio-purple radio-inline">
 			                                <input type="radio" name="urutkan" value="Nama Poli" id="nama_poli">
 			                                <label for="nama_poli"> Nama Poli </label>
+			                            </div>
+	                    			</div>
+					            </div>
+					            <div class="form-group">
+					            	<label class="col-md-1 control-label" style="text-align:left; width: 9%;">Cari Berdasarkan :</label>
+					            	<div class="col-md-3">
+		                    			<div class="radio radio-purple radio-inline">
+			                                <input type="radio" name="cari_berdasarkan" value="Nama Poli">
+			                                <label for="cari_nama_poli"> Nama Poli </label>
+			                            </div>
+		                                <div class="radio radio-purple radio-inline">
+			                                <input type="radio" name="cari_berdasarkan" value="Jenis">
+			                                <label for="cari_jenis"> Jenis </label>
 			                            </div>
 	                    			</div>
 					            </div>
@@ -803,6 +805,7 @@ function hapus_perawat(btn,id){
 			                            <select class="form-control" name="jenis" required="required">
 			                                <option value="Poli">Poli</option>
 			                                <option value="Apotek">Apotek</option>
+			                                <option value="Laborat">Laborat</option>
 			                                <option value="Fisioterapi">Fisioterapi</option>
 			                                <option value="Penunjang Medis">Penunjang Medis</option>
 			                                <option value="Penunjang Non Medis">Penunjang Non Medis</option>
@@ -1138,8 +1141,8 @@ function hapus_perawat(btn,id){
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<button id="popup_perawat" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal3" style="display:none;">Standard Modal</button>
-<div id="myModal3" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<button id="popup_perawat" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal5" style="display:none;">Standard Modal</button>
+<div id="myModal5" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog" style="width:55%;">
     	<div class="modal-content">
             <div class="modal-header">
@@ -1158,20 +1161,22 @@ function hapus_perawat(btn,id){
 		            </div>
         		</form>
             	<div class="table-responsive">
-	                <table class="table table-bordered table-hover" id="tabel_perawat">
-	                    <thead>
-	                        <tr class="merah_popup">
-	                            <th style="text-align:center; color: #fff;">No</th>
-	                            <th style="text-align:center; color: #fff;">NIP</th>
-	                            <th style="text-align:center; color: #fff;">Nama Perawat</th>
-	                            <th style="text-align:center; color: #fff;">Jabatan</th>
-	                            <th style="text-align:center; color: #fff;">Poli</th>
-	                        </tr>
-	                    </thead>
-	                    <tbody>
-	                        
-	                    </tbody>
-	                </table>
+            		<div class="scroll-y">
+		                <table class="table table-bordered table-hover" id="tabel_perawat">
+		                    <thead>
+		                        <tr class="merah_popup">
+		                            <th style="text-align:center; color: #fff;">No</th>
+		                            <th style="text-align:center; color: #fff;">NIP</th>
+		                            <th style="text-align:center; color: #fff;">Nama Perawat</th>
+		                            <th style="text-align:center; color: #fff;">Jabatan</th>
+		                            <th style="text-align:center; color: #fff;">Poli</th>
+		                        </tr>
+		                    </thead>
+		                    <tbody>
+		                        
+		                    </tbody>
+		                </table>
+            		</div>
             	</div>
         	</div>
             <div class="modal-footer">
@@ -1181,8 +1186,8 @@ function hapus_perawat(btn,id){
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<button id="popup_detail_perawat" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal4" style="display:none;">Standard Modal</button>
-<div id="myModal4" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<button id="popup_detail_perawat" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal6" style="display:none;">Standard Modal</button>
+<div id="myModal6" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog" style="width:55%;">
     	<div class="modal-content">
             <div class="modal-header">
@@ -1193,7 +1198,7 @@ function hapus_perawat(btn,id){
             	<div class="table-responsive">
 	                <table class="table table-bordered" id="tabel_detail_perawat">
 	                    <thead>
-	                        <tr class="kuning_popup">
+	                        <tr class="hijau_popup">
 	                            <th style="text-align:center; color: #fff;">No</th>
 	                            <th style="text-align:center; color: #fff;">NIP</th>
 	                            <th style="text-align:center; color: #fff;">Nama Perawat</th>

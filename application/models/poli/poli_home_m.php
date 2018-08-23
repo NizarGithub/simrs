@@ -133,13 +133,17 @@ class Poli_home_m extends CI_Model {
 				b.BULAN,
 				b.TAHUN,
 				b.ID_POLI,
-				c.ID_DIVISI
+				b.STATUS_SUDAH,
+				c.ID_DIVISI,
+				e.KODE_ANTRIAN,
+				e.NOMOR_ANTRIAN
 			FROM admum_rawat_jalan b
 			LEFT JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
 			LEFT JOIN admum_poli c ON c.ID = b.ID_POLI
 			LEFT JOIN kepeg_divisi d ON d.ID = c.ID_DIVISI
+			JOIN rk_antrian_pasien e ON e.ID_PELAYANAN = b.ID
 			WHERE $where
-			ORDER BY PSN.ID DESC
+			ORDER BY b.ID DESC
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -147,6 +151,11 @@ class Poli_home_m extends CI_Model {
 
 	function terima_pasien($id){
 		$sql = "UPDATE admum_rawat_jalan SET STS_TERIMA = '1' WHERE ID = '$id'";
+		$this->db->query($sql);
+	}
+
+	function ubah_jenis_pasien($id_pasien){
+		$sql = "UPDATE rk_pasien SET JENIS_PASIEN = 'Lama' WHERE ID = '$id_pasien'";
 		$this->db->query($sql);
 	}
 
@@ -219,6 +228,86 @@ class Poli_home_m extends CI_Model {
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
+	}
+
+	function ubah_stt_panggil($id_rj,$tanggal){
+		$sql = "UPDATE rk_antrian_pasien SET STATUS_PANGGIL = '1' WHERE ID_PELAYANAN = '$id_rj' AND TANGGAL = '$tanggal'";
+		$this->db->query($sql);
+	}
+
+	function panggil_pasien($id_rj){
+		$sql = "
+			SELECT
+				a.*,
+				b.NAMA_POLI
+			FROM rk_antrian_pasien a
+			JOIN (
+				SELECT
+					a.*,
+					b.NAMA AS NAMA_POLI
+				FROM admum_rawat_jalan a
+				JOIN admum_poli b ON b.ID = a.ID_POLI
+			) b ON b.ID = a.ID_PELAYANAN
+			WHERE a.ID_PELAYANAN = '$id_rj'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function data_pasien_baru($level,$id_divisi,$posisi,$now){
+		$where = "1 = 1";
+
+		if($level == null){
+			$where = $where;
+		}else{
+			$where = $where." AND c.ID_DIVISI = '$id_divisi' AND b.STS_POSISI = '$posisi' AND b.TANGGAL = '$now'";
+		}
+
+		$sql = "
+			SELECT 
+				PSN.*,
+				b.ID AS ID_RJ,
+				b.ID_POLI,
+				c.ID_DIVISI,
+				b.STS_TERIMA,
+				e.KODE_ANTRIAN,
+				e.NOMOR_ANTRIAN
+			FROM admum_rawat_jalan b
+			LEFT JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
+			LEFT JOIN admum_poli c ON c.ID = b.ID_POLI
+			LEFT JOIN kepeg_divisi d ON d.ID = c.ID_DIVISI
+			JOIN rk_antrian_pasien e ON e.ID_PELAYANAN = b.ID
+			WHERE $where
+			AND b.STS_TERIMA = '0'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function get_antrian_pasien(){
+		$sql = "
+			SELECT
+				a.ID,
+				a.TANGGAL,
+				a.WAKTU,
+				a.ID_PASIEN,
+				a.ID_PELAYANAN,
+				a.BARCODE,
+				a.WAKTU,
+				a.ID_LOKET,
+				b.NAMA_LOKET,
+				a.KODE_ANTRIAN,
+				a.NOMOR_ANTRIAN,
+				a.STATUS_PANGGIL
+			FROM rk_antrian_pasien a
+			JOIN kepeg_loket b ON b.ID = a.ID_LOKET
+			WHERE a.STATUS_PANGGIL = '1'
+			AND a.STATUS_CLOSING = '0'
+			ORDER BY a.NOMOR_ANTRIAN DESC
+			LIMIT 1
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
 	}
 
 }

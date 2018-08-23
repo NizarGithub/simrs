@@ -231,7 +231,8 @@
                     <input type="hidden" id="id_antrian_now_on" value="">
                     <input type="hidden" id="kode_antrian_now_on" value="">
                     <input type="hidden" id="jml_antrian_now_on" value="">
-                    <div class="col-lg-3 col-md-6">
+                    <input type="hidden" id="ke_tindakan" value="">
+                    <!-- <div class="col-lg-3 col-md-6">
                         <div class="card-box widget-user">
                             <div>
                                 <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/antri_online.png">
@@ -243,43 +244,45 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <div class="card-box widget-user">
                             <div>
                                 <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/small-queue-management.png">
                                 <div class="wid-u-info">
-                                    <h4 class="m-t-0 m-b-5"> Antrian Offline</h4>
-                                    <button type="button" class="btn btn-danger waves-effect waves-light m-b-5"><b id="loket_offline"></b></button>
-                                    <button type="button" class="btn btn-purple waves-effect waves-light m-b-5" onclick="panggil_antrian('offline');"><i class="fa fa-bullhorn m-r-5"></i><b id="nomor_offline">-</b></button>
-                                    <button type="button" class="btn btn-success waves-effect waves-light m-b-5" onclick="next_antri('offline');"><b>Berikutnya</b> <i class="fa fa-arrow-circle-right"></i></button>
+                                    <h4 class="m-t-0 m-b-5"> Nomor Antrian <!-- <b id="loket_offline"></b> --></h4>
+                                    <!-- <h2 class="text-success" id="nomor_offline">0</h2> -->
+                                    <button type="button" class="btn btn-purple waves-effect waves-light m-t-15" data-original-title="Nomor antrian sekarang" title="" data-placement="top" data-toggle="tooltip">
+                                        <b id="nomor_offline"></b>
+                                    </button>
+                                    <button type="button" class="btn btn-success waves-effect waves-light m-t-15" data-target="#modalClosing" data-toggle="modal" data-original-title="Digunakan untuk menghentikan Nomor Antrian dan me-reset ulang." title="" data-placement="top" data-toggle="tooltip">
+                                        <b>Closing Antrian</b> <i class="fa fa-hand-stop-o"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <div class="card-box widget-user">
                             <div>
                                 <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/Clock-Icon-Image.png">
                                 <div class="wid-u-info">
                                     <h4 class="m-t-0 m-b-5">Waktu</h4>
-                                    <button type="button" class="btn btn-info waves-effect waves-light m-b-5"><b id="waktu_txt"></b></button>
+                                    <h2 class="text-info" id="waktu_txt">0</h2>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <div class="card-box widget-user">
                             <div>
                                 <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/kisspng-calendar-date-computer-icons-time-calendar-icon-5ac41db68edb81.1459769815228021025852.jpg">
                                 <div class="wid-u-info">
                                     <h4 class="m-t-0 m-b-5">Tanggal</h4>
-                                    <button type="button" class="btn btn-danger waves-effect waves-light m-b-5">
-                                        <b><?php echo date('d'); ?> <?php echo $bulan[date('n')]; ?> <?php echo date('Y'); ?></b>
-                                    </button>
+                                    <h2 class="text-danger"><?php echo date('d'); ?> <?php echo $bulan[date('n')]; ?> <?php echo date('Y'); ?></h2>
                                 </div>
                             </div>
                         </div>
@@ -349,37 +352,77 @@
         </div>
         <!-- End Of Next Antrian Modal -->
 
+        <!-- Closing Antrian Modal -->
+        <div id="modalClosing" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content p-0 b-0">
+                    <div class="panel panel-color panel-primary">
+                        <div class="panel-heading">
+                            <button type="button" class="close m-t-5" data-dismiss="modal" aria-hidden="true">×</button>
+                            <h3 class="panel-title"> Konfirmasi </h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>Apakah anda ingin menghentikan nomor antrian dan mereset ulang?</p>
+                        </div>
+                        <div class="panel-footer">
+                            <center>
+                                <button type="button" class="btn btn-inverse " data-dismiss="modal" id="tidak_closing">Tidak</button>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <button type="button" class="btn btn-danger" id="ya_closing"> Ya </button>
+                            </center>                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Of Closing Antrian Modal -->
+
         <!-- Modal -->
         <div id="popup_pasien_baru">
             <div class="window_pasien_baru">
-                <div class="table-responsive">
-                    <table id="tabel_pasien_home" class="table table-hover table-bordered">
-                        <thead>
-                            <tr class="kuning_popup">
-                                <th style="text-align:center; vertical-align: middle;">
-                                    <!-- <div class="checkbox checkbox-primary">
-                                        <input id="checkboxAll" type="checkbox" name="centang_semua">
-                                        <label for="checkboxAll">
-                                            &nbsp;
-                                        </label>
-                                    </div> -->
-                                </th>
-                                <th style="color:#fff; text-align:center; vertical-align: middle;">No</th>
-                                <th style="color:#fff; text-align:center; vertical-align: middle;">No. RM</th>
-                                <th style="color:#fff; text-align:center; vertical-align: middle;">Tgl / Waktu</th>
-                                <th style="color:#fff; text-align:center; vertical-align: middle;">Nama Pasien</th>
-                                <th style="color:#fff; text-align:center; vertical-align: middle;">JK</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            
-                        </tbody>
-                    </table>
+                <div class="row" id="view_data">
+                    <div class="col-md-12">
+                        <div class="card-box">
+                            <form class="form-horizontal" role="form">
+                                <div class="form-group">
+                                    <h4 class="header-title m-t-0">Daftar Pasien Baru</h4>
+                                </div>
+                                <div class="form-group">
+                                    <div class="table-responsive">
+                                        <table id="tabel_pasien_home" class="table table-hover table-bordered">
+                                            <thead>
+                                                <tr class="kuning_popup">
+                                                    <th style="text-align:center; vertical-align: middle;">
+                                                        <!-- <div class="checkbox checkbox-primary">
+                                                            <input id="checkboxAll" type="checkbox" name="centang_semua">
+                                                            <label for="checkboxAll">
+                                                                &nbsp;
+                                                            </label>
+                                                        </div> -->
+                                                    </th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">No</th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">No. RM</th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Tgl / Waktu</th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Nama Pasien</th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">JK</th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Antrian</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <center>
+                                        <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal" id="tutup_pas">Tutup</button>
+                                    </center>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <hr>
-                <center>
-                    <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal" id="tutup_pas">Tutup</button>
-                </center>
             </div>
         </div>
 
@@ -461,6 +504,7 @@
         var snd = new Audio("<?php echo base_url(); ?>sound/nokia_tune_new.mp3"); // buffers automatically when created
         var timer = 0;
         var level = "<?php echo $level; ?>";
+        var tdk = $('#ke_tindakan').val();
 
         jQuery(document).ready(function() {
             $('#datatable').dataTable();
@@ -473,23 +517,42 @@
             if(level == null || level == ""){
                 
             }else{
-                get_antrian_offline();
-                get_antrian_online();
-                get_notif_pasien();
-                timer = setInterval(function () {
+                if(tdk == ""){
+                    get_antrian_offline();
+                    // get_antrian_online();
                     get_notif_pasien();
-                }, 5000);
+                    timer = setInterval(function () {
+                        get_notif_pasien();
+                        get_antrian_offline();
+                    }, 5000);
+                }else{
+                    $('#popup_pasien_baru').hide();
+                    snd.pause();
+                }
             }
 
 
             $('#li_notif').click(function(){
                 $('#popup_pasien_baru').show();
+                data_pasien_baru();
             });
 
             $('#tutup_pas').click(function(){
-                $('#popup_pasien_baru').hide();
+                $('#popup_pasien_baru').fadeOut();
                 snd.pause();
                 clearInterval(timer);
+            });
+
+            $('#ya_closing').click(function(){
+                $.ajax({
+                    url : '<?php echo base_url(); ?>poli/poli_home_c/closing_antrian',
+                    type : "POST",
+                    dataType : "json",
+                    success : function(res){
+                        $('#tidak_closing').click();
+                        notif_closing_antrian();
+                    }
+                });
             });
         });
 
@@ -519,7 +582,7 @@
                 dataType : "json",
                 success : function(res){
                     if(res['cek'].length != 0){
-                        $('#loket_offline').html(res['data']['NAMA_LOKET']);
+                        // $('#loket_offline').html(res['data']['NAMA_LOKET']);
                         var id_kode_antrian = res['data']['KODE_ANTRIAN'];
                         get_nomor_offline(id_kode_antrian);
                         // console.log(id_kode_antrian);
@@ -542,15 +605,13 @@
                 success : function(res){
                     $('#id_antrian_now').val(id_kode_antrian);
                     if(res == null || res == ""){
-                        $('#kode_antrian_now').val('B');
+                        $('#kode_antrian_now').val('A');
                         $('#jml_antrian_now').val('1');
-                        $('#nomor_offline').html('B-1');
+                        $('#nomor_offline').html('A-1');
                     }else{
-                        for(var i=0; i<res.length; i++){
-                            $('#kode_antrian_now').val(res[i].KODE);
-                            $('#jml_antrian_now').val(res[i].URUT);
-                            $('#nomor_offline').html(res[i].KODE+'-'+res[i].URUT);
-                        }
+                        $('#kode_antrian_now').val(res['KODE_ANTRIAN']);
+                        $('#jml_antrian_now').val(res['NOMOR_ANTRIAN']);
+                        $('#nomor_offline').html(res['KODE_ANTRIAN']+'-'+res['NOMOR_ANTRIAN']);
                     }
                 }
             });
@@ -607,7 +668,7 @@
             if(status == 'offline'){
                 kode_antrian = $('#kode_antrian_now').val();
                 jml_antrian  = $('#jml_antrian_now').val();
-                nama_loket_antrian_txt = $('#loket_offline').html();
+                // nama_loket_antrian_txt = $('#loket_offline').html();
             }else{
                 kode_antrian = $('#kode_antrian_now_on').val();
                 jml_antrian  = $('#jml_antrian_now_on').val();
@@ -635,7 +696,7 @@
                 id_antrian   = $('#id_antrian_now').val();
                 kode_antrian = $('#kode_antrian_now').val();
                 jml_antrian  = $('#jml_antrian_now').val();
-                nama_loket_antrian_txt = $('#loket_offline').html();
+                // nama_loket_antrian_txt = $('#loket_offline').html();
             }else{
                 id_antrian   = $('#id_antrian_now_on').val();
                 kode_antrian = $('#kode_antrian_now_on').val();
@@ -721,20 +782,9 @@
         }
 
         function data_pasien_baru(){
-            var keyword = "";
-            var urutkan = "";
-            var pilih_umur = "";
-            var pilih_status = "";
-
             $.ajax({
                 url : '<?php echo base_url(); ?>poli/poli_home_c/notif_pasien_baru',
-                data : {
-                    keyword:keyword,
-                    urutkan:urutkan,
-                    pilih_umur:pilih_umur,
-                    pilih_status:pilih_status
-                },
-                type : "GET",
+                type : "POST",
                 dataType : "json",
                 success : function(result){
                     $tr = "";
@@ -753,14 +803,16 @@
                                         '</div>';
 
                             result[i].WAKTU_DAFTAR = result[i].WAKTU_DAFTAR==null?"00:00":result[i].WAKTU_DAFTAR;
+                            var antrian = result[i].KODE_ANTRIAN+' - '+result[i].NOMOR_ANTRIAN;
 
                             $tr +=  '<tr>'+
                                     '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].KODE_PASIEN+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].TANGGAL_DAFTAR+' - '+result[i].WAKTU_DAFTAR+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].KODE_PASIEN+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL_DAFTAR+' - '+result[i].WAKTU_DAFTAR+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+antrian+'</td>'+
                                     '</tr>';
                         }
                     }
@@ -785,6 +837,7 @@
                     $('#popup_pasien_baru').fadeOut();
                     // console.log(res);
                     data_pasien();
+                    data_pasien_baru();
                 }
             });
 

@@ -156,7 +156,7 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
         <div class="content-w">
           <ul class="breadcrumb">
             <li class="breadcrumb-item">
-              <a href="index.html">Home</a>
+              <a href="<?php echo base_url(); ?>">Home</a>
             </li>
             <li class="breadcrumb-item">
               <span><?php echo $subtitle; ?></span>
@@ -368,12 +368,12 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
     <script src="<?php echo $base_url2; ?>slider/js/index.js"></script>
     <script type="text/javascript">
     $(document).ready(function(){
-        get_antri_on();
+        // get_antri_on();
         get_antri_off();
 
-        setInterval(function () {
-            get_antri_on();
-        }, 3000);
+        // setInterval(function () {
+        //     get_antri_on();
+        // }, 3000);
 
         setInterval(function () {
             get_antri_off();
@@ -400,37 +400,12 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
         return i;
     }
 
-    function get_antri_on(){
-        var id_kode_antrian = $('#id_online').val();
-        console.log(id_kode_antrian);
-        var status = $('#status_online').val();
-
-        $.ajax({
-            url : '<?php echo base_url(); ?>portal_pasien/get_antri_online',
-            data : {
-              id_kode_antrian:id_kode_antrian,
-              status:status
-            },
-            type : "POST",
-            dataType : "json",
-            success : function(res){
-                if(res == null || res == ""){
-                    $('#nomor_'+status).html('1');
-                }else{
-                  for(var i=0; i<res.length; i++){
-                    $('#nomor_'+status).html(res[i].URUT);
-                  }
-                }
-            }
-        });
-    }
-
     function get_antri_off(){
         var id_kode_antrian = $('#id_offline').val();
         var status = $('#status_offline').val();
         
         $.ajax({
-            url : '<?php echo base_url(); ?>portal_pasien/get_antri_online',
+            url : '<?php echo base_url(); ?>portal_pasien/get_antrian_off',
             data : {
               id_kode_antrian:id_kode_antrian,
               status:status
@@ -442,7 +417,7 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
                     $('#nomor_'+status).html('1');
                 }else{
                   for(var i=0; i<res.length; i++){
-                    $('#nomor_'+status).html(res[i].URUT);
+                    $('#nomor_'+status).html(res[i].NOMOR_ANTRIAN);
                   }
                 }
             }

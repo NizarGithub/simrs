@@ -152,6 +152,17 @@ class Lab_home_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function tot_pasien_terima(){
+		$tanggal = date('d-m-Y');
+		$adm = 'Dari Admission';
+		$poli = 'Dari Poli';
+
+		$data['adm'] = $this->model->tot_pasien_terima($tanggal,$adm);
+		$data['poli'] = $this->model->tot_pasien_terima($tanggal,$poli);
+
+		echo json_encode($data);
+	}
+
 	function get_pasien_dr_poli(){
 		$tanggal = $this->input->get('tanggal');
 		$keyword = $this->input->get('keyword');
@@ -233,13 +244,13 @@ class Lab_home_c extends CI_Controller {
 		//001/2016
 		if($total == 0){
 			$no = $this->add_leading_zero(1,3);
-			$kode = "2016".$no;
+			$kode = $tahun.$no;
 		}else{
 			$s = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan' AND TAHUN = '$tahun'";
 			$q = $this->db->query($s)->row();
 			$next = $q->NEXT+1;
 			$no = $this->add_leading_zero($next,3);
-			$kode = "2016".$no;
+			$kode = $tahun.$no;
 		}
 
 		echo json_encode($kode);
@@ -281,6 +292,18 @@ class Lab_home_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function get_data_lab_id(){
+		$id_lab = $this->input->post('id_lab');
+		$data = $this->model->get_data_lab_id($id_lab);
+		echo json_encode($data);
+	}
+
+	function get_data_lab_det(){
+		$id_lab = $this->input->post('id_lab');
+		$data = $this->model->get_data_lab_det($id_lab);
+		echo json_encode($data);
+	}
+
 	function data_laborat_id(){
 		$id = $this->input->post('id');
 		$data = $this->model->data_laborat_id($id);
@@ -318,7 +341,7 @@ class Lab_home_c extends CI_Controller {
 			'data3' => $data3,
 		);
 
-		$this->load->view('lab/pdf/rk_laporan_hasil_lab_pdf_v',$data);
+		$this->load->view('lab/pdf/cetak_hasil_lab_pdf_v',$data);
 	}
 
 	function load_laborat(){
@@ -350,7 +373,7 @@ class Lab_home_c extends CI_Controller {
 		$id_pelayanan = $this->input->post('id_rj');
 		$id_poli = $this->input->post('id_poli');
 		$id_peg_dokter = $this->input->post('id_dokter');
-		$id_pasien = $this->input->post('id_pasien');
+		$id_pasien = $this->input->post('id_pasien2');
 		$jenis_laborat = $this->input->post('id_laborat');
 		$total_tarif = str_replace(',', '', $this->input->post('total_tarif_pemeriksaan'));
 		$cito = $this->input->post('cito');
@@ -365,7 +388,7 @@ class Lab_home_c extends CI_Controller {
 		$datetime = new DateTime();
 		$format = $datetime->setTimezone($tz_object);
 		$waktu = $format->format('H:i:s');
-		$tipe = 'Dari Admission';
+		$tipe = 'APS';
 
 		$this->model->simpan_pemeriksaan($kode_lab,$id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$jenis_laborat,$total_tarif,$cito,$tanggal,$bulan,$tahun,$waktu,$tipe);
 		$id_pemeriksaan_rj = $this->db->insert_id();
@@ -417,6 +440,56 @@ class Lab_home_c extends CI_Controller {
 		}
 
 		$this->model->simpan_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$pilihan);
+
+		echo '1';
+	}
+
+	function cetak_laborat_aps($id){
+		$id_pasien = base64_decode($id);
+		$tanggal = date('d-m-Y');
+		// $tanggal = '20-08-2018';
+
+		$data = array(
+			'settitle' => 'Cetak Hasil Laborat',
+			'filename' => date('dmY').'_cetak_hasil_laborat',
+			'data1' => $this->model->hasil_lab_per_pasien($id_pasien,$tanggal),
+			'data2' => $this->model->hasil_lab_det_per_pasien($id_pasien,$tanggal),
+			'data3' => $this->model->hasil_lab_per_pasien_id($id_pasien,$tanggal)
+		);
+
+		$this->load->view('lab/pdf/cetak_hasil_lab_pdf_v',$data);
+	}
+
+	function simpan_tindakan(){
+		$id_pemeriksaan_rj = $this->input->post('id_lab');
+		$cito = $this->input->post('cito');
+		$total_tarif_lab = $this->input->post('total_tarif_lab');
+		$pemeriksaan = $this->input->post('id_pemeriksaan');
+		$hasil = $this->input->post('hasil_periksa');
+		$nilai_rujukan = $this->input->post('nilai_rujukan');
+		$tanggal = date('d-m-Y');
+		$bulan = date('n');
+		$tahun = date('Y');
+		$subtotal = str_replace(',', '', $this->input->post('tarif_pemeriksaan'));
+		$total_tarif = str_replace(',', '', $this->input->post('total_tarif_pemeriksaan'));
+		$total_baru = $total_tarif_lab + $total_tarif;
+
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu = $format->format('H:i:s');
+
+		$id_detail = $this->input->post('id_detail');
+
+		$this->db->query("UPDATE rk_laborat_rj SET TOTAL_TARIF = '$total_tarif', CITO = '$cito' WHERE ID = '$id_pemeriksaan_rj'");
+
+		foreach ($id_detail as $key => $value) {
+			$this->model->hapus_lab_det($value);
+		}
+
+		foreach ($pemeriksaan as $key => $value) {
+			$this->model->simpan_pemeriksaan_detail($id_pemeriksaan_rj,$value,$hasil[$key],$nilai_rujukan[$key],$tanggal,$bulan,$tahun,$subtotal[$key],$waktu);
+		}
 
 		echo '1';
 	}

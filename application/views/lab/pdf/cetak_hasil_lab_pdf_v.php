@@ -74,26 +74,31 @@ function formatTanggal($tgl){
 
 <table align="left">
 	<tr>
-		<td>
-			<img src="<?php echo base_url(); ?>picture/Indonesian_Red_Cross_Society_logo.png" style="width:75px; height:75px;">
+		<td rowspan="7">
+			<img src="<?php echo base_url(); ?>picture/Indonesian_Red_Cross_Society_logo.png" style="width:75px; height:75px; margin-top: 80px; margin-right: 15px;">
 		</td>
-        <td>&nbsp;</td>
-        <td>
-            <b style="font-size:16px;">My Company</b><br/>
-            <h5>
-                My Company Address
-                <br/>
-                (031) 123456
-            </h5>
-        </td>
 	</tr>
+    <tr>
+      <td style="text-align:center; font-weight: bold; width: 100%;">Nama RS</td>
+    </tr>
+    <tr>
+      <td style="text-align:center; font-size: 13px; width: 100%;">Alamat</td>
+    </tr>
+    <tr>
+      <td style="text-align:center; width: 100%;">S I D O A R J O</td>
+    </tr>
+    <tr>
+      <td style="text-align:center; font-size: 12px; width: 100%;">Telepon</td>
+    </tr>
+    <tr>
+      <td style="text-align:center; font-size: 12px; width: 100%;">No Ijin</td>
+    </tr>
 </table>
 
 <br/>
 <hr>
 <br/>
 
-<?php if($view == 'rj'){ ?>
 <table align="left">
     <tr>
         <td style="width:120px;">No. RM</td>
@@ -102,26 +107,16 @@ function formatTanggal($tgl){
         <td style="width:205px;">&nbsp;</td>
         <td style="width:85px;">Tanggal</td>
         <td>:</td>
-        <td style="width:175px;"><?php echo $data1->HARI; ?>, <?php echo formatTanggal($data1->TANGGAL); ?></td>
+        <td style="width:175px;"><?php echo formatTanggal($data1->TANGGAL); ?></td>
     </tr>
     <tr>
         <td style="width:120px;">Nama Pasien</td>
         <td>:</td>
         <td style="width:130px;"><?php echo $data1->NAMA; ?></td>
         <td style="width:205px;">&nbsp;</td>
-        <td style="width:85px;">No. Lab</td>
+        <td style="width:85px;">Jenis Kelamin</td>
         <td>:</td>
-        <td style="width:175px;"><?php echo $data3->KODE_LAB; ?></td>
-    </tr>
-    <tr>
-        <td style="width:120px;">Umur</td>
-        <td>:</td>
-        <td style="width:130px;"><?php echo $data1->UMUR; ?> Tahun</td>
-    </tr>
-    <tr>
-        <td style="width:120px;">Jenis Kelamin</td>
-        <td>:</td>
-        <td style="width:130px;">
+        <td style="width:175px;">
             <?php
                 if($data1->JENIS_KELAMIN == 'L'){
                     echo "Laki - Laki";
@@ -131,52 +126,22 @@ function formatTanggal($tgl){
             ?>
         </td>
     </tr>
-</table>
-<?php }else if($view == 'igd'){ ?>
-<table align="left">
     <tr>
-        <td style="width:70px;">No. RM</td>
+        <td style="width:120px;">Tgl Lahir</td>
         <td>:</td>
-        <td style="width:150px;"><?php echo $data1->KODE_PASIEN; ?></td>
+        <td style="width:130px;"><?php echo formatTanggal($data1->TANGGAL_LAHIR); ?></td>
         <td style="width:205px;">&nbsp;</td>
-        <td style="width:85px;">Jenis Kelamin</td>
+        <td style="width:120px;">Umur</td>
         <td>:</td>
-        <td style="width:175px;">
-        <?php
-            if($data1->JENIS_KELAMIN == 'L'){
-                echo "Laki - Laki";
-            }else{
-                echo "Perempuan";
-            }
-        ?>  
-        </td>
-    </tr>
-    <tr>
-        <td style="width:70px;">Pasien</td>
-        <td>:</td>
-        <td style="width:150px;"><?php echo $data1->NAMA_PASIEN; ?></td>
-        <td style="width:205px;">&nbsp;</td>
-        <td style="width:85px;">Umur</td>
-        <td>:</td>
-        <td style="width:175px;"><?php echo $data1->UMUR; ?> Tahun</td>
-    </tr>
-    <tr>
-        <td style="width:70px;">Agama</td>
-        <td>:</td>
-        <td style="width:150px;"><?php echo $data1->AGAMA; ?></td>
-        <td style="width:205px;">&nbsp;</td>
-        <td style="width:85px;">Tgl Masuk</td>
-        <td>:</td>
-        <td style="width:175px;"><?php echo formatTanggal($data1->TANGGAL); ?></td>
+        <td style="width:130px;"><?php echo $data1->UMUR; ?> Tahun</td>
     </tr>
 </table>
-<?php } ?>
 
 <br/>
 
 <table align="left">
     <tr>
-        <td style="width:85px;">No. Lab</td>
+        <td style="width:50px;">No. Lab</td>
         <td>:</td>
         <td style="width:175px;"><?php echo $data3->KODE_LAB; ?></td>
     </tr>
@@ -185,43 +150,39 @@ function formatTanggal($tgl){
 <br/>
 
 <table align="left" class="tabel">
-    <thead>
+    <tbody>
         <tr>
             <th>PEMERIKSAAN</th>
             <th>HASIL</th>
             <th>NILAI RUJUKAN</th> 
-            <th>TARIF</th>
+            <th>BIAYA</th>
         </tr>
-    </thead>
-    <tbody>
-    <?php
+        <?php
         $total = 0;
         foreach ($data2 as $value) {
             $total += $value->TARIF;
-    ?>
+        ?>
         <tr>
             <td style="width:210px;"><?php echo $value->NAMA_PEMERIKSAAN; ?></td>
             <td style="width:150px; text-align:center;"><?php echo $value->HASIL; ?></td>
             <td style="width:200px; text-align:center;"><?php echo $value->NILAI_RUJUKAN; ?></td>
             <td style="width:100px; text-align:right;"><?php echo number_format($value->TARIF,0,'.',','); ?></td>
         </tr>
-    <?php
-        }
-    ?>
-    </tbody>
-    <tfoot>
+        <?php
+            }
+        ?>
         <tr>
             <td colspan="3" style="text-align: center; font-weight: bold; font-size: 11px;">TOTAL</td>
             <td style="text-align: right; font-weight: bold; font-size: 11px;"><?php echo number_format($total,0,'.',','); ?></td>
         </tr>
-    </tfoot>
+    </tbody>
 </table>
 
 <?PHP
     //----ukuran kertas dalam inch----//
     // custom
-    $width_custom = 11.69;
-    $height_custom = 8.27;
+    // $width_custom = 11.69;
+    // $height_custom = 8.27;
     //A2
     // $width_a2 = 23.4;
     // $height_a2 = 16.5;
@@ -237,7 +198,7 @@ function formatTanggal($tgl){
     // $html2pdf->Output($filename.'.pdf');
 
     $content = ob_get_clean();
-    $html2pdf = new HTML2PDF('L','A5','fr');
+    $html2pdf = new HTML2PDF('P','A4','fr');
     $html2pdf->pdf->SetTitle($settitle);
     $html2pdf->WriteHTML($content, isset($_GET['vuehtml']));
     $html2pdf->Output($filename.'.pdf');

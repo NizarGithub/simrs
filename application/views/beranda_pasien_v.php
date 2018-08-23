@@ -43,16 +43,14 @@ function get_dokter(){
                   
                   $div += '<div class="col-md-6">'+
                             '<div class="element-wrapper">'+
-                            '  <h6 class="element-header">'+
-                            '    Dokter Hari Ini'+
-                            '  </h6>'+
+                            '  <h6 class="element-header">'+res[i].NAMA+'</h6>'+
                               '<div class="element-box-tp">'+
                                 '<div class="profile-tile">'+
                                 '  <div class="profile-tile-box">'+
                                 '    <div class="pt-avatar-w">'+
                                 '      <img src="'+foto+'">'+
                                 '    </div>'+
-                                '    <div class="pt-user-name">'+res[i].NAMA+'</div>'+
+                                '    <div class="pt-user-name">'+res[i].NAMA_DIV+'</div>'+
                                 '  </div>'+
                                 '  <div class="profile-tile-meta">'+
                                 '    <ul>'+
@@ -60,7 +58,7 @@ function get_dokter(){
                                 '        Last Login:<strong>'+res[i].TIME_LOG+'</strong>'+
                                 '      </li>'+
                                 '      <li>'+
-                                '        Divisi:<strong>'+res[i].NAMA_DIV+'</strong>'+
+                                '        Tanggal:<strong>'+res[i].DATE_LOG+'</strong>'+
                                 '      </li>'+
                                 '    </ul>'+
                                 '    <div class="pt-btn">'+stt+'</div>'+

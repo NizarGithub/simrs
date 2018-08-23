@@ -463,6 +463,7 @@
                         for(var i=0; i<res.length; i++){
                             $('#kode_antrian_now').val(res[i].KODE);
                             $('#jml_antrian_now').val(res[i].URUT);
+                            $('#id_loket_now').val(res[i].ID);
                             $('#nomor_offline').html(res[i].KODE+'-'+res[i].URUT);
                             
                             $('#kode_antrian_off_now').val(res[i].KODE);

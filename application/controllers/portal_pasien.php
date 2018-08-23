@@ -65,34 +65,35 @@ class Portal_pasien extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	function getJmlAntrianPasien($id_kode_antrian,$status){
-		$tgl = date('d-m-Y');
+	function getJmlAntrianPasien(){
 
 		$sql = "
 			SELECT
-				a.*,
-				c.ID_KODE,
-				c.KODE,
-				c.URUT,
-				c.TGL,
-				d.ID_PEGAWAI,
-				b.STS AS STATUS
-			FROM kepeg_loket a
-			LEFT JOIN kepeg_setup_antrian b ON b.ID = a.KODE_ANTRIAN
-			LEFT JOIN kepeg_antrian c ON c.ID_KODE = a.KODE_ANTRIAN
-			LEFT JOIN kepeg_loket_operator d ON d.ID_LOKET = a.ID
-			WHERE c.TGL = '$tgl'
-			AND c.ID_KODE = '$id_kode_antrian'
-			AND b.STS = '$status'
+			a.ID,
+			a.TANGGAL,
+			a.WAKTU,
+			a.ID_PASIEN,
+			a.ID_PELAYANAN,
+			a.BARCODE,
+			a.WAKTU,
+			a.ID_LOKET,
+			b.NAMA_LOKET,
+			a.KODE_ANTRIAN,
+			a.NOMOR_ANTRIAN,
+			a.STATUS_PANGGIL
+		FROM rk_antrian_pasien a
+		JOIN kepeg_loket b ON b.ID = a.ID_LOKET
+		WHERE a.STATUS_PANGGIL = '1'
+		AND a.STATUS_CLOSING = '0'
+		ORDER BY a.NOMOR_ANTRIAN DESC
+		LIMIT 1
 		";
 
 		return $this->db->query($sql)->result();
 	}
 
-	function get_antri_online(){
-		$id_kode_antrian = $this->input->post('id_kode_antrian');
-		$status = $this->input->post('status');
-		$data = $this->getJmlAntrianPasien($id_kode_antrian,$status);
+	function get_antrian_off(){
+		$data = $this->getJmlAntrianPasien();
 		echo json_encode($data);
 	}
 

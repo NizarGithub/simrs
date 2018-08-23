@@ -41,10 +41,7 @@ class Poli_home_c extends CI_Controller {
 	}
 
 	function get_nomor_offline(){
-		$id_kode_antrian = $this->input->post('id_kode_antrian');
-		$status = 'offline';
-		$id_user = $this->input->post('id_user');
-		$data = $this->master_model_m->getJmlAntrian($id_kode_antrian,$status,$id_user);
+		$data = $this->model->get_antrian_pasien();
 		echo json_encode($data);
 	}
 
@@ -92,10 +89,10 @@ class Poli_home_c extends CI_Controller {
         $level = $this->input->get('level');
     	$id_divisi = $this->input->get('id_divisi'); //ID POLI
 		$keyword = $this->input->get('keyword');
-		$now = date('d-m-Y');
 		$posisi = '1';
+		$now = date('d-m-Y');
 
-		$data = $this->model->data_pasien($keyword,$posisi,$now,$id_divisi,$level);
+		$data = $this->model->data_pasien_baru($level,$id_divisi,$posisi,$now);
 		echo json_encode($data);
 	}
 
@@ -125,7 +122,15 @@ class Poli_home_c extends CI_Controller {
 
 	function terima_pasien(){
 		$id = $this->input->post('id');
+		$tanggal = date('d-m-Y');
 		$this->model->terima_pasien($id);
+		$this->model->ubah_stt_panggil($id,$tanggal);
+		echo '1';
+	}
+
+	function ubah_jenis_pasien(){
+		$id_pasien = $this->input->post('id_pasien');
+		$this->model->ubah_jenis_pasien($id_pasien);
 		echo '1';
 	}
 
@@ -183,6 +188,22 @@ class Poli_home_c extends CI_Controller {
 		$resep['ind'] = $data;
 		$resep['det'] = $this->model->get_resep($id_resep);
 		echo json_encode($resep);
+	}
+
+	function panggil_pasien(){
+		$id_rj = $this->input->post('id');
+		$tanggal = date('d-m-Y');
+		$data = $this->model->panggil_pasien($id_rj);
+		$this->model->ubah_stt_panggil($id_rj,$tanggal);
+		echo json_encode($data);
+	}
+
+	function closing_antrian(){
+		$sql = "UPDATE kepeg_antrian SET STATUS_CLOSING = '1' WHERE STATUS_CLOSING = '0'";
+		$this->db->query($sql);
+		$sql1 = "UPDATE rk_antrian_pasien SET STATUS_CLOSING = '1' WHERE STATUS_CLOSING = '0'";
+		$this->db->query($sql1);
+		echo '1';
 	}
 
 } 

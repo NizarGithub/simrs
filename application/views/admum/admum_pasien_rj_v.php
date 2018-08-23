@@ -1,7 +1,15 @@
 <script type="text/javascript" src="<?php echo base_url(); ?>js-devan/jquery-1.11.1.min.js"></script>
 
 <style type="text/css">
-#view_jk2, #view_pendidikan2, #view_agama2, #view_goldar2, #view_tgl_lahir2, #view_kec2, #view_kab_kota2, #view_prov2{
+#view_jk2, 
+#view_pendidikan2, 
+#view_agama2, 
+#view_goldar2, 
+#view_tgl_lahir2,
+#view_kec2,
+#view_kab_kota2,
+#view_prov2,
+.view_lab{
     display: none;
 }
 
@@ -113,6 +121,25 @@ $(document).ready(function(){
     //     }
     // });
 
+    $('#btn_proses').click(function(){
+        var rd = $("input[name='pilihan']:checked").val();
+        $.ajax({
+            url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/simpan',
+            data : $('#form_pasien_baru').serialize(),
+            type : "POST",
+            dataType : "json",
+            success : function(res){
+                if(rd == '1'){
+                    window.open('<?php echo base_url(); ?>admum/admum_pasien_rj_c/struk_antrian', '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+                    window.location = "<?php echo base_url(); ?>admum/admum_pasien_rj_c";
+                }else{
+                    notif_simpan();
+                    window.location = "<?php echo base_url(); ?>admum/admum_pasien_rj_c";
+                }
+            }
+        });
+    });
+
     $('#batal').click(function(){
         window.location = "<?php echo base_url(); ?>admum/admum_pasien_rj_c";
     });
@@ -147,9 +174,42 @@ $(document).ready(function(){
         var rd = $("input[name='pilihan']:checked").val();
         if(rd == '1'){
             $('.view_poli').show();
+            $('.view_lab').hide();
         }else{
             $('.view_poli').hide();
+            $('.view_lab').show();
+
+            $.ajax({
+                url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/get_kode_lab',
+                type : "POST",
+                dataType : "json",
+                success : function(kode){
+                    $('#kode_lab').val(kode);
+                }
+            });
+
+            $.ajax({
+                url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/get_biaya_lab',
+                data : {jenis:'Laborat'},
+                type : "POST",
+                dataType : "json",
+                success : function(row){
+                    $('#id_poli').val(row['ID']);
+                    $('#id_peg_dokter').val(row['ID_PEG_DOKTER']);
+                    $('#biaya_lab').val(formatNumber(row['BIAYA']));
+                }
+            });
         }
+    });
+
+    $('.btn_jenis_laborat').click(function(){
+        $('#popup_laborat').click();
+        load_laborat();
+    });
+
+    $('.btn_pemeriksaan').click(function(){
+        $('#popup_pemeriksaan').click();
+        load_pemeriksaan();
     });
 });
 
@@ -203,6 +263,7 @@ function data_provinsi(){
 
 function load_data_pasien(){
     var keyword = $('#cari_pasien').val();
+
     if(ajax){
         ajax.abort();
     }
@@ -731,12 +792,161 @@ function Search_tgl_RI(tgl){
         }
     });
 }
+
+//LABORAT
+
+function load_laborat(){
+    var keyword = $('#cari_laborat').val();
+
+    if(ajax){
+        ajax.abort();
+    }
+
+    ajax = $.ajax({
+        url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/load_laborat',
+        data : {keyword:keyword},
+        type : "GET",
+        dataType : "json",
+        success : function(result){
+            $tr = "";
+
+            if(result == "" || result == null){
+                $tr = "<tr><td colspan='2' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+            }else{
+                var no = 0;
+
+                for(var i=0; i<result.length; i++){
+                    no++;
+
+                    $tr += "<tr style='cursor:pointer;' onclick='klik_laborat("+result[i].ID+");'>"+
+                                "<td style='text-align:center;'>"+no+"</td>"+
+                                "<td>"+result[i].JENIS_LABORAT+"</td>"+
+                            "</tr>";
+                }
+            }
+
+            $('#tb_laborat tbody').html($tr);
+        }
+    });
+
+    $('#cari_laborat').off('keyup').keyup(function(){
+        load_laborat();
+    });
+}
+
+function klik_laborat(id){
+    $('#tutup_laborat').click();
+
+    $.ajax({
+        url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/klik_laborat',
+        data : {id:id},
+        type : "POST",
+        dataType : "json",
+        success : function(row){
+            $('#id_laborat').val(id);
+            $('#jenis_laborat').val(row['JENIS_LABORAT']);
+        }
+    });
+}
+
+function load_pemeriksaan(){
+    var keyword = $('#cari_pemeriksaan').val();
+
+    if(ajax){
+        ajax.abort();
+    }
+
+    ajax = $.ajax({
+        url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/load_pemeriksaan',
+        data : {keyword:keyword},
+        type : "GET",
+        dataType : "json",
+        success : function(result){
+            $tr = "";
+
+            if(result == "" || result == null){
+                $tr = "<tr><td colspan='4' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+            }else{
+                var no = 0;
+
+                for(var i=0; i<result.length; i++){
+                    no++;
+
+                    $tr += "<tr style='cursor:pointer;' onclick='klik_pemeriksaan("+result[i].ID+");'>"+
+                                "<td style='text-align:center;'>"+no+"</td>"+
+                                "<td>"+result[i].KODE+"</td>"+
+                                "<td>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
+                                "<td style='text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
+                            "</tr>";
+                }
+            }
+
+            $('#tb_pemeriksaan tbody').html($tr);
+        }
+    });
+
+    $('#cari_pemeriksaan').off('keyup').keyup(function(){
+        load_pemeriksaan();
+    });
+}
+
+function klik_pemeriksaan(id){
+    $('#tutup_pemeriksaan').click();
+
+    $.ajax({
+        url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/klik_pemeriksaan',
+        data : {id:id},
+        type : "POST",
+        dataType : "json",
+        success : function(result){
+            $tr = "";
+
+            for(var i=0; i<result.length; i++){
+                var jumlah_data = $('#tr2_'+result[i].ID).length;
+
+                var aksi = "<button type='button' class='btn waves-light btn-danger btn-sm' onclick='deleteRow2(this);'><i class='fa fa-times'></i></button>";
+
+                if(jumlah_data > 0){
+                    var jumlah = $('#jumlah_pemeriksaan_'+result[i].ID).val();
+                    $('#jumlah_pemeriksaan_'+result[i].ID).val(parseInt(jumlah)+1);
+                }else{
+                    $tr = "<tr id='tr2_"+result[i].ID+"'>"+
+                            "<input type='hidden' name='id_pemeriksaan[]' value='"+result[i].ID+"'>"+
+                            "<input type='hidden' name='tarif_pemeriksaan[]' value='"+result[i].TARIF+"'>"+
+                            "<td style='vertical-align:middle;'>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
+                            "<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
+                            "<td style='vertical-align:middle; text-align:right;'><b>"+formatNumber(result[i].TARIF)+"</b></td>"+
+                            "<td align='center'>"+aksi+"</td>"+
+                          "</tr>";
+                }
+            }
+
+            $('#tabel_tambah_pemeriksaan tbody').append($tr);
+            hitung_pemeriksaan();
+        }
+    });
+}
+
+function deleteRow2(btn){
+    var row = btn.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+    hitung_pemeriksaan();
+}
+
+function hitung_pemeriksaan(){
+    var total = 0;
+    $("input[name='tarif_pemeriksaan[]']").each(function(idx,elm){
+        var tarif = elm.value;
+        total += parseFloat(tarif);
+    });
+    $('#total_tarif_pemeriksaan').val(formatNumber(total));
+}
 </script>
 
 <input type="hidden" id="ord_tmp" value="" />
 <div class="row">
     <div class="col-sm-12">
-        <form class="form-horizontal" role="form" action="<?php echo $url_simpan; ?>" method="post" id="form_pasien_baru">
+        <form class="form-horizontal" role="form" action="" method="post" id="form_pasien_baru">
             <div class="card-box">
                 <div class="row">
             		<div class="col-lg-6">
@@ -908,8 +1118,8 @@ function Search_tgl_RI(tgl){
                     </div>
                     <div class="col-lg-6">
                         <div class="form-group">
-                            <label class="col-md-3 control-label">&nbsp;</label>
-                            <div class="col-md-9">
+                            <label class="col-md-2 control-label">&nbsp;</label>
+                            <div class="col-md-10">
                                 <div class="radio radio-success radio-inline">
                                     <input type="radio" id="inlineRadio1" value="1" name="pilihan" checked>
                                     <label for="inlineRadio1"> Poli </label>
@@ -921,10 +1131,9 @@ function Search_tgl_RI(tgl){
                             </div>
                         </div>
                         <div class="form-group view_poli">
-                            <label class="col-md-3 control-label">Poli Tujuan</label>
-                            <div class="col-md-9">
+                            <label class="col-md-2 control-label">Poli Tujuan</label>
+                            <div class="col-md-10">
                                 <div class="input-group">
-                                    <input type="hidden" name="id_poli" id="id_poli" value="">
                                     <input type="text" class="form-control" id="poli_tujuan" value="" required="required" readonly>
                                     <span class="input-group-btn">
                                         <button type="button" class="btn btn-primary btn_poli"><i class="fa fa-search"></i></button>
@@ -933,24 +1142,90 @@ function Search_tgl_RI(tgl){
                             </div>
                         </div>
                         <div class="form-group view_poli">
-                            <label class="col-md-3 control-label">Dokter</label>
-                            <div class="col-md-9">
+                            <label class="col-md-2 control-label">Dokter</label>
+                            <div class="col-md-10">
                                 <input type="text" class="form-control" id="dokter" value="" readonly>
                             </div>
                         </div>
                         <div class="form-group view_poli">
-                            <label class="col-md-3 control-label">Biaya</label>
-                            <div class="col-md-9">
+                            <label class="col-md-2 control-label">Biaya</label>
+                            <div class="col-md-10">
                                 <input type="text" class="form-control" id="biaya" value="" readonly>
                             </div>
                         </div>
-                        <div class="form-group view_poli">
-                            <label class="col-md-3 control-label">Biaya Reg</label>
-                            <div class="col-md-9">
+                        
+                        <div class="form-group view_lab">
+                            <label class="col-md-2 control-label">Biaya</label>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" id="biaya_lab" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group view_lab">
+                            <label class="col-md-2 control-label">Kode</label>
+                            <div class="col-md-5">
+                                <input type="text" class="form-control" name="kode_lab" id="kode_lab" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group view_lab">
+                            <label class="col-md-2 control-label">Jenis Laborat</label>
+                            <div class="col-md-5">
+                                <div class="input-group">
+                                    <input type="hidden" name="id_laborat" id="id_laborat" value="">
+                                    <input type="text" class="form-control" id="jenis_laborat" value="" readonly>
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary btn_jenis_laborat" style="cursor:cursor;"><i class="fa fa-search"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group view_lab">
+                            <label class="col-md-2 control-label">Pemeriksaan</label>
+                            <div class="col-md-5">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" value="" readonly="readonly" required="required">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-inverse btn_pemeriksaan"><i class="fa fa-search"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group view_lab">
+                            <label class="col-md-2 control-label">&nbsp;</label>
+                            <div class="col-md-10">
+                                <div class="table-responsive">
+                                    <table id="tabel_tambah_pemeriksaan" class="table table-bordered">
+                                        <thead>
+                                            <tr class="kuning_tr">
+                                                <th style="color:#fff; text-align:center;">Pemeriksaan</th>
+                                                <th style="color:#fff; text-align:center;">Tarif</th>
+                                                <th style="color:#fff; text-align:center;">Sub Total</th>
+                                                <th style="color:#fff; text-align:center;">#</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group view_lab">
+                            <label class="col-md-2 control-label">Total Tarif</label>
+                            <div class="col-md-5">
+                                <input type="text" class="form-control" name="total_tarif_pemeriksaan" id="total_tarif_pemeriksaan" value="" readonly="readonly">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Biaya Reg</label>
+                            <div class="col-md-10">
                                 <input type="text" class="form-control" name="biaya_reg" id="biaya_reg" value="" readonly>
+                                <input type="hidden" name="id_poli" id="id_poli" value="">
+                                <input type="hidden" name="id_peg_dokter" id="id_peg_dokter" value="">
                                 <input type="hidden" id="id_kode_antrian_off_now" name="id_kode_antrian" value="">
                                 <input type="hidden" id="kode_antrian_off_now" name="kode_antrian" value="">
                                 <input type="hidden" id="jml_antrian_off_now" name="jumlah_antrian" value="">
+                                <input type="hidden" id="id_loket_now" name="id_loket" value="">
                                 <input type="hidden" id="barcode" name="barcode" value="">
                             </div>
                         </div>
@@ -958,7 +1233,7 @@ function Search_tgl_RI(tgl){
                 </div>
                 <hr>
                 <center>
-                    <button type="submit" class="btn btn-success m-b-5" value="daftar" id="btn_proses" disabled="disabled">
+                    <button type="button" class="btn btn-success m-b-5" value="daftar" id="btn_proses" disabled="disabled">
                         <i class="fa fa-refresh"></i> <span><b>Proses</b></span>
                     </button>
                     <button type="button" class="btn btn-danger m-b-5" id="batal">
@@ -1178,6 +1453,101 @@ function Search_tgl_RI(tgl){
                         </div>
                     </div>
                 </div>                
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- LABORAT -->
+<button class="btn btn-primary" data-toggle="modal" data-target="#myModal1_laborat" id="popup_laborat" style="display:none;">Standard Modal</button>
+<div id="myModal1_laborat" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">Data Jenis Laborat</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="cari_laborat" placeholder="Cari..." value="">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn waves-effect waves-light btn-custom" style="cursor:default;">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <div class="scroll-y">
+                        <table class="table table-hover table-bordered" id="tb_laborat">
+                            <thead>
+                                <tr class="hijau_popup">
+                                    <th style="text-align:center; color: #fff;" width="50">No</th>
+                                    <th style="text-align:center; color: #fff;">Jenis Laborat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_laborat">Tutup</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<button class="btn btn-primary" data-toggle="modal" data-target="#myModal1_pemeriksaan" id="popup_pemeriksaan" style="display:none;">Standard Modal</button>
+<div id="myModal1_pemeriksaan" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog" style="width:50%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">Data Tindakan</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="cari_pemeriksaan" placeholder="Cari..." value="">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn waves-effect waves-light btn-custom" style="cursor:default;">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <div class="scroll-y">
+                        <table class="table table-hover table-bordered" id="tb_pemeriksaan">
+                            <thead>
+                                <tr class="hijau_popup">
+                                    <th style="text-align:center; color: #fff;" width="50">No</th>
+                                    <th style="text-align:center; color: #fff;">Kode</th>
+                                    <th style="text-align:center; color: #fff;">Pemeriksaan</th>
+                                    <th style="text-align:center; color: #fff;">Tarif</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_pemeriksaan">Tutup</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

@@ -66,11 +66,14 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				PEG.NAMA AS NAMA_DOKTER,
 				RJ.HARI,
 				RJ.TANGGAL,
-				RJ.SISTEM_BAYAR
+				RJ.SISTEM_BAYAR,
+				AP.KODE_ANTRIAN,
+				AP.NOMOR_ANTRIAN
 			FROM admum_rawat_jalan RJ
 			LEFT JOIN rk_pasien PASIEN ON RJ.ID_PASIEN = PASIEN.ID
 			LEFT JOIN admum_poli POLI ON RJ.ID_POLI = POLI.ID
 			LEFT JOIN kepeg_pegawai PEG ON PEG.ID = POLI.ID_PEG_DOKTER
+			JOIN rk_antrian_pasien AP ON AP.ID_PELAYANAN = RJ.ID
 			WHERE RJ.ID = '$id'
 		";
 		$query = $this->db->query($sql);

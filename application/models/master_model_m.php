@@ -73,17 +73,14 @@ class Master_model_m extends CI_Model
 
 		$sql = "
 			SELECT
-				a.*,
+				a.*, 
 				c.ID_KODE,
 				c.KODE,
 				c.URUT,
-				c.TGL,
-				d.ID_PEGAWAI,
-				b.STS AS STATUS
+				c.TGL
 			FROM kepeg_loket a
 			LEFT JOIN kepeg_setup_antrian b ON b.ID = a.KODE_ANTRIAN
-			LEFT JOIN kepeg_antrian c ON c.ID_KODE = a.KODE_ANTRIAN
-			LEFT JOIN kepeg_loket_operator d ON d.ID_LOKET = a.ID
+			JOIN kepeg_antrian c ON c.ID_KODE = a.KODE_ANTRIAN
 			WHERE 1 = 1
 			AND c.ID_KODE = '$id_kode_antrian'
 			AND c.STATUS_CLOSING = '0'

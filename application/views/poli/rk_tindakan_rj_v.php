@@ -13,7 +13,7 @@
 	display: none;
 }
 
-#view_laborat_tambah, #view_laborat_ubah{
+#view_laborat_tambah, #view_laborat_ubah, .view_lab{
 	display: none;
 }
 
@@ -204,6 +204,15 @@ $(document).ready(function(){
 			}
 		});
 	});
+
+	$('#checkboxLab').click(function(){
+		var cek = $('#checkboxLab').is(':checked');
+		if(cek == true){
+			$('.view_lab').show();
+		}else{
+			$('.view_lab').hide();
+		}
+	});	
 
 	//DIAGNOSA
 
@@ -1955,7 +1964,7 @@ function data_surat_dokter_ada(){
 	                    <a href="#resep1" role="tab" data-toggle="tab"><i class="fa fa-medkit"></i>&nbsp;Resep</a>
 	                </li>
 	                <li role="presentation" id="dt_laborat">
-	                    <a href="#laborat1" role="tab" data-toggle="tab"><i class="fa fa-building"></i>&nbsp;Laboraturium</a>
+	                    <a href="#laborat1" role="tab" data-toggle="tab"><i class="fa fa-building"></i>&nbsp;Laborat</a>
 	                </li>
 	                <li role="presentation" id="dt_kondisi_akhir">
 	                    <a href="#kondisi_akhir1" role="tab" data-toggle="tab"><i class="fa fa-check-square-o"></i>&nbsp;Kondisi Akhir</a>
@@ -2398,6 +2407,17 @@ function data_surat_dokter_ada(){
 	                    <form class="form-horizontal" id="view_laborat">
 	                    	<div class="form-group">
 	                    		<div class="col-md-6">
+	                    			<div class="checkbox checkbox-primary">
+		                                <input id="checkboxLab" type="checkbox">
+		                                <label for="checkboxLab">
+		                                    Perlu cek Laborat?
+		                                </label>
+		                            </div>
+	                    		</div>
+	                    	</div>
+	                    	<hr>
+	                    	<div class="form-group view_lab">
+	                    		<div class="col-md-6">
 	                    			<h4 class="m-t-0"><i class="fa fa-table"></i>&nbsp;<b>Tabel Laborat</b></h4>
 	                    		</div>
 	                    		<div class="col-md-6">
@@ -2406,7 +2426,7 @@ function data_surat_dokter_ada(){
 									</button>
 	                    		</div>
 	                    	</div>
-	                    	<div class="form-group">
+	                    	<div class="form-group view_lab">
 	                    		<div class="col-md-12">
 				                    <div class="table-responsive">
 							            <table id="tabel_laborat" class="table table-bordered">
@@ -2429,7 +2449,7 @@ function data_surat_dokter_ada(){
 							        </div>
 	                    		</div>
 	                    	</div>
-	                    	<div class="form-group">
+	                    	<div class="form-group view_lab">
 	                    		<div class="col-md-8">
 	                    			&nbsp;
 	                    		</div>

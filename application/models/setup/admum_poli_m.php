@@ -154,6 +154,7 @@ class Admum_poli_m extends CI_Model {
 			LEFT JOIN admum_poli POLI ON POLI.ID_PEG_DOKTER = PEG.ID
 			LEFT JOIN kepeg_kel_jabatan JAB ON JAB.ID = PEG.ID_JABATAN
 			WHERE $where
+			AND POLI.ID IS NULL
 			ORDER BY PEG.ID DESC
 		";
 		$query = $this->db->query($sql);
@@ -232,6 +233,7 @@ class Admum_poli_m extends CI_Model {
 			LEFT JOIN admum_poli_perawat PRWT ON PRWT.ID_PEG_PERAWAT = PEG.ID
 			LEFT JOIN admum_poli POLI ON POLI.ID = PRWT.ID_POLI
 			WHERE $where
+			AND POLI.ID IS NULL
 			ORDER BY PEG.ID DESC
 		";
 		$query = $this->db->query($sql);

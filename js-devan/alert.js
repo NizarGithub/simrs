@@ -208,6 +208,27 @@ function notif_pasien_baru(){
     toastr["success"]("Pasien baru telah didaftar!", "Notifikasi");
 }
 
+function notif_closing_antrian(){
+    toastr.options = {
+      "closeButton": false,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": false,
+      "positionClass": "toast-bottom-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+    toastr["success"]("Nomor antrian berhasil di closing dan direset!", "Notifikasi");
+}
+
 function notif_tanggal_kurang(){
     toastr.options = {
       "closeButton": false,

@@ -350,20 +350,30 @@ function data_pasien(){
 
                 for(var i=0; i<result.length; i++){
                     no++;
-
-                    var detail = '<button type="button" id="btn_history" onclick="detail_pasien('+result[i].ID+');" class="btn btn-danger waves-effect waves-light btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg">'+
-                                    '<i class="fa fa-eye"></i>';
-                                 '</button>';
-
+                    var nomor = result[i].KODE_ANTRIAN+'-'+result[i].NOMOR_ANTRIAN;
+                    var encodedString = Base64.encode(result[i].ID_RJ);
+                    var panggil = '';
                     var aksi = '';
 
-                    if(level == null || level == ""){
-                        aksi =  '<button type="button" id="btn_history" onclick="detail_rm('+result[i].ID+');" class="btn btn-success waves-effect waves-light btn-sm">'+
-                                    '<i class="fa fa-book"></i>';
-                                '</button>';
+                    if(result[i].STATUS_SUDAH == '1'){
+                        panggil = '<span class="label label-success">Selesai Ditangani</span>';
+                        aksi = '<span class="label label-success">Selesai Ditangani</span>';
                     }else{
-                        var encodedString = Base64.encode(result[i].ID_RJ);
-                        aksi = '<a href="<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/tindakan_rj/'+encodedString+'" class="btn btn-success waves-effect waves-light btn-sm"><i class="fa fa-user-md"></i></a>';
+                        panggil = '<button type="button" onclick="panggil_pasien('+result[i].ID_RJ+');" class="btn btn-purple waves-effect waves-light btn-sm">'+
+                                    nomor+' <i class="fa fa-bullhorn"></i>'+
+                                  '</button>';
+                        if(level == null || level == ""){
+                            aksi =  '<button type="button" onclick="detail_rm('+result[i].ID+');" class="btn btn-success waves-effect waves-light btn-sm">'+
+                                        '<i class="fa fa-book"></i>';
+                                    '</button>';
+                        }else{
+                            aksi = '<a href="<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/tindakan_rj/'+encodedString+'" class="btn btn-success waves-effect waves-light btn-sm m-r-5" onclick="klik_tindakan('+result[i].ID+');">'+
+                                        '<i class="fa fa-user-md"></i> Tindakan'+
+                                    '</a>'+
+                                   '<button type="button" onclick="detail_pasien('+result[i].ID+');" class="btn btn-primary waves-effect waves-light btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg">'+
+                                        '<i class="fa fa-eye"></i> Detail'+
+                                   '</button>';
+                        }
                     }
 
                     result[i].WAKTU_DAFTAR = result[i].WAKTU_DAFTAR==null?"00:00":result[i].WAKTU_DAFTAR;
@@ -372,11 +382,11 @@ function data_pasien(){
                     $tr +=  '<tr>'+
                             '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].KODE_PASIEN+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].TANGGAL+' - '+result[i].WAKTU_DAFTAR+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL+' - '+result[i].WAKTU_DAFTAR+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].ALAMAT+'</td>'+
-                            '   <td style="vertical-align:middle;" align="center">'+detail+'</td>'+
+                            '   <td style="vertical-align:middle;" align="center">'+panggil+'</td>'+
                             '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
                             '</tr>';
                 }
@@ -478,6 +488,30 @@ function detail_pasien(id){
     });
 }
 
+function panggil_pasien(id){
+    $.ajax({
+        url : '<?php echo base_url(); ?>poli/poli_home_c/panggil_pasien',
+        data : {id:id},
+        type : "POST",
+        dataType : "json",
+        success : function(row){
+            var kode_antrian = row['KODE_ANTRIAN'];
+            var jml_antrian = row['NOMOR_ANTRIAN'];
+            var poli = row['NAMA_POLI'];
+
+            responsiveVoice.speak(
+              "Pengunjung dengan nomor antrian, "+kode_antrian+","+jml_antrian+", silahkan menuju ke "+poli+". Terima kasih. ",
+              "Indonesian Female",
+              {
+               pitch: 1, 
+               rate: 1, 
+               volume: 1
+              }
+            );
+        }
+    });
+}
+
 function detail_rm(id_pasien){
     $('#popup_rekam_medik').click();
     $('#id_pasien').val(id_pasien);
@@ -502,6 +536,18 @@ function detail_rm(id_pasien){
 
             $('#tabel_poli tbody').html($tr);
             get_tindakan();
+        }
+    });
+}
+
+function klik_tindakan(id_pasien){
+    $.ajax({
+        url : '<?php echo base_url(); ?>poli/poli_home_c/ubah_jenis_pasien',
+        data : {id_pasien:id_pasien},
+        type : "POST",
+        dataType : "json",
+        success : function(res){
+            console.log(res);
         }
     });
 }
@@ -762,17 +808,17 @@ function get_resep(){
                         <div class="table-responsive">
                             <table id="tabel_pasien" class="table table-hover table-bordered">
                                 <thead>
-                                    <tr class="biru">
+                                    <tr class="merah">
                                         <th style="color:#fff; text-align:center;">No</th>
                                         <th style="color:#fff; text-align:center;">No. RM</th>
                                         <th style="color:#fff; text-align:center;">Tgl / Waktu</th>
                                         <th style="color:#fff; text-align:center;">Nama Pasien</th>
                                         <th style="color:#fff; text-align:center;">JK</th>
                                         <th style="color:#fff; text-align:center;">Alamat</th>
-                                        <th style="color:#fff; text-align:center;">Detail</th>
+                                        <th style="color:#fff; text-align:center;">Panggil</th>
                                         <th style="color:#fff; text-align:center;">
                                             <?php 
-                                                echo $level=$level==null?"Rekam Medik":"Tindakan"; 
+                                                echo $level=$level==null?"Rekam Medik":"Aksi"; 
                                             ?>  
                                         </th>
                                     </tr>
