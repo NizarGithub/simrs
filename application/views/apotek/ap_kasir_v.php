@@ -158,7 +158,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                             <th style="text-align:center;">TANGGAL</th>
                                             <th style="text-align:center;">Nama</th>
                                             <th style="text-align:center;">Poli</th>
-                                            <th style="text-align:center;">Resep</th>
+                                            <th style="text-align:center;">Copy Resep</th>
                                             <th style="text-align:center;">Total Biaya</th>
                                         </tr>
                                     </thead>
@@ -1084,7 +1084,7 @@ $(document).ready(function(){
                 var id_rj = $('#id_rj').val();
                 var encodedString = Base64.encode(id_rj);
                 get_invoice();
-                window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_resep/'+encodedString, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+                window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_pembayaran/'+encodedString, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
             }
         });
     });
@@ -1101,6 +1101,7 @@ function startTime() {
     document.getElementById('waktu_txt').innerHTML = h + ":" + m + ":" + s;
     $('#waktu').val(h + ":" + m + ":" + s);
     var t = setTimeout(startTime, 500);
+    console.log(h);
 
     if(h >= 7 && h < 14){
         $('#shift_user').html('1');
@@ -1167,7 +1168,7 @@ function get_pasien(){
                                 "<td style='text-align:center;'>"+result[i].TANGGAL+"</td>"+
                                 "<td>"+result[i].NAMA+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].NAMA_POLI+"</td>"+
-                                "<td style='text-align:center;'>"+result[i].KODE_RESEP+"</td>"+
+                                "<td align='center'><button class='btn btn-success' type='button' onclick='klik_copy_resep("+result[i].ID+");'>"+result[i].KODE_RESEP+"</button></td>"+
                                 "<td style='text-align:right;'>"+aksi+"</td>"+
                             "</tr>";
                 }
@@ -1180,6 +1181,11 @@ function get_pasien(){
     $('#cari_nama_menu').off('keyup').keyup(function(){
         get_pasien();
     });
+}
+
+function klik_copy_resep(id){
+          // var encodedString = Base64.encode(id);
+          window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_resep/'+id, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
 }
 
 function klik_pasien(id,id_pasien,total){
