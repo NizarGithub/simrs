@@ -80,6 +80,8 @@ class Login_c extends CI_Controller {
 					redirect('poli/poli_home_c');
 				}else if($data->LEVEL == 'Laborat'){
 					redirect('lab/lab_home_c');
+				}else if($data->LEVEL == 'Farmasi'){
+					redirect('apotek/ap_home_c');
 				}else if($data->LEVEL == 'Kasir AA'){
 					
 				}else if($data->LEVEL == 'Kasir Rajal'){

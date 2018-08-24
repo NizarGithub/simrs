@@ -296,6 +296,7 @@ function cek_username_submit(){
                                     <option value="Admission">Admission</option>
                                     <option value="Poli">Poli</option>
                                     <option value="Laborat">Laborat</option>
+                                    <option value="Farmasi">Farmasi</option>
                                     <option value="Kasir AA">Kasir AA</option>
                                     <option value="Kasir Rajal">Kasir Rajal</option>
                                     <option value="Kasir Ranap">Kasir Ranap</option>
