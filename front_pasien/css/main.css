@@ -6337,7 +6337,8 @@ body {
   /*max-width: 1600px;*/
   margin: 0px auto;
   position: relative;
-  min-height: 100%; }
+  /*min-height: 100%; */
+}
   .all-wrapper.with-pattern {
     box-shadow: none;
     border-radius: 0px;

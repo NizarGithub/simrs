@@ -48,7 +48,7 @@ function get_dokter(){
                                 '<div class="profile-tile">'+
                                 '  <div class="profile-tile-box">'+
                                 '    <div class="pt-avatar-w">'+
-                                '      <img src="'+foto+'">'+
+                                '      <img src="'+foto+'" style="max-height:60px; max-width:60px;">'+
                                 '    </div>'+
                                 '    <div class="pt-user-name">'+res[i].NAMA_DIV+'</div>'+
                                 '  </div>'+

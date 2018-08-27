@@ -1,13 +1,13 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Ap_beli_obat_c extends CI_Controller {
+class Ap_kasir_aa_c extends CI_Controller {
 
 	function __construct()
 	{
 		parent::__construct();
 		$this->load->helper('url');
 		$this->load->library('fpdf/HTML2PDF');
-		$this->load->model('apotek/ap_beli_obat_m','model');
+		$this->load->model('apotek/ap_kasir_aa_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
     	$id_user = $sess_user['id'];
 	    if($id_user == "" || $id_user == null){
@@ -55,7 +55,7 @@ class Ap_beli_obat_c extends CI_Controller {
 			'get_invoice' => $kode,
 		);
 
-		$this->load->view('apotek/ap_kasir_v',$data);
+		$this->load->view('apotek/ap_kasir_aa_v',$data);
 	}
 
 	function get_data_obat(){
