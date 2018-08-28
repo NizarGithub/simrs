@@ -35,34 +35,33 @@ class Ap_gudang_obat_m extends CI_Model {
 	}
 
 	function klik_nama_obat($id){
-		$sql = "
-			SELECT
-				NM_OBT.ID,
-				NM_OBT.KODE_OBAT,
-				NM_OBT.BARCODE,
-				NM_OBT.NAMA_OBAT,
-				NM_OBT.ID_MERK,
-				SUP.MERK,
-				OBAT.ID AS ID_GUDANG,
-				OBAT.ID_JENIS_OBAT,
-				JENIS.NAMA_JENIS,
-				OBAT.ID_SATUAN_OBAT,
-				SAT.NAMA_SATUAN,
-				OBAT.KADALUARSA,
-				OBAT.JUMLAH,
-				OBAT.ISI,
-				OBAT.TOTAL,
-				OBAT.JUMLAH_BUTIR,
-				OBAT.HARGA_BELI,
-				OBAT.HARGA_JUAL
-			FROM admum_setup_nama_obat NM_OBT
-			LEFT JOIN obat_supplier SUP ON SUP.ID = NM_OBT.ID_MERK
-			LEFT JOIN (
-				SELECT * FROM apotek_gudang_obat WHERE AKTIF = '1'
-			) OBAT ON OBAT.ID_SETUP_NAMA_OBAT = NM_OBT.ID
-			LEFT JOIN obat_jenis JENIS ON JENIS.ID = OBAT.ID_JENIS_OBAT
-			LEFT JOIN obat_satuan SAT ON SAT.ID = obat.ID_SATUAN_OBAT
-			WHERE NM_OBT.ID = '$id'
+		$sql = "SELECT
+						NM_OBT.ID,
+						NM_OBT.KODE_OBAT,
+						NM_OBT.BARCODE,
+						NM_OBT.NAMA_OBAT,
+						NM_OBT.ID_MERK,
+						SUP.MERK,
+						OBAT.ID AS ID_GUDANG,
+						OBAT.ID_JENIS_OBAT,
+						JENIS.NAMA_JENIS,
+						OBAT.ID_SATUAN_OBAT,
+						SAT.NAMA_SATUAN,
+						OBAT.KADALUARSA,
+						OBAT.JUMLAH,
+						OBAT.ISI,
+						OBAT.TOTAL,
+						OBAT.JUMLAH_BUTIR,
+						OBAT.HARGA_BELI,
+						OBAT.HARGA_JUAL
+					FROM admum_setup_nama_obat NM_OBT
+					LEFT JOIN obat_supplier SUP ON SUP.ID = NM_OBT.ID_MERK
+					LEFT JOIN (
+						SELECT * FROM apotek_gudang_obat WHERE AKTIF = '1'
+					) OBAT ON OBAT.ID_SETUP_NAMA_OBAT = NM_OBT.ID
+					LEFT JOIN obat_jenis JENIS ON JENIS.ID = OBAT.ID_JENIS_OBAT
+					LEFT JOIN obat_satuan SAT ON SAT.ID = OBAT.ID_SATUAN_OBAT
+					WHERE NM_OBT.ID = '$id'
 		";
 		$query = $this->db->query($sql);
 		return $query->row();
@@ -121,7 +120,7 @@ class Ap_gudang_obat_m extends CI_Model {
 		}
 
 		$sql = "
-			SELECT 
+			SELECT
 				OBAT.ID,
 				NM_OBT.KODE_OBAT,
 				NM_OBT.BARCODE,
@@ -157,10 +156,10 @@ class Ap_gudang_obat_m extends CI_Model {
 	}
 
 	function data_obat_xls(){
-		
+
 
 		$sql = "
-			SELECT 
+			SELECT
 				OBAT.ID,
 				NM_OBT.KODE_OBAT,
 				NM_OBT.BARCODE,
@@ -195,7 +194,7 @@ class Ap_gudang_obat_m extends CI_Model {
 
 	function data_obat_id($id){
 		$sql = "
-			SELECT 
+			SELECT
 				OBAT.ID,
 				OBAT.ID_SETUP_NAMA_OBAT,
 				NM_OBT.KODE_OBAT,
@@ -217,8 +216,11 @@ class Ap_gudang_obat_m extends CI_Model {
 				OBAT.HARGA_JUAL,
 				OBAT.KADALUARSA,
 				OBAT.TANGGAL_MASUK,
+				OBAT.WAKTU_MASUK,
 				OBAT.STATUS_RACIK,
-				OBAT.GAMBAR	
+				OBAT.GAMBAR,
+				OBAT.ID_GOLONGAN,
+				OBAT.ID_KATEGORI
 			FROM apotek_gudang_obat OBAT
 			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
 			LEFT JOIN obat_supplier SUP ON SUP.ID = NM_OBT.ID_MERK
@@ -229,8 +231,8 @@ class Ap_gudang_obat_m extends CI_Model {
 		$query = $this->db->query($sql);
 		return $query->row();
 	}
-	
-	
+
+
 
 	function simpan(
 		$id_nama_obat,
@@ -249,9 +251,12 @@ class Ap_gudang_obat_m extends CI_Model {
 		$waktu_masuk,
 		$aktif,
 		$first_out,
-		$urut_barang,
+		// $urut_barang,
 		$status_racik,
-		$gambar){
+		$gambar,
+		$id_golongan,
+		$id_kategori
+	){
 
 		$sql = "
 			INSERT INTO apotek_gudang_obat(
@@ -271,9 +276,10 @@ class Ap_gudang_obat_m extends CI_Model {
 				WAKTU_MASUK,
 				AKTIF,
 				FIRST_OUT,
-				URUT_BARANG,
 				STATUS_RACIK,
-				GAMBAR
+				GAMBAR,
+				ID_GOLONGAN,
+				ID_KATEGORI
 			) VALUES (
 				'$id_nama_obat',
 				'$id_jenis',
@@ -291,17 +297,18 @@ class Ap_gudang_obat_m extends CI_Model {
 				'$waktu_masuk',
 				'$aktif',
 				'$first_out',
-				'$urut_barang',
 				'$status_racik',
-				'$gambar'
+				'$gambar',
+				'$id_golongan',
+				'$id_kategori'
 			)
 		";
 		$this->db->query($sql);
 	}
 
-	function ubah($id,$id_nama_obat,$id_jenis,$id_satuan,$jumlah,$isi,$total,$jumlah_butir,$harga_beli,$harga_jual,$kadaluarsa,$status_racik,$gambar){
+	function ubah($id,$id_nama_obat,$id_jenis,$id_satuan,$jumlah,$isi,$total,$jumlah_butir,$harga_beli,$harga_jual,$kadaluarsa,$status_racik,$gambar,$id_golongan,$id_kategori){
 		$sql = "
-			UPDATE apotek_gudang_obat SET 
+			UPDATE apotek_gudang_obat SET
 				ID_SETUP_NAMA_OBAT = '$id_nama_obat',
 				ID_JENIS_OBAT = '$id_jenis',
 				ID_SATUAN_OBAT = '$id_satuan',
@@ -313,7 +320,9 @@ class Ap_gudang_obat_m extends CI_Model {
 				HARGA_JUAL = '$harga_jual',
 				KADALUARSA = '$kadaluarsa',
 				STATUS_RACIK = '$status_racik',
-				GAMBAR = '$gambar'
+				GAMBAR = '$gambar',
+				ID_GOLONGAN = '$id_golongan',
+				ID_KATEGORI = '$id_kategori'
 			WHERE ID = '$id'
 		";
 		$this->db->query($sql);

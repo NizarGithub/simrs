@@ -5,7 +5,7 @@ class Admum_setup_obat_m extends CI_Model {
 	function __construct()
 	{
 		parent::__construct();
-		$this->load->database(); 
+		$this->load->database();
 	}
 
 	function data_merk($keyword){
@@ -66,15 +66,15 @@ class Admum_setup_obat_m extends CI_Model {
 		}
 
 		$sql = "
-			SELECT 
+			SELECT
 				OBAT.ID,
 				OBAT.KODE_OBAT,
 				OBAT.BARCODE,
 				OBAT.NAMA_OBAT,
-				SUP.MERK	
+				SUP.MERK
 			FROM admum_setup_nama_obat OBAT
 			LEFT JOIN obat_supplier SUP ON SUP.ID = OBAT.ID_MERK
-			WHERE $where 
+			WHERE $where
 			ORDER BY OBAT.ID DESC
 		";
 		$query = $this->db->query($sql);
@@ -83,13 +83,13 @@ class Admum_setup_obat_m extends CI_Model {
 
 	function data_obat_id($id){
 		$sql = "
-			SELECT 
+			SELECT
 				OBAT.ID,
 				OBAT.KODE_OBAT,
 				OBAT.BARCODE,
 				OBAT.NAMA_OBAT,
 				OBAT.ID_MERK,
-				SUP.MERK	
+				SUP.MERK
 			FROM admum_setup_nama_obat OBAT
 			LEFT JOIN obat_supplier SUP ON SUP.ID = OBAT.ID_MERK
 			WHERE OBAT.ID = '$id'
@@ -98,29 +98,26 @@ class Admum_setup_obat_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan($kode_obat,$barcode,$nama_obat,$merk){
+	function simpan($kode_obat,$barcode,$nama_obat){
 		$sql = "
 			INSERT INTO admum_setup_nama_obat(
 				KODE_OBAT,
 				BARCODE,
-				NAMA_OBAT,
-				ID_MERK
+				NAMA_OBAT
 			) VALUES (
 				'$kode_obat',
 				'$barcode',
-				'$nama_obat',
-				'$merk'
+				'$nama_obat'
 			)
 		";
 		$this->db->query($sql);
 	}
 
-	function ubah($id,$barcode,$nama_obat,$id_merk){
+	function ubah($id,$barcode,$nama_obat){
 		$sql = "
-			UPDATE admum_setup_nama_obat SET 
+			UPDATE admum_setup_nama_obat SET
 				BARCODE = '$barcode',
-				NAMA_OBAT = '$nama_obat',
-				ID_MERK = '$id_merk'
+				NAMA_OBAT = '$nama_obat'
 			WHERE ID = '$id'";
 		$this->db->query($sql);
 	}

@@ -31,7 +31,7 @@ $(document).ready(function(){
         // Allow: backspace, delete, tab, escape, enter and .
         if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
              // Allow: Ctrl+A, Command+A
-            (e.keyCode == 65 && ( e.ctrlKey === true || e.metaKey === true ) ) || 
+            (e.keyCode == 65 && ( e.ctrlKey === true || e.metaKey === true ) ) ||
              // Allow: home, end, left, right, down, up
             (e.keyCode >= 35 && e.keyCode <= 40)) {
                  // let it happen, don't do anything
@@ -122,7 +122,7 @@ function data_supplier(){
         						"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
         						"<td style='vertical-align:middle;'>"+result[i].KODE_SUPPLIER+"</td>"+
         						"<td style='vertical-align:middle;'>"+result[i].NAMA_SUPPLIER+"</td>"+
-        						"<td style='vertical-align:middle;'>"+result[i].MERK+"</td>"+
+        						// "<td style='vertical-align:middle;'>"+result[i].MERK+"</td>"+
         						"<td style='vertical-align:middle;'>"+result[i].ALAMAT+"</td>"+
         						"<td style='vertical-align:middle;'>"+result[i].EMAIL+"</td>"+
         						"<td style='vertical-align:middle; text-align:center;'>"+result[i].TELEPON+"</td>"+
@@ -173,7 +173,7 @@ function ubah_supplier(id){
 			$('#id_ubah').val(id);
 			$('#kode_supplier_ubah').val(row['KODE_SUPPLIER']);
 			$('#nama_supplier_ubah').val(row['NAMA_SUPPLIER']);
-			$('#merk_ubah').val(row['MERK']);
+			// $('#merk_ubah').val(row['MERK']);
 			$('#alamat_ubah').val(row['ALAMAT']);
 			$('#email_ubah').val(row['EMAIL']);
 			$('#telepon_ubah').val(row['TELEPON']);
@@ -249,7 +249,7 @@ function hapus_supplier(id){
 		                        <th style="color:#fff; text-align:center;" width="50">No</th>
 		                        <th style="color:#fff; text-align:center;">Kode Supplier</th>
 		                        <th style="color:#fff; text-align:center;">Nama Supplier</th>
-		                        <th style="color:#fff; text-align:center;">Merk</th>
+		                        <!-- <th style="color:#fff; text-align:center;">Merk</th> -->
 		                        <th style="color:#fff; text-align:center;">Alamat</th>
 		                        <th style="color:#fff; text-align:center;">Email</th>
 		                        <th style="color:#fff; text-align:center;">Telepon</th>
@@ -258,7 +258,7 @@ function hapus_supplier(id){
 		                </thead>
 
 		                <tbody>
-		                    
+
 		                </tbody>
 		            </table>
 		        </div>
@@ -300,12 +300,12 @@ function hapus_supplier(id){
 		                            <input type="text" class="form-control" name="nama_supplier" value="" required="required">
 		                        </div>
 		                    </div>
-		                    <div class="form-group">
+		                    <!-- <div class="form-group">
 		                        <label class="col-md-2 control-label">Merk</label>
 		                        <div class="col-md-4">
 		                            <input type="text" class="form-control" name="merk" value="" required="required">
 		                        </div>
-		                    </div>
+		                    </div> -->
 		                    <div class="form-group">
 		                        <label class="col-md-2 control-label">Alamat</label>
 		                        <div class="col-md-4">
@@ -353,19 +353,19 @@ function hapus_supplier(id){
                     <input type="text" class="form-control" name="nama_supplier_ubah" id="nama_supplier_ubah" value="" required="required">
                 </div>
             </div>
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label class="col-md-2 control-label">Merk</label>
                 <div class="col-md-4">
                     <input type="text" class="form-control" name="merk_ubah" id="merk_ubah" value="" required="required">
                 </div>
-            </div>
+            </div> -->
             <div class="form-group">
                 <label class="col-md-2 control-label">Alamat</label>
                 <div class="col-md-4">
                     <textarea name="alamat_ubah" id="alamat_ubah" class="form-control" rows="5" required="required"></textarea>
                 </div>
             </div>
-            <div class="form-group"> 
+            <div class="form-group">
                 <label class="col-md-2 control-label">Email</label>
                 <div class="col-md-4">
                     <input type="email" class="form-control" name="email_ubah" id="email_ubah" value="">

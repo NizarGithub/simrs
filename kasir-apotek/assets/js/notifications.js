@@ -11,7 +11,7 @@ $(function () {
                     HorizontalPosition: $(this).data("horiz-pos"),
                     VerticalPosition: $(this).data("verti-pos"),
                     ShowOverlay: $(this).data("overlay") ? $(this).data("overlay") : false,
-                    TimeShown: $(this).data("timeshown") ? $(this).data("timeshown") : 2000,
+                    TimeShown: $(this).data("timeshown") ? $(this).data("timeshown") : 5000,
                     OpacityOverlay: $(this).data("opacity") ? $(this).data("opacity") : 0.5,
                     MinWidth: $(this).data("min-width") ? $(this).data("min-width") : 250
                 });
@@ -24,7 +24,7 @@ $(function () {
                     HorizontalPosition: $(this).data("horiz-pos"),
                     VerticalPosition: $(this).data("verti-pos"),
                     ShowOverlay: $(this).data("overlay") ? $(this).data("overlay") : false,
-                    TimeShown: $(this).data("timeshown") ? $(this).data("timeshown") : 2000,
+                    TimeShown: $(this).data("timeshown") ? $(this).data("timeshown") : 5000,
                     OpacityOverlay: $(this).data("opacity") ? $(this).data("opacity") : 0.5,
                     MinWidth: $(this).data("min-width") ? $(this).data("min-width") : 250
                 });
@@ -37,7 +37,7 @@ $(function () {
                     HorizontalPosition: $(this).data("horiz-pos"),
                     VerticalPosition: $(this).data("verti-pos"),
                     ShowOverlay: $(this).data("overlay") ? $(this).data("overlay") : false,
-                    TimeShown: $(this).data("timeshown") ? $(this).data("timeshown") : 2000,
+                    TimeShown: $(this).data("timeshown") ? $(this).data("timeshown") : 5000,
                     OpacityOverlay: $(this).data("opacity") ? $(this).data("opacity") : 0.5,
                     MinWidth: $(this).data("min-width") ? $(this).data("min-width") : 250
                 });
@@ -53,7 +53,7 @@ $(function () {
                 HorizontalPosition: 'right',
                 VerticalPosition: 'bottom',
                 ShowOverlay: false,
-                TimeShown: 3000,
+                TimeShown: 5000,
                 onClosed: function () {
                     alert('I am a function called when notif is closed !')
                 }

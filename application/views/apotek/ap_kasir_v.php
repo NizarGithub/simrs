@@ -77,11 +77,18 @@ $user_detail = $this->model->get_user_detail($id_user);
     z-index: 9999;
     display: none;
 }
+#short_shift{
+  display: none;
+}
+#btn_closing_kasir{
+  display: none;
+  cursor: pointer;
+}
 </style>
 
 </head>
 
-<body data-page="medias" onload="startTime();">
+<body data-page="medias" onload="startTime(); startNotifClosing();">
     <!-- BEGIN TOP MENU -->
     <input type="hidden" id="sts_edit" value="0" />
     <input type="hidden" id="sts_lunas" value="0" />
@@ -102,6 +109,9 @@ $user_detail = $this->model->get_user_detail($id_user);
             <div class="navbar-collapse collapse">
                 <!-- BEGIN TOP NAVIGATION MENU -->
                 <ul class="nav navbar-nav pull-right header-menu">
+                    <li style="margin-right: 5px;">
+                        <button id="btn_show_data_pembayaran" style="margin-top: 6px;" class="btn btn-success btn-sm" type="button"> <i class="fa fa-folder-open-o"></i> Data Pembayaran </button>
+                      </li>
                     <li style="margin-right: 5px;">
                         <button onclick="$('#modal-12').addClass('md-show');" style="margin-top: 6px;" class="btn btn-warning btn-sm" type="button"> <i class="fa fa-question-circle"></i> Bantuan </button>
                     </li>
@@ -148,7 +158,7 @@ $user_detail = $this->model->get_user_detail($id_user);
             <div class="panel-content">
                 <div class="row media-manager">
                     <div class="margin-bottom-30"></div>
-                    <div class="col-sm-7">
+                    <div class="col-sm-8">
                         <div class="panel panel-default">
                             <div class="scroll-y">
                                 <table class="table table-hover" id="tabel_pasien">
@@ -159,6 +169,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                             <th style="text-align:center;">Nama</th>
                                             <th style="text-align:center;">Poli</th>
                                             <th style="text-align:center;">Copy Resep</th>
+                                            <th style="text-align:center;">Nota Poli</th>
                                             <th style="text-align:center;">Total Biaya</th>
                                         </tr>
                                     </thead>
@@ -170,9 +181,9 @@ $user_detail = $this->model->get_user_detail($id_user);
                         </div>
                     </div>
 
-                    <div class="col-sm-1" style="width: 2%;">   </div>
+                    <!-- <div class="col-sm-1" style="width: 2%;">   </div> -->
 
-                    <div id="panel_kanan" class="col-sm-4" style="width: 38%; background:#F0F4F8;">
+                    <div id="panel_kanan" class="col-sm-4" style="width: 32%; background:#F0F4F8;">
                         <form id="form_pembayaran">
                             <div class="m-b-10"></div>
 
@@ -322,23 +333,40 @@ $user_detail = $this->model->get_user_detail($id_user);
                         </form>
                         <hr>
                         <div class="row m-t-20">
-                            <div class="col-lg-6 col-md-6">
-                                <div class="panel panel-icon no-bd bg-blue hover-effect">
-                                    <div class="panel-body bg-blue">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="icon"><i class="fa fa-user"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="panel-footer bg-blue">
-                                        <h4><strong>Shift <b id="shift_user">0</b></strong></h4>
-                                        <p><?=$user_detail->NAMA;?></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6">
+                          <div class="col-lg-12 col-md-6" id="long_shift">
+                              <div class="panel panel-icon no-bd bg-blue hover-effect">
+                                  <div class="panel-body bg-blue">
+                                      <div class="row">
+                                          <div class="col-md-12">
+                                              <div class="icon"><i class="fa fa-user"></i>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="panel-footer bg-blue">
+                                      <h4><strong>Shift <b class="shift_user">0</b></strong></h4>
+                                      <p><?=$user_detail->NAMA;?></p>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="col-lg-6 col-md-6" id="short_shift">
+                              <div class="panel panel-icon no-bd bg-blue hover-effect">
+                                  <div class="panel-body bg-blue">
+                                      <div class="row">
+                                          <div class="col-md-12">
+                                              <div class="icon"><i class="fa fa-user"></i>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="panel-footer bg-blue">
+                                      <h4><strong>Shift <b class="shift_user">0</b></strong></h4>
+                                      <p><?=$user_detail->NAMA;?></p>
+                                  </div>
+                              </div>
+                          </div>
+
+                            <div class="col-lg-6 col-md-6" id="btn_closing_kasir">
                                 <div class="panel panel-icon no-bd bg-purple hover-effect">
                                     <div class="panel-body bg-purple">
                                         <div class="row">
@@ -349,29 +377,30 @@ $user_detail = $this->model->get_user_detail($id_user);
                                         </div>
                                     </div>
                                     <div class="panel-footer bg-purple">
-                                        <h4><strong>Nota Poli</strong></h4>
+                                        <h4><strong>Tutup Kasir</strong></h4>
                                         <p>Input Nota Poli</p>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                         <div class="row m-t-20">
-                            <div class="col-lg-6 col-md-6">
-                                <div class="panel panel-icon no-bd bg-green hover-effect">
-                                    <div class="panel-body bg-green">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="icon"><i class="fa fa-file-text"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="panel-footer bg-green">
-                                        <h4><strong>Rekap Pendapatan</strong></h4>
-                                        <p>Harian, Bulanan dan Tahunan</p>
-                                    </div>
-                                </div>
-                            </div>
+                          <div class="col-lg-6 col-md-6">
+                              <div class="panel panel-icon no-bd bg-green hover-effect">
+                                  <div class="panel-body bg-green">
+                                      <div class="row">
+                                          <div class="col-md-12">
+                                              <div class="icon"><i class="fa fa-file-text"></i>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="panel-footer bg-green">
+                                      <h4><strong>Rekap Pendapatan</strong></h4>
+                                      <p>Hari, Bulan Dan Tahun</p>
+                                  </div>
+                              </div>
+                          </div>
                             <div class="col-lg-6 col-md-6">
                                 <div class="panel panel-icon no-bd bg-dark hover-effect">
                                     <div class="panel-body bg-dark">
@@ -692,6 +721,62 @@ $user_detail = $this->model->get_user_detail($id_user);
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
+    <button class="btn btn-danger" data-toggle="modal" id="popup_closing" style="display:none;" data-target="#modal-basic1">Show me</button>
+    <div class="modal fade" id="modal-basic1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: #EBEBEB; color: #2B2B2B;">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <center><h2 class="modal-title" id="myModalLabel"><strong>Konfirmasi</strong></h2></center>
+                        </div>
+                        <div class="modal-body">
+                            Apakah anda ingin melakukan penutupan kasir?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="btn_ya_closing" class="btn btn-success">Ya</button>
+                            <button type="button" class="btn btn-danger" id="btn_tutup_closing" data-dismiss="modal">Tidak</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <button class="btn btn-danger" data-toggle="modal" id="popup_data_pembayaran" style="display:none;" data-target="#modal-large">Show me</button>
+    <div class="modal fade" id="modal-large" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <center><h3 class="modal-title" id="myModalLabel"><strong>Data Pembayaran</strong></h3></center>
+                        </div>
+                        <div class="modal-body">
+                          <table class="table" id="tabel_pembayaran">
+                            <thead>
+                              <tr class="info">
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Invoice</th>
+                                <th>Total Biaya</th>
+                                <th>Pegawai</th>
+                                <th>Shift</th>
+                                <th>Copy Resep</th>
+                                <th>Nota Poli</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <button type="button" data-type="error" class="btn btn-danger notification" id="notif_closing" data-message="" style="display:none;" data-horiz-pos="left" data-verti-pos="bottom">Error</button>
+
+    <button type="button" onclick="snd.play();" id="btn_suara_closing" style="display:none;" name="button">aaa</button>
+
     <div class="modal fade" id="modal-basic" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog" style="width: 25%;">
             <div class="modal-content">
@@ -714,7 +799,6 @@ $user_detail = $this->model->get_user_detail($id_user);
             </div>
         </div>
     </div>
-
     <div class="md-overlay"></div>
 
 <!-- BEGIN MANDATORY SCRIPTS -->
@@ -732,10 +816,11 @@ $user_detail = $this->model->get_user_detail($id_user);
 <script src="<?=base_url();?>kasir-apotek/assets/plugins/breakpoints/breakpoints.js"></script>
 <script src="<?=base_url();?>kasir-apotek/assets/plugins/numerator/jquery-numerator.js"></script>
 <!-- END MANDATORY SCRIPTS -->
-<!--
-<script src="<? //base_url();?>kasir-apotek/assets/plugins/modal/js/classie.js"></script>
-<script src="<? //base_url();?>kasir-apotek/assets/plugins/modal/js/modalEffects.js"></script>
--->
+
+<!-- <script src="<?=base_url();?>kasir-apotek/assets/plugins/modal/js/classie.js"></script>
+<script src="<?=base_url();?>kasir-apotek/assets/plugins/modal/js/modalEffects.js"></script> -->
+<script src="<?php echo base_url(); ?>js-devan/pagination.js"></script>
+
 
 <script src="<?=base_url();?>kasir-apotek/assets/js/application.js"></script>
 <script src="<?=base_url();?>kasir-apotek/assets/js/form.js"></script>
@@ -747,8 +832,11 @@ $user_detail = $this->model->get_user_detail($id_user);
 <script src="<?=base_url();?>kasir-apotek/assets/js/notifications.js"></script>
 
 <script src="<?php echo base_url(); ?>js-devan/js-form.js"></script>
+<script src="http://code.responsivevoice.org/responsivevoice.js"></script>
 
 <script type="text/javascript">
+var snd = new Audio("<?php echo base_url(); ?>sound/Google_Event-1.mp3"); // buffers automatically when created
+
 var Base64 = {
     _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/-",
 
@@ -1089,7 +1177,101 @@ $(document).ready(function(){
         });
     });
 
+    $('#btn_closing_kasir').click(function(){
+      $('#popup_closing').click();
+    });
+
+    $('#btn_ya_closing').click(function(){
+      simpan_closing();
+    });
+
+    $('#btn_show_data_pembayaran').click(function(){
+        data_pembayaran();
+    });
 });
+
+function data_pembayaran(){
+  $('#popup_data_pembayaran').click();
+  $.ajax({
+    url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/data_pembayaran',
+    type : "POST",
+    dataType : "json",
+    success : function(result){
+      var table = '';
+      if(result == null || result == ""){
+          table = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+      }else{
+          var no = 0;
+          for(var i=0; i<result.length; i++){
+              no++;
+              table += "<tr>"+
+                          "<td style='text-align:center;'>"+no+"</td>"+
+                          "<td style='text-align:center;'>"+result[i].TANGGAL_CLOSING+"</td>"+
+                          "<td style='text-align:center;'>"+result[i].INVOICE+"</td>"+
+                          "<td style='text-align:center;'>"+formatNumber(result[i].TOTAL)+"</td>"+
+                          "<td style='text-align:center;'>"+result[i].NAMA_PEGAWAI+"</td>"+
+                          "<td style='text-align:center;'>"+result[i].SHIFT+"</td>"+
+                          "<td><button class='btn btn-success btn-sm' type='button' onclick='klik_copy_resep("+result[i].ID_RAJAL+");'><i class='fa fa-print'></i> "+result[i].KODE_RESEP+"</button></td>"+
+                          "<td><button class='btn btn-info btn-sm' type='button' onclick='klik_print_poli("+result[i].ID_RAJAL+");'><i class='fa fa-print'></i> Print Poli</button></td>"+
+                      "</tr>";
+          }
+      }
+      $('#tabel_pembayaran tbody').html(table);
+      // paging_pembayaran();
+    }
+  });
+}
+
+function paging_pembayaran($selector){
+    if(typeof $selector == 'undefined')
+    {
+        $selector = $("#tabel_pembayaran tbody tr");
+    }
+    window.tp = new Pagination('#tablePaging', {
+        itemsCount:$selector.length,
+        pageSize : '10',
+        onPageSizeChange: function (ps) {
+            console.log('changed to ' + ps);
+        },
+        onPageChange: function (paging) {
+            //custom paging logic here
+            //console.log(paging);
+            var start = paging.pageSize * (paging.currentPage - 1),
+                end = start + paging.pageSize,
+                $rows = $selector;
+
+            $rows.hide();
+
+            for (var i = start; i < end; i++) {
+                $rows.eq(i).show();
+            }
+        }
+    });
+}
+
+function simpan_closing(){
+  $("input[name='id_rajal_hidden[]']").each(function(idx, elm){
+    var id_rajal = elm.value;
+    var id_pegawai = $('#id_pegawai').val();
+    var shift = $('#shift').val();
+    $.ajax({
+      url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing',
+      data : {
+        id_rajal:id_rajal,
+        id_pegawai:id_pegawai,
+        shift:shift
+      },
+      type : "POST",
+      dataType : "json",
+      success : function(){
+        $('#btn_tutup_closing').click();
+        $('#short_shift').hide();
+        $('#long_shift').show();
+        $('#btn_closing_kasir').hide();
+      }
+    });
+  });
+}
 
 function startTime() {
     var today = new Date();
@@ -1101,17 +1283,68 @@ function startTime() {
     document.getElementById('waktu_txt').innerHTML = h + ":" + m + ":" + s;
     $('#waktu').val(h + ":" + m + ":" + s);
     var t = setTimeout(startTime, 500);
-    console.log(h);
+    var jam = h+':'+m;
+    console.log(jam);
 
     if(h >= 7 && h < 14){
-        $('#shift_user').html('1');
+        $('.shift_user').html('1');
         $('#shift').val('1');
     }else if(h >= 14 && h < 23){
-        $('#shift_user').html('2');
+        $('.shift_user').html('2');
         $('#shift').val('2');
     }else{
-        $('#shift_user').html('Tutup');
+        $('.shift_user').html('Tutup');
         $('#shift').val('0');
+    }
+}
+
+function startNotifClosing() {
+    var today = new Date();
+    var h = today.getHours();
+    var m = today.getMinutes();
+    var s = today.getSeconds();
+    m = checkTime(m);
+    s = checkTime(s);
+    document.getElementById('waktu_txt').innerHTML = h + ":" + m + ":" + s;
+    $('#waktu').val(h + ":" + m + ":" + s);
+    var t = setTimeout(startNotifClosing, 6000);
+    var jam = h+':'+m;
+    console.log(jam);
+
+    if (jam == '15:42') {
+      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 15 menit lagi");
+      $('#notif_closing').click();
+      $('#btn_suara_closing').click();
+    }else if (jam == '13:50') {
+      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 10 menit lagi");
+      $('#notif_closing').click();
+      $('#btn_suara_closing').click();
+    }else if (jam == '13:55') {
+      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 5 menit lagi");
+      $('#notif_closing').click();
+      $('#btn_suara_closing').click();
+    }else if (jam == '20:45') {
+      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 15 menit lagi");
+      $('#notif_closing').click();
+      $('#btn_suara_closing').click();
+    }else if (jam == '20:50') {
+      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 10 menit lagi");
+      $('#notif_closing').click();
+      $('#btn_suara_closing').click();
+    }else if (jam == '20:55') {
+      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 5 menit lagi");
+      $('#notif_closing').click();
+      $('#btn_suara_closing').click();
+    }
+
+    if (jam > '20:28' && jam < '21:00') {
+      $('#short_shift').show();
+      $('#long_shift').hide();
+      $('#btn_closing_kasir').show();
+    }else if (jam > '20:45' && jam < '21:00') {
+      $('#short_shift').show();
+      $('#long_shift').hide();
+      $('#btn_closing_kasir').show();
     }
 }
 
@@ -1150,7 +1383,7 @@ function get_pasien(){
             $tr = "";
 
             if(result == null || result == ""){
-                $tr = "<tr><td colspan='6' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+                $tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
             }else{
                 var no = 0;
                 for(var i=0; i<result.length; i++){
@@ -1163,12 +1396,20 @@ function get_pasien(){
                         aksi = '<i class="fa fa-check-square-o"></i> '+formatNumber(result[i].TOTAL);
                     }
 
+                    var status_bayar = '';
+                    if(result[i].STS_BAYAR == '0'){
+                        status_bayar = "<span class='label label-danger'><b>BL</b></span>";
+                    }else{
+                        status_bayar = "<span class='label label-success'><b>L</b></span>";
+                    }
+
                     $tr += "<tr>"+
-                                "<td style='text-align:center;'>"+no+"</td>"+
+                                "<td style='text-align:center;'><input type='text' value='"+result[i].ID_KASIR_RAJAL+"' name='id_rajal_hidden[]'>"+no+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].TANGGAL+"</td>"+
-                                "<td>"+result[i].NAMA+"</td>"+
+                                "<td>"+result[i].NAMA+" "+status_bayar+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].NAMA_POLI+"</td>"+
-                                "<td align='center'><button class='btn btn-success' type='button' onclick='klik_copy_resep("+result[i].ID+");'>"+result[i].KODE_RESEP+"</button></td>"+
+                                "<td align='center'><button class='btn btn-success' type='button' onclick='klik_copy_resep("+result[i].ID+");'><i class='fa fa-print'></i> "+result[i].KODE_RESEP+"</button></td>"+
+                                "<td align='center'><button class='btn btn-info' type='button' onclick='klik_print_poli("+result[i].ID+");'><i class='fa fa-print'></i> Print Poli</button></td>"+
                                 "<td style='text-align:right;'>"+aksi+"</td>"+
                             "</tr>";
                 }
@@ -1186,6 +1427,11 @@ function get_pasien(){
 function klik_copy_resep(id){
           // var encodedString = Base64.encode(id);
           window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_resep/'+id, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+}
+
+function klik_print_poli(id){
+          // var encodedString = Base64.encode(id);
+          window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/nota_poli/'+id, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
 }
 
 function klik_pasien(id,id_pasien,total){

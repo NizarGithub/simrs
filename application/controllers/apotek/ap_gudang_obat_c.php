@@ -17,10 +17,10 @@ class Ap_gudang_obat_c extends CI_Controller {
 	function index()
 	{
 
-		if($this->input->post('cetuk')){		
-			
+		if($this->input->post('cetuk')){
+
 				$this->cetak_excel();
-			
+
 		}
 
 		$data = array(
@@ -43,11 +43,11 @@ class Ap_gudang_obat_c extends CI_Controller {
 	}
 
 	function cetak_excel(){
-		
+
 
 		$data = array(
 			'dt' => $this->model->data_obat_xls(),
-			
+
 			'title' => 'LAPORAN GUDANG OBAT',
 			'image'	=> base_url().'picture/jtech-logo.png',
 		);
@@ -63,10 +63,10 @@ class Ap_gudang_obat_c extends CI_Controller {
 		$tahun = date('Y');
 
 		$sql = "
-			SELECT 
-				COUNT(*) AS TOTAL 
-			FROM nomor 
-			WHERE ID_KLIEN = '$id_klien' 
+			SELECT
+				COUNT(*) AS TOTAL
+			FROM nomor
+			WHERE ID_KLIEN = '$id_klien'
 			AND KETERANGAN = '$keterangan'
 			AND BULAN = '$bulan'
 			AND TAHUN = '$tahun'
@@ -98,9 +98,9 @@ class Ap_gudang_obat_c extends CI_Controller {
 		$tahun = date('Y');
 
 		$sql_cek = "
-			SELECT 
-				COUNT(*) AS TOTAL 
-			FROM nomor 
+			SELECT
+				COUNT(*) AS TOTAL
+			FROM nomor
 			WHERE ID_KLIEN = '$id_klien'
 			AND KETERANGAN = '$keterangan'
 			AND BULAN = '$bulan'
@@ -168,7 +168,7 @@ class Ap_gudang_obat_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	private function set_upload_options(){   
+	private function set_upload_options(){
 	    //upload an image options
 	    $config = array();
 	    $config['upload_path'] = './files/foto_obat/';
@@ -179,7 +179,7 @@ class Ap_gudang_obat_c extends CI_Controller {
 	    return $config;
 	}
 
-	function upload($file,$id){   
+	function upload($file,$id){
 	    $this->load->library('upload');
 
 	    $files = $_FILES;
@@ -188,7 +188,7 @@ class Ap_gudang_obat_c extends CI_Controller {
 	        $_FILES[$file]['type'] = $files[$file]['type'];
 	        $_FILES[$file]['tmp_name'] = $files[$file]['tmp_name'];
 	        $_FILES[$file]['error'] = $files[$file]['error'];
-	        $_FILES[$file]['size'] = $files[$file]['size'];    
+	        $_FILES[$file]['size'] = $files[$file]['size'];
 
 	        $this->upload->initialize($this->set_upload_options());
 	        $this->upload->do_upload($file);
@@ -219,10 +219,12 @@ class Ap_gudang_obat_c extends CI_Controller {
 	    $format = $datetime->setTimezone($tz_object);
 	    $waktu_masuk = $format->format('H:i:s');
 		$aktif = "";
-		$urut_barang = "";
+		// $urut_barang = "";
 		$first_out = "";
 		$status_racik = $this->input->post('status_obat');
 		$gambar = "";
+		$id_golongan = $this->input->post('id_golongan');
+		$id_kategori = $this->input->post('id_kategori');
 
 		$sq_cek = "SELECT ID FROM apotek_gudang_obat ORDER BY ID DESC LIMIT 1";
 		$qr_cek = $this->db->query($sq_cek)->row();
@@ -240,15 +242,15 @@ class Ap_gudang_obat_c extends CI_Controller {
 
 		if($total_data == 0){
 			$aktif = '1';
-			$urut_barang = '1';
+			// $urut_barang = '1';
 			$first_out = '1';
 		}else{
 			$aktif = '0';
-			$sql = "SELECT * FROM apotek_gudang_obat WHERE ID_SETUP_NAMA_OBAT = '$id_nama_obat' ORDER BY URUT_BARANG DESC LIMIT 1";
-			$qry = $this->db->query($sql)->row();
-			$urut = $qry->URUT_BARANG;
-			$urut_barang = $urut+1;
-			$first_out = $urut_barang;
+			// $sql = "SELECT * FROM apotek_gudang_obat WHERE ID_SETUP_NAMA_OBAT = '$id_nama_obat' ORDER BY URUT_BARANG DESC LIMIT 1";
+			// $qry = $this->db->query($sql)->row();
+			// $urut = $qry->URUT_BARANG;
+			// $urut_barang = $urut+1;
+			// $first_out = $urut_barang;
 		}
 
 		$this->model->simpan(
@@ -268,9 +270,12 @@ class Ap_gudang_obat_c extends CI_Controller {
 			$waktu_masuk,
 			$aktif,
 			$first_out,
-			$urut_barang,
+			// $urut_barang,
 			$status_racik,
-			$gambar);
+			$gambar,
+			$id_golongan,
+			$id_kategori
+		);
 
 		$this->session->set_flashdata('sukses','1');
 		redirect('apotek/ap_gudang_obat_c');
@@ -288,14 +293,16 @@ class Ap_gudang_obat_c extends CI_Controller {
 		$harga_beli = str_replace(',', '', $this->input->post('harga_beli_ubah'));
 		$harga_jual = str_replace(',', '', $this->input->post('harga_jual_ubah'));
 		$kadaluarsa = $this->input->post('tanggal_expired_ubah');
-		
+		$id_golongan = $this->input->post('id_golongan_ubah');
+		$id_kategori = $this->input->post('id_kategori_ubah');
+
 		$status_racik = "";
 		if($this->input->post('checkbox2')){
 			$status_racik = $this->input->post('status_obat_ubah');
 		}else{
 			$status_racik = $this->input->post('status_obat_hidden');
 		}
-		
+
 		$gambar = "";
 		if(!empty($_FILES['fileuser']['name'])){
 			$gambar = strtolower(str_replace(' ', '_', $id.'_'.$_FILES['fileuser']['name']));
@@ -305,7 +312,7 @@ class Ap_gudang_obat_c extends CI_Controller {
 			$gambar = $this->input->post('file_hidden');
 		}
 
-		$this->model->ubah($id,$id_nama_obat,$id_jenis,$id_satuan,$jumlah,$isi,$total,$jumlah_butir,$harga_beli,$harga_jual,$kadaluarsa,$status_racik,$gambar);
+		$this->model->ubah($id,$id_nama_obat,$id_jenis,$id_satuan,$jumlah,$isi,$total,$jumlah_butir,$harga_beli,$harga_jual,$kadaluarsa,$status_racik,$gambar,$id_golongan,$id_kategori);
 
 		$this->session->set_flashdata('ubah','1');
 		redirect('apotek/ap_gudang_obat_c');

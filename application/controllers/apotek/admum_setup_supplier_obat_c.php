@@ -39,9 +39,9 @@ class Admum_setup_supplier_obat_c extends CI_Controller {
 		$tahun = date('Y');
 
 		$sql = "
-			SELECT 
-				COUNT(*) AS TOTAL 
-			FROM nomor 
+			SELECT
+				COUNT(*) AS TOTAL
+			FROM nomor
 			WHERE KETERANGAN = '$keterangan'
 			AND TAHUN = '$tahun'
 		";
@@ -69,9 +69,9 @@ class Admum_setup_supplier_obat_c extends CI_Controller {
 		$tahun = date('Y');
 
 		$sql_cek = "
-			SELECT 
-				COUNT(*) AS TOTAL 
-			FROM nomor 
+			SELECT
+				COUNT(*) AS TOTAL
+			FROM nomor
 			WHERE KETERANGAN = '$keterangan'
 			AND TAHUN = '$tahun'
 		";
@@ -103,7 +103,7 @@ class Admum_setup_supplier_obat_c extends CI_Controller {
 	function simpan(){
 		$kode_supplier = $this->input->post('kode_supplier');
 		$nama_supplier = $this->input->post('nama_supplier');
-		$merk = $this->input->post('merk');
+		// $merk = $this->input->post('merk');
 		$alamat = $this->input->post('alamat');
 		$email = $this->input->post('email');
 		$telepon = $this->input->post('telepon');
@@ -111,7 +111,7 @@ class Admum_setup_supplier_obat_c extends CI_Controller {
 		$bulan = date('n');
 		$tahun = date('Y');
 
-		$this->model->simpan($kode_supplier,$nama_supplier,$merk,$alamat,$email,$telepon,$tanggal_daftar,$bulan,$tahun);
+		$this->model->simpan($kode_supplier,$nama_supplier,$alamat,$email,$telepon,$tanggal_daftar,$bulan,$tahun);
 		$this->insert_kode_supplier();
 
 		$this->session->set_flashdata('sukses','1');
@@ -121,12 +121,11 @@ class Admum_setup_supplier_obat_c extends CI_Controller {
 	function ubah(){
 		$id = $this->input->post('id_ubah');
 		$nama_supplier = $this->input->post('nama_supplier_ubah');
-		$merk = $this->input->post('merk_ubah');
 		$alamat = $this->input->post('alamat_ubah');
 		$email = $this->input->post('email_ubah');
 		$telepon = $this->input->post('telepon_ubah');
 
-		$this->model->ubah($id,$nama_supplier,$merk,$alamat,$email,$telepon);
+		$this->model->ubah($id,$nama_supplier,$alamat,$email,$telepon);
 
 		$this->session->set_flashdata('ubah','1');
 		redirect('apotek/admum_setup_supplier_obat_c');

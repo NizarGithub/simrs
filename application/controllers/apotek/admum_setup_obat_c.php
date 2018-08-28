@@ -41,9 +41,9 @@ class Admum_setup_obat_c extends CI_Controller {
 		$tahun = date('Y');
 
 		$sql = "
-			SELECT 
-				COUNT(*) AS TOTAL 
-			FROM nomor 
+			SELECT
+				COUNT(*) AS TOTAL
+			FROM nomor
 			WHERE KETERANGAN = '$keterangan'
 			AND BULAN = '$bulan'
 			AND TAHUN = '$tahun'
@@ -74,9 +74,9 @@ class Admum_setup_obat_c extends CI_Controller {
 		$tahun = date('Y');
 
 		$sql_cek = "
-			SELECT 
-				COUNT(*) AS TOTAL 
-			FROM nomor 
+			SELECT
+				COUNT(*) AS TOTAL
+			FROM nomor
 			WHERE KETERANGAN = '$keterangan'
 			AND BULAN = '$bulan'
 			AND TAHUN = '$tahun'
@@ -145,9 +145,9 @@ class Admum_setup_obat_c extends CI_Controller {
 		$kode_obat = $this->input->post('kode_obat');
 		$barcode = $this->input->post('barcode');
 		$nama_obat = $this->input->post('nama_obat');
-		$merk = $this->input->post('id_merk');
+		// $merk = $this->input->post('id_merk');
 
-		$this->model->simpan($kode_obat,$barcode,$nama_obat,$merk);
+		$this->model->simpan($kode_obat,$barcode,$nama_obat);
 		$this->insert_kode_obat();
 
 		$this->session->set_flashdata('sukses','1');
@@ -158,17 +158,17 @@ class Admum_setup_obat_c extends CI_Controller {
 		$id = $this->input->post('id_ubah');
 		$barcode = $this->input->post('barcode_ubah');
 		$nama_obat = $this->input->post('nama_obat_ubah');
-		$id_merk_ubah = $this->input->post('id_merk_ubah');
+		// $id_merk_ubah = $this->input->post('id_merk_ubah');
 
-		$id_merk = "";
+		// $id_merk = "";
+		//
+		// if($id_merk_ubah != ""){
+		// 	$id_merk = $id_merk_ubah;
+		// }else{
+		// 	$id_merk = $this->input->post('id_merk_lama');
+		// }
 
-		if($id_merk_ubah != ""){
-			$id_merk = $id_merk_ubah;
-		}else{
-			$id_merk = $this->input->post('id_merk_lama');
-		}
-
-		$this->model->ubah($id,$barcode,$nama_obat,$id_merk);
+		$this->model->ubah($id,$barcode,$nama_obat);
 
 		$this->session->set_flashdata('ubah','1');
 		redirect('apotek/admum_setup_obat_c');

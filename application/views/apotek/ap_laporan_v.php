@@ -27,6 +27,10 @@ $(document).ready(function(){
 		data_obat();
 	});
 
+	$('#dt_gudang_obat').click(function(){
+		data_gudang_obat();
+	});
+
 	$("input[name='urutkan']").click(function(){
         var urut = $("input[name='urutkan']:checked").val();
 
@@ -41,6 +45,21 @@ $(document).ready(function(){
     $('#urutkan_stok').change(function(){
         data_obat();
     });
+
+		$("input[name='urutkan_gudang']").click(function(){
+	        var urut = $("input[name='urutkan_gudang']:checked").val();
+
+	        if(urut == 'Stok'){
+	            $('#view_stok_gudang').show();
+	        }else{
+	            $('#view_stok_gudang').hide();
+	            data_gudang_obat();
+	        }
+	    });
+
+	    $('#urutkan_stok_gudang').change(function(){
+	        data_gudang_obat();
+	    });
 
 });
 
@@ -264,6 +283,93 @@ function data_obat(){
     });
 }
 
+function data_gudang_obat(){
+	$('#popup_load').show();
+
+	var keyword = $('#cari_obat_gudang').val();
+  var urutkan = $("input[name='urutkan_gudang']:checked").val();
+  var urutkan_stok = $('#urutkan_stok_gudang').val();
+
+	$.ajax({
+		url : '<?php echo base_url(); ?>apotek/ap_laporan_c/get_data_gudang_obat',
+        data : {
+            keyword:keyword,
+            urutkan:urutkan,
+            urutkan_stok:urutkan_stok,
+        },
+        type : "POST",
+        dataType : "json",
+        success : function(result){
+        	$tr = "";
+        	if(result == "" || result == null){
+        		$tr = "<tr><td colspan='11' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+        	}else{
+						var no = 0;
+
+						for(var i=0; i<result.length; i++){
+							no++;
+
+        			$tr += "<tr>"+
+        							"<td style='text-align:center;'>"+no+"</td>"+
+        							"<td>"+
+        								"<b>"+result[i].NAMA_OBAT+"</b><br/>"+
+                        "<small>"+result[i].KODE_OBAT+"</small>"+
+        							"</td>"+
+                      "<td style='text-align:center;'>"+result[i].NAMA_JENIS+"</td>"+
+											"<td>"+result[i].HARGA_BELI+"</td>"+
+											"<td>"+result[i].HARGA_JUAL+"</td>"+
+        						  "<td>"+NumberToMoney(result[i].TOTAL)+"</td>"+
+        						  "<td style='text-align:center;'>"+formatTanggal(result[i].KADALUARSA)+"</td>"+
+        					  "</tr>";
+        		}
+        	}
+
+        	$('#tabel_gudang tbody').html($tr);
+        	pagingGudangObat();
+        	$('#popup_load').fadeOut();
+        }
+	});
+
+    $('#tombol_cari').click(function(){
+        data_obat();
+        $('#tombol_reset').show();
+        $('#tombol_cari').hide();
+    });
+
+    $('#tombol_reset').click(function(){
+        $('#cari_obat_gudang').val("");
+        data_gudang_obat();
+        $('#tombol_reset').hide();
+        $('#tombol_cari').show();
+    });
+}
+
+function pagingGudangObat($selector){
+	var jumlah_tampil = $('#jumlah_tampil_gb').val();
+    if(typeof $selector == 'undefined')
+    {
+        $selector = $("#tabel_gudang tbody tr");
+    }
+    window.tp = new Pagination('#tablePagingGudangObat', {
+        itemsCount:$selector.length,
+        pageSize : parseInt(jumlah_tampil),
+        onPageSizeChange: function (ps) {
+            console.log('changed to ' + ps);
+        },
+        onPageChange: function (paging) {
+            //custom paging logic here
+            //console.log(paging);
+            var start = paging.pageSize * (paging.currentPage - 1),
+                end = start + paging.pageSize,
+                $rows = $selector;
+            $rows.hide();
+            for (var i = start; i < end; i++) {
+                $rows.eq(i).show();
+            }
+        }
+    });
+}
+
 function onEnterText(e){
     if (e.keyCode == 13) {
         data_obat();
@@ -287,6 +393,10 @@ function onEnterText(e){
 	display: none;
 }
 
+#view_stok_gudang{
+	display: none;
+}
+
 #tombol_reset{
 	display: none;
 }
@@ -307,6 +417,9 @@ function onEnterText(e){
                 </li>
                 <li role="presentation" id="dt_stok_obat">
                     <a href="#stok_obat1" role="tab" data-toggle="tab"><i class="fa fa-file-text-o"></i> Data Stok Obat</a>
+                </li>
+								<li role="presentation" id="dt_gudang_obat">
+                    <a href="#gudang_obat1" role="tab" data-toggle="tab"><i class="fa fa-file-text-o"></i> Laporan Gudang Obat</a>
                 </li>
             </ul>
             <div class="tab-content">
@@ -360,7 +473,7 @@ function onEnterText(e){
 			                </thead>
 
 			                <tbody>
-			                    
+
 			                </tbody>
 			            </table>
 			        </div>
@@ -447,7 +560,7 @@ function onEnterText(e){
 					                </thead>
 
 					                <tbody>
-					                    
+
 					                </tbody>
 					            </table>
 					        </div>
@@ -472,8 +585,107 @@ function onEnterText(e){
 			                </div>
 			            </div>
 			        </form>
-                </div>
             </div>
+
+						<div role="tabpanel" class="tab-pane fade" id="gudang_obat1">
+							<form class="form-horizontal" role="form" action="<?php echo base_url(); ?>apotek/ap_laporan_c/cetak_gudang_obat" method="post" target="blank">
+							<div class="form-group">
+									<label class="col-md-1 control-label" style="text-align:left;">Urutkan</label>
+									<div class="col-md-6">
+											<div class="radio radio-purple radio-inline">
+													<input type="radio" name="urutkan_gudang" value="Default" id="default_gudang" checked="checked">
+													<label for="default"> Default </label>
+											</div>
+											<div class="radio radio-purple radio-inline">
+													<input type="radio" name="urutkan_gudang" value="Nama Obat" id="urut_nama_obat_gudang">
+													<label for="nama_poli"> Nama Obat </label>
+											</div>
+											<div class="radio radio-purple radio-inline">
+													<input type="radio" name="urutkan_gudang" value="Stok" id="urut_stok_gudang">
+													<label for="jenis"> Stok </label>
+											</div>
+											<div class="radio radio-purple radio-inline">
+													<input type="radio" name="urutkan_gudang" value="Expired" id="urut_expired_gudang">
+													<label for="jenis"> Expired </label>
+											</div>
+									</div>
+									<div class="col-md-4 pull-right">
+										<div class="input-group">
+												<input type="text" class="form-control" name="cari_obat" id="cari_obat_gudang" placeholder="Cari..." value="" onkeypress="return onEnterText(event);">
+												<span class="input-group-btn">
+													<button type="button" class="btn waves-effect waves-light btn-warning" id="tombol_cari">
+														<i class="fa fa-search"></i>
+													</button>
+													<button type="button" class="btn waves-effect waves-light btn-warning" id="tombol_reset">
+														<i class="fa fa-refresh"></i>
+													</button>
+												</span>
+										</div>
+									</div>
+							</div>
+							<div class="form-group" id="view_stok_gudang">
+									<label class="col-md-1 control-label">&nbsp;</label>
+									<div class="col-md-2">
+											<select name="urutkan_stok_gudang" id="urutkan_stok_gudang" class="form-control">
+													<option value="Rendah">Terendah</option>
+													<option value="Tinggi">Tertinggi</option>
+											</select>
+									</div>
+							</div>
+							<div class="form-group">
+								<div class="table-responsive">
+									<table id="tabel_gudang" class="table table-bordered">
+											<thead>
+													<tr class="biru">
+															<th style="color:#fff; text-align:center;" width="50">No</th>
+															<th style="color:#fff; text-align:center;">Nama Obat</th>
+															<th style="color:#fff; text-align:center;">Jenis Obat</th>
+															<th style="color:#fff; text-align:center;">Harga Beli</th>
+															<th style="color:#fff; text-align:center;">Harga Jual</th>
+															<th style="color:#fff; text-align:center;">Stok</th>
+															<th style="color:#fff; text-align:center;">Tanggal Expired</th>
+													</tr>
+											</thead>
+											<tbody>
+											</tbody>
+									</table>
+							</div>
+							</div>
+							<div class="form-group">
+								<div class="col-md-10">
+									<div id="tablePagingGudangObat"></div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-md-6">
+										<div class="radio radio-purple radio-inline">
+												<input type="radio" name="print" id="excel" value="excel" checked="checked">
+												<label for="excel"> Excel </label>
+										</div>
+										<div class="radio radio-purple radio-inline">
+												<input type="radio" name="print" id="pdf" value="pdf" >
+												<label for="pdf"> PDF </label>
+										</div>
+								</div>
+							</div>
+							<div class="form-group">
+							<div class="col-md-9">
+								<button type="submit" class="btn waves-effect waves-light btn-danger"><i class="fa fa-print"></i> Cetak</button>
+							</div>
+									<label class="col-md-2 control-label">Jumlah Tampil</label>
+									<div class="col-md-1 pull-right">
+										<select class="form-control" id="jumlah_tampil_gb">
+													<option value="10">10</option>
+													<option value="20">20</option>
+													<option value="50">50</option>
+													<option value="100">100</option>
+											</select>
+									</div>
+							</div>
+					</form>
+					</div>
+
+        </div>
+			</div>
 		</div>
 	</div>
-</div>

@@ -17,41 +17,44 @@ class Ap_kasir_rajal_m extends CI_Model {
 			$where = $where;
 		}
 
-		$sql = "
-			SELECT
-				a.*,
-				(a.TOT_POLI+a.TOT_TINDAKAN+a.TOT_RESEP+a.TOT_LAB) AS TOTAL
-			FROM(
-				SELECT
-					RJ.ID,
-					RJ.ID_PASIEN,
-					PS.NAMA,
-					IFNULL(PS.NAMA_ORTU,'-') AS NAMA_ORTU,
-					RJ.TANGGAL,
-					RJ.ID_POLI,
-					IFNULL(PL.NAMA,'-') AS NAMA_POLI,
-					PEG.NAMA AS NAMA_PEGAWAI,
-					RJ.STS_BAYAR,
-					IFNULL(PL.BIAYA,0) AS TOT_POLI,
-					IFNULL(TD.TOTAL,0) AS TOT_TINDAKAN,
-					IFNULL(RS.TOTAL,0) AS TOT_RESEP,
-					IFNULL(LAB.TOTAL_TARIF,0) AS TOT_LAB,
-					RS.KODE_RESEP
-				FROM admum_rawat_jalan RJ
-				LEFT JOIN rk_pasien PS ON PS.ID = RJ.ID_PASIEN
-				LEFT JOIN (
-					SELECT * FROM admum_poli
-					WHERE AKTIF = '1'
-				) PL ON PL.ID = RJ.ID_POLI
-				LEFT JOIN kepeg_pegawai PEG ON PEG.ID = PL.ID_PEG_DOKTER
-				LEFT JOIN rk_tindakan_rj TD ON TD.ID_PELAYANAN = RJ.ID
-				LEFT JOIN rk_resep_rj RS ON RS.ID_PELAYANAN = RJ.ID
-				LEFT JOIN rk_laborat_rj LAB ON LAB.ID_PELAYANAN = RJ.ID
-			) a
-			WHERE $where
-			AND a.TANGGAL = '$tanggal'
-			ORDER BY a.ID DESC
-		";
+		$sql = "SELECT
+							a.*,
+							(a.TOT_POLI+a.TOT_TINDAKAN+a.TOT_RESEP+a.TOT_LAB) AS TOTAL
+						FROM(
+							SELECT
+								RJ.ID,
+								RJ.ID_PASIEN,
+								PS.NAMA,
+								IFNULL(PS.NAMA_ORTU,'-') AS NAMA_ORTU,
+								RJ.TANGGAL,
+								RJ.ID_POLI,
+								IFNULL(PL.NAMA,'-') AS NAMA_POLI,
+								PEG.NAMA AS NAMA_PEGAWAI,
+								RJ.STS_BAYAR,
+								IFNULL(PL.BIAYA,0) AS TOT_POLI,
+								IFNULL(TD.TOTAL,0) AS TOT_TINDAKAN,
+								IFNULL(RS.TOTAL,0) AS TOT_RESEP,
+								IFNULL(LAB.TOTAL_TARIF,0) AS TOT_LAB,
+								RS.KODE_RESEP,
+								PEM.ID AS ID_KASIR_RAJAL,
+								RJ.STS_CLOSING
+							FROM admum_rawat_jalan RJ
+							LEFT JOIN rk_pasien PS ON PS.ID = RJ.ID_PASIEN
+							LEFT JOIN (
+								SELECT * FROM admum_poli
+								WHERE AKTIF = '1'
+							) PL ON PL.ID = RJ.ID_POLI
+							LEFT JOIN kepeg_pegawai PEG ON PEG.ID = PL.ID_PEG_DOKTER
+							LEFT JOIN rk_tindakan_rj TD ON TD.ID_PELAYANAN = RJ.ID
+							LEFT JOIN rk_resep_rj RS ON RS.ID_PELAYANAN = RJ.ID
+							LEFT JOIN rk_laborat_rj LAB ON LAB.ID_PELAYANAN = RJ.ID
+							LEFT JOIN rk_pembayaran_kasir PEM ON RJ.ID = PEM.ID_PELAYANAN
+						) a
+						WHERE $where
+						AND a.TANGGAL = '$tanggal'
+						AND a.STS_CLOSING = '0'
+						ORDER BY a.ID DESC
+					";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
@@ -448,4 +451,71 @@ class Ap_kasir_rajal_m extends CI_Model {
 		return $this->db->query($sql)->result();
 	}
 
+	function simpan_closing($id_rajal, $id_pegawai, $shift, $tanggal, $pukul){
+		$data = array(
+			'ID_KASIR_RAJAL' => $id_rajal,
+			'TANGGAL' => $tanggal,
+			'WAKTU' => $pukul,
+			'ID_PEGAWAI' => $id_pegawai,
+			'SHIFT' => $shift
+		);
+
+	  $this->db->insert('ap_tutup_kasir_rajal', $data);
+
+		$data_update = array(
+			'STATUS_CLOSING' => 1
+		);
+		$this->db->where('ID', $id_rajal);
+    $this->db->update('rk_pembayaran_kasir', $data_update);
+	}
+
+	function data_pembayaran(){
+		$query = $this->db->query("SELECT
+																TUTUP.ID AS ID_CLOSING,
+																TUTUP.TANGGAL AS TANGGAL_CLOSING,
+																TUTUP.SHIFT,
+																BAYAR.INVOICE,
+																RAJAL.ID AS ID_RAJAL,
+																BAYAR.TOTAL,
+																PEGAWAI.NAMA AS NAMA_PEGAWAI,
+																RESEP.KODE_RESEP
+																FROM
+																ap_tutup_kasir_rajal AS TUTUP
+																LEFT JOIN rk_pembayaran_kasir AS BAYAR ON TUTUP.ID_KASIR_RAJAL=BAYAR.ID
+																LEFT JOIN rk_pasien AS PASIEN ON BAYAR.ID_PASIEN=PASIEN.ID
+																LEFT JOIN admum_rawat_jalan AS RAJAL ON BAYAR.ID_PELAYANAN=RAJAL.ID
+																LEFT JOIN rk_resep_rj RESEP ON RESEP.ID_PELAYANAN = RAJAL.ID
+																LEFT JOIN kepeg_pegawai AS PEGAWAI ON TUTUP.ID_PEGAWAI=PEGAWAI.ID
+		");
+		return $query->result_array();
+	}
+
+	function nota_poli($id_rj){
+		$sql = $this->db->query("SELECT
+																TUTUP.ID AS ID_CLOSING,
+																TUTUP.TANGGAL AS TANGGAL_CLOSING,
+																TUTUP.SHIFT,
+																BAYAR.INVOICE,
+																RAJAL.ID AS ID_RAJAL,
+																BAYAR.TOTAL,
+																PEGAWAI.NAMA AS NAMA_PEGAWAI,
+																RESEP.KODE_RESEP,
+																PASIEN.NAMA AS NAMA_PASIEN,
+																PASIEN.ALAMAT AS ALAMAT_PASIEN,
+																POLI.NAMA AS NAMA_POLI,
+																DOKTER.NAMA AS NAMA_DOKTER
+																FROM
+																ap_tutup_kasir_rajal AS TUTUP
+																LEFT JOIN rk_pembayaran_kasir AS BAYAR ON TUTUP.ID_KASIR_RAJAL=BAYAR.ID
+																LEFT JOIN rk_pasien AS PASIEN ON BAYAR.ID_PASIEN=PASIEN.ID
+																LEFT JOIN admum_rawat_jalan AS RAJAL ON BAYAR.ID_PELAYANAN=RAJAL.ID
+																LEFT JOIN admum_poli AS POLI ON RAJAL.ID_POLI=POLI.ID
+																LEFT JOIN kepeg_pegawai AS DOKTER ON POLI.ID_PEG_DOKTER=DOKTER.ID
+																LEFT JOIN rk_resep_rj RESEP ON RESEP.ID_PELAYANAN = RAJAL.ID
+																LEFT JOIN kepeg_pegawai AS PEGAWAI ON TUTUP.ID_PEGAWAI=PEGAWAI.ID
+																WHERE RAJAL.ID = '$id_rj'
+		");
+
+		return $sql->row_array();
+	}
 }

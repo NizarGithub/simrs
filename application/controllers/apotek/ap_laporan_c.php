@@ -101,4 +101,73 @@ class Ap_laporan_c extends CI_Controller {
 		$this->load->view('apotek/pdf/laporan_stok_obat_pdf_v',$data);
 	}
 
+	function get_data_gudang_obat(){
+		$keyword = $this->input->post('keyword');
+		$urutkan = $this->input->post('urutkan');
+		$urutkan_stok = $this->input->post('urutkan_stok');
+		$data = $this->model->data_gudang_obat($keyword,$urutkan,$urutkan_stok);
+		echo json_encode($data);
+	}
+
+	function cetak_gudang_pdf(){
+		$keyword = $this->input->post('cari_obat_gudang');
+		$urutkan = $this->input->post('urutkan_gudang');
+		$urutkan_stok = $this->input->post('urutkan_stok_gudang');
+		$m = date('n');
+		$y = date('Y');
+		$bulan = array(
+			1 =>	"Januari", 2  =>"Februari", 3  =>"Maret", 4 =>"April",
+			5 =>	"Mei", 6  =>"Juni", 7  =>"Juli", 8 =>"Agustus",
+			9 =>	"September", 10 =>"Oktober", 11 =>"November", 12 =>"Desember"
+		);
+		$bln = $bulan[intval($m)];
+		$data = array(
+			'title' => 'Laporan Gudang Obat',
+			'settitle' => 'Laporan Gudang Obat',
+			'dt' => $this->model->data_gudang_obat($keyword,$urutkan,$urutkan_stok),
+			'dt_row' => $this->model->data_gudang_obat_row($keyword,$urutkan,$urutkan_stok),
+			'filename' => 'lap_gudang_obat_'.$bln.'_'.$y,
+			'bulan' => $bln,
+			'tahun' => $y,
+			'urutkan_stok' => $urutkan_stok,
+			'urutkan' => $urutkan
+		);
+		$this->load->view('apotek/pdf/laporan_gudang_obat_pdf_v',$data);
+  }
+
+	function cetak_gudang_excel(){
+		$keyword = $this->input->post('cari_obat_gudang');
+		$urutkan = $this->input->post('urutkan_gudang');
+		$urutkan_stok = $this->input->post('urutkan_stok_gudang');
+		$m = date('n');
+		$y = date('Y');
+		$bulan = array(
+			1 =>	"Januari", 2  =>"Februari", 3  =>"Maret", 4 =>"April",
+			5 =>	"Mei", 6  =>"Juni", 7  =>"Juli", 8 =>"Agustus",
+			9 =>	"September", 10 =>"Oktober", 11 =>"November", 12 =>"Desember"
+		);
+		$bln = $bulan[intval($m)];
+		$data = array(
+			'title' => 'Laporan Gudang Obat',
+			'settitle' => 'Laporan Gudang Obat',
+			'dt' => $this->model->data_gudang_obat($keyword,$urutkan,$urutkan_stok),
+			'dt_row' => $this->model->data_gudang_obat_row($keyword,$urutkan,$urutkan_stok),
+			'filename' => 'lap_gudang_obat_'.$bln.'_'.$y,
+			'bulan' => $bln,
+			'tahun' => $y,
+			'urutkan_stok' => $urutkan_stok,
+			'urutkan' => $urutkan
+		);
+		$this->load->view('apotek/xls/laporan_gudang_obat_xls_v',$data);
+  }
+
+	function cetak_gudang_obat(){
+		$cetak = $this->input->post('print');
+    if ($cetak == 'excel') {
+      $this->cetak_gudang_excel();
+    }else {
+      $this->cetak_gudang_pdf();
+    }
+	}
+
 }

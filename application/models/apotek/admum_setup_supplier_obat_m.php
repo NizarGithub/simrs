@@ -48,12 +48,11 @@ class Admum_setup_supplier_obat_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan($kode_supplier,$nama_supplier,$merk,$alamat,$email,$telepon,$tanggal_daftar,$bulan,$tahun){
+	function simpan($kode_supplier,$nama_supplier,$alamat,$email,$telepon,$tanggal_daftar,$bulan,$tahun){
 		$sql = "
 			INSERT INTO obat_supplier(
 				KODE_SUPPLIER,
 				NAMA_SUPPLIER,
-				MERK,
 				ALAMAT,
 				EMAIL,
 				TELEPON,
@@ -63,7 +62,6 @@ class Admum_setup_supplier_obat_m extends CI_Model {
 			) VALUES (
 				'$kode_supplier',
 				'$nama_supplier',
-				'$merk',
 				'$alamat',
 				'$email',
 				'$telepon',
@@ -74,11 +72,10 @@ class Admum_setup_supplier_obat_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
-	function ubah($id,$nama_supplier,$merk,$alamat,$email,$telepon){
+	function ubah($id,$nama_supplier,$alamat,$email,$telepon){
 		$sql = "
-			UPDATE obat_supplier SET 
-				NAMA_SUPPLIER = '$nama_supplier',
-				MERK = '$merk',
+			UPDATE obat_supplier SET
+				NAMA_SUPPLIER = '$nama_supplier',				
 				ALAMAT = '$alamat',
 				EMAIL = '$email',
 				TELEPON = '$telepon'
@@ -90,6 +87,6 @@ class Admum_setup_supplier_obat_m extends CI_Model {
 	function hapus($id){
 		$sql = "DELETE FROM obat_supplier WHERE ID = '$id'";
 		$this->db->query($sql);
-	} 
+	}
 
 }

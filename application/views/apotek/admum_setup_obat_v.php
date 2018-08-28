@@ -15,7 +15,7 @@ $(document).ready(function(){
     <?php }else if($this->session->flashdata('hapus')){ ?>
     	notif_hapus();
     <?php } ?>
-    
+
 	data_obat();
 
 	$("#jumlah_tampil").change(function(){
@@ -34,40 +34,40 @@ $(document).ready(function(){
         $('#view_data').show();
 	});
 
-	$('#merk').click(function(){
-		$('#ket').val('Tambah');
-		$('#popup_merk').click();
-		get_merk();
-	});
-
-	$('#btn_merk').click(function(){
-		$('#ket').val('Tambah');
-		$('#popup_merk').click();
-		get_merk();
-	});
-
-	$('#checkbox2').click(function(){
-		var cek = $('#checkbox2').is(":checked");
-		if(cek == true){
-			$('#view_merk').show();
-		}else{
-			$('#view_merk').hide();
-			$('#id_merk_ubah').val("");
-			$('#merk_ubah').val("");
-		}
-	});
-
-	$('#merk_ubah').click(function(){
-		$('#ket').val('Ubah');
-		$('#popup_merk').click();
-		get_merk();
-	});
-
-	$('#btn_merk_ubah').click(function(){
-		$('#ket').val('Ubah');
-		$('#popup_merk').click();
-		get_merk();
-	});
+	// $('#merk').click(function(){
+	// 	$('#ket').val('Tambah');
+	// 	$('#popup_merk').click();
+	// 	get_merk();
+	// });
+	//
+	// $('#btn_merk').click(function(){
+	// 	$('#ket').val('Tambah');
+	// 	$('#popup_merk').click();
+	// 	get_merk();
+	// });
+	//
+	// $('#checkbox2').click(function(){
+	// 	var cek = $('#checkbox2').is(":checked");
+	// 	if(cek == true){
+	// 		$('#view_merk').show();
+	// 	}else{
+	// 		$('#view_merk').hide();
+	// 		$('#id_merk_ubah').val("");
+	// 		$('#merk_ubah').val("");
+	// 	}
+	// });
+	//
+	// $('#merk_ubah').click(function(){
+	// 	$('#ket').val('Ubah');
+	// 	$('#popup_merk').click();
+	// 	get_merk();
+	// });
+	//
+	// $('#btn_merk_ubah').click(function(){
+	// 	$('#ket').val('Ubah');
+	// 	$('#popup_merk').click();
+	// 	get_merk();
+	// });
 });
 
 var ajax = "";
@@ -83,73 +83,73 @@ function get_kode_obat(){
     });
 }
 
-//MERK OBAT
-
-function get_merk(){
-	var keyword = $('#cari_merk').val();
-
-	if(ajax){
-		ajax.abort();
-	}
-
-	ajax = $.ajax({
-        url : '<?php echo base_url(); ?>apotek/admum_setup_obat_c/data_merk',
-        data : {keyword:keyword},
-        type : "GET",
-        dataType : "json",
-        success : function(result){
-            $tr = "";
-
-            if(result == "" || result == null){
-            	$tr = "<tr><td colspan='2' style='text-align:center;'><b>Merk yang dicari tidak ada</b></td></tr>";
-            }else{
-	            var no = 0;
-	            for(var i=0; i<result.length; i++){
-	            	no++;
-
-	            	$tr += '<tr style="cursor:pointer;" onclick="klik_merk('+result[i].ID+');">'+
-	                        '    <td style="text-align:center;">'+no+'</td>'+
-	                        '    <td>'+result[i].MERK+'</td>'+
-	                        '</tr>';
-	            }
-            }
-
-            $('#tabel_merk tbody').html($tr);
-        }
-    });
-
-    $('#cari_merk').off('keyup').keyup(function(){
-    	get_merk();
-    });
-}
-
-function klik_merk(id_merk){
-	$('#tutup_merk').click();
-
-	$.ajax({
-		url : '<?php echo base_url(); ?>apotek/admum_setup_obat_c/klik_merk',
-		data : {id_merk:id_merk},
-		type : "POST",
-		dataType : "json",
-		success : function(row){
-			var ket = $('#ket').val();
-
-			if(ket == 'Tambah'){
-				$('#id_merk').val(id_merk);
-				$('#merk').val(row['MERK']);
-				$('#id_merk_ubah').val("");
-				$('#merk_ubah').val("");
-			}else{
-				$('#id_merk').val("");
-				$('#merk').val("");
-				$('#id_merk_ubah').val(id_merk);
-				$('#merk_ubah').val(row['MERK']);
-			}
-		}
-	});
-}
-
-//-------------
+// //MERK OBAT
+//
+// function get_merk(){
+// 	var keyword = $('#cari_merk').val();
+//
+// 	if(ajax){
+// 		ajax.abort();
+// 	}
+//
+// 	ajax = $.ajax({
+//         url : '<?php //echo base_url(); ?>apotek/admum_setup_obat_c/data_merk',
+//         data : {keyword:keyword},
+//         type : "GET",
+//         dataType : "json",
+//         success : function(result){
+//             $tr = "";
+//
+//             if(result == "" || result == null){
+//             	$tr = "<tr><td colspan='2' style='text-align:center;'><b>Merk yang dicari tidak ada</b></td></tr>";
+//             }else{
+// 	            var no = 0;
+// 	            for(var i=0; i<result.length; i++){
+// 	            	no++;
+//
+// 	            	$tr += '<tr style="cursor:pointer;" onclick="klik_merk('+result[i].ID+');">'+
+// 	                        '    <td style="text-align:center;">'+no+'</td>'+
+// 	                        '    <td>'+result[i].MERK+'</td>'+
+// 	                        '</tr>';
+// 	            }
+//             }
+//
+//             $('#tabel_merk tbody').html($tr);
+//         }
+//     });
+//
+//     $('#cari_merk').off('keyup').keyup(function(){
+//     	get_merk();
+//     });
+// }
+//
+// function klik_merk(id_merk){
+// 	$('#tutup_merk').click();
+//
+// 	$.ajax({
+// 		url : '<?php //echo base_url(); ?>apotek/admum_setup_obat_c/klik_merk',
+// 		data : {id_merk:id_merk},
+// 		type : "POST",
+// 		dataType : "json",
+// 		success : function(row){
+// 			var ket = $('#ket').val();
+//
+// 			if(ket == 'Tambah'){
+// 				$('#id_merk').val(id_merk);
+// 				$('#merk').val(row['MERK']);
+// 				$('#id_merk_ubah').val("");
+// 				$('#merk_ubah').val("");
+// 			}else{
+// 				$('#id_merk').val("");
+// 				$('#merk').val("");
+// 				$('#id_merk_ubah').val(id_merk);
+// 				$('#merk_ubah').val(row['MERK']);
+// 			}
+// 		}
+// 	});
+// }
+//
+// //-------------
 
 function paging($selector){
 	var jumlah_tampil = $('#jumlah_tampil').val();
@@ -217,7 +217,6 @@ function data_obat(){
         						"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_OBAT+"</td>"+
         						"<td style='vertical-align:middle;'>"+result[i].BARCODE+"</td>"+
         						"<td style='vertical-align:middle;'>"+result[i].NAMA_OBAT+"</td>"+
-        						"<td style='vertical-align:middle;'>"+result[i].MERK+"</td>"+
         						"<td align='center'>"+aksi+"</td>"+
         					"</tr>";
         		}
@@ -266,8 +265,8 @@ function ubah_obat(id){
 			$('#kode_obat_ubah').val(row['KODE_OBAT']);
 			$('#barcode_ubah').val(row['BARCODE']);
 			$('#nama_obat_ubah').val(row['NAMA_OBAT']);
-			$('#id_merk_lama').val(row['ID_MERK']);
-			$('#merk_txt').val(row['MERK']);
+			// $('#id_merk_lama').val(row['ID_MERK']);
+			// $('#merk_txt').val(row['MERK']);
 		}
 	});
 
@@ -354,13 +353,13 @@ function cek_barcode(){
                         <th style="color:#fff; text-align:center;">Kode Obat</th>
                         <th style="color:#fff; text-align:center;">Barcode</th>
                         <th style="color:#fff; text-align:center;">Nama Obat</th>
-                        <th style="color:#fff; text-align:center;">Merk</th>
+                        <!-- <th style="color:#fff; text-align:center;">Merk</th> -->
                         <th style="color:#fff; text-align:center;">Aksi</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    
+
                 </tbody>
             </table>
         </div>
@@ -411,7 +410,7 @@ function cek_barcode(){
                     <input type="text" class="form-control" name="nama_obat" value="" required="required">
                 </div>
             </div>
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label class="col-md-2 control-label">Merk</label>
                 <div class="col-md-4">
                     <div class="input-group">
@@ -424,7 +423,7 @@ function cek_barcode(){
                         </span>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <div class="form-group">
                 <label class="col-md-2 control-label">&nbsp;</label>
                 <div class="col-md-3">
@@ -456,7 +455,7 @@ function cek_barcode(){
                     <input type="text" class="form-control" name="nama_obat_ubah" id="nama_obat_ubah" value="">
                 </div>
             </div>
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label class="col-md-2 control-label">Merk</label>
                 <div class="col-md-4">
                 	<input type="hidden" class="form-control" name="id_merk_lama" id="id_merk_lama" value="" readonly>
@@ -484,7 +483,7 @@ function cek_barcode(){
                         </span>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <div class="form-group">
                 <label class="col-md-2 control-label">&nbsp;</label>
                 <div class="col-md-3">
@@ -496,7 +495,7 @@ function cek_barcode(){
     </div>
 </div>
 
-<button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal" id="popup_merk" style="display:none;">Standard Modal</button>
+<!-- <button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal" id="popup_merk" style="display:none;">Standard Modal</button>
 <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -528,7 +527,7 @@ function cek_barcode(){
 	                        </tr>
 	                    </thead>
 	                    <tbody>
-	                        
+
 	                    </tbody>
 	                </table>
             	</div>
@@ -538,7 +537,7 @@ function cek_barcode(){
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <button id="popup_hps" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#custom-width-modal" style="display:none;">Custom width Modal</button>
 <div id="custom-width-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">

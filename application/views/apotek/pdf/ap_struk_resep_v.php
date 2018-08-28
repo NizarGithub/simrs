@@ -14,7 +14,7 @@ table{
 }
 .square {
     background: #fff;
-    width: 18px;
+    width: 15px;
     height: 13px;
     border: 1px solid #000;
     display: inline;

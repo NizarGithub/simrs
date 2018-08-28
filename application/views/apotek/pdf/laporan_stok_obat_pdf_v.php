@@ -1,5 +1,5 @@
-<?PHP  
-	ob_start();         
+<?PHP
+	ob_start();
 ?>
 
 <style>
