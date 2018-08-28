@@ -21,27 +21,66 @@ class Rk_pelayanan_ri_m extends CI_Model {
 			SELECT
 				RI.ID,
 				RI.ID_PASIEN,
+				RI.TANGGAL_MASUK,
+				RI.WAKTU,
 				PASIEN.KODE_PASIEN,
 				PASIEN.NAMA AS NAMA_PASIEN,
-				RI.TANGGAL_MASUK,
+				PASIEN.JENIS_KELAMIN,
 				RI.ASAL_RUJUKAN,
 				RI.NAMA_PENANGGUNGJAWAB,
 				RI.SISTEM_BAYAR,
 				RI.ID_KAMAR,
-				KRI.KODE_KAMAR,
-				KRI.NAMA_KAMAR,
+				KRI.KELAS,
+				KRI.VISITE_DOKTER,
+				PEG.NAMA AS NAMA_DOKTER,
 				RI.ID_BED,
 				BED.NOMOR_BED
 			FROM admum_rawat_inap RI
 			LEFT JOIN rk_pasien PASIEN ON PASIEN.ID = RI.ID_PASIEN
 			LEFT JOIN admum_kamar_rawat_inap KRI ON KRI.ID = RI.ID_KAMAR
 			LEFT JOIN admum_bed_rawat_inap BED ON BED.ID = RI.ID_BED
+			LEFT JOIN kepeg_pegawai PEG ON PEG.ID = RI.ID_DOKTER
 			WHERE $where
 			AND RI.STATUS_SUDAH = '0'
 			ORDER BY RI.ID DESC
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
+	}
+
+	function data_rawat_inap_id($id){
+		$sql = "
+			SELECT
+				RI.ID,
+				RI.ID_PASIEN,
+				PASIEN.KODE_PASIEN,
+				PASIEN.NAMA AS NAMA_PASIEN,
+				PASIEN.JENIS_KELAMIN,
+				PASIEN.UMUR,
+				RI.TANGGAL_MASUK,
+				RI.ASAL_RUJUKAN,
+				RI.NAMA_PENANGGUNGJAWAB,
+				RI.SISTEM_BAYAR,
+				RI.KELAS,
+				RI.ID_KAMAR,
+				KRI.KELAS,
+				KRI.VISITE_DOKTER,
+				PEG.NAMA AS NAMA_DOKTER,
+				RI.ID_BED,
+				BED.NO,
+				BED.NOMOR_BED,
+				PASIEN.STATUS,
+				PASIEN.ALAMAT,
+				PASIEN.PEKERJAAN
+			FROM admum_rawat_inap RI
+			LEFT JOIN rk_pasien PASIEN ON PASIEN.ID = RI.ID_PASIEN
+			LEFT JOIN admum_kamar_rawat_inap KRI ON KRI.ID = RI.ID_KAMAR
+			LEFT JOIN admum_bed_rawat_inap BED ON BED.ID = RI.ID_BED
+			LEFT JOIN kepeg_pegawai PEG ON PEG.ID = RI.ID_DOKTER
+			WHERE RI.ID = '$id'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
 	}
 
 	function data_pasien_sudah($keyword){
@@ -82,39 +121,6 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
-	}
-
-	function data_rawat_inap_id($id){
-		$sql = "
-			SELECT
-				RI.ID,
-				RI.ID_PASIEN,
-				PASIEN.KODE_PASIEN,
-				PASIEN.NAMA AS NAMA_PASIEN,
-				PASIEN.JENIS_KELAMIN,
-				PASIEN.UMUR,
-				RI.TANGGAL_MASUK,
-				RI.ASAL_RUJUKAN,
-				RI.NAMA_PENANGGUNGJAWAB,
-				RI.SISTEM_BAYAR,
-				RI.KELAS,
-				RI.ID_KAMAR,
-				KRI.KODE_KAMAR,
-				KRI.NAMA_KAMAR,
-				RI.ID_BED,
-				BED.NO,
-				BED.NOMOR_BED,
-				PASIEN.STATUS,
-				PASIEN.ALAMAT,
-				PASIEN.PEKERJAAN
-			FROM admum_rawat_inap RI
-			LEFT JOIN rk_pasien PASIEN ON PASIEN.ID = RI.ID_PASIEN
-			LEFT JOIN admum_kamar_rawat_inap KRI ON KRI.ID = RI.ID_KAMAR
-			LEFT JOIN admum_bed_rawat_inap BED ON BED.ID = RI.ID_BED
-			WHERE RI.ID = '$id'
-		";
-		$query = $this->db->query($sql);
-		return $query->row();
 	}
 
 	// TINDAKAN
@@ -880,7 +886,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_diagnosa($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$diagnosa,$tindakan,$kasus,$spesialistik){
+	function simpan_diagnosa($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$diagnosa,$tindakan){
 		$sql = "
 			INSERT INTO rk_ri_diagnosa(
 				ID_PELAYANAN,
@@ -889,9 +895,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				BULAN,
 				TAHUN,
 				DIAGNOSA,
-				TINDAKAN,
-				ID_KASUS,
-				ID_SPESIALISTIK
+				TINDAKAN
 			) VALUES (
 				'$id_pelayanan',
 				'$id_pasien',
@@ -899,21 +903,17 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				'$bulan',
 				'$tahun',
 				'$diagnosa',
-				'$tindakan',
-				'$kasus',
-				'$spesialistik'
+				'$tindakan'
 			)
 		";
 		$this->db->query($sql);
 	}
 
-	function ubah_diagnosa($id,$diagnosa,$tindakan,$kasus,$spesialistik){
+	function ubah_diagnosa($id,$diagnosa,$tindakan){
 		$sql = "
 			UPDATE rk_ri_diagnosa SET
 				DIAGNOSA = '$diagnosa',
-				TINDAKAN = '$tindakan',
-				ID_KASUS = '$kasus',
-				ID_SPESIALISTIK = '$spesialistik'
+				TINDAKAN = '$tindakan'
 			WHERE ID = '$id'
 		";
 		$this->db->query($sql);

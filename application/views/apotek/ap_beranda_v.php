@@ -46,7 +46,7 @@ a {
 <div class="col-md-12">
     <div id="dashboard-depan">
     <?PHP 
-        $get_menu2 = $this->master_model_m->get_menu_2($id_user, 4);
+        $get_menu2 = $this->master_model_m->get_menu_2($id_user, 3);
         foreach ($get_menu2 as $key => $menu2) {
             $link = base_url().$menu2->LINK;
             $icon = base_url().$menu2->GAMBAR_ICON;
