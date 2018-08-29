@@ -57,7 +57,7 @@ a {
 
 <div class="row">
 <?PHP 
-    $get_menu2 = $this->master_model_m->get_menu_2($id_user, 10);
+    $get_menu2 = $this->master_model_m->get_menu_2($id_user, 7);
     foreach ($get_menu2 as $key => $menu2) {
         $link = base_url().$menu2->LINK;
         $icon = base_url().$menu2->GAMBAR_ICON;
@@ -90,9 +90,9 @@ a {
                     $id = $menu3->ID;
                     $text = "";
                     if($id % 2 == 0){
-                        $text = "text-success";
+                        $text = "text-danger";
                     }else{
-                        $text = "text-custom";
+                        $text = "text-purple";
                     }
 ?>
     <div class="col-lg-3 col-md-6" onclick="klik_menu('<?php echo $link3; ?>');" style="cursor: pointer;">

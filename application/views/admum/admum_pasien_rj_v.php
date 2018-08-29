@@ -307,6 +307,7 @@ function load_data_pasien(){
 }
 
 function klik_pasien(id){
+    $('#popup_load').show();
     $('#tutup_pasien').click();
 
     $.ajax({
@@ -348,6 +349,8 @@ function klik_pasien(id){
             get_biaya_reg(row['JENIS_PASIEN']);
 
             $('#btn_proses').removeAttr('disabled');
+
+            $('#popup_load').fadeOut();
         }
     });
 }
@@ -392,6 +395,7 @@ function load_poli(){
 }
 
 function klik_poli(id){
+    $('#popup_load').show();
     $('#tutup_poli').click();
 
     $.ajax({
@@ -404,6 +408,7 @@ function klik_poli(id){
             $('#poli_tujuan').val(row['NAMA_POLI']);
             $('#dokter').val(row['NAMA_DOKTER']);
             $('#biaya').val(formatNumber(row['BIAYA']));
+            $('#popup_load').fadeOut();
         }
     });
 }
@@ -942,6 +947,12 @@ function hitung_pemeriksaan(){
     $('#total_tarif_pemeriksaan').val(formatNumber(total));
 }
 </script>
+
+<div id="popup_load">
+    <div class="window_load">
+        <img src="<?=base_url()?>picture/progress.gif" height="100" width="125">
+    </div>
+</div>
 
 <input type="hidden" id="ord_tmp" value="" />
 <div class="row">

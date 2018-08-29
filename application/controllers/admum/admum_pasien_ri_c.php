@@ -5,6 +5,7 @@ class Admum_pasien_ri_c extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();
+		date_default_timezone_set('Asia/Jakarta');
 		$this->load->model('admum/admum_pasien_ri_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
     	$id_user = $sess_user['id'];
@@ -20,8 +21,8 @@ class Admum_pasien_ri_c extends CI_Controller {
 
 		$data = array(
 			'page' => 'admum/admum_pasien_ri_v',
-			'title' => 'Pendaftaran Rawat Inap',
-			'subtitle' => 'Pasien Baru',
+			'title' => 'Rawat Inap',
+			'subtitle' => 'Pendaftaran Rawat Inap',
 			'childtitle' => 'Rawat Inap',
 			'master_menu' => 'pasien',
 			'view' => 'pasien_ri',
@@ -128,68 +129,77 @@ class Admum_pasien_ri_c extends CI_Controller {
 		}
 	}
 
+	function simpan_log($aksi,$id_pasien){
+		$sess_user = $this->session->userdata('masuk_rs');
+    	$id_pegawai = $sess_user['id'];
+    	$sql = "SELECT
+					a.ID,
+					a.NAMA,
+					b.NAMA_DEP,
+					c.NAMA_DIV
+				FROM kepeg_pegawai a
+				LEFT JOIN kepeg_departemen b ON b.ID = a.ID_DEPARTEMEN
+				LEFT JOIN kepeg_divisi c ON c.ID = a.ID_DIVISI
+				WHERE a.ID = '$id_pegawai'
+    	";
+    	$qry = $this->db->query($sql);
+    	$row = $qry->row();
+    	$nama = $row->NAMA;
+    	$dep = $row->NAMA_DEP;
+    	$div = $row->NAMA_DIV;
+		$tanggal = date('d-m-Y');
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu = $format->format('H:i:s');
+		$ket = '';
+		if($aksi == 'ri'){
+			$ket = 'pendaftaran '.strtoupper('rawat inap');
+		}else{
+			$ket = strtoupper($aksi);
+		}
+		$keterangan = "User ".strtoupper($nama)." Departemen ".strtoupper($dep)." Divisi ".strtoupper($div)." telah melakukan ".$ket;
+
+		$this->master_model_m->simpan_log2($id_pegawai,$id_pasien,$tanggal,$waktu,$keterangan);
+	}
+
 	function simpan(){
-		$id_pasien_new = "";
-		$baru = $this->input->post('baru');
-
-		$kode_pasien = $this->input->post('kode_pasien');
-		$tanggal_daftar = date('d-m-Y');
-		$nama = addslashes($this->input->post('nama'));
-		$jenis_kelamin = $this->input->post('jenis_kelamin');
-		$pendidikan = $this->input->post('pendidikan');
-		$agama = $this->input->post('agama');
-		$alamat = addslashes($this->input->post('alamat'));
-		$golongan_darah = $this->input->post('golongan_darah');
-		$tempat_lahir = addslashes($this->input->post('tempat_lahir'));
-		$tanggal_lahir = $this->input->post('tanggal_lahir');
-		$umur = $this->input->post('umur');
-		$kelurahan = addslashes($this->input->post('kelurahan'));
-		$kecamatan = addslashes($this->input->post('kecamatan'));
-		$kota = addslashes($this->input->post('kota'));
-		$provinsi = $this->input->post('provinsi');
-
+		$id_pasien = $this->input->post('id_pasien');
 		$tanggal_masuk = date('d-m-Y');
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu = $format->format('H:i:s');
 		$bulan = date('n');
 		$tahun = date('Y');
-		$asal_rujukan = $this->input->post('asal_rujukan');
 		$nama_pjawab = $this->input->post('nama_pjawab');
 		$telepon = $this->input->post('telepon');
 		$sistem_bayar = $this->input->post('sistem_bayar');
+		$asal_rujukan = $this->input->post('rujukan_dari');
+		$id_dokter = $this->input->post('id_dokter');
 		$kelas = $this->input->post('kelas_kamar');
 		$id_kamar = $this->input->post('id_ruangan');
 		$id_bed = $this->input->post('id_bed');
 
-		if($baru){
-			$this->model->simpan(
-				$kode_pasien,
-				$tanggal_daftar,
-				$nama,
-				$jenis_kelamin,
-				$pendidikan,
-				$agama,
-				$alamat,
-				$golongan_darah,
-				$tempat_lahir,
-				$tanggal_lahir,
-				$umur,
-				$kelurahan,
-				$kecamatan,
-				$kota,
-				$provinsi);
+		$id_asuransi = $this->input->post('id_kerjasama');
+		$asuransi = $this->input->post('nama_asuransi');
+		$no_kpa = $this->input->post('nomor_kpa');
+		$nama = $this->input->post('nama');
+		$perusahaan = $this->input->post('perusahaan');
+		$bp_poli = $this->input->post('bp_poli');
+		$asal_cabang = $this->input->post('asal_cabang');
+		$status_pasien = $this->input->post('status_pasien');
+		$jumlah = str_replace(',', '', $this->input->post('jumlah_klaim'));
 
-			$id_pasien_new = $this->db->insert_id();
+		$this->model->simpan_ri($id_pasien,$tanggal_masuk,$waktu,$bulan,$tahun,$nama_pjawab,$telepon,$sistem_bayar,$asal_rujukan,$id_dokter,$kelas,$id_kamar,$id_bed);
+		$this->model->update_stt_pakai($id_bed);
+		$id_ri = $this->db->insert_id();
 
-			$this->model->simpan_ri($id_pasien_new,$tanggal_masuk,$bulan,$tahun,$asal_rujukan,$nama_pjawab,$telepon,$sistem_bayar,$kelas,$id_kamar,$id_bed);
-			$this->model->update_stt_pakai($id_bed);
-
-			$this->insert_kode_pasien();
-		}else{
-			$id_pasien_new = $this->input->post('id_pasien');
-
-			$this->model->simpan_ri($id_pasien_new,$tanggal_masuk,$bulan,$tahun,$asal_rujukan,$nama_pjawab,$telepon,$sistem_bayar,$kelas,$id_kamar,$id_bed);
-			$this->model->update_stt_pakai($id_bed);
-
+		if($sistem_bayar == '2'){
+			$this->model->simpan_asuransi($id_ri,$id_asuransi,$asuransi,$no_kpa,$nama,$perusahaan,$bp_poli,$asal_cabang,$status_pasien,$jumlah);
 		}
+
+		$this->simpan_log('ri',$id_pasien);
 
 		$this->session->set_flashdata('sukses','1');
 		redirect('admum/admum_pasien_ri_c');
@@ -202,7 +212,7 @@ class Admum_pasien_ri_c extends CI_Controller {
 	}
 
 	function load_data_pasien(){
-		$keyword = $this->input->post('keyword');
+		$keyword = $this->input->get('keyword');
 		$data = $this->model->load_data_pasien($keyword);
 		echo json_encode($data);
 	}
@@ -213,16 +223,16 @@ class Admum_pasien_ri_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	function load_ruangan(){
+	function load_kamar(){
 		$keyword = $this->input->post('keyword');
 		$kelas = $this->input->post('kelas');
-		$data = $this->model->load_ruangan($keyword,$kelas);
+		$data = $this->model->load_kamar($keyword,$kelas);
 		echo json_encode($data);
 	}
 
-	function klik_ruangan(){
+	function klik_kamar(){
 		$id = $this->input->post('id');
-		$data = $this->model->klik_ruangan($id);
+		$data = $this->model->klik_kamar($id);
 		echo json_encode($data);
 	}
 
@@ -236,6 +246,30 @@ class Admum_pasien_ri_c extends CI_Controller {
 	function klik_bed(){
 		$id = $this->input->post('id');
 		$data = $this->model->klik_bed($id);
+		echo json_encode($data);
+	}
+
+	function load_dokter(){
+		$keyword = $this->input->get('keyword');
+		$data = $this->model->load_dokter($keyword);
+		echo json_encode($data);
+	}
+
+	function klik_dokter(){
+		$id = $this->input->post('id');
+		$data = $this->model->klik_dokter($id);
+		echo json_encode($data);
+	}
+
+	function load_asuransi(){
+		$keyword = $this->input->get('keyword');
+		$data = $this->model->load_asuransi($keyword);
+		echo json_encode($data);
+	}
+
+	function klik_asuransi(){
+		$id = $this->input->post('id');
+		$data = $this->model->klik_asuransi($id);
 		echo json_encode($data);
 	}
 

@@ -292,8 +292,9 @@ function data_laborat(){
 
               for(var i=0; i<result.length; i++){
                     no++;
+                    var tot = parseFloat(result[i].BIAYA) + parseFloat(result[i].TOTAL_TARIF);
 
-                    total += parseFloat(result[i].TOTAL_TARIF);
+                    total += tot;
 
                     var aksi =  '<button type="button" class="btn btn-primary waves-effect waves-light btn-sm" onclick="hasil_laborat('+id_pelayanan+');">'+
                                       '<i class="fa fa-tint"></i>'+
@@ -318,11 +319,12 @@ function data_laborat(){
                                 "<td style='vertical-align:middle; text-align:center;'>"+tanggal+"</td>"+
                                 "<td style='vertical-align:middle;'>"+result[i].JENIS_LABORAT+"</td>"+
                                 "<td style='vertical-align:middle; text-align:center;'>"+cito+"</td>"+
+                                "<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].BIAYA)+"</td>"+
                                 "<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TOTAL_TARIF)+"</td>"+
                                 "<td align='center'>"+aksi+"</td>"+
                                 "<td align='center'>"+
                                     '<button type="button" class="btn btn-success waves-effect waves-light btn-sm" onclick="tambah_tindakan('+result[i].ID+');">'+
-                                        'Cek'+
+                                        '<i class="fa fa-thumb-tack"></i> Cek'+
                                     '</button>&nbsp;'+
                                 "</td>"+
                                  "<td align='center'>"+
@@ -390,7 +392,7 @@ function get_data_lab_det(id_lab){
                           "<td align='center'><input type='text' class='form-control' name='nilai_rujukan[]' value='"+result[i].NILAI_RUJUKAN+"' style='width:200px;'></td>"+
                           "<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
                           "<td style='vertical-align:middle; text-align:right;'><b>"+formatNumber(result[i].TARIF)+"</b></td>"+
-                          "<td align='center'>"+aksi+"</td>"+
+                          "<td align='center'>&nbsp;</td>"+
                         "</tr>";
             }
 
@@ -567,72 +569,60 @@ function hitung_pemeriksaan(){
         		<tbody>
         			<tr>
         				<td>NO. RM</td>
-        				<td>:</td>
-        				<td><span style="color:#0066b2;"><?php echo $dt->KODE_PASIEN; ?></span></td>
+        				<td><span style="color:#0066b2;">: <?php echo $dt->KODE_PASIEN; ?></span></td>
         				<td>JENIS KELAMIN</td>
-        				<td>:</td>
-        				<td>
-                    <span style="color:#0066b2;"><?php echo $jk; ?></span>
-                </td>
+        				<td><span style="color:#0066b2;">: <?php echo $jk; ?></span></td>
         			</tr>
         			<tr>
         				<td>NAMA</td>
-        				<td>:</td>
-        				<td><span style="color:#0066b2;"><?php echo $dt->NAMA; ?></span></td>
+        				<td><span style="color:#0066b2;">: <?php echo $dt->NAMA; ?></span></td>
         				<td>UMUR</td>
-        				<td>:</td>
-        				<td><span style="color:#0066b2;"><?php echo $dt->UMUR; ?> Tahun</span></td>
+        				<td><span style="color:#0066b2;">: <?php echo $dt->UMUR; ?> Tahun</span></td>
         			</tr>
         			<tr>
         				<td>GOL. DARAH</td>
-        				<td>:</td>
-        				<td>
-        					<span style="color:#0066b2;"><?php echo $dt->GOLONGAN_DARAH; ?></span>
-        				</td>
+        				<td><span style="color:#0066b2;">: <?php echo $dt->GOLONGAN_DARAH; ?></span></td>
         				<td>TGL LAHIR</td>
-        				<td>:</td>
-        				<td>
-                    <span style="color:#0066b2;"><?php echo $dt->TANGGAL_LAHIR; ?></span>
-                </td>
+        				<td><span style="color:#0066b2;">: <?php echo $dt->TANGGAL_LAHIR; ?></span></td>
         			</tr>
         		</tbody>
         	</table>
         </div>
         <div class="col-md-6">
-            <table class="table">
-                <tbody>
-                    <tr>
-                        <td>PENDIDIKAN</td>
-                        <td>:</td>
-                        <td><span style="color:#0066b2;"><?php echo $dt->PENDIDIKAN; ?></span></td>
-                        <td>AGAMA</td>
-                        <td>:</td>
-                        <td><span style="color:#0066b2;"><?php echo $dt->AGAMA; ?></span></td>
-                    </tr>
-                    <tr>
-                        <td>PEKERJAAN</td>
-                        <td>:</td>
-                        <td><span style="color:#0066b2;"><?php echo $kerja; ?></span></td>
-                        <td>TEMPAT LAHIR</td>
-                        <td>:</td>
-                        <td><span style="color:#0066b2;"><?php echo $dt->TEMPAT_LAHIR; ?></span></td>
-                    </tr>
-                    <tr>
-                        <td>ALAMAT</td>
-                        <td>:</td>
-                        <td>
-                            <span style="color:#0066b2;">
-                              <?php echo $dt->ALAMAT; ?> Kec. <?php echo $dt->KECAMATAN; ?><br>
-                              Kel. <?php echo $dt->KELURAHAN; ?> <br>
-                              Kec. <?php echo $dt->KOTA; ?>
-                            </span>
-                        </td>
-                        <td>NAMA ORTU</td>
-                        <td>:</td>
-                        <td><span style="color:#0066b2;"><?php echo $dt->NAMA_ORTU; ?></span></td>
-                    </tr>
-                </tbody>
-            </table>
+          <table class="table">
+            <tbody>
+                <tr>
+                    <td>PENDIDIKAN</td>
+                    <td>:</td>
+                    <td><span style="color:#0066b2;"><?php echo $dt->PENDIDIKAN; ?></span></td>
+                    <td>AGAMA</td>
+                    <td>:</td>
+                    <td><span style="color:#0066b2;"><?php echo $dt->AGAMA; ?></span></td>
+                </tr>
+                <tr>
+                    <td>PEKERJAAN</td>
+                    <td>:</td>
+                    <td><span style="color:#0066b2;"><?php echo $kerja; ?></span></td>
+                    <td>TEMPAT LAHIR</td>
+                    <td>:</td>
+                    <td><span style="color:#0066b2;"><?php echo $dt->TEMPAT_LAHIR; ?></span></td>
+                </tr>
+                <tr>
+                    <td>ALAMAT</td>
+                    <td>:</td>
+                    <td>
+                        <span style="color:#0066b2;">
+                          <?php echo $dt->ALAMAT; ?> Kec. <?php echo $dt->KECAMATAN; ?><br>
+                          Kel. <?php echo $dt->KELURAHAN; ?> <br>
+                          Kec. <?php echo $dt->KOTA; ?>
+                        </span>
+                    </td>
+                    <td>NAMA ORTU</td>
+                    <td>:</td>
+                    <td><span style="color:#0066b2;"><?php echo $dt->NAMA_ORTU; ?></span></td>
+                </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -671,7 +661,8 @@ function hitung_pemeriksaan(){
                               <th style="color:#fff; text-align:center;">Tanggal / Waktu</th>
                               <th style="color:#fff; text-align:center;">Jenis Laborat</th>
                               <th style="color:#fff; text-align:center;">Cito</th>
-                              <th style="color:#fff; text-align:center;">Biaya</th>
+                              <th style="color:#fff; text-align:center;">Biaya Lab</th>
+                              <th style="color:#fff; text-align:center;">Biaya Tindakan</th>
                               <th style="color:#fff; text-align:center;">Aksi</th>
                               <th style="color:#fff; text-align:center;">Tindakan</th>
                               <th style="color:#fff; text-align:center;">Cetak</th>
@@ -912,7 +903,7 @@ function hitung_pemeriksaan(){
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title" id="myModalLabel">Hasil Laborat</h4>
+                <h4 class="modal-title" id="myModalLabel">Detail Tindakan</h4>
             </div>
             <div class="modal-body">
                   <div class="table-responsive">
@@ -921,7 +912,7 @@ function hitung_pemeriksaan(){
                                 <thead>
                                     <tr class="hijau_popup">
                                         <th style="text-align:center; color: #fff;" width="50">No</th>
-                                        <th style="text-align:center; color: #fff;">Pemeriksaan</th>
+                                        <th style="text-align:center; color: #fff;">Tindakan</th>
                                         <th style="text-align:center; color: #fff;">Tarif</th>
                                         <th style="text-align:center; color: #fff;">Subtotal</th>
                                     </tr>

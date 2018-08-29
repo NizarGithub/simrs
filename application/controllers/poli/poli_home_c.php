@@ -135,21 +135,23 @@ class Poli_home_c extends CI_Controller {
 	}
 
 	function get_rekam_medik(){
+		$id_rj = $this->input->post('id_rj');
 		$id_pasien = $this->input->post('id_pasien');
-		$tanggal = date('d-m-Y');
-		$data['rk'] = $this->model->get_rekam_medik($id_pasien,$tanggal);
+		$tanggal = $this->input->post('tanggal');
+		$data['rk'] = $this->model->get_rekam_medik($id_rj,$tanggal);
 		$data['ps'] = $this->model->data_pasien_id($id_pasien);
 		echo json_encode($data);
 	}
 
 	function get_tindakan(){
-		$id_pasien = $this->input->post('id_pasien');
-		$tanggal = date('d-m-Y');
+		$id_rj = $this->input->post('id_rj');
+		$tanggal = $this->input->post('tanggal');
 		$sql = "
 			SELECT
 				TD.*
 			FROM rk_tindakan_rj TD
-			WHERE TD.ID_PASIEN = '$id_pasien'
+			WHERE TD.ID_PELAYANAN = '$id_rj'
+			AND TD.TANGGAL = '$tanggal'
 		";
 		$query = $this->db->query($sql);
 		$id_tindakan = '';
@@ -165,29 +167,38 @@ class Poli_home_c extends CI_Controller {
 	}
 
 	function get_diagnosa(){
-		$id_pasien = $this->input->post('id_pasien');
-		$tanggal = date('d-m-Y');
-		$data = $this->model->get_diagnosa($id_pasien);
+		$id_rj = $this->input->post('id_rj');
+		$tanggal = $this->input->post('tanggal');
+		$data = $this->model->get_diagnosa($id_rj,$tanggal);
 		echo json_encode($data);
 	}
 
 	function get_resep(){
-		$id_pasien = $this->input->post('id_pasien');
-		$tanggal = date('d-m-Y');
-		$sql = "SELECT * FROM rk_resep_rj WHERE ID_PASIEN = '$id_pasien'";
+		$id_rj = $this->input->post('id_rj');
+		$tanggal = $this->input->post('tanggal');
+		$sql = "SELECT * FROM rk_resep_rj WHERE ID_PELAYANAN = '$id_rj' AND TANGGAL = '$tanggal'";
 		$query = $this->db->query($sql);
-		$id_resep = '';
-		$data = '';
-		if($query->num_rows() > 0){
-			$data = $query->row();
-			$id_resep = $data->ID;
-		}else{
-			$id_resep = '';
-		}
+		$data = $query->result();	
+		echo json_encode($data);
+	}
 
-		$resep['ind'] = $data;
-		$resep['det'] = $this->model->get_resep($id_resep);
-		echo json_encode($resep);
+	function get_resep_det(){
+		$id_resep = $this->input->post('id_resep');
+		$data = $this->model->get_resep($id_resep);
+		echo json_encode($data);
+	}
+
+	function get_lab(){
+		$id_pasien = $this->input->post('id_pasien');
+		$tanggal = $this->input->post('tanggal');
+		$data = $this->model->get_lab($id_pasien,$tanggal);
+		echo json_encode($data);
+	}
+
+	function get_lab_det(){
+		$id_lab = $this->input->post('id_lab');
+		$data = $this->model->get_lab_det($id_lab);
+		echo json_encode($data);
 	}
 
 	function panggil_pasien(){

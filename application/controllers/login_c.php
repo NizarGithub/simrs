@@ -70,27 +70,30 @@ class Login_c extends CI_Controller {
 			$sql_log = "UPDATE kepeg_pegawai SET STS_LOGIN = '1',DATE_LOG = '$tanggal',TIME_LOG = '$waktu' WHERE ID = '$id_login'";
 			$this->db->query($sql_log);
 
-			if($data->STS_LOGIN == 1){
-				$this->session->set_flashdata('sudah_login','1');
-				redirect('login_c');
-			}else{
-				if($data->LEVEL == 'Admission'){
-					redirect('admum/admum_pasien_baru_c');
-				}else if($data->LEVEL == 'Poli'){
-					redirect('poli/poli_home_c');
-				}else if($data->LEVEL == 'Laborat'){
-					redirect('lab/lab_home_c');
-				}else if($data->LEVEL == 'Farmasi'){
-					redirect('apotek/ap_home_c');
-				}else if($data->LEVEL == 'Kasir AA'){
-					
-				}else if($data->LEVEL == 'Kasir Rajal'){
-					redirect('apotek/ap_kasir_rajal_c');
-				}else if($data->LEVEL == 'Kasir Ranap'){
+			// if($data->STS_LOGIN == 1){
+			// 	$this->session->set_flashdata('sudah_login','1');
+			// 	redirect('login_c');
+			// }else{
+			// }
 
-				}else if($data->LEVEL == null){
-					redirect('portal');
-				}
+			if($data->LEVEL == 'Admission'){
+				redirect('admum/admum_pasien_baru_c');
+			}else if($data->LEVEL == 'Poli'){
+				redirect('poli/poli_home_c');
+			}else if($data->LEVEL == 'Laborat'){
+				redirect('lab/lab_home_c');
+			}else if($data->LEVEL == 'Farmasi'){
+				redirect('apotek/ap_home_c');
+			}else if($data->LEVEL == 'Kasir AA'){
+				redirect('apotek/ap_kasir_aa_c');
+			}else if($data->LEVEL == 'Kasir Rajal'){
+				redirect('apotek/ap_kasir_rajal_c');
+			}else if($data->LEVEL == 'Kasir Ranap'){
+				redirect('finance/kasir_ranap_c');
+			}else if($data->LEVEL == 'Perawat'){
+				redirect('poli/rk_pelayanan_ri_c');
+			}else if($data->LEVEL == null){
+				redirect('portal');
 			}
 
 		}else{

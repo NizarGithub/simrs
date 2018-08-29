@@ -22,9 +22,7 @@ class Antrian_home_c extends CI_Controller {
 			'subtitle' => 'Antrian',
 			'master_menu' => 'antrian',
 			'view' => 'antrian',
-			'msg' => '',
-			'dtAntrian' => $this->model->getDataAntrian(),
-			'dtAntrian_last' => $this->model->getDataAntrian_last(),
+			'msg' => ''
 		);
 
 		$this->load->view('antrian/antrian_home_v',$data);
@@ -37,6 +35,11 @@ class Antrian_home_c extends CI_Controller {
 
 	function getAntrianLast(){
 		$data = $this->model->getDataAntrian_last();
+		echo json_encode($data);
+	}
+
+	function get_nomor_offline(){
+		$data = $this->model->get_antrian_pasien();
 		echo json_encode($data);
 	}
 

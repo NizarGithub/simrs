@@ -55,29 +55,7 @@
             <div class="container" style="margin-left: 0; width: 100%;">
                 <div class="row">
                     <div class="col-sm-4" id="head_list_antrian">
-                        <?PHP if(count($dtAntrian) == 0){ ?>
-                        <div class="col-lg-12 col-md-12">
-                            <div class="card-box widget-user" style="background: #FFF; border: 2px solid #fff;">
-                                <center> <h2><b>Tidak ada Antrian</b></h2> </center>
-                            </div>
-                        </div>
-                        <?PHP } else {
-                            foreach ($dtAntrian as $key => $row) {
-                         ?>
-                        <div class="col-lg-12 col-md-12">
-                            <div class="card-box widget-user" style="background: #1ca0de; border: 2px solid #fff; border-bottom:30px solid #FFF;">
-                                <table width="100%">
-                                    <tr>
-                                        <td style="color:#FFF; font-size: 30px;"> <b>No. Antrian</b> </td>
-                                        <td style="color:#FFF; font-size: 45px;" align="center"> <b><?=$row->KODE;?>-<?=$row->URUT;?></b> </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="color:#FFF; font-size: 45px;"> <b><?=$row->NAMA_LOKET;?></b> </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                        <?PHP } } ?>                        
+                                                
                     </div>
 
                     <div class="col-sm-8" style="padding-left: 0;">
@@ -97,21 +75,7 @@
                             <hr>
                             <div class="row">
                                 <div class="col-sm-12" id="last_antrian_head">
-                                    <?PHP if(count($dtAntrian) == 0){ ?>
-                                    <center>
-                                        <img src="<?=base_url();?>picture/forbidden.png" width="300"/> <br>
-                                        <font style="color: rgb(237, 28, 36); font-size: 80px; font-weight:bold;"> TIDAK ADA ANTRIAN </font>
-                                    </center>
-                                    <?PHP } else { ?>
-                                    <center>
-                                        <p><font style="color: rgb(28, 160, 222); font-size: 55px; font-weight:bold;"> Antrian Nomor </font></p>
-                                        <p style="line-height: 0.8;"><font style="color: rgb(237, 28, 36); font-size: 165px; font-weight:bold;"> <?=$dtAntrian_last->KODE;?>-<?=$dtAntrian_last->URUT;?> </font></p>
-                                        <p><font style="color: rgb(28, 160, 222); font-size: 55px; font-weight:bold;"> Mohon Menuju Ke</font></p>
-                                        <p style="line-height: 0.8;">
-                                            <font style="color: rgb(237, 28, 36); font-size: 100px; font-weight:bold;"> <?=$dtAntrian_last->NAMA_LOKET;?> </font>
-                                        </p>
-                                    </center>
-                                    <?PHP } ?>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -125,9 +89,11 @@
     <script src="<?php echo base_url(); ?>assets/js/bootstrap.min.js"></script>
     <script>
     jQuery(document).ready(function() {  
+        getAntrian();
+
         setInterval(function () {
           getAntrian();
-        }, 1000);
+        }, 5000);
     });
 
     function startTime() {
@@ -141,6 +107,7 @@
         h + ":" + m + ":" + s;
         var t = setTimeout(startTime, 500);
     }
+
     function checkTime(i) {
         if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
         return i;
@@ -148,7 +115,7 @@
 
     function getAntrian(){
         $.ajax({
-            url : '<?php echo base_url(); ?>antrian/antrian_home_c/getAntrian',
+            url : '<?php echo base_url(); ?>antrian/antrian_home_c/get_nomor_offline',
             data : {
                 sts:"ok",
             },
@@ -156,8 +123,8 @@
             dataType : "json",
             success : function(result){
                 var jml = result.length;
+                // console.log(jml);
                 if(result.length > 0){
-
                     var isi = "";
                     $.each(result,function(i,res){
                         isi += '<div class="col-lg-12 col-md-12">'+
@@ -165,10 +132,10 @@
                                         '<table width="100%">'+
                                             '<tr>'+
                                                 '<td style="color:#FFF; font-size: 30px;"> <b>No. Antrian</b> </td>'+
-                                                '<td style="color:#FFF; font-size: 45px;" align="center"> <b>'+res.KODE+'-'+res.URUT+'</b> </td>'+
+                                                '<td style="color:#FFF; font-size: 45px;" align="center"> <b>'+res.KODE_ANTRIAN+'-'+res.NOMOR_ANTRIAN+'</b> </td>'+
                                             '</tr>'+
                                             '<tr>'+
-                                                '<td style="color:#FFF; font-size: 45px;"> <b>'+res.NAMA_LOKET+'</b> </td>'+
+                                                '<td style="color:#FFF; font-size: 45px;"> <b>'+res.NAMA_POLI+'</b> </td>'+
                                             '</tr>'+
                                         '</table>'+
                                     '</div>'+
@@ -192,31 +159,34 @@
     function get_antrian_last(jml){
         if(jml > 0){
             $.ajax({
-                url : '<?php echo base_url(); ?>antrian/antrian_home_c/getAntrianLast',
+                url : '<?php echo base_url(); ?>antrian/antrian_home_c/get_nomor_offline',
                 data : {
                     sts:"ok",
                 },
                 type : "POST",
                 dataType : "json",
                 success : function(res){
-                    var isi =   '<center>'+
-                                '<p><font style="color: rgb(28, 160, 222); font-size: 55px; font-weight:bold;"> Antrian Nomor </font></p>'+
-                                '<p style="line-height: 0.8;"><font style="color: rgb(237, 28, 36); font-size: 165px; font-weight:bold;"> '+res.KODE+'-'+res.URUT+' </font></p>'+
-                                '<p><font style="color: rgb(28, 160, 222); font-size: 55px; font-weight:bold;"> Mohon Menuju Ke</font></p>'+
-                                '<p style="line-height: 0.8;">'+
-                                    '<font style="color: rgb(237, 28, 36); font-size: 100px; font-weight:bold;"> '+res.NAMA_LOKET+' </font>'+
-                                '</p>'+
-                            '</center>';
+                    var isi = '';
+                    for(var i=0; i<res.length; i++){
+                        var isi =   '<center>'+
+                                        '<p><font style="color: rgb(28, 160, 222); font-size: 55px; font-weight:bold;"> Antrian Nomor </font></p>'+
+                                        '<p style="line-height: 0.8;"><font style="color: rgb(237, 28, 36); font-size: 165px; font-weight:bold;"> '+res[i].KODE_ANTRIAN+'-'+res[i].NOMOR_ANTRIAN+' </font></p>'+
+                                        '<p><font style="color: rgb(28, 160, 222); font-size: 55px; font-weight:bold;"> Mohon Menuju Ke</font></p>'+
+                                        '<p style="line-height: 0.8;">'+
+                                            '<font style="color: rgb(237, 28, 36); font-size: 100px; font-weight:bold;"> '+res[i].NAMA_POLI+' </font>'+
+                                        '</p>'+
+                                    '</center>';
+                    }
                             
                     $('#last_antrian_head').html(isi);
                 }
             });
 
         } else {
-            var isi =  '<center>'+
-                        '<img src="<?=base_url();?>picture/forbidden.png" width="300"/> <br>'+
-                        '<font style="color: rgb(237, 28, 36); font-size: 80px; font-weight:bold;"> TIDAK ADA ANTRIAN </font>'+
-                   '</center>';
+            var isi =   '<center>'+
+                            '<img src="<?=base_url();?>picture/forbidden.png" width="300"/> <br>'+
+                            '<font style="color: rgb(237, 28, 36); font-size: 80px; font-weight:bold;"> TIDAK ADA ANTRIAN </font>'+
+                       '</center>';
             $('#last_antrian_head').html(isi);
         }
 

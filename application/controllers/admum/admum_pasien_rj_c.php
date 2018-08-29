@@ -128,6 +128,40 @@ class Admum_pasien_rj_c extends CI_Controller {
 		}
 	}
 
+	function simpan_log($aksi,$id_pasien){
+		$sess_user = $this->session->userdata('masuk_rs');
+    	$id_pegawai = $sess_user['id'];
+    	$sql = "SELECT
+					a.ID,
+					a.NAMA,
+					b.NAMA_DEP,
+					c.NAMA_DIV
+				FROM kepeg_pegawai a
+				LEFT JOIN kepeg_departemen b ON b.ID = a.ID_DEPARTEMEN
+				LEFT JOIN kepeg_divisi c ON c.ID = a.ID_DIVISI
+				WHERE a.ID = '$id_pegawai'
+    	";
+    	$qry = $this->db->query($sql);
+    	$row = $qry->row();
+    	$nama = $row->NAMA;
+    	$dep = $row->NAMA_DEP;
+    	$div = $row->NAMA_DIV;
+		$tanggal = date('d-m-Y');
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu = $format->format('H:i:s');
+		$ket = '';
+		if($aksi == 'rj'){
+			$ket = 'pendaftaran '.strtoupper('rawat jalan');
+		}else{
+			$ket = strtoupper($aksi);
+		}
+		$keterangan = "User ".strtoupper($nama)." Departemen ".strtoupper($dep)." Divisi ".strtoupper($div)." telah melakukan ".$ket;
+
+		$this->master_model_m->simpan_log2($id_pegawai,$id_pasien,$tanggal,$waktu,$keterangan);
+	}
+
 	function randomNumber($length) {
 	    $result = '';
 
@@ -224,6 +258,8 @@ class Admum_pasien_rj_c extends CI_Controller {
 				$this->model->simpan_pemeriksaan_detail($id_pemeriksaan_rj,$value,$tanggal,$bulan,$tahun,$subtotal[$key],$waktu);
 			}
 		}
+
+		$this->simpan_log('rj',$id_pasien_new);
 
 		// $this->session->set_flashdata('sukses','1');
 		// redirect('admum/admum_pasien_rj_c');

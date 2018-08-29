@@ -7,6 +7,42 @@ class Master_model_m extends CI_Model
 		  $this->load->database();
 	}
 
+	function simpan_log($id_pegawai,$tanggal,$waktu,$keterangan){
+		$sql = "
+			INSERT INTO kepeg_log_aktifitas(
+				ID_PEGAWAI,
+				TANGGAL,
+				WAKTU,
+				KETERANGAN
+			) VALUES (
+				'$id_pegawai',
+				'$tanggal',
+				'$waktu',
+				'$keterangan'
+			)
+		";
+		$this->db->query($sql);
+	}
+
+	function simpan_log2($id_pegawai,$id_pasien,$tanggal,$waktu,$keterangan){
+		$sql = "
+			INSERT INTO kepeg_log_aktifitas(
+				ID_PEGAWAI,
+				ID_PASIEN,
+				TANGGAL,
+				WAKTU,
+				KETERANGAN
+			) VALUES (
+				'$id_pegawai',
+				'$id_pasien',
+				'$tanggal',
+				'$waktu',
+				'$keterangan'
+			)
+		";
+		$this->db->query($sql);
+	}
+
 	function get_user_info($id_user){
 		$sql = "
 		SELECT a.*, b.NAMA AS JABATAN, c.NAMA_DEP , d.NAMA_DIV FROM kepeg_pegawai a 
@@ -172,23 +208,6 @@ class Master_model_m extends CI_Model
 			UPDATE kepeg_antrian SET
 				URUT = '$urut'
 			WHERE TGL = '$tgl' AND STS = '$status'
-		";
-		$this->db->query($sql);
-	}
-
-	function simpan_log($id_pegawai,$tanggal,$waktu,$keterangan){
-		$sql = "
-			INSERT INTO kepeg_log_aktifitas(
-				ID_PEGAWAI,
-				TANGGAL,
-				WAKTU,
-				KETERANGAN
-			) VALUES (
-				'$id_pegawai',
-				'$tanggal',
-				'$waktu',
-				'$keterangan'
-			)
 		";
 		$this->db->query($sql);
 	}

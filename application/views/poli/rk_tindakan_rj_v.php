@@ -1960,11 +1960,11 @@ function data_surat_dokter_ada(){
 	                <li role="presentation" id="dt_diagnosa">
 	                    <a href="#diagnosa1" role="tab" data-toggle="tab"><i class="fa fa-heartbeat"></i>&nbsp;Diagnosa</a>
 	                </li>
-	                <li role="presentation" id="dt_resep">
-	                    <a href="#resep1" role="tab" data-toggle="tab"><i class="fa fa-medkit"></i>&nbsp;Resep</a>
-	                </li>
 	                <li role="presentation" id="dt_laborat">
 	                    <a href="#laborat1" role="tab" data-toggle="tab"><i class="fa fa-building"></i>&nbsp;Laborat</a>
+	                </li>
+	                <li role="presentation" id="dt_resep">
+	                    <a href="#resep1" role="tab" data-toggle="tab"><i class="fa fa-medkit"></i>&nbsp;Resep</a>
 	                </li>
 	                <li role="presentation" id="dt_kondisi_akhir">
 	                    <a href="#kondisi_akhir1" role="tab" data-toggle="tab"><i class="fa fa-check-square-o"></i>&nbsp;Kondisi Akhir</a>

@@ -11,7 +11,7 @@
         <title><?php echo $title; ?></title>
 
         <!--Morris Chart CSS -->
-		<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/morris/morris.css">
+        <link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/morris/morris.css">
 
         <!-- Notification css (Toastr) -->
         <link href="<?php echo base_url(); ?>assets/plugins/toastr/toastr.min.css" rel="stylesheet" type="text/css" />
@@ -54,27 +54,19 @@
 
         <script src="<?php echo base_url(); ?>assets/js/modernizr.min.js"></script>
         <?PHP 
-            date_default_timezone_set('Asia/Jakarta');
             $sess_user = $this->session->userdata('masuk_rs');
             $id_user = $sess_user['id'];
             $user = $this->master_model_m->get_user_info($id_user);
             $level = $user->LEVEL;
-            $nama_div = $user->NAMA_DIV;
-            $nama = $user->NAMA;
 
             $is_operator = $this->master_model_m->is_operator($id_user, 'admission');
-            $bulan = array(
-                1 =>    "Januari", 2  =>"Februari", 3  =>"Maret", 4 =>"April",
-                5 =>    "Mei", 6  =>"Juni", 7  =>"Juli", 8 =>"Agustus",
-                9 =>    "September", 10 =>"Oktober", 11 =>"November", 12 =>"Desember"
-            );
         ?>
     </head>
 
-    <body onload="startTime();">
+    <body>
         <!-- Navigation Bar-->
         <header id="topnav">
-            <div class="topbar-main" style="background-color:#00a4e4; height:60px;">
+            <div class="topbar-main" style="background-color:#faae40; height:60px;">
                 <div class="container">
                     <!-- LOGO -->
                     <div class="topbar-left">
@@ -85,7 +77,7 @@
                     <!-- End Logo container-->
 
                     <div class="menu-extras">                        
-                        <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#0a4d8c; height:60px;">
+                        <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#f1632a; height:60px;">
                             <li>
                                 <form role="search" class="navbar-left app-search pull-left hidden-xs" style="margin-right:0px; margin-top:0px;">
                                 <?php
@@ -137,14 +129,15 @@
                         <!-- Navigation Menu-->
                         <ul class="navigation-menu">
                             <li <?php if($master_menu == 'home'){ echo 'class="active"';}else{echo '';} ?> >
-                                <a href="<?php echo base_url(); ?>admum/admum_home_c">
+                                <a href="<?php echo base_url(); ?>setup/setup_home_c">
                                     <i class="zmdi zmdi-view-dashboard"></i> <span> Dashboard </span> 
                                 </a>
                             </li>
                             <?PHP 
-                            $get_menu2 = $this->master_model_m->get_menu_2($id_user, 1);
+                            $get_menu2 = $this->master_model_m->get_menu_2($id_user, 7);
                             foreach ($get_menu2 as $key => $menu2) {
                             ?>
+
                                 <?PHP if($menu2->LINK == null || $menu2->LINK == ""){ ?>
                                     <li <?php if($master_menu == $menu2->MASTER){ echo 'class="has-submenu active"';}else{echo 'class="has-submenu"';} ?> >
                                         <a href="#"><i class="<?=$menu2->ICON;?>"></i><span> <?=$menu2->NAMA;?> </span> </a>
@@ -191,83 +184,8 @@
                 </div>
 
                 <div class="row">
-                    <input type="hidden" id="id_antrian_now" value="">
-                    <input type="hidden" id="kode_antrian_now" value="">
-                    <input type="hidden" id="jml_antrian_now" value="">
-                    <input type="hidden" id="id_antrian_now_on" value="">
-                    <input type="hidden" id="kode_antrian_now_on" value="">
-                    <input type="hidden" id="jml_antrian_now_on" value="">
-                    <!-- <div class="col-lg-3 col-md-6">
-                        <div class="card-box widget-user">
-                            <div>
-                                <img alt="user" class="img-responsive img-circle" src="<?php //echo base_url(); ?>picture/antri_online.png">
-                                <div class="wid-u-info">
-                                    <h4 class="m-t-0 m-b-5">Antrian Online</h4>
-                                    <button type="button" class="btn btn-info waves-effect waves-light m-b-5"><b id="loket_online"></b></button>
-                                    <button type="button" class="btn btn-purple waves-effect waves-light m-b-5" onclick="panggil_antrian('online');"><i class="fa fa-bullhorn m-r-5"></i><b id="nomor_online">-</b></button>
-                                    <button type="button" class="btn btn-success waves-effect waves-light m-b-5" onclick="next_antri('online');"><b>Berikutnya</b> <i class="fa fa-arrow-circle-right"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
-                    <?php if($view == 'pasien_rj'){ ?>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card-box widget-user">
-                            <div class="dropdown pull-right">
-                                <a href="javascript:;" data-original-title="Nomor antrian ini digunakan untuk pasien daftar baru" title="" data-placement="top" data-toggle="tooltip">
-                                    <i class="fa fa-info-circle"></i>
-                                </a>
-                            </div>
-                            <div>
-                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/small-queue-management.png">
-                                <div class="wid-u-info">
-                                    <h4 class="m-t-0 m-b-5"> Nomor Antrian</h4>
-                                    <!-- <button type="button" class="btn btn-danger waves-effect waves-light m-b-5"><b id="loket_offline"></b></button> -->
-                                    <h2 class="text-success" id="nomor_offline">0</h2>
-                                    <!-- <button type="button" class="btn btn-success waves-effect waves-light m-b-5" onclick="next_antri('offline');"><b>Berikutnya</b> <i class="fa fa-arrow-circle-right"></i></button> -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <?php }else{ ?>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card-box widget-user">
-                            <div>
-                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/Recent-Documents-icon.png">
-                                <div class="wid-u-info">
-                                    <h4 class="m-t-0 m-b-5">Shift</h4>
-                                    <h2 class="text-success" id="shift_txt">0</h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <?php } ?>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card-box widget-user">
-                            <div>
-                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/Clock-Icon-Image.png">
-                                <div class="wid-u-info">
-                                    <h4 class="m-t-0 m-b-5">Waktu</h4>
-                                    <h2 class="text-info" id="waktu_txt">0</h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card-box widget-user">
-                            <div>
-                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/kisspng-calendar-date-computer-icons-time-calendar-icon-5ac41db68edb81.1459769815228021025852.jpg">
-                                <div class="wid-u-info">
-                                    <h4 class="m-t-0 m-b-5">Tanggal</h4>
-                                    <h2 class="text-danger"><?php echo date('d'); ?> <?php echo $bulan[date('n')]; ?> <?php echo date('Y'); ?></h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <?php $this->load->view($page); ?>
                 </div>
-
-                <?php $this->load->view($page); ?>
 
                 <br/>
                 <!-- Footer -->
@@ -373,7 +291,6 @@
         <script src="<?php echo base_url(); ?>js-devan/alert.js"></script>
         <script src="<?php echo base_url(); ?>js-devan/js-form.js"></script>
         <script src="<?php echo base_url(); ?>js-devan/pagination.js"></script>
-        <script src="<?php echo base_url(); ?>js-devan/JsBarcode.all.min.js"></script>
 
         <!-- Plugins Js -->
         <script src="<?php echo base_url(); ?>assets/plugins/bootstrap-inputmask/bootstrap-inputmask.min.js" type="text/javascript"></script>
@@ -388,8 +305,8 @@
         <script src="<?php echo base_url(); ?>assets/plugins/jquery-knob/jquery.knob.js"></script>
 
         <!--Morris Chart
-		<script src="<?php //echo base_url(); ?>assets/plugins/morris/morris.min.js"></script>
-		<script src="<?php //echo base_url(); ?>assets/plugins/raphael/raphael-min.js"></script>
+        <script src="<?php //echo base_url(); ?>assets/plugins/morris/morris.min.js"></script>
+        <script src="<?php //echo base_url(); ?>assets/plugins/raphael/raphael-min.js"></script>
         -->
         <!-- Dashboard init -->
         <script src="<?php echo base_url(); ?>assets/pages/jquery.dashboard.js"></script>
@@ -412,225 +329,8 @@
             $('#datatable-responsive').DataTable();
             $('#datatable-scroller').DataTable( { ajax: "<?php echo base_url(); ?>assets/plugins/datatables/json/scroller-demo.json", deferRender: true, scrollY: 380, scrollCollapse: true, scroller: true } );
             var table = $('#datatable-fixed-header').DataTable( { fixedHeader: true } );
-            $(".select2").select2();
-
-            <?php if($view == 'pasien_rj'){ ?>
-            get_antrian_offline();
-            // get_antrian_online();
-
-            setInterval(function () {
-                get_antrian_offline();
-            }, 5000);
-            <?php } ?>
+            $(".select2").select2(); 
         });
-
-        function startTime() {
-            var today = new Date();
-            var h = today.getHours();
-            var m = today.getMinutes();
-            var s = today.getSeconds();
-            m = checkTime(m);
-            s = checkTime(s);
-            document.getElementById('waktu_txt').innerHTML = h + ":" + m + ":" + s;
-
-            if(h >= 7 && h < 14){
-                $('#shift_txt').html('1 (Satu)');
-            }else if(h >= 14 && h < 21){
-                $('#shift_txt').html('2 (Dua)');
-            }else{
-                $('#shift_txt').html('3 (Tiga)');
-            }
-
-            var t = setTimeout(startTime, 500);
-        }
-
-        function checkTime(i) {
-            if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
-            return i;
-        }
-
-        function get_antrian_offline(){
-            var id_user = "<?php echo $id_user; ?>";
-
-            $.ajax({
-                url : '<?php echo base_url(); ?>admum/admum_home_c/get_antrian_offline',
-                data : {id_user:id_user},
-                type : "POST",
-                dataType : "json",
-                success : function(res){
-                    if(res['cek'].length != 0){
-                        // $('#loket_offline').html(res['data']['NAMA_LOKET']);
-                        var id_kode_antrian = res['data']['KODE_ANTRIAN'];
-                        get_nomor_offline(id_kode_antrian);
-                    }
-                }
-            });
-        }
-
-        function get_nomor_offline(id_kode_antrian){
-            var id_user = "<?php echo $id_user; ?>";
-
-            $.ajax({
-                url : '<?php echo base_url(); ?>admum/admum_home_c/get_nomor_offline',
-                data : {
-                    id_kode_antrian:id_kode_antrian,
-                    id_user:id_user
-                },
-                type : "POST",
-                dataType : "json",
-                success : function(res){
-                    $('#id_antrian_now').val(id_kode_antrian);
-                    $('#id_kode_antrian_off_now').val(id_kode_antrian);
-
-                    if(res == null || res == ""){
-                        $('#kode_antrian_now').val('A');
-                        $('#jml_antrian_now').val('1');
-                        $('#nomor_offline').html('A-1');
-                        
-                        $('#kode_antrian_off_now').val('A');
-                        $('#jml_antrian_off_now').val('1');
-                    }else{
-                        for(var i=0; i<res.length; i++){
-                            $('#kode_antrian_now').val(res[i].KODE);
-                            $('#jml_antrian_now').val(res[i].URUT);
-                            $('#id_loket_now').val(res[i].ID);
-                            $('#nomor_offline').html(res[i].KODE+'-'+res[i].URUT);
-                            
-                            $('#kode_antrian_off_now').val(res[i].KODE);
-                            $('#jml_antrian_off_now').val(parseInt(res[i].URUT)+1);
-                        }
-                    }
-                }
-            });
-        }
-
-        function get_antrian_online(){
-            var id_user = "<?php echo $id_user; ?>";
-
-            $.ajax({
-                url : '<?php echo base_url(); ?>admum/admum_home_c/get_antrian_online',
-                data : {id_user:id_user},
-                type : "POST",
-                dataType : "json",
-                success : function(res){
-                    $('#loket_online').html(res['data']['NAMA_LOKET']);
-                    var id_kode_antrian = res['data']['KODE_ANTRIAN'];
-                    get_nomor_online(id_kode_antrian);
-                }
-            });
-        }
-
-        function get_nomor_online(id_kode_antrian){
-            var id_user = "<?php echo $id_user; ?>";
-
-            $.ajax({
-                url : '<?php echo base_url(); ?>admum/admum_home_c/get_nomor_online',
-                data : {
-                    id_kode_antrian:id_kode_antrian,
-                    id_user:id_user
-                },
-                type : "POST",
-                dataType : "json",
-                success : function(res){
-                    $('#id_antrian_now_on').val(id_kode_antrian);
-                    if(res == null || res == ""){
-                        $('#kode_antrian_now_on').val('A');
-                        $('#jml_antrian_now_on').val('1');
-                        $('#nomor_online').html('A-1');
-                    }else{
-                        for(var i=0; i<res.length; i++){
-                            $('#kode_antrian_now_on').val(res[i].KODE);
-                            $('#jml_antrian_now_on').val(res[i].URUT);
-                            $('#nomor_online').html(res[i].KODE+'-'+res[i].URUT);
-                        }
-                    }
-                }
-            });
-        }
-
-        function panggil_antrian(status){
-            var kode_antrian = '';
-            var jml_antrian  = '';
-            var nama_loket_antrian_txt = '';
-            if(status == 'offline'){
-                kode_antrian = $('#kode_antrian_now').val();
-                jml_antrian  = $('#jml_antrian_now').val();
-                nama_loket_antrian_txt = $('#loket_offline').html();
-            }else{
-                kode_antrian = $('#kode_antrian_now_on').val();
-                jml_antrian  = $('#jml_antrian_now_on').val();
-                nama_loket_antrian_txt = $('#loket_online').html();
-            }
-
-            responsiveVoice.speak(
-              "Pengunjung dengan nomor antrian, "+kode_antrian+","+jml_antrian+", silahkan menuju ke "+nama_loket_antrian_txt+". Terima kasih. ",
-              "Indonesian Female",
-              {
-               pitch: 1, 
-               rate: 1, 
-               volume: 1
-              }
-             );
-        }
-
-        function next_antri(status){
-            var id_antrian   = '';
-            var kode_antrian = '';
-            var jml_antrian  = 0;
-            var jml_antrian2  = 0;
-            var nama_loket_antrian_txt = '';
-
-            if(status == 'offline'){
-                id_antrian   = $('#id_antrian_now').val();
-                kode_antrian = $('#kode_antrian_now').val();
-                jml_antrian  = $('#jml_antrian_now').val();
-                nama_loket_antrian_txt = $('#loket_offline').html();
-            }else{
-                id_antrian   = $('#id_antrian_now_on').val();
-                kode_antrian = $('#kode_antrian_now_on').val();
-                jml_antrian2  = $('#jml_antrian_now_on').val();
-                nama_loket_antrian_txt = $('#loket_online').html();
-            }
-
-            $.ajax({
-                url : '<?php echo base_url(); ?>admum/admum_home_c/next_antri',
-                data : {
-                    id_antrian:id_antrian,
-                    kode_antrian:kode_antrian,
-                    jml_antrian:jml_antrian,
-                    status:status
-                },
-                type : "POST",
-                dataType : "json",
-                success : function(row){
-                    if(row == 1){
-                        if(status == 'offline'){
-                            var jml_antrian_next = parseInt(jml_antrian) + 1;
-                            $('#nomor_offline').html(kode_antrian+'-'+jml_antrian_next);
-                            $('#jml_antrian_now').val(jml_antrian_next);
-                            get_antrian_online();
-                        }else{
-                            var jml_antrian_next = parseInt(jml_antrian2) + 1;
-                            $('#nomor_online').html(kode_antrian+'-'+jml_antrian_next);
-                            $('#jml_antrian_now_on').val(jml_antrian_next);
-                            get_antrian_offline();
-                        }
-
-                        // $('#close_next_antrian').click();
-
-                        // responsiveVoice.speak(
-                        //   "Pengunjung dengan nomor antrian, "+kode_antrian+","+jml_antrian_next+", silahkan menuju ke "+nama_loket_antrian_txt+". Terima kasih. ",
-                        //   "Indonesian Female",
-                        //   {
-                        //    pitch: 1, 
-                        //    rate: 1, 
-                        //    volume: 1
-                        //   }
-                        // );
-                    }
-                }
-            });
-        }
         </script>
     </body>
 </html>

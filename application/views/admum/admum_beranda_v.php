@@ -57,7 +57,7 @@ a {
 
 <div class="row">
 <?PHP 
-    $get_menu2 = $this->master_model_m->get_menu_2($id_user, 2);
+    $get_menu2 = $this->master_model_m->get_menu_2($id_user, 1);
     foreach ($get_menu2 as $key => $menu2) {
         $link = base_url().$menu2->LINK;
         $icon = base_url().$menu2->GAMBAR_ICON;
@@ -77,7 +77,7 @@ a {
                 <div class="wid-u-info">
                     <h4 class="m-t-0 m-b-5"><?php echo $menu2->NAMA; ?></h4>
                 </div>
-                <small class="<?php echo $text1; ?>"><b><?php echo str_replace('_', ' ', strtoupper($menu2->VIEW)); ?></b></small>
+                <small class="<?php echo $text1; ?>" style="margin-left: 20px;"><b><?php echo str_replace('_', ' ', strtoupper($menu2->VIEW)); ?></b></small>
             </div>
         </div>
     </div>

@@ -121,8 +121,7 @@ class Admum_pasien_rj_m extends CI_Model {
 
 		if($keyword != ""){
 			$where = $where." AND (
-				NAMA LIKE '%$keyword%' OR 
-				NIK LIKE '%$keyword%' OR 
+				NAMA LIKE '%$keyword%' OR
 				KODE_PASIEN LIKE '%$keyword%' OR 
 				NAMA_ORTU LIKE '%$keyword%' OR 
 				ALAMAT LIKE '%$keyword%'

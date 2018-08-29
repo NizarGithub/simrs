@@ -10,6 +10,7 @@ $level = $user->LEVEL;
 #loading_tindakan,
 #loading_diagnosa,
 #loading_resep,
+#loading_spin,
 .view_poli,
 #view_tanggal,
 #view_bulan{
@@ -357,7 +358,9 @@ function data_pasien(){
 
                     if(result[i].STATUS_SUDAH == '1'){
                         panggil = '<span class="label label-success">Selesai Ditangani</span>';
-                        aksi = '<span class="label label-success">Selesai Ditangani</span>';
+                        aksi = "<button type='button' onclick='detail_rm("+result[i].ID_RJ+","+result[i].ID+");' class='btn btn-primary waves-effect waves-light btn-sm' data-toggle='modal' data-target='.bs-example-modal-lg'>"+
+                                    "<i class='fa fa-eye'></i> Detail"+
+                               "</button>";
                     }else{
                         panggil = '<button type="button" onclick="panggil_pasien('+result[i].ID_RJ+');" class="btn btn-purple waves-effect waves-light btn-sm">'+
                                     nomor+' <i class="fa fa-bullhorn"></i>'+
@@ -376,13 +379,13 @@ function data_pasien(){
                         }
                     }
 
-                    result[i].WAKTU_DAFTAR = result[i].WAKTU_DAFTAR==null?"00:00":result[i].WAKTU_DAFTAR;
+                    result[i].WAKTU = result[i].WAKTU==null?"00:00":result[i].WAKTU;
                     result[i].ALAMAT = (result[i].ALAMAT=="" || result[i].ALAMAT==null)?"-":result[i].ALAMAT;
 
                     $tr +=  '<tr>'+
                             '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].KODE_PASIEN+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL+' - '+result[i].WAKTU_DAFTAR+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL+' - '+result[i].WAKTU+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].ALAMAT+'</td>'+
@@ -512,17 +515,25 @@ function panggil_pasien(id){
     });
 }
 
-function detail_rm(id_pasien){
+function detail_rm(id_rj,id_pasien){
     $('#popup_rekam_medik').click();
+    $('#id_rj').val(id_rj);
     $('#id_pasien').val(id_pasien);
+    $('#loading_spin').show();
+    var tanggal = $('#tanggal_rm').val();
 
     $.ajax({
         url : '<?php echo base_url(); ?>poli/poli_home_c/get_rekam_medik',
-        data : {id_pasien:id_pasien},
+        data : {
+            id_rj:id_rj,
+            id_pasien:id_pasien,
+            tanggal:tanggal
+        },
         type : "POST",
         dataType : "json",
         success : function(row){
             $('#nama_pasien_txt').html(row['ps']['NAMA']);
+            $('#tanggal_rm').val(row['rk']['TANGGAL']);
             row['rk']['NAMA_DOKTER'] = row['rk']['NAMA_DOKTER']==null?"-":row['rk']['NAMA_DOKTER'];
 
             $tr = '<tr>'+
@@ -535,9 +546,16 @@ function detail_rm(id_pasien){
                   '</tr>';
 
             $('#tabel_poli tbody').html($tr);
+            $('#total_poli').val(row['rk']['BIAYA']);
             get_tindakan();
+            get_resep();
+            get_lab();
         }
     });
+
+    setInterval(function () {
+        get_total_all();
+    }, 2000);
 }
 
 function klik_tindakan(id_pasien){
@@ -553,16 +571,21 @@ function klik_tindakan(id_pasien){
 }
 
 function get_tindakan(){
-    var id_pasien = $('#id_pasien').val();
-    $('#loading_tindakan').show();
+    var id_rj = $('#id_rj').val();
+    var tanggal = $('#tanggal_rm').val();
+    // $('#loading_tindakan').show();
 
     $.ajax({
         url : '<?php echo base_url(); ?>poli/poli_home_c/get_tindakan',
-        data : {id_pasien:id_pasien},
+        data : {
+            id_rj:id_rj,
+            tanggal:tanggal
+        },
         type : "POST",
         dataType : "json",
         success : function(res){
             $tr = '';
+            var tot = 0;
 
             if(res == null || res == ""){
                 $tr = '<tr><td colspan="3" style="text-align:center;">Data Tidak Ada</td></tr>';
@@ -571,6 +594,7 @@ function get_tindakan(){
 
                 for(var i=0; i<res.length; i++){
                     no++;
+                    tot += parseFloat(res[i].TARIF);
 
                     $tr +=  '<tr>'+
                                 '<td style="text-align:center;">'+no+'</td>'+
@@ -581,18 +605,24 @@ function get_tindakan(){
             }
 
             $('#tabel_tindakan tbody').html($tr);
-            $('#loading_tindakan').hide();
+            $('#tot_tindakan').html(formatNumber(tot));
+            // $('#loading_tindakan').hide();
+            $('#total_tindakan').val(tot);
         }
     });
 }
 
 function get_diagnosa(){
-    var id_pasien = $('#id_pasien').val();
-    $('#loading_diagnosa').show();
+    var id_rj = $('#id_rj').val();
+    var tanggal = $('#tanggal_rm').val();
+    // $('#loading_diagnosa').show();
 
     $.ajax({
         url : '<?php echo base_url(); ?>poli/poli_home_c/get_diagnosa',
-        data : {id_pasien:id_pasien},
+        data : {
+            id_rj:id_rj,
+            tanggal:tanggal
+        },
         type : "POST",
         dataType : "json",
         success : function(res){
@@ -616,51 +646,162 @@ function get_diagnosa(){
             }
 
             $('#tabel_diagnosa tbody').html($tr);
-            $('#loading_diagnosa').hide();
+            // $('#loading_diagnosa').hide();
         }
     });
 }
 
 function get_resep(){
-    var id_pasien = $('#id_pasien').val();
-    $('#loading_resep').show();
+    var id_rj = $('#id_rj').val();
+    var tanggal = $('#tanggal_rm').val();
+    // $('#loading_resep').show();
 
     $.ajax({
         url : '<?php echo base_url(); ?>poli/poli_home_c/get_resep',
-        data : {id_pasien:id_pasien},
+        data : {
+            id_rj:id_rj,
+            tanggal:tanggal
+        },
         type : "POST",
         dataType : "json",
+        async : false,
         success : function(res){
             $tr = '';
             $tr2 = '';
+            var tot = 0;
 
-            if(res['ind'] == null || res['ind'] == ""){
+            if(res == null || res == ""){
                 $tr = '<tr><td colspan="4" style="text-align:center;">Data Tidak Ada</td></tr>';
             }else{
-                $tr = '<tr>'+
-                        '<td>'+res['ind']['KODE_RESEP']+'</td>'+
-                        '<td style="text-align:center;">'+res['ind']['TANGGAL']+'</td>'+
-                        '<td style="text-align:right;">'+formatNumber(res['ind']['TOTAL'])+'</td>'+
-                      '</tr>'+
-                      '<tr>'+
-                        '<td style="text-align:center; font-weight:bold;">NAMA OBAT</td>'+
-                        '<td style="text-align:center; font-weight:bold;">ATURAN MINUM</td>'+
-                        '<td style="text-align:center;">&nbsp;</td>'+
-                      '</tr>';
+                var no = 0;
 
-                for(var i=0; i<res['det'].length; i++){
-                    $tr2 += '<tr>'+
-                                '<td>'+res['det'][i].NAMA_OBAT+'</td>'+
-                                '<td style="text-align:center;">'+res['det'][i].ATURAN_MINUM+'</td>'+
-                                '<td style="text-align:right;">'+formatNumber(res['det'][i].SUBTOTAL)+'</td>'+
-                            '</tr>';
+                for(var h=0; h<res.length; h++){
+                    no++;
+                    tot += parseFloat(res[h].TOTAL);
+
+                    $tr += '<tr>'+
+                            '<td style="text-align:center;">'+no+'</td>'+
+                            '<td style="text-align:center;">'+res[h].KODE_RESEP+'</td>'+
+                            '<td style="text-align:center;">'+res[h].TANGGAL+'</td>'+
+                            '<td style="text-align:right;"><b>'+formatNumber(res[h].TOTAL)+'</b></td>'+
+                          '</tr>';
+
+                    var id_resep = res[h].ID;
+
+                    $.ajax({
+                        url : '<?php echo base_url(); ?>poli/poli_home_c/get_resep_det',
+                        data : {id_resep:id_resep},
+                        type : "POST",
+                        dataType : "json",
+                        async : false,
+                        success : function(result){
+                            if(result != "" || result != null){
+                                var no2 = 0;
+
+                                for(var i=0; i<result.length; i++){
+                                    no2++;
+
+                                    $tr2 += '<tr>'+
+                                                '<td style="text-align:center;">'+no2+'</td>'+
+                                                '<td>'+result[i].NAMA_OBAT+'</td>'+
+                                                '<td>'+result[i].ATURAN_MINUM+'</td>'+
+                                                '<td style="text-align:right;">'+formatNumber(result[i].SUBTOTAL)+'</td>'+
+                                            '</tr>';
+                                }
+
+                                $('#tabel_resep_det tbody').html($tr2);
+                            }
+                        }
+                    });
+
                 }
             }
 
-            $('#tabel_resep tbody').html($tr+$tr2);
-            $('#loading_resep').hide();
+            $('#tabel_resep tbody').html($tr);
+            // $('#loading_resep').hide();
+            $('#total_resep').val(tot);
         }
     });
+}
+
+function get_lab(){
+    var id_pasien = $('#id_pasien').val();
+    var tanggal = $('#tanggal_rm').val();
+
+    $.ajax({
+        url : '<?php echo base_url(); ?>poli/poli_home_c/get_lab',
+        data : {
+            id_pasien:id_pasien,
+            tanggal:tanggal
+        },
+        type : "POST",
+        dataType : "json",
+        async : false,
+        success : function(res){
+            $tr = '';
+            $tr2 = '';
+            var tot = 0;
+
+            if(res == null || res == ""){
+                $tr = '<tr><td colspan="5" style="text-align:center;">Data Tidak Ada</td></tr>';
+            }else{
+                var no = 0;
+
+                for(var i=0; i<res.length; i++){
+                    no++;
+                    tot += parseFloat(res[i].TOTAL_TARIF);
+
+                    $tr += '<tr>'+
+                                '<td style="text-align:center;">'+no+'</td>'+
+                                '<td>'+res[i].KODE_LAB+'</td>'+
+                                '<td>'+res[i].TANGGAL+'</td>'+
+                                '<td>'+res[i].JENIS_LABORAT+'</td>'+
+                                '<td style="text-align:right;">'+formatNumber(res[i].TOTAL_TARIF)+'</td>'+
+                            '</tr>';
+
+                    var id_lab = res[i].ID;
+
+                    $.ajax({
+                        url : '<?php echo base_url(); ?>poli/poli_home_c/get_lab_det',
+                        data : {id_lab:id_lab},
+                        type : "POST",
+                        dataType : "json",
+                        async : false,
+                        success : function(result){
+                            var no2 = 0;
+                            if(result != "" || result != null){
+                                for(var j=0; j<result.length; j++){
+                                    no2++;
+
+                                    $tr2 += '<tr>'+
+                                                '<td style="text-align:center;">'+no2+'</td>'+
+                                                '<td>'+result[j].NAMA_PEMERIKSAAN+'</td>'+
+                                                '<td>'+result[j].HASIL+'</td>'+
+                                                '<td>'+result[j].NILAI_RUJUKAN+'</td>'+
+                                                '<td style="text-align:right;">'+formatNumber(result[j].SUBTOTAL)+'</td>'+
+                                            '</tr>';
+                                }
+
+                                $('#tabel_lab_det tbody').html($tr2);
+                            }
+                        }
+                    });
+                }
+            }
+
+            $('#tabel_lab tbody').html($tr);
+            $('#total_lab').val(tot);
+        }
+    });
+}
+
+function get_total_all(){
+    var total_tindakan = $('#total_tindakan').val();
+    var total_resep = $('#total_resep').val();
+    var total_poli = $('#total_poli').val();
+    var tot_all = parseFloat(total_tindakan) + parseFloat(total_resep) + parseFloat(total_poli);
+    $('#grand_tot').html(formatNumber(tot_all));
+    $('#loading_spin').hide();
 }
 </script>
 
@@ -903,6 +1044,11 @@ function get_resep(){
             </div>
             <div class="modal-body">
                 <form class="form-horizontal">
+                    <input type="hidden" id="tanggal_rm" value="">
+                    <input type="hidden" id="total_tindakan" value="">
+                    <input type="hidden" id="total_resep" value="">
+                    <input type="hidden" id="total_poli" value="">
+                    <input type="hidden" id="total_lab" value="">
                     <div class="form-body">
                         <div class="form-group">
                             <div class="col-md-6">
@@ -912,11 +1058,17 @@ function get_resep(){
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-info">
+                                    <i class="fa fa-spin fa-spinner" id="loading_spin"></i> <strong>Grandtotal :</strong> <b id="grand_tot">0</b>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
                 <div class="row">
                     <div class="col-md-12">
+                        <input type="hidden" name="id_rj" id="id_rj" value="">
                         <input type="hidden" name="id_pasien" id="id_pasien" value="">
                         <ul class="nav nav-tabs">
                             <li role="presentation" class="active">
@@ -956,6 +1108,12 @@ function get_resep(){
                                     <tbody>
                                         
                                     </tbody>
+                                    <tfoot>
+                                        <tr class="abu_tr">
+                                            <td colspan="2" style="text-align: center;">TOTAL</td>
+                                            <td style="text-align: right;"><b id="tot_tindakan">0</b></td>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
 
@@ -1000,9 +1158,23 @@ function get_resep(){
                                 </form>
                                 <table id="tabel_resep" class="table table-bordered">
                                     <thead>
-                                        <tr class="success">
+                                        <tr class="danger">
+                                            <th style="text-align: center;">NO</th>
                                             <th style="text-align: center;">KODE RESEP</th>
                                             <th style="text-align: center;">TANGGAL</th>
+                                            <th style="text-align: center;">TOTAL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                                <table id="tabel_resep_det" class="table table-bordered">
+                                    <thead>
+                                        <tr class="danger">
+                                            <th style="text-align: center;">NO</th>
+                                            <th style="text-align: center;">NAMA OBAT</th>
+                                            <th style="text-align: center;">ATURAN MINUM</th>
                                             <th style="text-align: center;">TOTAL</th>
                                         </tr>
                                     </thead>
@@ -1013,7 +1185,34 @@ function get_resep(){
                             </div>
 
                             <div role="tabpanel" class="tab-pane fade" id="lab1">
-                                
+                                <table id="tabel_lab" class="table table-bordered">
+                                    <thead>
+                                        <tr class="warning">
+                                            <th style="text-align: center;">NO</th>
+                                            <th style="text-align: center;">KODE LAB</th>
+                                            <th style="text-align: center;">TANGGAL</th>
+                                            <th style="text-align: center;">JENIS LAB</th>
+                                            <th style="text-align: center;">BIAYA</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                                <table id="tabel_lab_det" class="table table-bordered">
+                                    <thead>
+                                        <tr class="warning">
+                                            <th style="text-align: center;">NO</th>
+                                            <th style="text-align: center;">TINDAKAN</th>
+                                            <th style="text-align: center;">HASIL</th>
+                                            <th style="text-align: center;">NILAI RUJUKAN</th>
+                                            <th style="text-align: center;">BIAYA</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

@@ -21,6 +21,19 @@ $(document).ready(function(){
 
 	data_kamar();
 
+	$('#tombol_cari').click(function(){
+		data_kamar();
+		$('#tombol_reset').show();
+		$('#tombol_cari').hide();
+	});
+
+	$('#tombol_reset').click(function(){
+		$('#cari_kamar').val("");
+		data_kamar();
+		$('#tombol_reset').hide();
+		$('#tombol_cari').show();
+	});
+
 	$('#btn_tambah').click(function(){
 		get_kode_kamar();
 		$('#view_tambah').show();
@@ -190,7 +203,7 @@ function data_kamar(){
 			$tr = "";
 
 			if(result == "" || result == null){
-				$tr = "<tr><td colspan='8' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+				$tr = "<tr><td colspan='10' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
 				var no = 0;
 
@@ -224,10 +237,12 @@ function data_kamar(){
 					$tr += "<tr>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_KAMAR+"</td>"+
-								"<td style='vertical-align:middle;'>"+result[i].NAMA_KAMAR+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].KELAS+"</td>"+
-								"<td style='vertical-align:middle; text-align:center;'>"+result[i].KATEGORI+"</td>"+
 								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].BIAYA)+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+result[i].VISITE_DOKTER+"</td>"+
+								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].BIAYA_VISITE)+"</td>"+
+								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].JASA_SARANA)+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+result[i].PERUNTUKAN_KAMAR+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+formatNumber(result[i].JUMLAH_BED)+"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
 							"</tr>";
@@ -240,17 +255,8 @@ function data_kamar(){
 		}
 	});
 
-	$('#tombol_cari').click(function(){
+	$('#cari_kamar').off('keyup').keyup(function(){
 		data_kamar();
-		$('#tombol_reset').show();
-		$('#tombol_cari').hide();
-	});
-
-	$('#tombol_reset').click(function(){
-		$('#cari_kamar').val("");
-		data_kamar();
-		$('#tombol_reset').hide();
-		$('#tombol_cari').show();
 	});
 }
 
@@ -273,7 +279,7 @@ function tambah_bed(id){
 		dataType : "json",
 		success : function(row){
 			$('#id_kamar').val(id);
-			var nama_kamar = row['NAMA_KAMAR'];
+			var nama_kamar = row['KELAS'];
 			var judul = "Jumlah Bed Kamar "+nama_kamar;
 			$('#myModalLabel').html(judul);
 
@@ -285,7 +291,7 @@ function tambah_bed(id){
 			for(var i=0; i<parseInt(jumlah_bed); i++){
 				no++;
 
-				var nomor = nama_kamar+"&nbsp;"+no;
+				var nomor = nama_kamar+" - "+no;
 
 				$tr += "<tr>"+
 							"<input type='hidden' name='no[]' value='"+no+"'>"+
@@ -311,12 +317,13 @@ function detail_kamar(id){
 		dataType : "json",
 		success : function(result){
 			$('#kode_kamar_detail').val(result['detail']['KODE_KAMAR']);
-			$('#nama_kamar_detail').val(result['detail']['NAMA_KAMAR']);
-			$('#kategori_detail').val(result['detail']['KATEGORI']);
 			$('#kelas_detail').val(result['detail']['KELAS']);
 			$('#biaya_detail').val(formatNumber(result['detail']['BIAYA']));
+			$('#visite_dokter_detail').val(result['detail']['VISITE_DOKTER']);
+			$('#biaya_visite_detail').val(formatNumber(result['detail']['BIAYA_VISITE']));
+			$('#jasa_sarana_detail').val(formatNumber(result['detail']['JASA_SARANA']));
 			$('#jumlah_bed_detail').val(formatNumber(result['detail']['JUMLAH_BED']));
-			$('#fasilitas_detail').val(formatNumber(result['detail']['FASILITAS']));
+			$('#fasilitas_detail').val(formatNumber(result['detail']['PERUNTUKAN_KAMAR']));
 
 			$div = "";
 
@@ -367,30 +374,39 @@ function ubah_kamar(id){
 		success : function(row){
 			$('#id_ubah').val(id);
 			$('#kode_kamar_ubah').val(row['KODE_KAMAR']);
-			$('#nama_kamar_ubah').val(row['NAMA_KAMAR']);
-			$('#biaya_ubah').val(NumberToMoney(row['BIAYA']));
-			$('#jumlah_bed_ubah').val(NumberToMoney(row['JUMLAH_BED']));
-			$('#fasilitas_ubah').val(row['FASILITAS']);
 
-			if(row['KATEGORI'] == "Pria"){
-				$('#kategori_ubah option[value="Pria"]').attr('selected','selected');
-			}else if(row['KATEGORI'] == "Wanita"){
-				$('#kategori_ubah option[value="Wanita"]').attr('selected','selected');
-			}else if(row['KATEGORI'] == "Anak"){
-				$('#kategori_ubah option[value="Anak - Anak"]').attr('selected','selected');
-			}
-
-			if(row['KELAS'] == "Kelas 1"){
-				$('#kelas_kamar_ubah option[value="Kelas 1"]').attr('selected','selected');
-			}else if(row['KELAS'] == "Kelas 2"){
-				$('#kelas_kamar_ubah option[value="Kelas 2"]').attr('selected','selected');
-			}else if(row['KELAS'] == "Kelas 3"){
-				$('#kelas_kamar_ubah option[value="Kelas 3"]').attr('selected','selected');
+			if(row['KELAS'] == "SVIP"){
+				$('#kelas_kamar_ubah option[value="SVIP"]').attr('selected','selected');
 			}else if(row['KELAS'] == "VIP"){
 				$('#kelas_kamar_ubah option[value="VIP"]').attr('selected','selected');
-			}else if(row['KELAS'] == "VVIP"){
-				$('#kelas_kamar_ubah option[value="VVIP"]').attr('selected','selected');
+			}else if(row['KELAS'] == "1A"){
+				$('#kelas_kamar_ubah option[value="1A"]').attr('selected','selected');
+			}else if(row['KELAS'] == "1B"){
+				$('#kelas_kamar_ubah option[value="1B"]').attr('selected','selected');
+			}else if(row['KELAS'] == "2A"){
+				$('#kelas_kamar_ubah option[value="2A"]').attr('selected','selected');
+			}else if(row['KELAS'] == "2B"){
+				$('#kelas_kamar_ubah option[value="2B"]').attr('selected','selected');
+			}else if(row['KELAS'] == "3"){
+				$('#kelas_kamar_ubah option[value="3"]').attr('selected','selected');
+			}else if(row['KELAS'] == "Neo"){
+				$('#kelas_kamar_ubah option[value="Neo"]').attr('selected','selected');
 			}
+
+			$('#biaya_ubah').val(NumberToMoney(row['BIAYA']));
+
+			if(row['VISITE_DOKTER'] == 'Tarif A'){
+				$('#inlineRadio_ubah3').attr('checked','checked');
+			}else if(row['VISITE_DOKTER'] == 'Tarif B'){
+				$('#inlineRadio_ubah4').attr('checked','checked');
+			}else if(row['VISITE_DOKTER'] == 'Tarif C'){
+				$('#inlineRadio_ubah5').attr('checked','checked');
+			}
+
+			$('#tarif_ubah').val(NumberToMoney(row['BIAYA_VISITE']));
+			$('#jasa_sarana_ubah').val(NumberToMoney(row['JASA_SARANA']));
+			$('#peruntukan_kamar_ubah').val(row['PERUNTUKAN_KAMAR']);
+			$('#jumlah_bed_ubah').val(NumberToMoney(row['JUMLAH_BED']));
 
 			if(row['TOTAL'] != 0){
 				$('#jumlah_bed_ubah').attr('readonly','readonly');
@@ -416,7 +432,7 @@ function hapus_kamar(id){
 		dataType : "json",
 		success : function(row){
 			$('#id_hapus').val(id);
-			var txt = row['KODE_KAMAR']+' - '+row['NAMA_KAMAR'];
+			var txt = row['KODE_KAMAR']+' - '+row['KELAS'];
 			$('#msg').html('Apakah kamar <b>'+txt+'</b> ingin dihapus?');
 		}
 	});
@@ -462,48 +478,35 @@ function hapus_bed(id,id_kamar){
 	                    	</button>
 		                </div>
 		            	<div class="col-md-5">
-		                	<button type="submit" class="btn btn-success waves-effect w-md waves-light m-b-5 pull-right">
-		                		<i class="fa fa-file-text-o"></i> <b>Cetak Excel</b>
-		                	</button>
+		                	<input type="submit" name="pdf" class="btn btn-danger pull-right" value="Cetak PDF">
+		                	<input type="submit" name="excel" class="btn btn-success m-r-5 pull-right" value="Cetak Excel">
 		                </div>
 		            </div>
 		            <div class="form-group">
-		            	<label class="col-md-1 control-label" style="text-align:left; width:150px;">Cari Berdasarkan</label>
-		            	<div class="col-md-3">
+		            	<label class="col-md-1 control-label" style="text-align:left; width:8%;">Cari Berdasarkan</label>
+		            	<div class="col-md-4">
                 			<div class="radio radio-primary radio-inline">
-                                <input type="radio" name="cari_berdasarkan" value="Nama Kamar">
-                                <label for="nama_poli"> Nama Kamar </label>
+                                <input type="radio" name="cari_berdasarkan" value="Kode Kamar">
+                                <label for="nama_poli"> Kode Kamar </label>
                             </div>
                             <div class="radio radio-primary radio-inline">
                                 <input type="radio" name="cari_berdasarkan" value="Kelas Kamar">
                                 <label for="jenis"> Kelas Kamar </label>
                             </div>
             			</div>
-            			<label class="col-md-1 control-label" style="text-align:left;">Urutkan</label>
-            			<div class="col-md-6">
-                			<div class="radio radio-success radio-inline">
-                                <input type="radio" name="urutkan" value="Default" id="default" checked="checked">
-                                <label for="default"> Default </label>
-                            </div>
-                			<div class="radio radio-success radio-inline">
-                                <input type="radio" name="urutkan" value="Nama Kamar">
-                                <label for="nama_poli"> Nama Kamar </label>
-                            </div>
-                            <div class="radio radio-success radio-inline">
-                                <input type="radio" name="urutkan" value="Kelas Kamar">
-                                <label for="jenis"> Kelas Kamar </label>
-                            </div>
-            			</div>
 		            </div>
 		            <div class="form-group" id="view_kamar">
-		            	<label class="col-md-1 control-label" style="width:150px;">&nbsp;</label>
+		            	<label class="col-md-1 control-label" style="width:8%;">&nbsp;</label>
 		            	<div class="col-md-3">
 		            		<select class="form-control" id="pilih_kelas">
-                                <option value="Kelas 1">Kelas 1</option>
-                                <option value="Kelas 2">Kelas 2</option>
-                                <option value="Kelas 3">Kelas 3</option>
-                                <option value="VIP">VIP</option>
-                                <option value="VVIP">VVIP</option>
+                                <option value="SVIP">SVIP</option>
+		                        <option value="VIP">VIP</option>
+		                        <option value="1A">I A</option>
+		                        <option value="1B">I B</option>
+		                        <option value="2A">II A</option>
+		                        <option value="2B">II B</option>
+		                        <option value="3">III</option>
+		                        <option value="Neo">Ruang Neo</option>
                             </select>
 		            	</div>
 		            </div>
@@ -529,10 +532,12 @@ function hapus_bed(id,id_kamar){
 		                    <tr class="biru">
 		                        <th style="color:#fff; text-align:center;" width="50">No</th>
 		                        <th style="color:#fff; text-align:center;">Kode Kamar</th>
-		                        <th style="color:#fff; text-align:center;">Nama Kamar</th>
 		                        <th style="color:#fff; text-align:center;">Kelas</th>
-		                        <th style="color:#fff; text-align:center;">Kategori</th>
 		                        <th style="color:#fff; text-align:center;">Biaya</th>
+		                        <th style="color:#fff; text-align:center;">Visite Dokter Sp.</th>
+		                        <th style="color:#fff; text-align:center;">Biaya Visite</th>
+		                        <th style="color:#fff; text-align:center;">Jasa Sarana RS</th>
+		                        <th style="color:#fff; text-align:center;">Peruntukan Kmr</th>
 		                        <th style="color:#fff; text-align:center;">Jumlah Bed</th>
 		                        <th style="color:#fff; text-align:center;">Aksi</th>
 		                    </tr>
@@ -550,8 +555,20 @@ function hapus_bed(id,id_kamar){
 		        		</div>
                     </div>
                     <div class="form-group">
-		        		<div class="col-md-9">
-		        			&nbsp;
+                    	<label class="col-md-1 control-label" style="text-align:left; width: 5%;">Urutkan</label>
+		        		<div class="col-md-8">
+		        			<div class="radio radio-success radio-inline">
+                                <input type="radio" name="urutkan" value="Default" id="default" checked="checked">
+                                <label for="default"> Default </label>
+                            </div>
+                			<div class="radio radio-success radio-inline">
+                                <input type="radio" name="urutkan" value="Kode Kamar">
+                                <label for="nama_poli"> Kode Kamar </label>
+                            </div>
+                            <div class="radio radio-success radio-inline">
+                                <input type="radio" name="urutkan" value="Kelas Kamar">
+                                <label for="jenis"> Kelas Kamar </label>
+                            </div>
 		        		</div>
                         <label class="col-md-2 control-label">Jumlah Tampil</label>
                         <div class="col-md-1 pull-right">
@@ -584,6 +601,56 @@ function hapus_bed(id,id_kamar){
                 </div>
             </div>
             <div class="form-group">
+                <label class="col-md-2 control-label">Kelas</label>
+                <div class="col-md-3">
+                    <select class="form-control select2" name="kelas_kamar">
+                        <option value="SVIP">SVIP</option>
+                        <option value="VIP">VIP</option>
+                        <option value="1A">I A</option>
+                        <option value="1B">I B</option>
+                        <option value="2A">II A</option>
+                        <option value="2B">II B</option>
+                        <option value="3">III</option>
+                        <option value="Neo">Ruang Neo</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Biaya</label>
+                <div class="col-md-3">
+                	<div class="input-group">
+                        <span class="input-group-addon">Rp</span>
+                    	<input type="text" class="form-control" name="biaya" value="" required="required" onkeyup="FormatCurrency(this);">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Visite Dokter Spesialis</label>
+                <div class="col-md-6">
+                	<div class="radio radio-primary radio-inline">
+                        <input type="radio" id="inlineRadio3" value="Tarif A" name="visite">
+                        <label for="inlineRadio3"> Tarif A </label>
+                    </div>
+                    <div class="radio radio-primary radio-inline">
+                        <input type="radio" id="inlineRadio4" value="Tarif B" name="visite">
+                        <label for="inlineRadio4"> Tarif B </label>
+                    </div>
+                    <div class="radio radio-primary radio-inline">
+                        <input type="radio" id="inlineRadio5" value="Tarif C" name="visite">
+                        <label for="inlineRadio5"> Tarif C </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">&nbsp;</label>
+                <div class="col-md-3">
+                	<div class="input-group">
+                        <span class="input-group-addon">Rp</span>
+                    	<input type="text" class="form-control" name="tarif" value="" required="required" onkeyup="FormatCurrency(this);">
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="form-group">
                 <label class="col-md-2 control-label">Nama Kamar</label>
                 <div class="col-md-6">
                     <input type="text" class="form-control" name="nama_kamar" value="" required="required">
@@ -594,48 +661,34 @@ function hapus_bed(id,id_kamar){
                 <div class="col-md-3">
                     <select class="form-control" name="kategori">
                         <option value="Umum">Umum</option>
-                        <option value="Pria">Pria</option>
-                        <option value="Wanita">Wanita</option>
-                        <option value="Anak">Anak - Anak</option>
                     </select>
                 </div>
-            </div>
+            </div> -->
             <div class="form-group">
-                <label class="col-md-2 control-label">Kelas</label>
+                <label class="col-md-2 control-label">Jasa Sarana RS</label>
                 <div class="col-md-3">
-                    <select class="form-control" name="kelas_kamar">
-                        <option value="Kelas 1">Kelas 1</option>
-                        <option value="Kelas 2">Kelas 2</option>
-                        <option value="Kelas 3">Kelas 3</option>
-                        <option value="VIP">VIP</option>
-                        <option value="VVIP">VVIP</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">Biaya</label>
-                <div class="col-md-6">
                 	<div class="input-group">
                         <span class="input-group-addon">Rp</span>
-                    	<input type="text" class="form-control" name="biaya" value="" required="required" onkeyup="FormatCurrency(this);">
+                    	<input type="text" class="form-control" name="jasa_sarana" value="" required="required" onkeyup="FormatCurrency(this);">
                     </div>
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-2 control-label">Jumlah Bed</label>
+                <label class="col-md-2 control-label">Peruntukan Kamar</label>
                 <div class="col-md-6">
+                    <textarea name="peruntukan_kamar" class="form-control" rows="5"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Jumlah Bed</label>
+                <div class="col-md-3">
                 	<div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-bed"></i></span>
                     	<input type="text" class="form-control" name="jumlah_bed" value="" required="required" onkeyup="FormatCurrency(this);">
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">Fasilitas</label>
-                <div class="col-md-6">
-                    <textarea name="fasilitas" class="form-control" rows="5"></textarea>
-                </div>
-            </div>
+            <hr>
             <div class="form-group">
                 <label class="col-md-2 control-label">&nbsp;</label>
                 <div class="col-md-3">
@@ -647,41 +700,106 @@ function hapus_bed(id,id_kamar){
     </div>
 </div>
 
-<button id="popup_bed" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal2" style="display:none;">Standard Modal</button>
-<div id="myModal2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form action="<?php echo $url_simpan_bed; ?>" method="post">
-        	<div class="modal-content">
-	            <div class="modal-header">
-	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-	                <h4 class="modal-title" id="myModalLabel"></h4>
-	            </div>
-            	<div class="modal-body">
-            		<input type="hidden" name="id_kamar" id="id_kamar" value="">
-	            	<div class="table-responsive">
-	            		<div class="scroll-y">
-			                <table class="table table-striped" id="tabel_bed">
-			                    <thead>
-			                        <tr class="merah_popup">
-			                            <th style="text-align:center; color: #fff;">Nomor Bed</th>
-			                            <th style="text-align:center; color: #fff;">Jumlah</th>
-			                        </tr>
-			                    </thead>
-			                    <tbody>
-			                        
-			                    </tbody>
-			                </table>
-	            		</div>
-	            	</div>
-            	</div>
-	            <div class="modal-footer">
-	            	<button type="submit" class="btn btn-primary waves-effect">Simpan</button>
-	                <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_jenis">Tutup</button>
-	            </div>
-        	</div><!-- /.modal-content -->
-        </form>
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+<div class="col-lg-12" id="view_ubah">
+    <div class="card-box card-tabs">
+    	<h4 class="header-title m-t-0 m-b-30">Ubah Kamar</h4>
+		<hr/>
+    	<form class="form-horizontal" role="form" action="<?php echo $url_ubah; ?>" method="post">
+    		<input type="hidden" name="id_ubah" id="id_ubah" value="">
+        	<div class="form-group">
+                <label class="col-md-2 control-label">Kode Kamar</label>
+                <div class="col-md-6">
+                	<div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                    	<input type="text" class="form-control" id="kode_kamar_ubah" value="" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Kelas</label>
+                <div class="col-md-3">
+                    <select class="form-control" name="kelas_kamar_ubah" id="kelas_kamar_ubah">
+                        <option value="SVIP">SVIP</option>
+                        <option value="VIP">VIP</option>
+                        <option value="1A">I A</option>
+                        <option value="1B">I B</option>
+                        <option value="2A">II A</option>
+                        <option value="2B">II B</option>
+                        <option value="3">III</option>
+                        <option value="Neo">Ruang Neo</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Biaya</label>
+                <div class="col-md-3">
+                	<div class="input-group">
+                        <span class="input-group-addon">Rp</span>
+                    	<input type="text" class="form-control" name="biaya_ubah" id="biaya_ubah" value="" required="required" onkeyup="FormatCurrency(this);">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Visite Dokter Spesialis</label>
+                <div class="col-md-6">
+                	<div class="radio radio-primary radio-inline">
+                        <input type="radio" id="inlineRadio_ubah3" value="Tarif A" name="visite_ubah">
+                        <label for="inlineRadio_ubah3"> Tarif A </label>
+                    </div>
+                    <div class="radio radio-primary radio-inline">
+                        <input type="radio" id="inlineRadio_ubah4" value="Tarif B" name="visite_ubah">
+                        <label for="inlineRadio_ubah4"> Tarif B </label>
+                    </div>
+                    <div class="radio radio-primary radio-inline">
+                        <input type="radio" id="inlineRadio_ubah5" value="Tarif C" name="visite_ubah">
+                        <label for="inlineRadio_ubah5"> Tarif C </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">&nbsp;</label>
+                <div class="col-md-3">
+                	<div class="input-group">
+                        <span class="input-group-addon">Rp</span>
+                    	<input type="text" class="form-control" name="tarif_ubah" id="tarif_ubah" value="" required="required" onkeyup="FormatCurrency(this);">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Jasa Sarana RS</label>
+                <div class="col-md-3">
+                	<div class="input-group">
+                        <span class="input-group-addon">Rp</span>
+                    	<input type="text" class="form-control" name="jasa_sarana_ubah" id="jasa_sarana_ubah" value="" required="required" onkeyup="FormatCurrency(this);">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Peruntukan Kamar</label>
+                <div class="col-md-6">
+                    <textarea name="peruntukan_kamar_ubah" id="peruntukan_kamar_ubah" class="form-control" rows="5"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Jumlah Bed</label>
+                <div class="col-md-6">
+                	<div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-bed"></i></span>
+                    	<input type="text" class="form-control" name="jumlah_bed_ubah" id="jumlah_bed_ubah" value="" required="required" onkeyup="FormatCurrency(this);">
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="form-group">
+                <label class="col-md-2 control-label">&nbsp;</label>
+                <div class="col-md-3">
+                	<button type="submit" class="btn btn-success waves-effect waves-light m-b-5"> <i class="fa fa-save"></i> <span>Simpan</span> </button>
+                	<button type="button" class="btn btn-danger waves-effect waves-light m-b-5" id="batal_ubah"> <i class="fa fa-times"></i> <span>Batal</span> </button>
+                </div>
+            </div>
+    	</form>
+    </div>
+</div>
 
 <button id="popup_detail" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#full-width-modal" style="display:none;">Full width Modal</button>
 <div id="full-width-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="full-width-modalLabel" aria-hidden="true" style="display: none;">
@@ -706,12 +824,30 @@ function hapus_bed(id,id_kamar){
 				            </div>
 				    	</div>
 				    	<div class="col-md-6">
+			    			<div class="form-group">
+				                <label class="col-md-3 control-label">Visite Dokter Sp.</label>
+				                <div class="col-md-8">
+				                	<input type="text" class="form-control" id="visite_dokter_detail" value="" readonly>
+				                </div>
+				            </div>
+			    		</div>
+			    	</div>
+			    	<div class="row">
+			    		<div class="col-md-6">
+			    			<div class="form-group">
+				                <label class="col-md-3 control-label">Kelas</label>
+				                <div class="col-md-8">
+				                    <input type="text" class="form-control" id="kelas_detail" value="" readonly>
+				                </div>
+				            </div>
+			    		</div>
+			    		<div class="col-md-6">
 				            <div class="form-group">
-				                <label class="col-md-3 control-label">Biaya</label>
+				                <label class="col-md-3 control-label">Biaya Visite</label>
 				                <div class="col-md-8">
 				                	<div class="input-group">
 				                        <span class="input-group-addon">Rp</span>
-				                    	<input type="text" class="form-control" id="biaya_detail" value="" readonly>
+				                    	<input type="text" class="form-control" id="biaya_visite_detail" value="" readonly>
 				                    </div>
 				                </div>
 				            </div>
@@ -720,9 +856,12 @@ function hapus_bed(id,id_kamar){
 			    	<div class="row">
 			    		<div class="col-md-6">
 			    			<div class="form-group">
-				                <label class="col-md-3 control-label">Nama Kamar</label>
+				                <label class="col-md-3 control-label">Biaya</label>
 				                <div class="col-md-8">
-				                    <input type="text" class="form-control" id="nama_kamar_detail" value="" readonly>
+				                	<div class="input-group">
+				                        <span class="input-group-addon">Rp</span>
+				                    	<input type="text" class="form-control" id="biaya_detail" value="" readonly>
+				                    </div>
 				                </div>
 				            </div>
 			    		</div>
@@ -741,27 +880,20 @@ function hapus_bed(id,id_kamar){
 			    	<div class="row">
 			    		<div class="col-md-6">
 			    			<div class="form-group">
-				                <label class="col-md-3 control-label">Kategori</label>
+				                <label class="col-md-3 control-label">Jasa Sarana RS</label>
 				                <div class="col-md-8">
-				                    <input type="text" class="form-control" id="kategori_detail" value="" readonly>
+				                	<div class="input-group">
+				                        <span class="input-group-addon">Rp</span>
+				                    	<input type="text" class="form-control" id="jasa_sarana_detail" value="" readonly>
+				                    </div>
 				                </div>
 				            </div>
 			    		</div>
 			    		<div class="col-md-6">
 			    			<div class="form-group">
-				                <label class="col-md-3 control-label">Fasilitas</label>
+				                <label class="col-md-3 control-label">Peruntukan Kamar</label>
 				                <div class="col-md-8">
 				                    <textarea id="fasilitas_detail" class="form-control" rows="5" readonly></textarea>
-				                </div>
-				            </div>
-			    		</div>
-			    	</div>
-			    	<div class="row">
-			    		<div class="col-md-6">
-			    			<div class="form-group">
-				                <label class="col-md-3 control-label">Kelas</label>
-				                <div class="col-md-8">
-				                    <input type="text" class="form-control" id="kelas_detail" value="" readonly>
 				                </div>
 				            </div>
 			    		</div>
@@ -789,83 +921,41 @@ function hapus_bed(id,id_kamar){
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<div class="col-lg-12" id="view_ubah">
-    <div class="card-box card-tabs">
-    	<h4 class="header-title m-t-0 m-b-30">Ubah Kamar</h4>
-		<hr/>
-    	<form class="form-horizontal" role="form" action="<?php echo $url_ubah; ?>" method="post">
-    		<input type="hidden" name="id_ubah" id="id_ubah" value="">
-        	<div class="form-group">
-                <label class="col-md-2 control-label">Kode Kamar</label>
-                <div class="col-md-6">
-                	<div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                    	<input type="text" class="form-control" id="kode_kamar_ubah" value="" readonly>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">Nama Kamar</label>
-                <div class="col-md-6">
-                    <input type="text" class="form-control" name="nama_kamar_ubah" id="nama_kamar_ubah" value="" required="required">
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">Kategori</label>
-                <div class="col-md-3">
-                    <select class="form-control" name="kategori_ubah" id="kategori_ubah">
-                        <option value="Pria">Pria</option>
-                        <option value="Wanita">Wanita</option>
-                        <option value="Anak">Anak - Anak</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">Kelas</label>
-                <div class="col-md-3">
-                    <select class="form-control" name="kelas_kamar_ubah" id="kelas_kamar_ubah">
-                        <option value="Kelas 1">Kelas 1</option>
-                        <option value="Kelas 2">Kelas 2</option>
-                        <option value="Kelas 3">Kelas 3</option>
-                        <option value="VIP">VIP</option>
-                        <option value="VVIP">VVIP</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">Biaya</label>
-                <div class="col-md-6">
-                	<div class="input-group">
-                        <span class="input-group-addon">Rp</span>
-                    	<input type="text" class="form-control" name="biaya_ubah" id="biaya_ubah" value="" required="required" onkeyup="FormatCurrency(this);">
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">Jumlah Bed</label>
-                <div class="col-md-6">
-                	<div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-bed"></i></span>
-                    	<input type="text" class="form-control" name="jumlah_bed_ubah" id="jumlah_bed_ubah" value="" required="required" onkeyup="FormatCurrency(this);">
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">Fasilitas</label>
-                <div class="col-md-6">
-                    <textarea name="fasilitas_ubah" id="fasilitas_ubah" class="form-control" rows="5"></textarea>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">&nbsp;</label>
-                <div class="col-md-3">
-                	<button type="submit" class="btn btn-success waves-effect waves-light m-b-5"> <i class="fa fa-save"></i> <span>Simpan</span> </button>
-                	<button type="button" class="btn btn-danger waves-effect waves-light m-b-5" id="batal_ubah"> <i class="fa fa-times"></i> <span>Batal</span> </button>
-                </div>
-            </div>
-    	</form>
-    </div>
-</div>
+<button id="popup_bed" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal2" style="display:none;">Standard Modal</button>
+<div id="myModal2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="<?php echo $url_simpan_bed; ?>" method="post">
+        	<div class="modal-content">
+	            <div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	                <h4 class="modal-title" id="myModalLabel"></h4>
+	            </div>
+            	<div class="modal-body">
+            		<input type="hidden" name="id_kamar" id="id_kamar" value="">
+	            	<div class="table-responsive">
+	            		<div class="scroll-y">
+			                <table class="table table-bordered" id="tabel_bed">
+			                    <thead>
+			                        <tr class="merah_popup">
+			                            <th style="text-align:center; color: #fff;">Nomor Bed</th>
+			                            <th style="text-align:center; color: #fff;">Jumlah</th>
+			                        </tr>
+			                    </thead>
+			                    <tbody>
+			                        
+			                    </tbody>
+			                </table>
+	            		</div>
+	            	</div>
+            	</div>
+	            <div class="modal-footer">
+	            	<button type="submit" class="btn btn-primary waves-effect">Simpan</button>
+	                <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_jenis">Tutup</button>
+	            </div>
+        	</div><!-- /.modal-content -->
+        </form>
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 <button id="popup_hps" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#custom-width-modal" style="display:none;">Custom width Modal</button>
 <div id="custom-width-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
@@ -898,7 +988,7 @@ function hapus_bed(id,id_kamar){
             </div>
         	<div class="modal-body">
         		<p>Data tidak bisa terhapus.</p>
-        		<p>Hapus dahulu data bed kamar yang bersangkutan.</p>
+        		<p><b>Hapus dahulu Data Bed kamar yang bersangkutan.</b></p>
         	</div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal">Tutup</button>

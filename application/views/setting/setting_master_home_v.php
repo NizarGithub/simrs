@@ -91,8 +91,17 @@
                         <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#4d81a9;">
                             <li>
                                 <form role="search" class="navbar-left app-search pull-left hidden-xs" style="margin-right:0px;">
-                                    <h5 style="color:#fff;"><b><?php echo strtoupper($user->NAMA_DIV);?></b></h5>
+                                    <?php
+                                    $nama_div = '';
+                                    if($user->NAMA_DIV == null){
+                                        $nama_div = $user->JABATAN;
+                                    }else{
+                                        $nama_div = $user->NAMA_DIV;
+                                    }
+                                ?>
+                                    <h5 style="color:#fff;"><b><?php echo strtoupper($nama_div);?></b></h5>
                                     <h6 style="color:#fff;"><b><?php echo $user->NAMA;?></b></h6>
+                                    <!-- <h6 style="color:#fff;"><b><?php echo $user->JABATAN;?></b></h6> -->
                                 </form>
                             </li>
                             <li class="dropdown user-box">

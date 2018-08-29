@@ -100,6 +100,27 @@ class Lab_home_m extends CI_Model {
 		return $query->row();
 	}
 
+	function get_notif_pasien($posisi,$now){
+		$sql = "
+			SELECT 
+				PSN.*,
+				b.ID AS ID_RJ,
+				b.TANGGAL,
+				b.WAKTU AS WAKTU_RJ,
+				b.STS_POSISI,
+				b.STS_TERIMA,
+				c.TIPE
+			FROM admum_rawat_jalan b
+			JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
+			JOIN rk_laborat_rj c ON c.ID_PELAYANAN = b.ID
+			WHERE b.STS_POSISI = '$posisi'
+			AND b.STS_TERIMA = '0'
+			AND b.TANGGAL = '$now'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
 	function data_pasien($keyword,$posisi,$now){
 		$where = "1 = 1";
 		$order = "";
@@ -128,8 +149,9 @@ class Lab_home_m extends CI_Model {
 			JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
 			JOIN rk_laborat_rj c ON c.ID_PELAYANAN = b.ID
 			WHERE $where
-			AND b.STS_POSISI = '2'
+			AND b.STS_POSISI = '$posisi'
 			AND b.STS_TERIMA = '0'
+			AND b.TANGGAL = '$now'
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -170,7 +192,7 @@ class Lab_home_m extends CI_Model {
 		}
 
 		if($hasil_cek == 'True'){
-			$where = $where." AND b.STS_POSISI = '$posisi'";
+			$where = $where." AND b.STS_POSISI = '$posisi' AND b.STS_TERIMA = '2'";
 		}else{
 			if($level == null){
 				if($tanggal_awal != "" && $tanggal_akhir != ""){
@@ -390,9 +412,11 @@ class Lab_home_m extends CI_Model {
 				LAB.TANGGAL,
 				LAB.BULAN,
 				LAB.TAHUN,
-				LAB.WAKTU
+				LAB.WAKTU,
+				c.BIAYA
 			FROM rk_laborat_rj LAB
 			LEFT JOIN admum_setup_jenis_laborat SET_LAB ON SET_LAB.ID = LAB.JENIS_LABORAT
+			JOIN admum_poli c ON LAB.ID_POLI = c.ID
 			WHERE LAB.ID_PELAYANAN = '$id'
 			ORDER BY LAB.ID DESC
 		";

@@ -43,55 +43,75 @@ a {
     $user = $this->master_model_m->get_user_info($id_user);
 ?>
 
-<div class="col-md-12">
-    <div id="dashboard-depan">
-    <?PHP 
-        $get_menu2 = $this->master_model_m->get_menu_2($id_user, 7);
-        foreach ($get_menu2 as $key => $menu2) {
-        	if($menu2->NAMA != 'Asuransi'){
-            $link = base_url().$menu2->LINK;
-            $icon = base_url().$menu2->GAMBAR_ICON;
-            if($menu2->LINK != null || $menu2->LINK != ""){
-    ?>
-        <div class="tile-depan">
+<div class="row">
+<?PHP 
+    $get_menu2 = $this->master_model_m->get_menu_2($id_user, 7);
+    foreach ($get_menu2 as $key => $menu2) {
+        if($menu2->NAMA != 'Asuransi'){
+        $link = base_url().$menu2->LINK;
+        $icon = base_url().$menu2->GAMBAR_ICON;
+        if($menu2->LINK != null || $menu2->LINK != ""){
+?>
+    <div class="col-md-3">
+        <div class="text-center card-box">
             <a href="<?php echo $link; ?>">
-                <img src="<?php echo $icon; ?>"><br />
-                <?php echo $menu2->NAMA; ?>
+                <div>
+                    <img alt="profile-image" class="img-circle thumb-xl img-thumbnail m-b-10" src="<?php echo $icon; ?>" style="width: 75px; height: 75px;">
+                    <p class="text-muted font-14">
+                        <span class="label label-primary"><?php echo $menu2->NAMA; ?></span>
+                    </p>
+                </div>
             </a>
         </div>
-    <?php
-            }else{
-                $get_menu3 = $this->master_model_m->get_menu_3($id_user, $menu2->ID);
-                foreach ($get_menu3 as $key => $menu3) {
-                    $link3 = base_url().$menu3->LINK;
-                    $icon3 = base_url().$menu3->GAMBAR_ICON;
-    ?>
-                    <div class="tile-depan">
+    </div>
+<?php
+        }else{
+            $get_menu3 = $this->master_model_m->get_menu_3($id_user, $menu2->ID);
+            foreach ($get_menu3 as $key => $menu3) {
+                $link3 = base_url().$menu3->LINK;
+                $icon3 = base_url().$menu3->GAMBAR_ICON;
+?>
+                <div class="col-md-3">
+                    <div class="text-center card-box">
                         <a href="<?php echo $link3; ?>">
-                            <img src="<?php echo $icon3; ?>"><br />
-                            <?php echo $menu3->NAMA; ?>
+                            <div>
+                                <img alt="profile-image" class="img-circle thumb-xl img-thumbnail m-b-10" src="<?php echo $icon3; ?>" style="width: 75px; height: 75px;">
+                                <p class="text-muted font-14">
+                                    <span class="label label-danger"><?php echo $menu3->NAMA; ?></span>
+                                </p>
+                            </div>
                         </a>
                     </div>
-    <?php
-                }
+                </div>
+<?php
             }
-        
-
-    	} else {
-    		$get_data_asuransi = $this->master_model_m->get_data_asuransi();
-            foreach ($get_data_asuransi as $key => $asr) { 
-        ?>
-	        <div class="tile-depan">
-	            <a href="<?php echo base_url();?>asuransi/list_asuransi_c/index/<?=$asr->ID;?>">
-	                <img src="<?=base_url();?>files/asuransi/<?=$asr->LOGO;?>"/>
-	                <br /> 
-	                <?=$asr->NAMA_ASURANSI;?>
-	            </a>
-	        </div>
-        <?PHP 
-        	}
-    	}
-    }
+        }
+    
+    } else {
+        $get_data_asuransi = $this->master_model_m->get_data_asuransi();
+        foreach ($get_data_asuransi as $key => $asr) {
+            $label = '';
+            if($asr->ID % 2 == 0){
+                $label = 'label label-success';
+            }else{
+                $label = 'label label-purple';
+            }
     ?>
-    </div>
+        <div class="col-md-3">
+            <div class="text-center card-box">
+                <a href="<?php echo base_url();?>asuransi/list_asuransi_c/index/<?=$asr->ID;?>">
+                    <div>
+                        <img alt="profile-image" class="img-circle thumb-xl img-thumbnail m-b-10" src="<?=base_url();?>files/asuransi/<?=$asr->LOGO;?>" style="width: 75px; height: 75px;">
+                        <p class="text-muted font-14">
+                            <span class="<?php echo $label; ?>"><?=$asr->NAMA_ASURANSI;?></span>
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    <?PHP 
+        }
+    }
+}
+?>
 </div>

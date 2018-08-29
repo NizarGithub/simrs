@@ -116,21 +116,6 @@ class Admum_data_pasien_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	function data_pasien_id(){
-		$id_klien = "";
-		$id = $this->input->post('id');
-		$data = $this->model->data_pasien_id($id,$id_klien);
-		echo json_encode($data);
-	}
-
-	function hapus(){
-		$id = $this->input->post('id_hapus');
-		$this->model->hapus_pasien($id);
-
-		$this->session->set_flashdata('hapus','1');
-		redirect('admum/admum_data_pasien_c');
-	}
-
 	function kirim_permintaan(){
 		$this->simpan_log('Permintaan Hapus');
 		$id_pegawai = $this->input->post('id_pegawai');
@@ -152,6 +137,13 @@ class Admum_data_pasien_c extends CI_Controller {
 		$now = $this->input->get('now');
 
 		$data = $this->model->data_pasien($id_klien,$keyword,$urutkan,$pilih_umur,$pilih_status,$now);
+		echo json_encode($data);
+	}
+
+	function data_pasien_id(){
+		$id_klien = "";
+		$id = $this->input->post('id');
+		$data = $this->model->data_pasien_id($id,$id_klien);
 		echo json_encode($data);
 	}
 
@@ -197,6 +189,14 @@ class Admum_data_pasien_c extends CI_Controller {
 			$status);
 
 		$this->session->set_flashdata('ubah','1');
+		redirect('admum/admum_data_pasien_c');
+	}
+
+	function hapus(){
+		$id = $this->input->post('id_hapus');
+		$this->model->hapus_pasien($id);
+
+		$this->session->set_flashdata('hapus','1');
 		redirect('admum/admum_data_pasien_c');
 	}
 	//
@@ -443,6 +443,52 @@ class Admum_data_pasien_c extends CI_Controller {
 		);
 
 		$this->load->view('admum/excel/excel_data_pasien_igd',$data);
+	}
+
+	function get_history_medik(){
+		$id_pasien = $this->input->post('id_pasien');
+		$data = array();
+		$data['detail_RJ'] = $this->model->getDetailLayananRJ($id_pasien, '');
+		$data['detail_IGD'] = $this->model->getDetailLayananIGD($id_pasien, '');
+
+		$data['detail_RI'] = $this->model->getDetailLayananRI($id_pasien, '');
+		$data['dataDetVisite_RI'] = $this->model->dataDetVisite_RI($id_pasien, '');
+		$data['dataDetGizi_RI'] = $this->model->dataDetGizi_RI($id_pasien, '');
+		$data['dataDetOksigen_RI'] = $this->model->dataDetOksigen_RI($id_pasien, '');
+		$data['dataDetDiagnosa_RI'] = $this->model->dataDetDiagnosa_RI($id_pasien, '');
+		$data['dataDetResep_RI'] = $this->model->dataDetResep_RI($id_pasien, '');
+
+		echo json_encode($data);
+	}
+
+	function get_history_medik_by_search_rj(){
+		$id_pasien = $this->input->post('id_pasien');
+		$tgl = addslashes($this->input->post('tgl'));
+		$data = array();
+		$data['detail_RJ'] = $this->model->getDetailLayananRJ($id_pasien, $tgl);
+		echo json_encode($data);
+	}
+
+	function get_history_medik_by_search_igd(){
+		$id_pasien = $this->input->post('id_pasien');
+		$tgl = addslashes($this->input->post('tgl'));
+		$data = array();
+		$data['detail_IGD'] = $this->model->getDetailLayananIGD($id_pasien, $tgl);
+		echo json_encode($data);
+	}
+
+	function get_history_medik_by_search_ri(){
+		$id_pasien = $this->input->post('id_pasien');
+		$tgl = addslashes($this->input->post('tgl'));
+		$data = array();
+		$data['detail_RI'] = $this->model->getDetailLayananRI($id_pasien, $tgl);
+		$data['dataDetVisite_RI'] = $this->model->dataDetVisite_RI($id_pasien, $tgl);
+		$data['dataDetGizi_RI'] = $this->model->dataDetGizi_RI($id_pasien, $tgl);
+		$data['dataDetOksigen_RI'] = $this->model->dataDetOksigen_RI($id_pasien, $tgl);
+		$data['dataDetDiagnosa_RI'] = $this->model->dataDetDiagnosa_RI($id_pasien, $tgl);
+		$data['dataDetResep_RI'] = $this->model->dataDetResep_RI($id_pasien, $tgl);
+
+		echo json_encode($data);
 	}
 
 }

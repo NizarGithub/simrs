@@ -208,11 +208,19 @@
                     <div id="navigation">
                         <!-- Navigation Menu-->
                         <ul class="navigation-menu">
+                            <?php if($view != 'pelayanan_ri'){ ?>
                             <li <?php if($master_menu == 'home'){ echo 'class="active"';}else{echo '';} ?> >
                                 <a href="<?php echo base_url(); ?>poli/poli_home_c">
                                     <i class="zmdi zmdi-view-dashboard"></i> <span> Dashboard </span> 
                                 </a>
                             </li>
+                            <?php }else{ ?>
+                            <li <?php if($master_menu == 'home'){ echo 'class="active"';}else{echo '';} ?> >
+                                <a href="<?php echo base_url(); ?>poli/rk_pelayanan_ri_c">
+                                    <i class="zmdi zmdi-view-dashboard"></i> <span> Dashboard </span> 
+                                </a>
+                            </li>
+                            <?php } ?>
                         </ul>
                         <!-- End navigation menu  --> 
                     </div>
@@ -246,6 +254,7 @@
                         </div>
                     </div> -->
 
+                    <?php if($view != 'pelayanan_ri'){ ?>
                     <div class="col-lg-4 col-md-6">
                         <div class="card-box widget-user">
                             <div>
@@ -256,14 +265,26 @@
                                     <button type="button" class="btn btn-purple waves-effect waves-light m-t-15" data-original-title="Nomor antrian sekarang" title="" data-placement="top" data-toggle="tooltip">
                                         <b id="nomor_offline"></b>
                                     </button>
-                                    <button type="button" class="btn btn-success waves-effect waves-light m-t-15" data-target="#modalClosing" data-toggle="modal" data-original-title="Digunakan untuk menghentikan Nomor Antrian dan me-reset ulang." title="" data-placement="top" data-toggle="tooltip">
+                                    <button type="button" class="btn btn-success waves-effect waves-light m-t-15" id="btn_closing" data-original-title="Digunakan untuk menghentikan Nomor Antrian dan me-reset ulang." title="" data-placement="top" data-toggle="tooltip">
                                         <b>Closing Antrian</b> <i class="fa fa-hand-stop-o"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-
+                    <?php }else{ ?>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card-box widget-user">
+                            <div>
+                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/Recent-Documents-icon.png">
+                                <div class="wid-u-info">
+                                    <h4 class="m-t-0 m-b-5">Shift</h4>
+                                    <h2 class="text-success" id="shift_txt">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php } ?>
                     <div class="col-lg-4 col-md-6">
                         <div class="card-box widget-user">
                             <div>
@@ -353,7 +374,8 @@
         <!-- End Of Next Antrian Modal -->
 
         <!-- Closing Antrian Modal -->
-        <div id="modalClosing" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <button id="popup_closing" data-target="#modalClosing" data-toggle="modal" style="display: none;">Modal</button>
+        <div id="modalClosing" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content p-0 b-0">
                     <div class="panel panel-color panel-primary">
@@ -531,7 +553,6 @@
                 }
             }
 
-
             $('#li_notif').click(function(){
                 $('#popup_pasien_baru').show();
                 data_pasien_baru();
@@ -541,6 +562,10 @@
                 $('#popup_pasien_baru').fadeOut();
                 snd.pause();
                 clearInterval(timer);
+            });
+
+            $('#btn_closing').click(function(){
+                $('#popup_closing').click();
             });
 
             $('#ya_closing').click(function(){
@@ -563,6 +588,15 @@
             var s = today.getSeconds();
             m = checkTime(m);
             s = checkTime(s);
+
+            if(h >= 7 && h < 14){
+                $('#shift_txt').html('1 (Satu)');
+            }else if(h >= 14 && h < 21){
+                $('#shift_txt').html('2 (Dua)');
+            }else{
+                $('#shift_txt').html('3 (Tiga)');
+            }
+
             document.getElementById('waktu_txt').innerHTML = h + ":" + m + ":" + s;
             var t = setTimeout(startTime, 500);
         }

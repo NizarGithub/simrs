@@ -80,7 +80,15 @@
                         <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#f1632a; height:60px;">
                             <li>
                                 <form role="search" class="navbar-left app-search pull-left hidden-xs" style="margin-right:0px; margin-top:0px;">
-                                    <h5 style="color:#fff;"><b><?php echo strtoupper($user->NAMA_DIV);?></b></h5>
+                                <?php
+                                    $nama_div = '';
+                                    if($user->NAMA_DIV == null){
+                                        $nama_div = $user->JABATAN;
+                                    }else{
+                                        $nama_div = $user->NAMA_DIV;
+                                    }
+                                ?>
+                                    <h5 style="color:#fff;"><b><?php echo strtoupper($nama_div);?></b></h5>
                                     <h6 style="color:#fff;"><b><?php echo $user->NAMA;?></b></h6>
                                 </form>
                             </li>
@@ -121,12 +129,12 @@
                         <!-- Navigation Menu-->
                         <ul class="navigation-menu">
                             <li <?php if($master_menu == 'home'){ echo 'class="active"';}else{echo '';} ?> >
-                                <a href="<?php echo base_url(); ?>setup/admum_home_c">
+                                <a href="<?php echo base_url(); ?>setup/setup_home_c">
                                     <i class="zmdi zmdi-view-dashboard"></i> <span> Dashboard </span> 
                                 </a>
                             </li>
                             <?PHP 
-                            $get_menu2 = $this->master_model_m->get_menu_2($id_user, 16);
+                            $get_menu2 = $this->master_model_m->get_menu_2($id_user, 10);
                             foreach ($get_menu2 as $key => $menu2) {
                             ?>
 

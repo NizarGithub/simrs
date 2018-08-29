@@ -1,20 +1,31 @@
 <?php  
 	header("Cache-Control: no-cache, no-store, must-revalidate");  
 	header("Content-Type: application/vnd.ms-excel");  
-	header("Content-Disposition: attachment; filename=Data_kamar_inap.xls");
+	header("Content-Disposition: attachment; filename=$filename.xls");
 ?>
-
 <br/>
+
+<table>
+	<tr>
+		<td colspan="8" style="text-align: center;">
+			DAFTAR TARIF KAMAR DAN VISITE DOKTER <br>
+			UNTUK RAWAT INAP RSIA SOERYA
+		</td>
+	</tr>
+	<tr><td colspan="8">&nbsp;</td></tr>
+</table>
+
 <table border="1">
     <thead>
         <tr>
-            <th style="height:30px; text-align:center;" width="50">No</th>
-            <th style="height:30px; text-align:center;">Kode Kamar</th>
-            <th style="height:30px; text-align:center;">Nama Kamar</th>
-            <th style="height:30px; text-align:center;">Kelas</th>
-            <th style="height:30px; text-align:center;">Kategori</th>
-            <th style="height:30px; text-align:center;">Biaya</th>
-            <th style="height:30px; text-align:center;">Jumlah Bed</th>
+            <th style="height:30px; text-align:center; background-color: #ed1c24; color: #fff;" width="50">No</th>
+            <th style="height:30px; text-align:center; background-color: #ed1c24; color: #fff;">Kode Kamar</th>
+            <th style="height:30px; text-align:center; background-color: #ed1c24; color: #fff;">Kelas</th>
+            <th style="height:30px; text-align:center; background-color: #ed1c24; color: #fff;">Biaya</th>
+            <th style="height:30px; text-align:center; background-color: #ed1c24; color: #fff;">Visite Dokter Sp.</th>
+            <th style="height:30px; text-align:center; background-color: #ed1c24; color: #fff;">Biaya Visite</th>
+            <th style="height:30px; text-align:center; background-color: #ed1c24; color: #fff;">Jasa Sarana RS</th>
+            <th style="height:30px; text-align:center; background-color: #ed1c24; color: #fff;">Peruntukan Kamar</th>
         </tr>
     </thead>
     <tbody>
@@ -29,12 +40,13 @@
 	?>
 		<tr>
 			<td style="height:25px; text-align:center;"><?php echo $no; ?></td>
-			<td style="height:25px;"><?php echo $val->KODE_KAMAR; ?></td>
-			<td style="height:25px;"><?php echo $val->NAMA_KAMAR; ?></td>
-			<td style="height:25px;"><?php echo $val->KELAS; ?></td>
-			<td style="height:25px;"><?php echo $val->KATEGORI; ?></td>
-			<td style="height:25px;"><?php echo $val->BIAYA; ?></td>
-			<td style="height:25px;"><?php echo $val->JUMLAH_BED; ?></td>
+			<td style="height:25px; text-align:center;"><?php echo $val->KODE_KAMAR; ?></td>
+			<td style="height:25px; text-align:center;"><?php echo $val->KELAS; ?></td>
+			<td style="height:25px; text-align: right;"><?php echo number_format($val->BIAYA,0,',','.'); ?></td>
+			<td style="height:25px; text-align:center;"><?php echo $val->VISITE_DOKTER; ?></td>
+			<td style="height:25px; text-align: right;"><?php echo number_format($val->BIAYA_VISITE,0,',','.'); ?></td>
+			<td style="height:25px; text-align: right;"><?php echo number_format($val->JASA_SARANA,0,',','.'); ?></td>
+			<td style="height:25px;"><?php echo $val->PERUNTUKAN_KAMAR; ?></td>
 		</tr>
 	<?php	
 		}

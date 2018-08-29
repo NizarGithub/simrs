@@ -5,6 +5,9 @@ class Admum_setup_kamar_rawat_inap_c extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();
+		date_default_timezone_set('Asia/Jakarta');
+		$this->load->helper('url');
+		$this->load->library('fpdf/HTML2PDF');
 		$this->load->model('setup/admum_setup_kamar_rawat_inap_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
 		$id_user = $sess_user['id'];
@@ -13,8 +16,7 @@ class Admum_setup_kamar_rawat_inap_c extends CI_Controller {
 	    }
 	}
 
-	function index()
-	{
+	function index(){
 		$data = array(
 			'page' => 'setup/admum_setup_kamar_rawat_inap_v',
 			'title' => 'Setup Kamar Rawat Inap',
@@ -27,18 +29,37 @@ class Admum_setup_kamar_rawat_inap_c extends CI_Controller {
 			'url_ubah' => base_url().'setup/admum_setup_kamar_rawat_inap_c/ubah',
 			'url_hapus' => base_url().'setup/admum_setup_kamar_rawat_inap_c/hapus',
 			'url_hapus_bed' => base_url().'setup/admum_setup_kamar_rawat_inap_c/hapus_bed',
-			'url_cetak' => base_url().'setup/admum_setup_kamar_rawat_inap_c/cetak_excel',
+			'url_cetak' => base_url().'setup/admum_setup_kamar_rawat_inap_c/cetak',
 		);
 
 		$this->load->view('setup/setup_home_v',$data);
 	}
 
+	function cetak(){
+		if($this->input->post('excel')){
+			$this->cetak_excel();
+		}else{
+			$this->cetak_pdf();
+		}
+	}
+
 	function cetak_excel(){
 		$data = array(
 			'dt' => $this->model->data_kamar('','Default','',''),
+			'filename' => date('dmY').'_laporanDataKamarRawatInap'
 		);
 
 		$this->load->view('setup/excel/excel_kamar_rawat_inap_xls',$data);
+	}
+
+	function cetak_pdf(){
+		$data = array(
+			'dt' => $this->model->data_kamar('','Default','',''),
+			'settitle' => 'Daftar Tarif Kamar dan Visite Dokter',
+			'filename' => date('dmY').'_laporanDataKamarRawatInap'
+		);
+
+		$this->load->view('setup/pdf/laporan_kamar_rawat_inap_pdf',$data);
 	}
 
 	function add_leading_zero($value, $threshold = 2) {
@@ -131,14 +152,18 @@ class Admum_setup_kamar_rawat_inap_c extends CI_Controller {
 
 	function simpan(){
 		$kode_kamar = $this->input->post('kode_kamar');
-		$nama_kamar = $this->input->post('nama_kamar');
-		$kategori = $this->input->post('kategori');
 		$kelas = $this->input->post('kelas_kamar');
 		$biaya = str_replace(',', '', $this->input->post('biaya'));
+		$visite_dokter = $this->input->post('visite');
+		$biaya_visite = str_replace(',', '', $this->input->post('tarif'));
+		$jasa_sarana = str_replace(',', '', $this->input->post('jasa_sarana'));
+		$peruntukan_kamar = $this->input->post('peruntukan_kamar');
 		$jumlah_bed = str_replace(',', '', $this->input->post('jumlah_bed'));
-		$fasilitas = $this->input->post('fasilitas');
+		$tanggal = date('d-m-Y');
+		$bulan = date('n');
+		$tahun = date('Y');
 
-		$this->model->simpan($kode_kamar,$nama_kamar,$kategori,$kelas,$biaya,$jumlah_bed,$fasilitas);
+		$this->model->simpan($kode_kamar,$kelas,$biaya,$visite_dokter,$biaya_visite,$jasa_sarana,$peruntukan_kamar,$jumlah_bed,$tanggal,$bulan,$tahun);
 		$this->insert_kode_kamar();
 
 		$this->session->set_flashdata('sukses','1');
@@ -166,14 +191,15 @@ class Admum_setup_kamar_rawat_inap_c extends CI_Controller {
 
 	function ubah(){
 		$id = $this->input->post('id_ubah');
-		$nama_kamar = $this->input->post('nama_kamar_ubah');
-		$kategori = $this->input->post('kategori_ubah');
 		$kelas = $this->input->post('kelas_kamar_ubah');
 		$biaya = str_replace(',', '', $this->input->post('biaya_ubah'));
+		$visite_dokter = $this->input->post('visite_ubah');
+		$biaya_visite = str_replace(',', '', $this->input->post('tarif_ubah'));
+		$jasa_sarana = str_replace(',', '', $this->input->post('jasa_sarana_ubah'));
+		$peruntukan_kamar = $this->input->post('peruntukan_kamar_ubah');
 		$jumlah_bed = str_replace(',', '', $this->input->post('jumlah_bed_ubah'));
-		$fasilitas = $this->input->post('fasilitas_ubah');
 
-		$this->model->ubah($id,$nama_kamar,$kategori,$kelas,$biaya,$jumlah_bed,$fasilitas);
+		$this->model->ubah($id,$kelas,$biaya,$visite_dokter,$biaya_visite,$jasa_sarana,$peruntukan_kamar,$jumlah_bed);
 
 		$this->session->set_flashdata('ubah','1');
 		redirect('setup/admum_setup_kamar_rawat_inap_c');

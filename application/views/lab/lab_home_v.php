@@ -444,11 +444,8 @@
         });
 
         function get_notif_pasien(){
-            var keyword = "";
-
             $.ajax({
                 url : '<?php echo base_url(); ?>lab/lab_home_c/get_notif_pasien',
-                data : {keyword:keyword},
                 type : "GET",
                 dataType : "json",
                 success : function(res){

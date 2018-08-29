@@ -52,9 +52,7 @@ class Admum_setup_tindakan_c extends CI_Controller {
 			SELECT 
 				COUNT(*) AS TOTAL 
 			FROM nomor 
-			WHERE ID_KLIEN = '$id_klien' 
-			AND KETERANGAN = '$keterangan'
-			AND TAHUN = '$tahun'
+			WHERE KETERANGAN = '$keterangan'
 		";
 		$qry = $this->db->query($sql);
 		$total = $qry->row()->TOTAL;
@@ -65,7 +63,7 @@ class Admum_setup_tindakan_c extends CI_Controller {
 			$no = $this->add_leading_zero(1,3);
 			$kode = $no;
 		}else{
-			$s = "SELECT * FROM nomor WHERE ID_KLIEN = '$id_klien' AND KETERANGAN = '$keterangan' AND TAHUN = '$tahun'";
+			$s = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan'";
 			$q = $this->db->query($s)->row();
 			$next = $q->NEXT+1;
 			$no = $this->add_leading_zero($next,3);
@@ -84,20 +82,19 @@ class Admum_setup_tindakan_c extends CI_Controller {
 			SELECT 
 				COUNT(*) AS TOTAL 
 			FROM nomor 
-			WHERE ID_KLIEN = '$id_klien'
-			AND KETERANGAN = '$keterangan'
+			WHERE KETERANGAN = '$keterangan'
 			AND TAHUN = '$tahun'
 		";
 		$total = $this->db->query($sql_cek)->row()->TOTAL;
 
 		if($total == 0){
-			$this->db->query("INSERT INTO nomor(ID_KLIEN,NEXT,KETERANGAN,TAHUN) VALUES ('$id_klien','1','$keterangan','$tahun')");
+			$this->db->query("INSERT INTO nomor(NEXT,KETERANGAN,TAHUN) VALUES ('1','$keterangan','$tahun')");
 		}else{
-			$sql = "SELECT * FROM nomor WHERE ID_KLIEN = '$id_klien' AND TAHUN = '$tahun' AND KETERANGAN = '$keterangan'";
+			$sql = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan'";
 			$query = $this->db->query($sql)->row();
 			$next = $query->NEXT+1;
 			$id = $query->ID;
-			$this->db->query("UPDATE nomor SET NEXT = '$next' WHERE ID = '$id' AND KETERANGAN = '$keterangan' AND ID_KLIEN = '$id_klien'");
+			$this->db->query("UPDATE nomor SET NEXT = '$next' WHERE ID = '$id' AND KETERANGAN = '$keterangan'");
 		}
 	} 
 

@@ -136,6 +136,40 @@ class Admum_pasien_baru_c extends CI_Controller {
 		echo json_encode(1);
 	}
 
+	function simpan_log($aksi){
+		$sess_user = $this->session->userdata('masuk_rs');
+    	$id_pegawai = $sess_user['id'];
+    	$sql = "SELECT
+					a.ID,
+					a.NAMA,
+					b.NAMA_DEP,
+					c.NAMA_DIV
+				FROM kepeg_pegawai a
+				LEFT JOIN kepeg_departemen b ON b.ID = a.ID_DEPARTEMEN
+				LEFT JOIN kepeg_divisi c ON c.ID = a.ID_DIVISI
+				WHERE a.ID = '$id_pegawai'
+    	";
+    	$qry = $this->db->query($sql);
+    	$row = $qry->row();
+    	$nama = $row->NAMA;
+    	$dep = $row->NAMA_DEP;
+    	$div = $row->NAMA_DIV;
+		$tanggal = date('d-m-Y');
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu = $format->format('H:i:s');
+		$ket = '';
+		if($aksi == 'daftar'){
+			$ket = 'pendaftaran '.strtoupper('pasien baru');
+		}else{
+			$ket = strtoupper($aksi);
+		}
+		$keterangan = "User ".strtoupper($nama)." Departemen ".strtoupper($dep)." Divisi ".strtoupper($div)." telah melakukan ".$ket;
+
+		$this->master_model_m->simpan_log($id_pegawai,$tanggal,$waktu,$keterangan);
+	}
+
 	function simpan(){
 		$tz_object = new DateTimeZone('Asia/Jakarta');
 		$datetime = new DateTime();
@@ -182,6 +216,7 @@ class Admum_pasien_baru_c extends CI_Controller {
 			$provinsi);
 
 		$this->insert_kode_pasien();
+		$this->simpan_log('daftar');
 
 		$this->session->set_flashdata('sukses','1');
 		redirect('admum/admum_pasien_baru_c');
@@ -202,52 +237,6 @@ class Admum_pasien_baru_c extends CI_Controller {
 	function klik_pasien(){
 		$id = $this->input->post('id');
 		$data = $this->model->klik_pasien($id);
-		echo json_encode($data);
-	}
-
-	function get_history_medik(){
-		$id_pasien = $this->input->post('id_pasien');
-		$data = array();
-		$data['detail_RJ'] = $this->model->getDetailLayananRJ($id_pasien, '');
-		$data['detail_IGD'] = $this->model->getDetailLayananIGD($id_pasien, '');
-
-		$data['detail_RI'] = $this->model->getDetailLayananRI($id_pasien, '');
-		$data['dataDetVisite_RI'] = $this->model->dataDetVisite_RI($id_pasien, '');
-		$data['dataDetGizi_RI'] = $this->model->dataDetGizi_RI($id_pasien, '');
-		$data['dataDetOksigen_RI'] = $this->model->dataDetOksigen_RI($id_pasien, '');
-		$data['dataDetDiagnosa_RI'] = $this->model->dataDetDiagnosa_RI($id_pasien, '');
-		$data['dataDetResep_RI'] = $this->model->dataDetResep_RI($id_pasien, '');
-
-		echo json_encode($data);
-	}
-
-	function get_history_medik_by_search_rj(){
-		$id_pasien = $this->input->post('id_pasien');
-		$tgl = addslashes($this->input->post('tgl'));
-		$data = array();
-		$data['detail_RJ'] = $this->model->getDetailLayananRJ($id_pasien, $tgl);
-		echo json_encode($data);
-	}
-
-	function get_history_medik_by_search_igd(){
-		$id_pasien = $this->input->post('id_pasien');
-		$tgl = addslashes($this->input->post('tgl'));
-		$data = array();
-		$data['detail_IGD'] = $this->model->getDetailLayananIGD($id_pasien, $tgl);
-		echo json_encode($data);
-	}
-
-	function get_history_medik_by_search_ri(){
-		$id_pasien = $this->input->post('id_pasien');
-		$tgl = addslashes($this->input->post('tgl'));
-		$data = array();
-		$data['detail_RI'] = $this->model->getDetailLayananRI($id_pasien, $tgl);
-		$data['dataDetVisite_RI'] = $this->model->dataDetVisite_RI($id_pasien, $tgl);
-		$data['dataDetGizi_RI'] = $this->model->dataDetGizi_RI($id_pasien, $tgl);
-		$data['dataDetOksigen_RI'] = $this->model->dataDetOksigen_RI($id_pasien, $tgl);
-		$data['dataDetDiagnosa_RI'] = $this->model->dataDetDiagnosa_RI($id_pasien, $tgl);
-		$data['dataDetResep_RI'] = $this->model->dataDetResep_RI($id_pasien, $tgl);
-
 		echo json_encode($data);
 	}
 

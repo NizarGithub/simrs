@@ -130,6 +130,7 @@ class Poli_home_m extends CI_Model {
 				PSN.*,
 				b.ID AS ID_RJ,
 				b.TANGGAL,
+				b.WAKTU,
 				b.BULAN,
 				b.TAHUN,
 				b.ID_POLI,
@@ -165,7 +166,7 @@ class Poli_home_m extends CI_Model {
 		return $query->result();
 	}
 
-	function get_rekam_medik($id_pasien,$tanggal){
+	function get_rekam_medik($id_rj,$tanggal){
 		$sql = "
 			SELECT
 				RJ.ID,
@@ -178,7 +179,7 @@ class Poli_home_m extends CI_Model {
 			FROM admum_rawat_jalan RJ
 			LEFT JOIN admum_poli P ON P.ID = RJ.ID_POLI
 			LEFT JOIN kepeg_pegawai PEG ON PEG.ID = P.ID_PEG_DOKTER
-			WHERE RJ.ID_PASIEN = '$id_pasien';
+			WHERE RJ.ID = '$id_rj';
 		";
 		$query = $this->db->query($sql);
 		return $query->row();
@@ -198,14 +199,15 @@ class Poli_home_m extends CI_Model {
 		return $query->result();
 	}
 
-	function get_diagnosa($id_pasien){
+	function get_diagnosa($id_rj,$tanggal){
 		$sql = "
 			SELECT 
 				DG.*,
 				PK.URAIAN AS NAMA_PENYAKIT
 			FROM rk_diagnosa_rj DG
 			LEFT JOIN admum_jenis_penyakit PK ON PK.ID = DG.ID_PENYAKIT
-			WHERE DG.ID_PASIEN = '$id_pasien'
+			WHERE DG.ID_PELAYANAN = '$id_rj'
+			AND DG.TANGGAL = '$tanggal'
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -225,6 +227,36 @@ class Poli_home_m extends CI_Model {
 			LEFT JOIN apotek_gudang_obat GD ON GD.ID = DET.ID_OBAT
 			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = GD.ID_SETUP_NAMA_OBAT
 			WHERE DET.ID_RESEP = '$id_resep'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function get_lab($id_pasien,$tanggal){
+		$sql = "
+			SELECT
+				a.ID,
+				a.KODE_LAB,
+				a.TANGGAL,
+				b.JENIS_LABORAT,
+				a.TOTAL_TARIF
+			FROM rk_laborat_rj a
+			JOIN admum_setup_jenis_laborat b ON b.ID = a.JENIS_LABORAT
+			WHERE a.ID_PASIEN = '$id_pasien'
+			AND a.TANGGAL = '$tanggal'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function get_lab_det($id_lab){
+		$sql = "
+			SELECT
+				a.*,
+				b.NAMA_PEMERIKSAAN
+			FROM rk_laborat_rj_detail a
+			JOIN admum_setup_pemeriksaan b ON b.ID = a.PEMERIKSAAN
+			WHERE a.ID_PEMERIKSAAN_RJ = '$id_lab'
 		";
 		$query = $this->db->query($sql);
 		return $query->result();

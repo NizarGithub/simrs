@@ -13,15 +13,15 @@ class Admum_setup_kamar_rawat_inap_m extends CI_Model {
 		$order = "";
 
 		if($urutkan == 'Default'){
-			$order = "ORDER BY RI.ID DESC";
-		}else if($urutkan == 'Nama Kamar'){
-			$order = "ORDER BY RI.NAMA_KAMAR ASC";
+			$order = "ORDER BY RI.ID ASC";
+		}else if($urutkan == 'Kode Kamar'){
+			$order = "ORDER BY RI.KODE_KAMAR ASC";
 		}else if($urutkan == 'Kelas Kamar'){
 			$order = "ORDER BY RI.KELAS ASC";
 		}
 
-		if($cari_berdasarkan == 'Nama Kamar'){
-			$where = $where." AND (RI.NAMA_KAMAR LIKE '%$keyword%' OR RI.KODE_KAMAR LIKE '%$keyword%')";
+		if($cari_berdasarkan == 'Kode Kamar'){
+			$where = $where." AND (RI.KODE_KAMAR LIKE '%$keyword%')";
 		}else if($cari_berdasarkan == 'Kelas Kamar'){
 			$where = $where." AND RI.KELAS = '$pilih_kelas'";
 		}else{
@@ -29,23 +29,14 @@ class Admum_setup_kamar_rawat_inap_m extends CI_Model {
 		}
 
 		if($keyword != ""){
-			$where = $where." AND (RI.NAMA_KAMAR LIKE '%$keyword%' OR RI.KODE_KAMAR LIKE '%$keyword%')";
+			$where = $where." AND (RI.KODE_KAMAR LIKE '%$keyword%')";
 		}else{
 			$where = $where;
 		}
 
 		$sql = "
 			SELECT 
-				RI.ID,
-				RI.KODE_KAMAR,
-				RI.NAMA_KAMAR,
-				RI.KATEGORI,
-				RI.KELAS,
-				RI.BIAYA,
-				RI.JUMLAH_BED,
-				RI.FASILITAS,
-				RI.STATUS_KAMAR,
-				RI.STATUS_PENUH,
+				RI.*,
 				IFNULL(BED.TOTAL,0) AS TOTAL
 			FROM admum_kamar_rawat_inap RI
 			LEFT JOIN(
@@ -62,16 +53,7 @@ class Admum_setup_kamar_rawat_inap_m extends CI_Model {
 	function data_kamar_id($id){
 		$sql = "
 			SELECT 
-				RI.ID,
-				RI.KODE_KAMAR,
-				RI.NAMA_KAMAR,
-				RI.KATEGORI,
-				RI.KELAS,
-				RI.BIAYA,
-				RI.JUMLAH_BED,
-				RI.FASILITAS,
-				RI.STATUS_KAMAR,
-				RI.STATUS_PENUH,
+				RI.*,
 				IFNULL(BED.TOTAL,0) AS TOTAL
 			FROM admum_kamar_rawat_inap RI
 			LEFT JOIN(
@@ -95,28 +77,36 @@ class Admum_setup_kamar_rawat_inap_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan($kode_kamar,$nama_kamar,$kategori,$kelas,$biaya,$jumlah_bed,$fasilitas){
+	function simpan($kode_kamar,$kelas,$biaya,$visite_dokter,$biaya_visite,$jasa_sarana,$peruntukan_kamar,$jumlah_bed,$tanggal,$bulan,$tahun){
 		$sql = "
 			INSERT INTO admum_kamar_rawat_inap(
 				KODE_KAMAR,
-				NAMA_KAMAR,
-				KATEGORI,
 				KELAS,
 				BIAYA,
+				VISITE_DOKTER,
+				BIAYA_VISITE,
+				JASA_SARANA,
+				PERUNTUKAN_KAMAR,
 				JUMLAH_BED,
-				FASILITAS,
 				STATUS_KAMAR,
-				STATUS_PENUH
+				STATUS_PENUH,
+				TANGGAL,
+				BULAN,
+				TAHUN
 			) VALUES (
 				'$kode_kamar',
-				'$nama_kamar',
-				'$kategori',
 				'$kelas',
 				'$biaya',
+				'$visite_dokter',
+				'$biaya_visite',
+				'$jasa_sarana',
+				'$peruntukan_kamar',
 				'$jumlah_bed',
-				'$fasilitas',
 				'READY',
-				'0'
+				'0',
+				'$tanggal',
+				'$bulan',
+				'$tahun'
 			)
 		";
 		$this->db->query($sql);
@@ -141,15 +131,16 @@ class Admum_setup_kamar_rawat_inap_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
-	function ubah($id,$nama_kamar,$kategori,$kelas,$biaya,$jumlah_bed,$fasilitas){
+	function ubah($id,$kelas,$biaya,$visite_dokter,$biaya_visite,$jasa_sarana,$peruntukan_kamar,$jumlah_bed){
 		$sql = "
 			UPDATE admum_kamar_rawat_inap SET
-				NAMA_KAMAR = '$nama_kamar',
-				KATEGORI = '$kategori',
 				KELAS = '$kelas',
 				BIAYA = '$biaya',
-				JUMLAH_BED = '$jumlah_bed',
-				FASILITAS = '$fasilitas'
+				VISITE_DOKTER = '$visite_dokter',
+				BIAYA_VISITE = '$biaya_visite',
+				JASA_SARANA = '$jasa_sarana',
+				PERUNTUKAN_KAMAR = '$peruntukan_kamar',
+				JUMLAH_BED = '$jumlah_bed'
 			WHERE ID = '$id'
 		";
 		$this->db->query($sql);

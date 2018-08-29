@@ -106,15 +106,6 @@ class Lab_home_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	function get_notif_pasien(){
-		$now = date('d-m-Y');
-		$keyword = $this->input->get('keyword');
-		$posisi = '2';
-
-		$data = $this->model->data_pasien($keyword,$posisi,$now);
-		echo json_encode($data);
-	}
-
 	function terima_pasien(){
 		$id = $this->input->post('id');
 		$this->model->terima_pasien($id);
@@ -137,8 +128,18 @@ class Lab_home_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function get_notif_pasien(){
+		// $now = date('d-m-Y');
+		$now = '23-08-2018';
+		$posisi = '2';
+
+		$data = $this->model->get_notif_pasien($posisi,$now);
+		echo json_encode($data);
+	}
+
 	function data_pasien(){
-		$now = date('d-m-Y');
+		// $now = date('d-m-Y');
+		$now = '23-08-2018';
 		$keyword = $this->input->get('keyword');
 		$posisi = '2';
 
