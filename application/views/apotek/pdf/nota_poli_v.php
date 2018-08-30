@@ -44,7 +44,7 @@
         <table style="width: 100%;">
           <tr>
             <td style="text-align: left; width: 88%;">Nomor: <?php echo $row['INVOICE']; ?></td>
-            <td style="text-align: right;">Tanggal: <?php echo $row['TANGGAL_CLOSING']; ?></td>
+            <td style="text-align: right;">Tanggal: <?php echo $row['TANGGAL']; ?></td>
           </tr>
         </table>
       <h2 style="text-transform: uppercase; font-weight: bold; text-align: center;">kwitansi pembayaran</h2>
@@ -107,7 +107,7 @@
       <div style="margin: 0 auto; max-width: 950px;">
         <table style="width: 100%;">
           <?php
-            $id_pelayanan = $row['ID_RAJAL'];
+            $id_pelayanan = $row['ID_PELAYANAN'];
             $query_here = $this->db->query("SELECT
                               TINDAKAN.NAMA_TINDAKAN
                               FROM
@@ -121,7 +121,7 @@
            ?>
           <tr>
             <td>-</td>
-            <td style="text-transform: uppercase;"><?php echo $rh['NAMA_TINDAKAN']; ?></td>            
+            <td style="text-transform: uppercase;"><?php echo $rh['NAMA_TINDAKAN']; ?></td>
           </tr>
           <?php
             }
@@ -144,7 +144,7 @@
             <td style="text-transform: uppercase; width: 60%;"><?php echo $row['NAMA_DOKTER']; ?></td>
             <td>Sidoarjo,
               <?php
-                $tgl = $row['TANGGAL_CLOSING'];
+                $tgl = $row['TANGGAL'];
                 $dat = substr($tgl,0,2);
                 $m = substr($tgl,3,2);
                 $y = substr($tgl,6);
@@ -193,7 +193,7 @@
           <tr>
             <td style="width: 20%;">SHIFT</td>
             <td style="width: 3%;">:</td>
-            <td style="text-transform: uppercase; width: 60%;"><?php echo $row['TANGGAL_CLOSING']; ?> (<?php echo $row['SHIFT']; ?>)</td>
+            <td style="text-transform: uppercase; width: 60%;"><?php echo $row['TANGGAL']; ?> (<?php echo $row['SHIFT']; ?>)</td>
             <td style="text-align: center; text-transform: uppercase;"><?php echo $row['NAMA_PEGAWAI']; ?></td>
           </tr>
         </table>

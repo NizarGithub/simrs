@@ -18,14 +18,14 @@ class Ap_kasir_aa_c extends CI_Controller {
 	function index()
 	{
 		$keterangan = 'KODE-TRX-OBAT';
-		$tanggal = date('d'); 
+		$tanggal = date('d');
 		$bulan = date('n');
 		$tahun = date('Y');
 
 		$sql = "
-			SELECT 
-				COUNT(*) AS TOTAL 
-			FROM nomor 
+			SELECT
+				COUNT(*) AS TOTAL
+			FROM nomor
 			WHERE KETERANGAN = '$keterangan'
 			AND TAHUN = '$tahun'
 		";
@@ -60,7 +60,7 @@ class Ap_kasir_aa_c extends CI_Controller {
 
 	function get_data_obat(){
 		$keyword = $this->input->post('keyword');
-		$data = $this->model->data_obat($keyword);
+		$data = $this->model->get_data_obat($keyword);
 		echo json_encode($data);
 	}
 
@@ -80,62 +80,38 @@ class Ap_kasir_aa_c extends CI_Controller {
 	    return sprintf('%0' . $threshold . 's', $value);
 	}
 
-	function romanic_number($integer, $upcase = true) { 
+	function romanic_number($integer, $upcase = true) {
 	    $table = array(
-	    	'M'		=>1000, 
-	    	'CM'	=>900, 
-	    	'D'		=>500, 
-	    	'CD'	=>400, 
-	    	'C'		=>100, 
-	    	'XC'	=>90, 
-	    	'L'		=>50, 
-	    	'XL'	=>40, 
-	    	'X'		=>10, 
-	    	'IX'	=>9, 
-	    	'V'		=>5, 
-	    	'IV'	=>4, 
+	    	'M'		=>1000,
+	    	'CM'	=>900,
+	    	'D'		=>500,
+	    	'CD'	=>400,
+	    	'C'		=>100,
+	    	'XC'	=>90,
+	    	'L'		=>50,
+	    	'XL'	=>40,
+	    	'X'		=>10,
+	    	'IX'	=>9,
+	    	'V'		=>5,
+	    	'IV'	=>4,
 	    	'I'		=>1
-	    ); 
-	    
-	    $return = ''; 
-	    while($integer > 0) 
-	    { 
-	        foreach($table as $rom=>$arb) 
-	        { 
-	            if($integer >= $arb) 
-	            { 
-	                $integer -= $arb; 
-	                $return .= $rom; 
-	                break; 
-	            } 
-	        } 
-	    } 
+	    );
 
-	    return $return; 
-	}
+	    $return = '';
+	    while($integer > 0)
+	    {
+	        foreach($table as $rom=>$arb)
+	        {
+	            if($integer >= $arb)
+	            {
+	                $integer -= $arb;
+	                $return .= $rom;
+	                break;
+	            }
+	        }
+	    }
 
-	function insert_kode(){
-	    $keterangan = 'KODE-TRX-OBAT';
-		$tahun = date('Y');
-
-		$sql_cek = "
-			SELECT 
-				COUNT(*) AS TOTAL 
-			FROM nomor 
-			WHERE KETERANGAN = '$keterangan'
-			AND TAHUN = '$tahun'
-		";
-		$total = $this->db->query($sql_cek)->row()->TOTAL;
-
-		if($total == 0){
-			$this->db->query("INSERT INTO nomor(NEXT,KETERANGAN,TAHUN) VALUES ('1','$keterangan','$tahun')");
-		}else{
-			$sql = "SELECT * FROM nomor WHERE TAHUN = '$tahun' AND KETERANGAN = '$keterangan'";
-			$query = $this->db->query($sql)->row();
-			$next = $query->NEXT+1;
-			$id = $query->ID;
-			$this->db->query("UPDATE nomor SET NEXT = '$next' WHERE ID = '$id' AND KETERANGAN = '$keterangan'");
-		}
+	    return $return;
 	}
 
 	function simpan_trx(){
@@ -236,6 +212,92 @@ class Ap_kasir_aa_c extends CI_Controller {
 		$dari = $this->input->post('dari');
 		$data = $this->model->get_resep_id($id_resep,$dari);
 		echo json_encode($data);
-	} 
+	}
 
+	function data_obat(){
+		$keyword = $this->input->get('keyword');
+		$data = $this->model->data_obat($keyword);
+		echo json_encode($data);
+	}
+
+	function get_invoice(){
+		$keterangan = 'KODE-TRX-OBAT';
+		$tanggal = date('d');
+		$bulan = date('n');
+		$tahun = date('Y');
+
+		$sql = "
+			SELECT
+				COUNT(*) AS TOTAL
+			FROM nomor
+			WHERE KETERANGAN = '$keterangan'
+			AND TAHUN = '$tahun'
+		";
+		$qry = $this->db->query($sql);
+		$total = $qry->row()->TOTAL;
+		$kode = "";
+
+		if($total == 0){
+			$no = $this->add_leading_zero(1,3);
+			$kode = $tahun.$bulan.$tanggal.$no;
+		}else{
+			$s = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan' AND TAHUN = '$tahun'";
+			$q = $this->db->query($s)->row();
+			$next = $q->NEXT+1;
+			$no = $this->add_leading_zero($next,3);
+			$kode = $tahun.$bulan.$tanggal.$no;
+		}
+
+		echo json_encode($kode);
+	}
+
+	function insert_kode(){
+	    $keterangan = 'KODE-TRX-OBAT';
+		$tahun = date('Y');
+
+		$sql_cek = "
+			SELECT
+				COUNT(*) AS TOTAL
+			FROM nomor
+			WHERE KETERANGAN = '$keterangan'
+			AND TAHUN = '$tahun'
+		";
+		$total = $this->db->query($sql_cek)->row()->TOTAL;
+
+		if($total == 0){
+			$this->db->query("INSERT INTO nomor(NEXT,KETERANGAN,TAHUN) VALUES ('1','$keterangan','$tahun')");
+		}else{
+			$sql = "SELECT * FROM nomor WHERE TAHUN = '$tahun' AND KETERANGAN = '$keterangan'";
+			$query = $this->db->query($sql)->row();
+			$next = $query->NEXT+1;
+			$id = $query->ID;
+			$this->db->query("UPDATE nomor SET NEXT = '$next' WHERE ID = '$id' AND KETERANGAN = '$keterangan'");
+		}
+	}
+
+	function data_keranjang(){
+		$data = $this->model->data_keranjang();
+		echo json_encode($data);
+	}
+
+	function simpan_keranjang(){
+		$id_gudang = $this->input->post('id');
+		$harga_beli = $this->input->post('harga_beli');
+
+		$sql_check = $this->db->query("SELECT COUNT(*) AS TOTAL FROM keranjang_beli WHERE ID_GUDANG_OBAT = '$id_gudang'")->row();
+
+		if ($sql_check->TOTAL == '0') {
+			$this->model->simpan_keranjang($id_gudang, $harga_beli);
+		}else {
+
+		}
+
+		echo '1';
+	}
+
+	function hapus_keranjang(){
+		$id = $this->input->post('id');
+		$data = $this->model->hapus_keranjang($id);
+		echo json_encode($data);
+	}
 }

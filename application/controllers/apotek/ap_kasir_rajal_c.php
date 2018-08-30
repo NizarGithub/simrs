@@ -62,7 +62,7 @@ class Ap_kasir_rajal_c extends CI_Controller {
 
 	function get_pasien(){
 		// $tanggal = date('d-m-Y');
-		$tanggal = '28-08-2018';
+		$tanggal = '29-08-2018';
 		$keyword = $this->input->get('keyword');
 		$data = $this->model->get_pasien($tanggal,$keyword);
 		echo json_encode($data);
@@ -77,12 +77,11 @@ class Ap_kasir_rajal_c extends CI_Controller {
 	function get_tindakan(){
 		$id_pasien = $this->input->post('id_pasien');
 		$tanggal = date('d-m-Y');
-		$sql = "
-			SELECT
-				TD.*
-			FROM rk_tindakan_rj TD
-			WHERE TD.ID_PASIEN = '$id_pasien'
-		";
+		$sql = "SELECT
+								TD.*
+							FROM rk_tindakan_rj TD
+							WHERE TD.ID_PASIEN = '$id_pasien'
+						";
 		$query = $this->db->query($sql);
 		$id_tindakan = '';
 		if($query->num_rows() > 0){
@@ -112,6 +111,25 @@ class Ap_kasir_rajal_c extends CI_Controller {
 
 		$resep['ind'] = $data;
 		$resep['det'] = $this->model->get_resep2($id_resep);
+		echo json_encode($resep);
+	}
+
+	function get_laborat(){
+		$id_pasien = $this->input->post('id_pasien');
+		$tanggal = date('d-m-Y');
+		$sql = "SELECT * FROM rk_laborat_rj WHERE ID_PASIEN = '$id_pasien'";
+		$query = $this->db->query($sql);
+		$id_laborat = '';
+		$data = '';
+		if($query->num_rows() > 0){
+			$data = $query->row();
+			$id_laborat = $data->ID;
+		}else{
+			$id_laborat = '';
+		}
+
+		$resep['ind'] = $data;
+		$resep['det'] = $this->model->get_laborat($id_laborat);
 		echo json_encode($resep);
 	}
 
@@ -367,4 +385,60 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		$data = $this->model->data_pembayaran();
 		echo json_encode($data);
 	}
+
+	function data_rekap_pendapatan(){
+		$data = $this->model->data_rekap_pendapatan();
+		echo json_encode($data);
+	}
+
+	function data_poli(){
+		$data = $this->model->data_poli();
+		echo json_encode($data);
+	}
+
+	function tanggal_filter(){
+    $tanggal_sekarang = $this->input->post('tanggal_sekarang');
+    $tanggal_sampai = $this->input->post('tanggal_sampai');
+    $data = $this->model->tanggal_filter($tanggal_sekarang, $tanggal_sampai);
+    echo json_encode($data);
+  }
+
+	function poli_filter(){
+    $id_poli = $this->input->post('result_poli');
+    $data = $this->model->poli_filter($id_poli);
+    echo json_encode($data);
+  }
+
+	function print_pdf(){
+    $by = $this->input->post('by');
+    $tanggal_sekarang = $this->input->post('tanggal_sekarang');
+    $tanggal_sampai = $this->input->post('tanggal_sampai');
+    $id_poli = $this->input->post('id_poli');		
+
+    $data = $this->model->print_pdf(
+      $by,
+      $tanggal_sekarang,
+      $tanggal_sampai,
+      $id_poli
+    );
+
+		$data_row = $this->model->print_pdf_row(
+      $by,
+      $tanggal_sekarang,
+      $tanggal_sampai,
+      $id_poli
+    );
+
+    $array = array(
+      'settitle' => 'Rekap Pendapatan',
+      'filename' => date('dmY').'_rekap_pendapatan',
+      'data' => $data,
+			'data_row' => $data_row,
+			'by' => $by,
+			'tanggal_sekarang' => $tanggal_sekarang,
+			'tanggal_sampai' => $tanggal_sampai,
+			'id_poli' => $id_poli
+    );
+    $this->load->view('apotek/pdf/print_rekap_pendaftaran_pdf_v', $array);
+  }
 }

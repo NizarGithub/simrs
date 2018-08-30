@@ -84,6 +84,10 @@ $user_detail = $this->model->get_user_detail($id_user);
   display: none;
   cursor: pointer;
 }
+
+#btn_rekap_pendapatan{
+  cursor: pointer;
+}
 </style>
 
 </head>
@@ -231,8 +235,8 @@ $user_detail = $this->model->get_user_detail($id_user);
                                             </div>
                                             <p>
                                                 <center>
-                                                    <button type="button" id="tunai_btn" onclick="get_tunai();" style="margin-top: -22px; float: left; margin-left: 125px;" class="btn btn-warning">Tunai</button>
-                                                    <button type="button" id="non_tunai_btn" onclick="get_non_tunai();" style="margin-top: -22px; float: left; margin-left: 50px;" class="btn btn-default">Debit/Credit Card</button>
+                                                    <button type="button" id="tunai_btn" onclick="get_tunai();" style="float: left;" class="btn btn-warning">Tunai</button>
+                                                    <button type="button" id="non_tunai_btn" onclick="get_non_tunai();" style="float: left; margin-left: 50px;" class="btn btn-default">Debit/Credit Card</button>
                                                 </center>
                                             </p>
                                             <div class="col-md-12 col-sm-12 col-xs-12">
@@ -378,13 +382,13 @@ $user_detail = $this->model->get_user_detail($id_user);
                                     </div>
                                     <div class="panel-footer bg-purple">
                                         <h4><strong>Tutup Kasir</strong></h4>
-                                        <p>Input Nota Poli</p>
+                                        <p>Tutup (Closing) Kasir</p>
                                     </div>
                                 </div>
                             </div>
 
                         </div>
-                        <div class="row m-t-20">
+                        <div class="row m-t-20" id="btn_rekap_pendapatan">
                           <div class="col-lg-6 col-md-6">
                               <div class="panel panel-icon no-bd bg-green hover-effect">
                                   <div class="panel-body bg-green">
@@ -695,6 +699,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                     <table class="table table-bordered" id="tabel_resep2">
                                         <thead>
                                             <tr class="info">
+                                                <th></th>
                                                 <th style="text-align: center;">KODE RESEP</th>
                                                 <th style="text-align: center;">TANGGAL</th>
                                                 <th style="text-align: center;">TOTAL</th>
@@ -707,7 +712,17 @@ $user_detail = $this->model->get_user_detail($id_user);
                                 </div>
 
                                 <div class="tab-pane fade" id="tab1_4">
-                                    Proses
+                                  <table class="table table-bordered" id="tabel_laborat">
+                                      <thead>
+                                          <tr class="warning">
+                                              <th style="text-align: center;">KODE LAB</th>
+                                              <th style="text-align: center;">TANGGAL</th>
+                                              <th style="text-align: center;">TOTAL TARIF</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                      </tbody>
+                                  </table>
                                 </div>
                             </div>
                         </div>
@@ -772,6 +787,84 @@ $user_detail = $this->model->get_user_detail($id_user);
                     </div>
                 </div>
             </div>
+
+      <button class="btn btn-danger" data-toggle="modal" id="popup_rekap_pendapatan" style="display:none;" data-target="#modal-large2">Show me</button>
+      <div class="modal fade" id="modal-large2" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-lg">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                              <center><h3 class="modal-title" id="myModalLabel"><strong>Rekap Pendapatan</strong></h3></center>
+                          </div>
+                          <div class="modal-body">
+                            <div class="row">
+                              <form class="" action="<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/print_pdf" target="_blank" method="post">
+                              <div class="col-md-12" style="margin-bottom: 1%;">
+                                <button type="button" id="btn_filter_semua" onclick="get_filter_semua();" style="float: left;" class="btn btn-success">Semua</button>
+                                <button type="button" id="btn_filter_tanggal" onclick="get_filter_tanggal();" style="float: left; margin-left: 1%;" class="btn btn-default">Tanggal</button>
+                                <button type="button" id="btn_filter_poli" onclick="get_filter_poli();" style="float: left; margin-left: 1%;" class="btn btn-default">Poli</button>
+                              </div>
+                              <input type="hidden" name="by" id="hidden_filter_semua" value="semua">
+                              <input type="hidden" name="by" id="hidden_filter_tanggal" value="tanggal" disabled>
+                              <input type="hidden" name="by" id="hidden_filter_poli" value="poli" disabled>
+                              <div id="form_tanggal_filter" style="display: none;">
+                                <div class="col-md-4">
+                                  <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="text" name="tanggal_sekarang" id="tanggal_sekarang" class="form-control">
+                                        <span class="input-group-addon bg-primary b-0 text-white">S/D</span>
+                                        <input type="text" name="tanggal_sampai" id="tanggal_sampai" class="form-control">
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="col-md-1">
+                                  <button type="button" class="btn btn-info" onclick="tanggal_filter();" name="button"><i class="fa fa-search"></i> Cari</button>
+                                </div>
+                              </div>
+                              <div id="form_poli_filter" style="display: none;">
+                                <div class="col-md-4">
+                                  <select class="form-control" name="id_poli" id="result_poli">
+                                    <?php
+                                    $this->db->select('*');
+                                    $this->db->from('admum_poli');
+                                    $result_poli = $this->db->get()->result_array();
+                                    foreach ($result_poli as $rp) {
+                                    ?>
+                                    <option value="<?php echo $rp['ID']; ?>"><?php echo $rp['NAMA']; ?></option>
+                                    <?php } ?>
+                                  </select>
+                                </div>
+                                <div class="col-md-1">
+                                  <button type="button" class="btn btn-info" onclick="poli_filter();" name="button"><i class="fa fa-search"></i> Cari</button>
+                                </div>
+                              </div>
+                              <div class="col-md-12">
+                                <table class="table" id="tabel_rekap_pendapatan">
+                                  <thead>
+                                    <tr class="info">
+                                      <th>No</th>
+                                      <th>Invoice</th>
+                                      <th>Nama Poli</th>
+                                      <th>Tanggal</th>
+                                      <th>Total Biaya</th>
+                                      <th>Pegawai</th>
+                                      <th>Shift</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                              <button type="submit" class="btn btn-success">Print</button>
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                          </div>
+                          </form>
+                      </div>
+                  </div>
+              </div>
 
     <button type="button" data-type="error" class="btn btn-danger notification" id="notif_closing" data-message="" style="display:none;" data-horiz-pos="left" data-verti-pos="bottom">Error</button>
 
@@ -1172,13 +1265,17 @@ $(document).ready(function(){
                 var id_rj = $('#id_rj').val();
                 var encodedString = Base64.encode(id_rj);
                 get_invoice();
-                window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_pembayaran/'+encodedString, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+                window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_pembayaran/'+id_rj, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
             }
         });
     });
 
     $('#btn_closing_kasir').click(function(){
       $('#popup_closing').click();
+    });
+
+    $('#btn_rekap_pendapatan').click(function(){
+      data_rekap_pendapatan();
     });
 
     $('#btn_ya_closing').click(function(){
@@ -1189,6 +1286,36 @@ $(document).ready(function(){
         data_pembayaran();
     });
 });
+
+function data_rekap_pendapatan(){
+  $('#popup_rekap_pendapatan').click();
+  $.ajax({
+    url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/data_rekap_pendapatan',
+    type : "POST",
+    dataType : "json",
+    success : function(result){
+      var table = '';
+      if(result == null || result == ""){
+          table = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+      }else{
+          var no = 0;
+          for(var i=0; i<result.length; i++){
+              no++;
+              table += "<tr>"+
+                          "<td style='text-align:center;'>"+no+"</td>"+
+                          "<td>"+result[i].INVOICE+"</td>"+
+                          "<td>"+result[i].NAMA_POLI+"</td>"+
+                          "<td>"+result[i].TANGGAL+"</td>"+
+                          "<td>"+result[i].TOTAL+"</td>"+
+                          "<td>"+result[i].NAMA_PEGAWAI+"</td>"+
+                          "<td>"+result[i].SHIFT+"</td>"+
+                      "</tr>";
+          }
+      }
+      $('#tabel_rekap_pendapatan tbody').html(table);
+    }
+  });
+}
 
 function data_pembayaran(){
   $('#popup_data_pembayaran').click();
@@ -1337,7 +1464,7 @@ function startNotifClosing() {
       $('#btn_suara_closing').click();
     }
 
-    if (jam > '20:28' && jam < '21:00') {
+    if (jam > '13:45' && jam < '14:00') {
       $('#short_shift').show();
       $('#long_shift').hide();
       $('#btn_closing_kasir').show();
@@ -1389,11 +1516,17 @@ function get_pasien(){
                 for(var i=0; i<result.length; i++){
                     no++;
                     var aksi = '';
-
                     if(result[i].STS_BAYAR == '0'){
                         aksi = "<button class='btn btn-info' type='button' onclick='klik_pasien("+result[i].ID+","+result[i].ID_PASIEN+","+result[i].TOTAL+");'>"+formatNumber(result[i].TOTAL)+"</button>";
                     }else{
                         aksi = '<i class="fa fa-check-square-o"></i> '+formatNumber(result[i].TOTAL);
+                    }
+
+                    var not_pol = '';
+                    if(result[i].STS_BAYAR == '0'){
+                        not_pol = "Nota Poli Kosong";
+                    }else{
+                        not_pol = "<button class='btn btn-info' type='button' onclick='klik_print_poli("+result[i].ID+");'><i class='fa fa-print'></i> Print Poli</button>";
                     }
 
                     var status_bayar = '';
@@ -1404,12 +1537,12 @@ function get_pasien(){
                     }
 
                     $tr += "<tr>"+
-                                "<td style='text-align:center;'><input type='text' value='"+result[i].ID_KASIR_RAJAL+"' name='id_rajal_hidden[]'>"+no+"</td>"+
+                                "<td style='text-align:center;'><input type='hidden' value='"+result[i].ID_KASIR_RAJAL+"' name='id_rajal_hidden[]'>"+no+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].TANGGAL+"</td>"+
                                 "<td>"+result[i].NAMA+" "+status_bayar+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].NAMA_POLI+"</td>"+
                                 "<td align='center'><button class='btn btn-success' type='button' onclick='klik_copy_resep("+result[i].ID+");'><i class='fa fa-print'></i> "+result[i].KODE_RESEP+"</button></td>"+
-                                "<td align='center'><button class='btn btn-info' type='button' onclick='klik_print_poli("+result[i].ID+");'><i class='fa fa-print'></i> Print Poli</button></td>"+
+                                "<td align='center'>"+not_pol+"</td>"+
                                 "<td style='text-align:right;'>"+aksi+"</td>"+
                             "</tr>";
                 }
@@ -1452,6 +1585,7 @@ function klik_pasien(id,id_pasien,total){
 
             get_tindakan(id_pasien);
             get_resep(id_pasien);
+            get_laborat(id_pasien);
         }
     });
 }
@@ -1471,11 +1605,13 @@ function get_resep(id_pasien){
                 $tr = '<tr><td colspan="4" style="text-align:center;">Data Tidak Ada</td></tr>';
             }else{
                 $tr = '<tr>'+
+                        '<td></td>'+
                         '<td>'+res['ind']['KODE_RESEP']+'</td>'+
                         '<td style="text-align:center;">'+res['ind']['TANGGAL']+'</td>'+
-                        '<td style="text-align:right;"><b>'+formatNumber(res['ind']['TOTAL'])+'</b></td>'+
+                        '<td style="text-align:right;"><b id="total_hitung">'+formatNumber(res['ind']['TOTAL'])+'</b></td>'+
                       '</tr>'+
                       '<tr class="info">'+
+                        '<td style="text-align:center;">&nbsp;</td>'+
                         '<td style="text-align:center; font-weight:bold;">NAMA OBAT</td>'+
                         '<td style="text-align:center; font-weight:bold;">JUMLAH</td>'+
                         '<td style="text-align:center;">&nbsp;</td>'+
@@ -1483,8 +1619,11 @@ function get_resep(id_pasien){
 
                 for(var i=0; i<res['det'].length; i++){
                     total_resep += parseFloat(res['det'][i].SUBTOTAL);
-
+                    // <input type='text' value='"+result[i].ID_KASIR_RAJAL+"' name='id_rajal_hidden[]'>
                     $tr2 += '<tr>'+
+                                '<td>'+
+                                '<input type="checkbox" class="form-control" id="cb_resep_'+res['det'][i].ID+'" name="check_total[]" value="'+res['det'][i].SUBTOTAL+'" onclick="hitung_total_resep('+res['det'][i].ID+');" checked>'+
+                                '</td>'+
                                 '<td>'+res['det'][i].NAMA_OBAT+'</td>'+
                                 '<td style="text-align:center;">'+formatNumber(res['det'][i].JUMLAH_BELI)+'</td>'+
                                 '<td style="text-align:right;">'+formatNumber(res['det'][i].SUBTOTAL)+'</td>'+
@@ -1497,6 +1636,73 @@ function get_resep(id_pasien){
             $('#tabel_resep2 tbody').html($tr+$tr2);
         }
     });
+}
+
+function get_laborat(id_pasien){
+    $.ajax({
+        url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/get_laborat',
+        data : {id_pasien:id_pasien},
+        type : "POST",
+        dataType : "json",
+        success : function(res){
+            $tr = '';
+            $tr2 = '';
+            var total_resep = 0;
+
+            if(res['ind'] == null || res['ind'] == ""){
+                $tr = '<tr><td colspan="4" style="text-align:center;">Data Tidak Ada</td></tr>';
+            }else{
+                $tr = '<tr>'+
+                        '<td>'+res['ind']['KODE_LAB']+'</td>'+
+                        '<td style="text-align:center;">'+res['ind']['TANGGAL']+'</td>'+
+                        '<td style="text-align:right;"><b id="total_hitung">'+formatNumber(res['ind']['TOTAL_TARIF'])+'</b></td>'+
+                      '</tr>'+
+                      '<tr class="warning">'+
+                        '<td colspan="2" style="text-align:center; font-weight:bold;">NAMA PEMERIKSAAN</td>'+
+                        '<td style="text-align:center; font-weight:bold;">TARIF</td>'+
+                      '</tr>';
+
+                for(var i=0; i<res['det'].length; i++){
+                    total_resep += parseFloat(res['det'][i].TARIF);
+                    $tr2 += '<tr>'+
+                                '<td colspan="2">'+res['det'][i].NAMA_PEMERIKSAAN+'</td>'+
+                                '<td style="text-align:right;">'+formatNumber(res['det'][i].TARIF)+'</td>'+
+                            '</tr>';
+                }
+
+                $('#biaya_lab').val(formatNumber(total_resep));
+            }
+
+            $('#tabel_laborat tbody').html($tr+$tr2);
+        }
+    });
+}
+
+function hitung_total_resep(id){
+ var id_check = $("input[name='check_total[]']:checked").length;
+ var val_check = $('#cb_resep_'+id).val();
+ var tot = 0;
+
+
+  $("input[name='check_total[]']:checked").each(function(idx,elm){
+    if (id_check != 0) {
+      tot += parseInt(elm.value, 10);
+    }
+  });
+ $('#total_hitung').html(formatNumber(tot));
+ $('#biaya_resep').val(formatNumber(tot));
+
+ var biaya_poli = $('#biaya_poli').val();
+ biaya_poli = biaya_poli.split(',').join('');
+ var biaya_tindakan = $('#biaya_tindakan').val();
+ biaya_tindakan = biaya_tindakan.split(',').join('');
+ var biaya_resep = $('#biaya_resep').val();
+ biaya_resep = biaya_resep.split(',').join('');
+ var biaya_lab = $('#biaya_lab').val();
+ biaya_lab = biaya_lab.split(',').join('');
+
+ var tambah_setiap_biaya = parseFloat(biaya_poli) + parseFloat(biaya_tindakan) + parseFloat(biaya_resep) + parseFloat(biaya_lab);
+ $('#grandtotal2').val(tambah_setiap_biaya);
 }
 
 function get_tindakan(id_pasien){
@@ -1747,6 +1953,140 @@ function get_non_tunai(){
     $('#b_kembali').val(0);
     $('#b_bayar').val(tagihan);
     $('#jenis_bayar').val('Kartu Kredit');
+}
+
+function get_filter_semua(){
+  document.getElementById("btn_filter_semua").className = "btn btn-success";
+  document.getElementById("btn_filter_tanggal").className = "btn btn-default";
+  document.getElementById("btn_filter_poli").className = "btn btn-default";
+  $('#form_tanggal_filter').hide();
+  $('#form_poli_filter').hide();
+
+  $('#hidden_filter_semua').removeAttr('disabled');
+  $('#hidden_filter_tanggal').attr('disabled','disabled');
+  $('#hidden_filter_poli').attr('disabled','disabled');
+  semua_filter();
+}
+
+function get_filter_tanggal(){
+  document.getElementById("btn_filter_tanggal").className = "btn btn-success";
+  document.getElementById("btn_filter_semua").className = "btn btn-default";
+  document.getElementById("btn_filter_poli").className = "btn btn-default";
+  $('#form_tanggal_filter').show();
+  $('#form_poli_filter').hide();
+
+  $('#hidden_filter_tanggal').removeAttr('disabled');
+  $('#hidden_filter_semua').attr('disabled','disabled');
+  $('#hidden_filter_poli').attr('disabled','disabled');
+}
+
+function get_filter_poli(){
+  document.getElementById("btn_filter_poli").className = "btn btn-success";
+  document.getElementById("btn_filter_semua").className = "btn btn-default";
+  document.getElementById("btn_filter_tanggal").className = "btn btn-default";
+  $('#form_tanggal_filter').hide();
+  $('#form_poli_filter').show();
+
+  $('#hidden_filter_poli').removeAttr('disabled');
+  $('#hidden_filter_semua').attr('disabled','disabled');
+  $('#hidden_filter_tanggal').attr('disabled','disabled');
+}
+
+function tanggal_filter(){
+  var tanggal_sekarang = $('#tanggal_sekarang').val();
+  var tanggal_sampai = $('#tanggal_sampai').val();
+  $.ajax({
+    url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/tanggal_filter',
+    data : {
+      tanggal_sekarang:tanggal_sekarang,
+      tanggal_sampai:tanggal_sampai
+    },
+    type : "POST",
+    dataType : "json",
+    success : function(result){
+      var table = '';
+      if(result == null || result == ""){
+          table = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+      }else{
+          var no = 0;
+          for(var i=0; i<result.length; i++){
+              no++;
+              table += "<tr>"+
+                          "<td style='text-align:center;'>"+no+"</td>"+
+                          "<td>"+result[i].INVOICE+"</td>"+
+                          "<td>"+result[i].NAMA_POLI+"</td>"+
+                          "<td>"+result[i].TANGGAL+"</td>"+
+                          "<td>"+result[i].TOTAL+"</td>"+
+                          "<td>"+result[i].NAMA_PEGAWAI+"</td>"+
+                          "<td>"+result[i].SHIFT+"</td>"+
+                      "</tr>";
+          }
+      }
+      $('#tabel_rekap_pendapatan tbody').html(table);
+    }
+  });
+}
+
+function poli_filter(){
+  var result_poli = $('#result_poli').val();
+  $.ajax({
+    url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/poli_filter',
+    data : {
+      result_poli:result_poli,
+    },
+    type : "POST",
+    dataType : "json",
+    success : function(result){
+      var table = '';
+      if(result == null || result == ""){
+          table = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+      }else{
+          var no = 0;
+          for(var i=0; i<result.length; i++){
+              no++;
+              table += "<tr>"+
+                          "<td style='text-align:center;'>"+no+"</td>"+
+                          "<td>"+result[i].INVOICE+"</td>"+
+                          "<td>"+result[i].NAMA_POLI+"</td>"+
+                          "<td>"+result[i].TANGGAL+"</td>"+
+                          "<td>"+result[i].TOTAL+"</td>"+
+                          "<td>"+result[i].NAMA_PEGAWAI+"</td>"+
+                          "<td>"+result[i].SHIFT+"</td>"+
+                      "</tr>";
+          }
+      }
+      $('#tabel_rekap_pendapatan tbody').html(table);
+    }
+  });
+}
+
+function semua_filter(){
+  $.ajax({
+    url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/data_rekap_pendapatan',
+    type : "POST",
+    dataType : "json",
+    success : function(result){
+      var table = '';
+      if(result == null || result == ""){
+          table = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+      }else{
+          var no = 0;
+          for(var i=0; i<result.length; i++){
+              no++;
+              table += "<tr>"+
+                          "<td style='text-align:center;'>"+no+"</td>"+
+                          "<td>"+result[i].INVOICE+"</td>"+
+                          "<td>"+result[i].NAMA_POLI+"</td>"+
+                          "<td>"+result[i].TANGGAL+"</td>"+
+                          "<td>"+result[i].TOTAL+"</td>"+
+                          "<td>"+result[i].NAMA_PEGAWAI+"</td>"+
+                          "<td>"+result[i].SHIFT+"</td>"+
+                      "</tr>";
+          }
+      }
+      $('#tabel_rekap_pendapatan tbody').html(table);
+    }
+  });
 }
 
 function deleteRow(btn){

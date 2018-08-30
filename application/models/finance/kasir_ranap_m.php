@@ -17,48 +17,47 @@ class Kasir_ranap_m extends CI_Model {
 			$where = $where;
 		}
 
-		$sql = "
-			SELECT
-				a.*,
-				(a.TOT_TINDAKAN+a.TOT_RESEP+a.BIAYA_KAMAR+a.BIAYA_VISITE+a.JASA_SARANA+a.TOT_LAB) AS TOTAL
-			FROM(
-				SELECT
-					a.ID,
-					a.ID_PASIEN,
-					b.KODE_PASIEN,
-					b.NAMA AS NAMA_PASIEN,
-					b.JENIS_KELAMIN,
-					b.NAMA_ORTU,
-					a.TANGGAL_MASUK,
-					a.WAKTU,
-					a.BULAN,
-					a.TAHUN,
-					a.NAMA_PENANGGUNGJAWAB,
-					a.TELEPON,
-					a.SISTEM_BAYAR,
-					a.ASAL_RUJUKAN,
-					a.ID_DOKTER,
-					a.KELAS,
-					a.ID_KAMAR,
-					a.ID_BED,
-					a.STATUS_SUDAH,
-					IFNULL(c.TOTAL,0) AS TOT_TINDAKAN,
-					IFNULL(d.TOTAL,0) AS TOT_RESEP,
-					e.BIAYA AS BIAYA_KAMAR,
-					e.BIAYA_VISITE,
-					e.JASA_SARANA,
-					IFNULL(g.TOTAL_TARIF,0) AS TOT_LAB
-				FROM admum_rawat_inap a
-				JOIN rk_pasien b ON b.ID = a.ID_PASIEN
-				LEFT JOIN rk_ri_tindakan c ON c.ID_PELAYANAN = a.ID
-				LEFT JOIN rk_ri_resep d ON d.ID_PELAYANAN = a.ID
-				LEFT JOIN admum_kamar_rawat_inap e ON e.ID = a.ID_KAMAR
-				LEFT JOIN rk_ri_laborat g ON g.ID_PELAYANAN = a.ID
-			) a
-			WHERE $where
-			AND a.TANGGAL_MASUK = '$tanggal'
-			ORDER BY a.ID DESC
-		";
+		$sql = "SELECT
+							a.*,
+							(a.TOT_TINDAKAN+a.TOT_RESEP+a.BIAYA_KAMAR+a.BIAYA_VISITE+a.JASA_SARANA+a.TOT_LAB) AS TOTAL
+						FROM(
+							SELECT
+								a.ID,
+								a.ID_PASIEN,
+								b.KODE_PASIEN,
+								b.NAMA AS NAMA_PASIEN,
+								b.JENIS_KELAMIN,
+								b.NAMA_ORTU,
+								a.TANGGAL_MASUK,
+								a.WAKTU,
+								a.BULAN,
+								a.TAHUN,
+								a.NAMA_PENANGGUNGJAWAB,
+								a.TELEPON,
+								a.SISTEM_BAYAR,
+								a.ASAL_RUJUKAN,
+								a.ID_DOKTER,
+								a.KELAS,
+								a.ID_KAMAR,
+								a.ID_BED,
+								a.STATUS_SUDAH,
+								IFNULL(c.TOTAL,0) AS TOT_TINDAKAN,
+								IFNULL(d.TOTAL,0) AS TOT_RESEP,
+								e.BIAYA AS BIAYA_KAMAR,
+								e.BIAYA_VISITE,
+								e.JASA_SARANA,
+								IFNULL(g.TOTAL_TARIF,0) AS TOT_LAB
+							FROM admum_rawat_inap a
+							JOIN rk_pasien b ON b.ID = a.ID_PASIEN
+							LEFT JOIN rk_ri_tindakan c ON c.ID_PELAYANAN = a.ID
+							LEFT JOIN rk_ri_resep d ON d.ID_PELAYANAN = a.ID
+							LEFT JOIN admum_kamar_rawat_inap e ON e.ID = a.ID_KAMAR
+							LEFT JOIN rk_ri_laborat g ON g.ID_PELAYANAN = a.ID
+						) a
+						WHERE $where
+						AND a.TANGGAL_MASUK = '$tanggal'
+						ORDER BY a.ID DESC
+					";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
