@@ -246,7 +246,7 @@ class Admum_pasien_rj_c extends CI_Controller {
 		if($pilihan == '1'){
 			$this->model->simpan_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$pilihan,$barcode,$nomor_antrian,$biaya_reg);
 			$id_rj = $this->db->insert_id();
-			$this->model->simpan_antrian($tanggal,$waktu,$id_pasien_new,$id_rj,$barcode,$id_loket,$kode_antrian,$nomor_antrian);
+			// $this->model->simpan_antrian($tanggal,$waktu,$id_pasien_new,$id_rj,$barcode,$id_loket,$kode_antrian,$nomor_antrian);
 			$this->simpan_antrian_off();
 		}else{
 			$this->model->simpan_lab_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$pilihan,$biaya_reg);

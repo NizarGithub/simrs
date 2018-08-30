@@ -619,12 +619,14 @@ function klik_perawat_tambah(id){
 					                				$akses = "";
 					                				if($aks->AKSES == "pasien"){
 							                    		$akses = "Beranda Pasien";
-							                    	} else if($aks->AKSES == "admum"){
+							                    	}else if($aks->AKSES == "admum"){
 							                    		$akses = "Admission";
-							                    	} else if($aks->AKSES == "poli"){
+							                    	}else if($aks->AKSES == "poli"){
 							                    		$akses = "Poli";
-							                    	} else if($aks->AKSES == "lab"){
+							                    	}else if($aks->AKSES == "lab"){
 							                    		$akses = "Laborat";
+							                    	}else if($aks->AKSES == "apk"){
+							                    		$akses = "Si RS Mobile";
 							                    	}else if($aks->AKSES == "apotek"){
 							                    		$akses = "Apotek";
 							                    	}else if($aks->AKSES == "rekam_medik"){
@@ -668,7 +670,7 @@ function klik_perawat_tambah(id){
 
 			                    <div class="form-group">
 			                        <label class="col-md-2 control-label"> Kode Antrian </label>
-			                        <div class="col-md-5">
+			                        <div class="col-md-3">
 			                            <select class="form-control" name="kode_antrian" id="kode_antrian" required="required">
 	                                        <option value=""> -- Pilih</option>
 	                                        <?PHP 
@@ -698,6 +700,10 @@ function klik_perawat_tambah(id){
 			                            <div class="checkbox checkbox-primary">
 			                                <input type="checkbox" name="akses[]" id="inlineCheckbox_lab" value="lab">
 			                                <label for="inlineCheckbox_lab"> Laborat </label>
+			                            </div>
+			                            <div class="checkbox checkbox-danger">
+			                                <input type="checkbox" name="akses[]" id="inlineCheckbox_apk" value="apk">
+			                                <label for="inlineCheckbox_apk"> Si RS Mobile </label>
 			                            </div>
 			                            <div class="checkbox checkbox-success">
 			                                <input type="checkbox" name="akses[]" id="inlineCheckbox4" value="apotek">

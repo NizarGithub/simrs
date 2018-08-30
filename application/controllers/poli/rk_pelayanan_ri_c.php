@@ -955,6 +955,7 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		$bulan = date('n');
 		$tahun = date('Y');
 		$dirawat = $this->input->post('dirawat_selama');
+		$tanggal_keluar = $this->input->post('tanggal_keluar');
 		$kondisi_akhir = $this->input->post('kondisi_akhir');
 
 		//ICU
@@ -987,7 +988,7 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		}
 
 		$this->model->simpan_ka($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$dirawat,$kondisi_akhir);
-		$this->db->query("UPDATE admum_rawat_inap SET STATUS_SUDAH = '1' WHERE ID = '$id_pelayanan'");
+		$this->db->query("UPDATE admum_rawat_inap SET STATUS_SUDAH = '1', TANGGAL_KELUAR = '$tanggal_keluar' WHERE ID = '$id_pelayanan'");
 
 		echo '1';
 	}

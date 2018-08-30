@@ -191,7 +191,7 @@ class Admum_pasien_ri_c extends CI_Controller {
 		$status_pasien = $this->input->post('status_pasien');
 		$jumlah = str_replace(',', '', $this->input->post('jumlah_klaim'));
 
-		$this->model->simpan_ri($id_pasien,$tanggal_masuk,$waktu,$bulan,$tahun,$nama_pjawab,$telepon,$sistem_bayar,$asal_rujukan,$id_dokter,$kelas,$id_kamar,$id_bed);
+		$this->model->simpan_ri($id_pasien,$tanggal_masuk,$waktu,$bulan,$tahun,$nama_pjawab,$telepon,$sistem_bayar,$asal_rujukan,$id_dokter,$id_asuransi,$kelas,$id_kamar,$id_bed);
 		$this->model->update_stt_pakai($id_bed);
 		$id_ri = $this->db->insert_id();
 

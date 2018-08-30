@@ -180,6 +180,10 @@ function deleteRow(btn){
 	                                <input type="checkbox" <?=$lab;?> name="akses[]" id="inlineCheckbox_lab" value="lab">
 	                                <label for="inlineCheckbox_lab"> Laborat </label>
 	                            </div>
+	                            <div class="checkbox checkbox-danger">
+	                                <input type="checkbox" <?=$lab;?> name="akses[]" id="inlineCheckbox_apk" value="apk">
+	                                <label for="inlineCheckbox_apk"> Si RS Mobile </label>
+	                            </div>
 	                            <div class="checkbox checkbox-success">
 	                                <input type="checkbox" <?=$apotek;?> name="akses[]" id="inlineCheckbox4" value="apotek">
 	                                <label for="inlineCheckbox4"> Apotek </label>

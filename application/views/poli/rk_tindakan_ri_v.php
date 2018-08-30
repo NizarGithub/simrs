@@ -3084,12 +3084,14 @@ function hapus_surat_dokter(id){
                 <li role="presentation" id="dt_resep">
                     <a href="#resep1" role="tab" data-toggle="tab"><i class="fa fa-medkit"></i></i>&nbsp;Resep</a>
                 </li>
-                <!-- <li role="presentation" id="dt_kondisi_akhir">
+                <li role="presentation" id="dt_kondisi_akhir">
                     <a href="#kondisi_akhir1" role="tab" data-toggle="tab"><i class="fa fa-check-square-o"></i>&nbsp;Kondisi Akhir</a>
                 </li>
+                <!--
                 <li role="presentation" id="dt_surat_dokter">
                     <a href="#surat_dokter1" role="tab" data-toggle="tab"><i class="fa fa-file-text-o"></i>&nbsp;Surat Dokter</a>
-                </li> -->
+                </li>
+                -->
             </ul>
             <div class="tab-content">
             	<div role="tabpanel" class="tab-pane fade in active" id="tindakan1">
@@ -4225,10 +4227,7 @@ function hapus_surat_dokter(id){
                                 <select class="form-control" name="kondisi_akhir" id="kondisi_akhir">
                                     <option value="Dirawat">Dirawat</option>
                                     <option value="Pulang">Pulang</option>
-                                    <option value="Atas Permintaan Sendiri">Atas Permintaan Sendiri</option>
                                     <option value="Dirujuk">Dirujuk</option>
-                                    <option value="Pindah Poli">Pindah Poli</option>
-                                    <option value="ICU">ICU</option>
                                     <option value="Operasi">Operasi</option>
                                     <option value="Meninggal">Meninggal</option>
                                 </select>
@@ -4243,8 +4242,14 @@ function hapus_surat_dokter(id){
                                 </div>
                 			</div>
                 		</div>
+                		<div class="form-group">
+                			<label class="col-sm-2 control-label">Tanggal Keluar</label>
+                			<div class="col-sm-4">
+                				<input type="text" class="form-control" name="tanggal_keluar" data-mask="99-99-9999" value="">
+                			</div>
+                		</div>
 
-                        <div id="view_icu">
+                        <!-- <div id="view_icu">
                         	<div class="form-group">
 		                        <label class="col-md-2 control-label">Ruang ICU</label>
 		                        <div class="col-md-4">
@@ -4276,7 +4281,7 @@ function hapus_surat_dokter(id){
 		                        </div>
 		                    </div>
 		                    <hr>
-                        </div>
+                        </div> -->
 
                         <div id="view_operasi">
                         	<div class="form-group">

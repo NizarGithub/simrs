@@ -30,6 +30,7 @@ $user_detail = $this->model->get_user_detail($id_user);
 <link href="<?=base_url();?>kasir-apotek/assets/css/style-devan.css" rel="stylesheet">
 <link href="<?=base_url();?>kasir-apotek/assets/plugins/modal/css/component.css" rel="stylesheet">
 <link href="<?=base_url();?>kasir-apotek/assets/plugins/jnotify/jNotify.jquery.css" rel="stylesheet">
+<link href="<?php echo base_url(); ?>css-devan/style-devan.css" rel="stylesheet" type="text/css" />
 <!-- END  MANDATORY STYLE -->
 <link rel="shortcut icon" href="<?php echo base_url(); ?>picture/apotek/pay.ico">
 
@@ -63,7 +64,8 @@ $user_detail = $this->model->get_user_detail($id_user);
 #msg_kosong,
 #view_non_tunai,
 #view_notif_bayar,
-#notif_sukses{
+#notif_sukses,
+#view_tambahan{
     display: none;
 }
 </style>
@@ -71,6 +73,12 @@ $user_detail = $this->model->get_user_detail($id_user);
 </head>
 
 <body data-page="medias" onload="startTime();">
+    <div id="popup_load">
+        <div class="window_load">
+            <img src="<?=base_url()?>picture/progress.gif" height="100" width="125">
+        </div>
+    </div>
+
     <!-- BEGIN TOP MENU -->
     <input type="hidden" id="sts_edit" value="0" />
     <input type="hidden" id="sts_lunas" value="0" />
@@ -107,6 +115,7 @@ $user_detail = $this->model->get_user_detail($id_user);
         </div>
     </nav>
     <!-- END TOP MENU -->
+
     <!-- BEGIN WRAPPER -->
     <div id="wrapper" style="padding-left: 0;">
         <!-- BEGIN MAIN CONTENT -->
@@ -131,7 +140,7 @@ $user_detail = $this->model->get_user_detail($id_user);
             <div class="panel-content">
                 <div class="row media-manager">
                     <div class="margin-bottom-30"></div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-5">
                         <div class="panel panel-default">
                             <div class="panel-heading clearfix pos-rel">
                               <div class="pos-abs top-12 l-15 f-18 c-gray"><i class="fa fa-table"></i></div>
@@ -140,7 +149,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                             <div class="panel-body messages">
                               <div class="row">
                                 <div class="col-md-12 col-sm-12 col-xs-12">
-                                  <div class="withScroll" data-height="525" id="tabel_pasien">
+                                  <div class="scroll-y" id="tabel_pasien" style="height: 505px;">
                         
                                   </div>
                                 </div>
@@ -149,19 +158,20 @@ $user_detail = $this->model->get_user_detail($id_user);
                         </div>
                     </div>
 
-                    <div class="col-sm-6">
+                    <div class="col-sm-7">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <!-- <h3 class="panel-title">Striped rows <strong>Table</strong></h3> -->
-                                <span style="padding-bottom: 6px; padding-top: 6px;" class="label label-success" style="">
+                                <span style="padding-bottom: 6px; padding-top: 6px;" class="label label-success">
                                     Invoice : #<b id="invoice_txt"></b>
                                 </span>
                                 <button type="button" class="btn btn-danger btn-sm" onclick="window.location='<?=base_url();?>finance/kasir_ranap_c';">Reset</button>
                             </div>
+                            <hr>
                             <div class="panel-body messages">
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <div class="withScroll" data-height="480">
+                                        <div class="scroll-y" style="height: 420px;">
                                             <h3 class="panel-title"><strong>Detail</strong> Kamar</h3>
                                             <table class="table table-bordered" id="tabel_kamar_byr">
                                                 <thead>
@@ -250,6 +260,23 @@ $user_detail = $this->model->get_user_detail($id_user);
                                                         <td style="text-align: right;"><b id="tot_biaya_resep">0</b></td>
                                                     </tr>
                                                 </tfoot>
+                                            </table>
+
+                                            <hr>
+
+                                            <h3 class="panel-title"><strong>Detail</strong> Asuransi</h3>
+                                            <table class="table table-bordered" id="tabel_asr_byr">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="text-align: center;">No</th>
+                                                        <th style="text-align: center;">Nama Asuransi</th>
+                                                        <th style="text-align: center;">Asuransi</th>
+                                                        <th style="text-align: center;">Biaya</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                </tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -512,10 +539,10 @@ $user_detail = $this->model->get_user_detail($id_user);
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="form_pembayaran">
-                    <input type="hidden" name="ppn_hidden" id="ppn_hidden" value="">
-                    <input type="hidden" name="jml_tr_baru" id="jml_tr_baru" value="0">
-                    <input type="hidden" name="tmp_sts_pesnaan" id="tmp_sts_pesnaan" value="0">
-                    <input type="hidden" name="jenis_bayar" id="jenis_bayar" value="">
+                    <input type="hidden" name="id_ri" id="id_ri" value="">
+                    <input type="hidden" name="invoice" id="invoice" value="">
+                    <input type="hidden" name="sistem_bayar" id="sistem_bayar" value="">
+                    <input type="hidden" name="jenis_bayar" id="jenis_bayar" value="Tunai">
 
                     <div class="modal-header" style="background-color: #EBEBEB; color: #2B2B2B;">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -543,23 +570,23 @@ $user_detail = $this->model->get_user_detail($id_user);
                                     </div>
 
                                     <div class="form-group">
-                                        <label class="form-label"><strong> Total Tagihan </strong></label>
+                                        <label class="form-label"><strong> Total Biaya </strong></label>
                                         <div class="controls">
                                             <input type="text" name="b_total_tagihan" id="b_total_tagihan" class="form-control" style="font-size: 15px; font-weight: bold;" readonly>
                                         </div>
                                     </div>
 
-                                    <div class="form-group tunai_grp">
-                                        <label class="form-label"><strong> Bayar </strong></label>
+                                    <div class="form-group">
+                                        <label class="form-label"><strong> Biaya Asuransi </strong></label>
                                         <div class="controls">
-                                            <input type="text" name="b_bayar" id="b_bayar" onkeyup="FormatCurrency(this); hitung_kembali();" class="form-control" style="font-size: 15px; font-weight: bold;">
+                                            <input type="text" name="b_asuransi" id="b_asuransi" class="form-control" style="font-size: 15px; font-weight: bold;" readonly>
                                         </div>
                                     </div>
 
-                                    <div class="form-group tunai_grp">
-                                        <label class="form-label"><strong> Kembali </strong></label>
+                                    <div class="form-group">
+                                        <label class="form-label"><strong> Total </strong></label>
                                         <div class="controls">
-                                            <input type="text" name="b_kembali" id="b_kembali" class="form-control" style="font-weight: bold; font-size: 20px; color: red;" readonly>
+                                            <input type="text" name="b_total" id="b_total" class="form-control" style="font-size: 15px; font-weight: bold;" readonly>
                                         </div>
                                     </div>
 
@@ -582,13 +609,35 @@ $user_detail = $this->model->get_user_detail($id_user);
                                             <input type="text" name="no_kartu" id="no_kartu" class="form-control" style="font-weight: bold; font-size: 15px;">
                                         </div>
                                     </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label"><strong> Bayar </strong></label>
+                                        <div class="controls">
+                                            <input type="text" name="b_bayar" id="b_bayar" onkeyup="FormatCurrency(this); hitung_kembali();" class="form-control" style="font-size: 15px; font-weight: bold;">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" id="view_tambahan">
+                                        <label class="form-label"><strong> Tambahan </strong></label>
+                                        <div class="controls">
+                                            <input type="hidden" name="asd" id="asd" value="">
+                                            <input type="text" name="b_tambahan" id="b_tambahan" onkeyup="FormatCurrency(this); hitung_tambahan();" class="form-control" style="font-size: 15px; font-weight: bold;">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label"><strong> Kembali </strong></label>
+                                        <div class="controls">
+                                            <input type="text" name="b_kembali" id="b_kembali" class="form-control" style="font-weight: bold; font-size: 20px; color: red;" readonly>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" onclick="simpan_pembayaran();" id="btn-proses-byr" disabled="disabled">Proses</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-success" id="btn-proses-byr" disabled="disabled">Proses</button>
+                        <button type="button" class="btn btn-default" id="btn-batal-byr" data-dismiss="modal">Batal</button>
                     </div>
                 </form>
 
@@ -903,26 +952,6 @@ $(document).ready(function(){
         $('#jenis_pembayaran').val('Non Tunai');
     });
 
-    $('#btn_bayar').click(function(){
-        $.ajax({
-            url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_pembayaran',
-            data : $('#form_pembayaran2').serialize(),
-            type : "POST",
-            dataType : "json",
-            success : function(res){
-                $('#btn_tutup').click();
-                $('#notif_sukses').click();
-                $('#id_pasien').val("");
-                $('#id_poli').val("");
-                $('#jenis_pembayaran').val("");
-                var id_rj = $('#id_rj').val();
-                var encodedString = Base64.encode(id_rj);
-                get_invoice();
-                window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_pembayaran/'+encodedString, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
-            }
-        });
-    });
-
     $('#btn_ya_closing').click(function(){
       simpan_closing();
     });
@@ -933,6 +962,30 @@ $(document).ready(function(){
 
     $('#btn_klik_bayar').click(function(){
         $('#popup_pembayaran').click();
+    });
+
+    $('#btn-proses-byr').click(function(){
+        $.ajax({
+            url : '<?=base_url();?>finance/kasir_ranap_c/simpan_trx',
+            data : $('#form_pembayaran').serialize(),
+            type : "POST",
+            dataType : "json",
+            success : function(res){
+                var id = $('#id_ri').val();
+                window.open('<?php echo base_url(); ?>finance/kasir_ranap_c/cetak/'+id, '_blank', 'location=yes,height=700,width=600,scrollbars=yes,status=yes');
+                setInterval(function () {
+                    window.location = "<?php echo base_url(); ?>finance/kasir_ranap_c";
+                }, 3000);
+            }
+        });
+    });
+
+    $('#btn-batal-byr').click(function(){
+        $('#b_bayar').val("");
+        $('#b_kembali').val("");
+        $('#b_tambahan').val("");
+        $('#warning_kelebihan').hide();
+        $('#view_tambahan').hide();
     });
 });
 
@@ -1035,27 +1088,33 @@ function get_pasien(){
                         img = '<?php echo base_url(); ?>kasir-apotek/assets/img/avatars/avatar5.png';
                     }
 
+                    var tanggal = shortMonth(result[i].TANGGAL_MASUK)+' - '+result[i].WAKTU;
+
                     result[i].SISTEM_BAYAR = result[i].SISTEM_BAYAR=='1'?"Umum":"Asuransi";
 
                     $tr +=  '<a href="javascript:;" class="message-item media" onclick="klik_pasien('+result[i].ID+');">'+
                             '  <div class="media">'+
                             '    <img src="'+img+'" width="50" class="pull-left">'+
                             '    <div class="media-body">'+
-                            '      <small class="pull-right">'+shortMonth(result[i].TANGGAL_MASUK)+'</small>'+
                             '      <div class="col-md-3">'+
-                            '           <h5 class="c-dark"><strong>'+result[i].KODE_PASIEN+'</strong></h5>'+
+                            '           <h5 class="c-dark"><strong>Pasien</strong></h5>'+
                             '           <h4 class="c-dark">'+result[i].NAMA_PASIEN+'</h4>'+
                             '      </div>'+
                             '      <div class="col-md-3">'+
                             '           <h5 class="c-dark"><strong>Total Biaya</strong></h5>'+
                             '           <h4 class="c-dark">'+formatNumber(result[i].TOTAL)+'</h4>'+
                             '      </div>'+
-                            '      <div class="col-md-3">'+
+                            '      <div class="col-md-2">'+
                             '           <h5 class="c-dark"><strong>Jenis Bayar</strong></h5>'+
                             '           <h4 class="c-dark">'+result[i].SISTEM_BAYAR+'</h4>'+
                             '      </div>'+
+                            '      <div class="col-md-2">'+
+                            '           <h5 class="c-dark"><strong>Asuransi</strong></h5>'+
+                            '           <h4 class="c-dark">'+formatNumber(result[i].TOT_ASURANSI)+'</h4>'+
+                            '      </div>'+
                             '    </div>'+
                             '  </div>'+
+                            '  <p class="f-14 c-blue pull-right"><b>'+tanggal+'</b></p>'+
                             '</a>';
                 }
             }
@@ -1069,21 +1128,13 @@ function get_pasien(){
     });
 }
 
-function klik_copy_resep(id){
-    // var encodedString = Base64.encode(id);
-    window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_resep/'+id, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
-}
-
-function klik_print_poli(id){
-    // var encodedString = Base64.encode(id);
-    window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/nota_poli/'+id, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
-}
-
 function klik_pasien(id_ri){
+    $('#popup_load').show();
     get_kamar(id_ri);
     get_tindakan(id_ri);
     get_lab(id_ri);
     get_resep(id_ri);
+    get_asuransi(id_ri);
 
     $.ajax({
         url : '<?php echo base_url(); ?>finance/kasir_ranap_c/get_pasien_id',
@@ -1091,9 +1142,16 @@ function klik_pasien(id_ri){
         type : "POST",
         dataType : "json",
         success : function(row){
+            $('#id_ri').val(id_ri);
             $('#btn_klik_bayar').removeAttr('disabled');
             $('#b_atas_nama').val(row['NAMA_PASIEN']);
             $('#b_total_tagihan').val(formatNumber(row['TOTAL']));
+            $('#b_asuransi').val(formatNumber(row['TOT_ASURANSI']));
+            $('#sistem_bayar').val(row['SISTEM_BAYAR']);
+
+            var total = parseFloat(row['TOTAL']) - parseFloat(row['TOT_ASURANSI']);
+            $('#b_total').val(formatNumber(total));
+            $('#popup_load').hide();
         }
     });
 }
@@ -1236,11 +1294,44 @@ function get_lab(id_ri){
     });
 }
 
+function get_asuransi(id_ri){
+    $.ajax({
+        url : '<?php echo base_url(); ?>finance/kasir_ranap_c/get_asuransi',
+        data : {id_ri:id_ri},
+        type : "POST",
+        dataType : "json",
+        success : function(res){
+            $tr = '';
+            var tot = 0;
+
+            if(res == null || res == ""){
+                $tr = '<tr><td colspan="4" style="text-align:center;">Tidak Ada Asuransi</td></tr>';
+            }else{
+                var no = 0;
+
+                for(var i=0; i<res.length; i++){
+                    no++;
+                    tot += parseFloat(res[i].SUBTOTAL);
+
+                    $tr +=  '<tr>'+
+                                '<td style="text-align:center;">'+no+'</td>'+
+                                '<td>'+res[i].NAMA_ASURANSI+'</td>'+
+                                '<td>'+res[i].ASURANSI+'</td>'+
+                                '<td style="text-align:right;">'+formatNumber(res[i].JML_KLAIM)+'</td>'+
+                            '</tr>';
+                }
+            }
+
+            $('#tabel_asr_byr tbody').html($tr);
+        }
+    });
+}
+
 function hitung_kembali(){
     var byr = $('#b_bayar').val();
     byr = byr.split(',').join('');
 
-    var total = $('#b_total_tagihan').val();
+    var total = $('#b_total').val();
     total = total.split(',').join('');
 
     var kembali = parseFloat(byr) - parseFloat(total);
@@ -1251,10 +1342,40 @@ function hitung_kembali(){
 
     if(byr == "") {
         kembali = "";
-    } else if(kembali < 0){
+    }else if(kembali < 0){
         kembali = "";
         $('#warning_kelebihan').show();
+        $('#view_tambahan').show();
         var s = parseFloat(total) - parseFloat(byr);
+        $('#asd').val(s);
+        $('#jumlah_bayar').html(formatNumber(s));
+        $('#btn-proses-byr').attr('disabled','disabled');
+    }else{
+        $('#warning_kelebihan').hide();
+        $('#view_tambahan').hide();
+        $('#btn-proses-byr').removeAttr('disabled');
+    }
+
+    $('#b_kembali').val(NumberToMoney(kembali));
+}
+
+function hitung_tambahan(){
+    var tambah = $('#b_tambahan').val();
+    tambah = tambah.split(',').join('');
+
+    var sisa = $('#asd').val();
+    sisa = sisa.split(',').join('');
+
+    console.log(sisa);
+
+    var kembali = parseFloat(tambah) - parseFloat(sisa);
+
+    if(tambah == ""){
+        kembali = "";
+    }else if(kembali < 0){
+        kembali = "";
+        $('#warning_kelebihan').show();
+        var s = parseFloat(sisa) - parseFloat(tambah);
         $('#jumlah_bayar').html(formatNumber(s));
         $('#btn-proses-byr').attr('disabled','disabled');
     }else{
@@ -1263,54 +1384,6 @@ function hitung_kembali(){
     }
 
     $('#b_kembali').val(NumberToMoney(kembali));
-}
-
-function get_bayar(){
-    var grandtotal = $('#grandtotal2').val();
-    var bayar = $('#bayar2').val();
-    grandtotal = grandtotal.split(',').join('');
-    bayar = bayar.split(',').join('');
-
-    if(bayar == ""){
-        bayar = 0;
-    }
-
-    if(parseFloat(bayar) < parseFloat(grandtotal)){
-        var kembali = parseFloat(bayar) - parseFloat(grandtotal);
-        $('#text_notif').html('Pembayaran kurang ');
-        $('#text_total_notif').html(formatNumber(kembali));
-        $('#kembali2').val(formatNumber(kembali));
-        $('#view_notif_bayar').show();
-        $('#btn_bayar').attr('disabled','disabled');
-    }else{
-        var kembali = parseFloat(bayar) - parseFloat(grandtotal);
-        $('#kembali2').val(formatNumber(kembali));
-        $('#view_notif_bayar').hide();
-        $('#btn_bayar').removeAttr('disabled');
-    }
-}
-
-function simpan_pembayaran(){
-    var b_kembali_sts = $('#b_kembali').val();
-
-    if(b_kembali_sts == "" || b_kembali_sts == null){
-        $('#warning_kelebihan').show();
-    } else {
-        $('#warning_kelebihan').hide();
-
-        $.ajax({
-            url : '<?=base_url();?>apotek/ap_kasir_rajal_c/simpan_trx',
-            data : $('#form_pembayaran').serialize(),
-            type : "POST",
-            dataType : "json",
-            success : function(result){
-                $('#modal-11').removeClass('md-show');
-                $('#popup_pembayaran').fadeOut();
-                cetak_resi();
-                window.location = "<?php echo base_url(); ?>apotek/ap_kasir_rajal_c";
-            }
-        });
-    }
 }
 
 function get_tunai(){
@@ -1324,7 +1397,7 @@ function get_tunai(){
 }
 
 function get_non_tunai(){
-    var tagihan = $('#b_total_tagihan').val();
+    var tagihan = $('#b_total').val();
     tagihan = tagihan.split(',').join('');
 
     document.getElementById("non_tunai_btn").className = "btn btn-warning";
@@ -1332,8 +1405,8 @@ function get_non_tunai(){
     $('.tunai_grp').hide();
     $('.non_tunai_grp').show();
     $('#b_kembali').val(0);
-    $('#b_bayar').val(tagihan);
-    $('#jenis_bayar').val('Kartu Kredit');
+    $('#b_bayar').val(formatNumber(tagihan));
+    $('#jenis_bayar').val('Non Tunai');
 }
 
 function deleteRow(btn){

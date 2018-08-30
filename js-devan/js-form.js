@@ -217,32 +217,32 @@ function shortMonth(tanggal){
 	var yy = tgl.substring(6);
 
 	if(parseInt(bln) == 1){
-		strMonth = "Januari";
+		strMonth = "Jan";
 	}else if(parseInt(bln) == 2){
-		strMonth = "Februari";
+		strMonth = "Feb";
 	}else if(parseInt(bln) == 3){
-		strMonth = "Maret";
+		strMonth = "Mar";
 	}else if(parseInt(bln) == 4){
-		strMonth = "April";
+		strMonth = "Apr";
 	}else if(parseInt(bln) == 5){
 		strMonth = "Mei";
 	}else if(parseInt(bln) == 6){
-		strMonth = "Juni";
+		strMonth = "Jun";
 	}else if(parseInt(bln) == 7){
-		strMonth = "Juli";
+		strMonth = "Jul";
 	}else if(parseInt(bln) == 8){
-		strMonth = "Agustus";
+		strMonth = "Agt";
 	}else if(parseInt(bln) == 9){
-		strMonth = "September";
+		strMonth = "Sep";
 	}else if(parseInt(bln) == 10){
-		strMonth = "Oktober";
+		strMonth = "Okt";
 	}else if(parseInt(bln) == 11){
-		strMonth = "November";
+		strMonth = "Nov";
 	}else if(parseInt(bln) == 12){
-		strMonth = "Desember";
+		strMonth = "Des";
 	}
 
-	return dd+" "+strMonth;
+	return dd+" "+strMonth+" "+yy;
 }
 
 function stringToDate(_date,_format,_delimiter){

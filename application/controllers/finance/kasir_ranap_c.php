@@ -6,6 +6,8 @@ class Kasir_ranap_c extends CI_Controller {
 	{ 
 		parent::__construct();
 		date_default_timezone_set('Asia/Jakarta');
+		$this->load->helper('url');
+		$this->load->library('fpdf/HTML2PDF');
 		$this->load->model('finance/kasir_ranap_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
 		$id_user = $sess_user['id'];
@@ -121,6 +123,61 @@ class Kasir_ranap_c extends CI_Controller {
 		$id_ri = $this->input->post('id_ri');
 		$data = $this->model->get_lab($id_ri);
 		echo json_encode($data);
+	}
+
+	function get_asuransi(){
+		$id_ri = $this->input->post('id_ri');
+		$data = $this->model->get_asuransi($id_ri);
+		echo json_encode($data);
+	}
+
+	function simpan_trx(){
+		$id = $this->input->post('id_ri');
+		$invoice = $this->input->post('invoice');
+		$tanggal = date('d-m-Y');
+		$bulan = date('n');
+		$tahun = date('Y');
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu = $format->format('H:i:s');
+		$atas_nama = $this->input->post('b_atas_nama');
+		$total = str_replace(',', '', $this->input->post('b_total_tagihan'));
+		$bayar = str_replace(',', '', $this->input->post('b_bayar'));
+		$tambahan = str_replace(',', '', $this->input->post('b_tambahan'));
+		$kembali = str_replace(',', '', $this->input->post('b_kembali'));
+		$jenis_bayar = $this->input->post('jenis_bayar');
+		$sistem_bayar = $this->input->post('sistem_bayar');
+		$kartu_kredit = $this->input->post('kartu_provider');
+		$nomor_kartu = $this->input->post('no_kartu');
+
+		if($jenis_bayar == 'Tunai'){
+			$this->model->simpan_tunai($id,$invoice,$tanggal,$bulan,$tahun,$waktu,$atas_nama,$total,$bayar,$kembali,$jenis_bayar,$sistem_bayar);
+		}else{
+			$this->model->simpan_non_tunai($id,$invoice,$tanggal,$bulan,$tahun,$waktu,$atas_nama,$total,$bayar,$tambahan,$kembali,$jenis_bayar,$sistem_bayar,$kartu_kredit,$nomor_kartu);
+		}
+
+		$this->db->query("UPDATE admum_rawat_inap SET STATUS_BAYAR = '1' WHERE ID = '$id'");
+		$this->insert_kode();
+
+		echo '1';
+	}
+
+	function cetak($id){
+		$data1 = $this->model->data_rawat_inap_id($id);
+		$data2 = $this->model->data_hasil_pemeriksaan($id);
+		$data3 = $this->model->data_laborat_id($id);
+
+		$data = array(
+			'settitle' => 'Pelayanan Rawat Inap',
+			'filename' => date('dmY').'_cetak_rawat_inap',
+			'view'	=> 'ri',
+			'data1' => $data1,
+			'data2' => $data2,
+			'data3' => $data3,
+		);
+
+		$this->load->view('finance/cetak_rawat_inap_pdf_v',$data);
 	}
 
 }
