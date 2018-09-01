@@ -15,14 +15,14 @@ class Log_home_c extends CI_Controller {
 	function index()
 	{
 		$data = array(
-			'page' => 'logistik/log_beranda_v',
+			'page' => 'finance/log_beranda_v',
 			'title' => 'Logistik',
 			'subtitle' => 'Logistik',
-			'master_menu' => 'home',
-			'view' => 'home',
+			'master_menu' => 'logistik',
+			'view' => 'logistik',
 		);
 
-		$this->load->view('logistik/log_home_v',$data);
+		$this->load->view('finance/finance_home_v',$data);
 	}
 
 }

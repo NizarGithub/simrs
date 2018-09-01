@@ -15,14 +15,14 @@ class Asuransi_c extends CI_Controller {
 	function index()
 	{
 		$data = array(
-			'page' => 'asuransi/asr_beranda_v',
+			'page' => 'finance/asr_beranda_v',
 			'title' => 'Asuransi',
 			'subtitle' => 'Asuransi',
-			'master_menu' => 'home',
-			'view' => '',
+			'master_menu' => 'asuransi',
+			'view' => 'asuransi'
 		);
 
-		$this->load->view('asuransi/asr_home_v',$data);
+		$this->load->view('finance/finance_home_v',$data);
 	}
 
 }

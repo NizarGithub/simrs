@@ -180,6 +180,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                                         <th style="text-align: center;">Kelas</th>
                                                         <th style="text-align: center;">No. Bed</th>
                                                         <th style="text-align: center;">Biaya</th>
+                                                        <th style="text-align: center;">Hari</th>
                                                         <th style="text-align: center;">Visite Dokter</th>
                                                         <th style="text-align: center;">Jasa Sarana</th>
                                                         <th style="text-align: center;">Total</th>
@@ -190,7 +191,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                                 </tbody>
                                                 <tfoot>
                                                     <tr class="active">
-                                                        <td colspan="6" style="text-align: center; font-weight: bold;">Total Biaya</td>
+                                                        <td colspan="7" style="text-align: center; font-weight: bold;">Total Biaya</td>
                                                         <td style="text-align: right;"><b id="tot_biaya_kamar">0</b></td>
                                                     </tr>
                                                 </tfoot>
@@ -540,6 +541,8 @@ $user_detail = $this->model->get_user_detail($id_user);
             <div class="modal-content">
                 <form id="form_pembayaran">
                     <input type="hidden" name="id_ri" id="id_ri" value="">
+                    <input type="hidden" name="id_user" id="id_user" value="<?php echo $id_user; ?>">
+                    <input type="hidden" name="shift" id="shift" value="">
                     <input type="hidden" name="invoice" id="invoice" value="">
                     <input type="hidden" name="sistem_bayar" id="sistem_bayar" value="">
                     <input type="hidden" name="jenis_bayar" id="jenis_bayar" value="Tunai">
@@ -972,7 +975,7 @@ $(document).ready(function(){
             dataType : "json",
             success : function(res){
                 var id = $('#id_ri').val();
-                window.open('<?php echo base_url(); ?>finance/kasir_ranap_c/cetak/'+id, '_blank', 'location=yes,height=700,width=600,scrollbars=yes,status=yes');
+                window.open('<?php echo base_url(); ?>finance/kasir_ranap_c/cetak/'+id, '_blank', 'location=yes,height=700,width=800,scrollbars=yes,status=yes');
                 setInterval(function () {
                     window.location = "<?php echo base_url(); ?>finance/kasir_ranap_c";
                 }, 3000);
@@ -1030,20 +1033,14 @@ function startTime() {
         $('.shift_user').html('2');
         $('#shift').val('2');
     }else{
-        $('.shift_user').html('Tutup');
-        $('#shift').val('0');
+        $('.shift_user').html('3');
+        $('#shift').val('3');
     }
 }
 
 function checkTime(i) {
     if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
     return i;
-}
-
-function cetak_resi(){
-    var invoice = $('#invoice').val();
-    var prt = window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk/'+invoice, '_blank');
-    prt.print();
 }
 
 function get_invoice(){
@@ -1156,6 +1153,46 @@ function klik_pasien(id_ri){
     });
 }
 
+function get_kamar(id_ri){
+    $.ajax({
+        url : '<?php echo base_url(); ?>finance/kasir_ranap_c/get_kamar',
+        data : {id_ri:id_ri},
+        type : "POST",
+        dataType : "json",
+        success : function(res){
+            $tr = '';
+            var tot = 0;
+
+            if(res == null || res == ""){
+                $tr = '<tr><td colspan="`8" style="text-align:center;">Data Tidak Ada</td></tr>';
+            }else{
+                var no = 0;
+
+                for(var i=0; i<res.length; i++){
+                    no++;
+                    var kelas = res[i].KELAS+' - '+res[i].VISITE_DOKTER;
+                    var total = parseFloat(res[i].BIAYA_KAMAR) + parseFloat(res[i].BIAYA_VISITE) + parseFloat(res[i].JASA_SARANA);
+                    tot += parseFloat(total);
+
+                    $tr += '<tr>'+
+                            '<td style="text-align:center;">'+no+'</td>'+
+                            '<td style="text-align:center;">'+kelas+'</td>'+
+                            '<td style="text-align:center;">'+res[i].NOMOR_BED+'</td>'+
+                            '<td style="text-align:right;">'+formatNumber(res[i].BIAYA)+'</td>'+
+                            '<td style="text-align:center;">'+res[i].DIRAWAT_SELAMA+'</td>'+
+                            '<td style="text-align:right;">'+formatNumber(res[i].BIAYA_VISITE)+'</td>'+
+                            '<td style="text-align:right;">'+formatNumber(res[i].JASA_SARANA)+'</td>'+
+                            '<td style="text-align:right;"><b>'+formatNumber(total)+'</b></td>'+
+                          '</tr>';
+                }
+            }
+
+            $('#tot_biaya_kamar').html(formatNumber(tot));
+            $('#tabel_kamar_byr tbody').html($tr);
+        }
+    });
+}
+
 function get_tindakan(id_ri){
     $.ajax({
         url : '<?php echo base_url(); ?>finance/kasir_ranap_c/get_tindakan',
@@ -1189,78 +1226,6 @@ function get_tindakan(id_ri){
     });
 }
 
-function get_resep(id_ri){
-    $.ajax({
-        url : '<?php echo base_url(); ?>finance/kasir_ranap_c/get_resep',
-        data : {id_ri:id_ri},
-        type : "POST",
-        dataType : "json",
-        success : function(res){
-            $tr = '';
-            var tot = 0;
-
-            if(res == null || res == ""){
-                $tr = '<tr><td colspan="4" style="text-align:center;">Data Tidak Ada</td></tr>';
-            }else{
-                var no = 0;
-
-                for(var i=0; i<res.length; i++){
-                    no++;
-                    tot += parseFloat(res[i].SUBTOTAL);
-
-                    $tr += '<tr>'+
-                            '<td style="text-align:center;">'+no+'</td>'+
-                            '<td>'+res[i].NAMA_OBAT+'</td>'+
-                            '<td style="text-align:right;"><b>'+formatNumber(res[i].SUBTOTAL)+'</b></td>'+
-                          '</tr>';
-                }
-            }
-
-            $('#tot_biaya_resep').html(formatNumber(tot));
-            $('#tabel_resep_byr tbody').html($tr);
-        }
-    });
-}
-
-function get_kamar(id_ri){
-    $.ajax({
-        url : '<?php echo base_url(); ?>finance/kasir_ranap_c/get_kamar',
-        data : {id_ri:id_ri},
-        type : "POST",
-        dataType : "json",
-        success : function(res){
-            $tr = '';
-            var tot = 0;
-
-            if(res == null || res == ""){
-                $tr = '<tr><td colspan="4" style="text-align:center;">Data Tidak Ada</td></tr>';
-            }else{
-                var no = 0;
-
-                for(var i=0; i<res.length; i++){
-                    no++;
-                    var kelas = res[i].KELAS+' - '+res[i].VISITE_DOKTER;
-                    var total = parseFloat(res[i].BIAYA) + parseFloat(res[i].BIAYA_VISITE) + parseFloat(res[i].JASA_SARANA);
-                    tot += parseFloat(total);
-
-                    $tr += '<tr>'+
-                            '<td style="text-align:center;">'+no+'</td>'+
-                            '<td style="text-align:center;">'+kelas+'</td>'+
-                            '<td style="text-align:center;">'+res[i].NOMOR_BED+'</td>'+
-                            '<td style="text-align:right;">'+formatNumber(res[i].BIAYA)+'</td>'+
-                            '<td style="text-align:right;">'+formatNumber(res[i].BIAYA_VISITE)+'</td>'+
-                            '<td style="text-align:right;">'+formatNumber(res[i].JASA_SARANA)+'</td>'+
-                            '<td style="text-align:right;"><b>'+formatNumber(total)+'</b></td>'+
-                          '</tr>';
-                }
-            }
-
-            $('#tot_biaya_kamar').html(formatNumber(tot));
-            $('#tabel_kamar_byr tbody').html($tr);
-        }
-    });
-}
-
 function get_lab(id_ri){
     $.ajax({
         url : '<?php echo base_url(); ?>finance/kasir_ranap_c/get_lab',
@@ -1290,6 +1255,39 @@ function get_lab(id_ri){
 
             $('#tot_biaya_laborat').html(formatNumber(tot));
             $('#tabel_laborat_byr tbody').html($tr);
+        }
+    });
+}
+
+function get_resep(id_ri){
+    $.ajax({
+        url : '<?php echo base_url(); ?>finance/kasir_ranap_c/get_resep',
+        data : {id_ri:id_ri},
+        type : "POST",
+        dataType : "json",
+        success : function(res){
+            $tr = '';
+            var tot = 0;
+
+            if(res == null || res == ""){
+                $tr = '<tr><td colspan="4" style="text-align:center;">Data Tidak Ada</td></tr>';
+            }else{
+                var no = 0;
+
+                for(var i=0; i<res.length; i++){
+                    no++;
+                    tot += parseFloat(res[i].SUBTOTAL);
+
+                    $tr += '<tr>'+
+                            '<td style="text-align:center;">'+no+'</td>'+
+                            '<td>'+res[i].NAMA_OBAT+'</td>'+
+                            '<td style="text-align:right;"><b>'+formatNumber(res[i].SUBTOTAL)+'</b></td>'+
+                          '</tr>';
+                }
+            }
+
+            $('#tot_biaya_resep').html(formatNumber(tot));
+            $('#tabel_resep_byr tbody').html($tr);
         }
     });
 }
@@ -1366,16 +1364,18 @@ function hitung_tambahan(){
     var sisa = $('#asd').val();
     sisa = sisa.split(',').join('');
 
-    console.log(sisa);
+    // console.log(sisa);
 
     var kembali = parseFloat(tambah) - parseFloat(sisa);
 
     if(tambah == ""){
         kembali = "";
+        $('#jumlah_bayar').html(formatNumber(sisa));
     }else if(kembali < 0){
         kembali = "";
         $('#warning_kelebihan').show();
         var s = parseFloat(sisa) - parseFloat(tambah);
+        // console.log(s);
         $('#jumlah_bayar').html(formatNumber(s));
         $('#btn-proses-byr').attr('disabled','disabled');
     }else{

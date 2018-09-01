@@ -178,16 +178,16 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
                         <div class="slide_viewer">
                           <div class="slide_group">
                             <div class="slide">
-                              <img src="<?php echo base_url(); ?>picture/hospital-wallpaper-12.jpg">
+                              <img src="<?php echo base_url(); ?>picture/slider/hospital-wallpaper-12.jpg" style="max-height: 350px; width: 100%;">
                             </div>
                             <div class="slide">
-                              <img src="<?php echo base_url(); ?>picture/hospital-wallpaper-12.jpg">
+                              <img src="<?php echo base_url(); ?>picture/slider/blog-guest-fox-susannah-2017-03-09-shutterstock_189632216-banner-edit.jpg" style="max-height: 350px; width: 100%;">
                             </div>
                             <div class="slide">
-                              <img src="<?php echo base_url(); ?>picture/hospital-wallpaper-12.jpg">
+                              <img src="<?php echo base_url(); ?>picture/slider/h1.jpg" style="max-height: 350px; width: 100%;">
                             </div>
                             <div class="slide">
-                              <img src="<?php echo base_url(); ?>picture/hospital-wallpaper-12.jpg">
+                              <img src="<?php echo base_url(); ?>picture/slider/hospital-wallpaper-12.jpg" style="max-height: 350px; width: 100%;">
                             </div>
                           </div>
                         </div>
@@ -318,7 +318,7 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
                     </div>
                   </div>
                   <div class="centered-header">
-                    <h6>Antrian <?php echo $value->STS_LOKET; ?></h6>
+                    <h6>Antrian Sekarang</h6>
                   </div>
                 </div>
                 <?php

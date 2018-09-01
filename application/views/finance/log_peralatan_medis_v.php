@@ -45,11 +45,11 @@ $(document).ready(function(){
 	});
 
 	$('#batal').click(function(){
-		window.location = "<?php echo base_url(); ?>logistik/log_peralatan_medis_c";
+		window.location = "<?php echo base_url(); ?>finance/log_peralatan_medis_c";
 	});
 
 	$('#batal_ubah').click(function(){
-		window.location = "<?php echo base_url(); ?>logistik/log_peralatan_medis_c";
+		window.location = "<?php echo base_url(); ?>finance/log_peralatan_medis_c";
 	});
 
 	$('#kode_alat').click(function(){
@@ -108,7 +108,7 @@ function load_nama_alat(){
 	}
 
 	ajax = $.ajax({
-		url : '<?php echo base_url()?>logistik/log_peralatan_medis_c/load_nama_alat',
+		url : '<?php echo base_url()?>finance/log_peralatan_medis_c/load_nama_alat',
 		data : {keyword:keyword},
 		type : "GET",
 		dataType : "json",
@@ -145,7 +145,7 @@ function klik_nama_alat(id){
 	$('#tutup_nama_alat').click();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/klik_nama_alat',
+		url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/klik_nama_alat',
 		data : {id:id},
 		type : "POST",
 		dataType : "json",
@@ -199,7 +199,7 @@ function get_satuan(){
 	}
 
 	ajax = $.ajax({
-        url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/data_satuan',
+        url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/data_satuan',
         data : {keyword:keyword},
         type : "GET",
         dataType : "json",
@@ -236,7 +236,7 @@ function get_departemen(){
 		ajax.abort();
 	}
 	ajax = $.ajax({
-        url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/data_departemen',
+        url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/data_departemen',
         data : {keyword:keyword},
         type : "GET",
         dataType : "json",
@@ -272,7 +272,7 @@ function get_divisi(){
 	if(ket == 'Tambah'){
 			var id_departemen = $('#id_departemen').val();
 			ajax = $.ajax({
-		        url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/data_divisi',
+		        url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/data_divisi',
 		        data : {
 										keyword:keyword,
 										id_departemen:id_departemen
@@ -299,7 +299,7 @@ function get_divisi(){
 	}else{
 			var id_departemen = $('#id_departemen_ubah').val();
 			ajax = $.ajax({
-		        url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/data_divisi',
+		        url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/data_divisi',
 		        data : {
 										keyword:keyword,
 										id_departemen:id_departemen
@@ -333,7 +333,7 @@ function klik_satuan(id_satuan){
 	$('#tutup_satuan').click();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/klik_satuan',
+		url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/klik_satuan',
 		data : {id_satuan:id_satuan},
 		type : "POST",
 		dataType : "json",
@@ -355,7 +355,7 @@ function klik_departemen(id_departemen){
 	$('#tutup_departemen').click();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/klik_departemen',
+		url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/klik_departemen',
 		data : {id_departemen:id_departemen},
 		type : "POST",
 		dataType : "json",
@@ -377,7 +377,7 @@ function klik_divisi(id_divisi){
 	$('#tutup_divisi').click();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/klik_divisi',
+		url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/klik_divisi',
 		data : {id_divisi:id_divisi},
 		type : "POST",
 		dataType : "json",
@@ -463,7 +463,7 @@ function data_peralatan(){
 	}
 
 	ajax = $.ajax({
-		url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/data_peralatan',
+		url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/data_peralatan',
 		data : {
 			keyword:keyword,
 			urutkan:urutkan,
@@ -619,7 +619,7 @@ function ubah_alat(id){
 	$('#ket').val('Ubah');
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/get_edit_data',
+		url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/get_edit_data',
 		data : {id:id},
 		type : "POST",
 		dataType : "json",
@@ -662,7 +662,7 @@ function ubah_alat(id){
 function hapus_alat(id){
     $('#popup_hapus').click();
     $.ajax({
-        url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/data_peralatan_id',
+        url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/data_peralatan_id',
         data : {id:id},
         type : "POST",
         dataType : "json",

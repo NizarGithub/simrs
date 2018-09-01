@@ -69,24 +69,24 @@ class Portal_pasien extends CI_Controller {
 
 		$sql = "
 			SELECT
-			a.ID,
-			a.TANGGAL,
-			a.WAKTU,
-			a.ID_PASIEN,
-			a.ID_PELAYANAN,
-			a.BARCODE,
-			a.WAKTU,
-			a.ID_LOKET,
-			b.NAMA_LOKET,
-			a.KODE_ANTRIAN,
-			a.NOMOR_ANTRIAN,
-			a.STATUS_PANGGIL
-		FROM rk_antrian_pasien a
-		JOIN kepeg_loket b ON b.ID = a.ID_LOKET
-		WHERE a.STATUS_PANGGIL = '1'
-		AND a.STATUS_CLOSING = '0'
-		ORDER BY a.NOMOR_ANTRIAN DESC
-		LIMIT 1
+				a.ID,
+				a.TANGGAL,
+				a.WAKTU,
+				a.ID_PASIEN,
+				a.ID_PELAYANAN,
+				a.BARCODE,
+				a.WAKTU,
+				a.ID_LOKET,
+				b.NAMA_LOKET,
+				a.KODE_ANTRIAN,
+				a.NOMOR_ANTRIAN,
+				a.STATUS_PANGGIL
+			FROM rk_antrian_pasien a
+			JOIN kepeg_loket b ON b.ID = a.ID_LOKET
+			WHERE a.STATUS_PANGGIL = '1'
+			AND a.STATUS_CLOSING = '0'
+			ORDER BY a.NOMOR_ANTRIAN DESC
+			LIMIT 1
 		";
 
 		return $this->db->query($sql)->result();

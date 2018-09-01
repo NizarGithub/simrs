@@ -928,7 +928,7 @@ $user = $this->master_model_m->get_user_info($id_user);
 	</div>
 	<div class="copyright">
 		<p>
-			 &copy; 2016 J-Tech Solusindo
+			 &copy; 2016 SIMRS
 		</p>
 	</div>
 	<div class="scroll-top">

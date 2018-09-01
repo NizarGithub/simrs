@@ -125,6 +125,14 @@ class Admum_pasien_igd_c extends CI_Controller {
 		}
 	}
 
+	function get_biaya_reg(){
+		$status = $this->input->post('status');
+		$sql = "SELECT * FROM admum_biaya_reg_pasien WHERE STATUS = '$status'";
+		$qry = $this->db->query($sql);
+		$row = $qry->row();
+		echo json_encode($row);
+	}
+
 	function simpan(){
 		$baru = $this->input->post('baru');
 		$id_pasien_new = "";

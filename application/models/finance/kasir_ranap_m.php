@@ -31,7 +31,7 @@ class Kasir_ranap_m extends CI_Model {
 		$sql = "
 			SELECT
 				a.*,
-				(a.TOT_TINDAKAN+a.TOT_RESEP+a.BIAYA_KAMAR+a.BIAYA_VISITE+a.JASA_SARANA+a.TOT_LAB) AS TOTAL
+				((a.BIAYA_KAMAR * a.DIRAWAT_SELAMA) + a.TOT_TINDAKAN + a.TOT_RESEP + a.BIAYA_VISITE + a.JASA_SARANA + a.TOT_LAB + a.BIAYA_REG) AS TOTAL
 			FROM(
 				SELECT
 					a.ID,
@@ -52,6 +52,7 @@ class Kasir_ranap_m extends CI_Model {
 					a.KELAS,
 					a.ID_KAMAR,
 					a.ID_BED,
+					IFNULL(a.BIAYA_REG,0) AS BIAYA_REG,
 					a.STATUS_SUDAH,
 					a.STATUS_BAYAR,
 					IFNULL(c.TOTAL,0) AS TOT_TINDAKAN,
@@ -60,7 +61,8 @@ class Kasir_ranap_m extends CI_Model {
 					e.BIAYA_VISITE,
 					e.JASA_SARANA,
 					IFNULL(g.TOTAL_TARIF,0) AS TOT_LAB,
-					IFNULL(h.JML_KLAIM,0) AS TOT_ASURANSI
+					IFNULL(h.JML_KLAIM,0) AS TOT_ASURANSI,
+					IFNULL(i.DIRAWAT_SELAMA,0) AS DIRAWAT_SELAMA
 				FROM admum_rawat_inap a
 				JOIN rk_pasien b ON b.ID = a.ID_PASIEN
 				LEFT JOIN rk_ri_tindakan c ON c.ID_PELAYANAN = a.ID
@@ -68,6 +70,7 @@ class Kasir_ranap_m extends CI_Model {
 				LEFT JOIN admum_kamar_rawat_inap e ON e.ID = a.ID_KAMAR
 				LEFT JOIN rk_ri_laborat g ON g.ID_PELAYANAN = a.ID
 				LEFT JOIN asr_asuransi h ON h.ID_RAWAT_INAP = a.ID
+				LEFT JOIN rk_ri_kondisi_akhir i ON i.ID_PELAYANAN = a.ID
 			) a
 			WHERE $where
 			AND a.TANGGAL_MASUK = '$tanggal'
@@ -82,7 +85,7 @@ class Kasir_ranap_m extends CI_Model {
 		$sql = "
 			SELECT
 				a.*,
-				(a.TOT_TINDAKAN+a.TOT_RESEP+a.BIAYA_KAMAR+a.BIAYA_VISITE+a.JASA_SARANA+a.TOT_LAB) AS TOTAL
+				((a.BIAYA_KAMAR * a.DIRAWAT_SELAMA) + a.TOT_TINDAKAN + a.TOT_RESEP + a.BIAYA_VISITE + a.JASA_SARANA + a.TOT_LAB + a.BIAYA_REG) AS TOTAL
 			FROM(
 				SELECT
 					a.ID,
@@ -103,6 +106,7 @@ class Kasir_ranap_m extends CI_Model {
 					a.KELAS,
 					a.ID_KAMAR,
 					a.ID_BED,
+					IFNULL(a.BIAYA_REG,0) AS BIAYA_REG,
 					a.STATUS_SUDAH,
 					IFNULL(c.TOTAL,0) AS TOT_TINDAKAN,
 					IFNULL(d.TOTAL,0) AS TOT_RESEP,
@@ -110,7 +114,8 @@ class Kasir_ranap_m extends CI_Model {
 					e.BIAYA_VISITE,
 					e.JASA_SARANA,
 					IFNULL(g.TOTAL_TARIF,0) AS TOT_LAB,
-					IFNULL(h.JML_KLAIM,0) AS TOT_ASURANSI
+					IFNULL(h.JML_KLAIM,0) AS TOT_ASURANSI,
+					IFNULL(i.DIRAWAT_SELAMA,0) AS DIRAWAT_SELAMA
 				FROM admum_rawat_inap a
 				JOIN rk_pasien b ON b.ID = a.ID_PASIEN
 				LEFT JOIN rk_ri_tindakan c ON c.ID_PELAYANAN = a.ID
@@ -118,6 +123,7 @@ class Kasir_ranap_m extends CI_Model {
 				LEFT JOIN admum_kamar_rawat_inap e ON e.ID = a.ID_KAMAR
 				LEFT JOIN rk_ri_laborat g ON g.ID_PELAYANAN = a.ID
 				LEFT JOIN asr_asuransi h ON h.ID_RAWAT_INAP = a.ID
+				LEFT JOIN rk_ri_kondisi_akhir i ON i.ID_PELAYANAN = a.ID
 			) a
 			WHERE a.ID = '$id'
 		";
@@ -163,17 +169,24 @@ class Kasir_ranap_m extends CI_Model {
 	function get_kamar($id_ri){
 		$sql = "
 			SELECT
-				a.ID,
-				a.ID_PASIEN,
-				b.KELAS,
-				b.BIAYA,
-				b.VISITE_DOKTER,
-				b.BIAYA_VISITE,
-				b.JASA_SARANA,
-				c.NOMOR_BED
-			FROM admum_rawat_inap a
-			LEFT JOIN admum_kamar_rawat_inap b ON b.ID = a.ID_KAMAR
-			LEFT JOIN admum_bed_rawat_inap c ON c.ID = a.ID_BED
+				a.*,
+				(a.BIAYA * a.DIRAWAT_SELAMA) AS BIAYA_KAMAR
+			FROM(
+				SELECT
+					a.ID,
+					a.ID_PASIEN,
+					b.KELAS,
+					b.BIAYA,
+					b.VISITE_DOKTER,
+					b.BIAYA_VISITE,
+					b.JASA_SARANA,
+					c.NOMOR_BED,
+					IFNULL(d.DIRAWAT_SELAMA,0) AS DIRAWAT_SELAMA
+				FROM admum_rawat_inap a
+				LEFT JOIN admum_kamar_rawat_inap b ON b.ID = a.ID_KAMAR
+				LEFT JOIN admum_bed_rawat_inap c ON c.ID = a.ID_BED
+				LEFT JOIN rk_ri_kondisi_akhir d ON d.ID_PELAYANAN = a.ID
+			) a
 			WHERE a.ID = '$id_ri'
 		";
 		$query = $this->db->query($sql);
@@ -209,10 +222,12 @@ class Kasir_ranap_m extends CI_Model {
 		return $query->result();
 	}
 
-	function simpan_tunai($id,$invoice,$tanggal,$bulan,$tahun,$waktu,$atas_nama,$total,$bayar,$kembali,$jenis_bayar,$sistem_bayar){
+	function simpan_tunai($id,$id_user,$shift,$invoice,$tanggal,$bulan,$tahun,$waktu,$atas_nama,$total,$bayar,$kembali,$jenis_bayar,$sistem_bayar){
 		$sql = "
 			INSERT INTO apotek_transaksi(
 				ID_RAWAT_INAP,
+				ID_USER,
+				SHIFT,
 				INVOICE,
 				TANGGAL,
 				BULAN,
@@ -226,6 +241,8 @@ class Kasir_ranap_m extends CI_Model {
 				SISTEM_BAYAR
 			) VALUES (
 				'$id',
+				'$id_user',
+				'$shift',
 				'$invoice',
 				'$tanggal',
 				'$bulan',
@@ -242,10 +259,12 @@ class Kasir_ranap_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
-	function simpan_non_tunai($id,$invoice,$tanggal,$bulan,$tahun,$waktu,$atas_nama,$total,$bayar,$tambahan,$kembali,$jenis_bayar,$sistem_bayar,$kartu_kredit,$nomor_kartu){
+	function simpan_non_tunai($id,$id_user,$shift,$invoice,$tanggal,$bulan,$tahun,$waktu,$atas_nama,$total,$bayar,$tambahan,$kembali,$jenis_bayar,$sistem_bayar,$kartu_kredit,$nomor_kartu){
 		$sql = "
 			INSERT INTO apotek_transaksi(
 				ID_RAWAT_INAP,
+				ID_USER,
+				SHIFT,
 				INVOICE,
 				TANGGAL,
 				BULAN,
@@ -262,6 +281,8 @@ class Kasir_ranap_m extends CI_Model {
 				NOMOR_KARTU
 			) VALUES (
 				'$id',
+				'$id_user',
+				'$shift',
 				'$invoice',
 				'$tanggal',
 				'$bulan',
@@ -325,7 +346,8 @@ class Kasir_ranap_m extends CI_Model {
 				BED.NOMOR_BED,
 				PASIEN.STATUS,
 				PASIEN.ALAMAT,
-				PASIEN.PEKERJAAN
+				PASIEN.PEKERJAAN,
+				PASIEN.JENIS_PASIEN
 			FROM admum_rawat_inap RI
 			LEFT JOIN rk_pasien PASIEN ON PASIEN.ID = RI.ID_PASIEN
 			LEFT JOIN admum_kamar_rawat_inap KRI ON KRI.ID = RI.ID_KAMAR
@@ -376,6 +398,34 @@ class Kasir_ranap_m extends CI_Model {
 		";
 		$query = $this->db->query($sql);
 		return $query->row();
+	}
+
+	function data_cetak_ri($id){
+		$sql = "
+			SELECT
+				RI.ID,
+				RI.ID_PASIEN,
+				RI.TANGGAL_MASUK,
+				RI.ASAL_RUJUKAN,
+				RI.NAMA_PENANGGUNGJAWAB,
+				RI.SISTEM_BAYAR,
+				RI.KELAS,
+				RI.ID_KAMAR,
+				RI.ID_DOKTER,
+				KRI.KELAS,
+				KRI.BIAYA,
+				KRI.VISITE_DOKTER,
+				KRI.BIAYA_VISITE,
+				KRI.JASA_SARANA,
+				KA.DIRAWAT_SELAMA,
+				RI.BIAYA_REG
+			FROM admum_rawat_inap RI
+			LEFT JOIN admum_kamar_rawat_inap KRI ON KRI.ID = RI.ID_KAMAR
+			LEFT JOIN rk_ri_kondisi_akhir KA ON KA.ID_PELAYANAN = RI.ID
+			WHERE RI.ID = '$id'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
 	}
 
 }

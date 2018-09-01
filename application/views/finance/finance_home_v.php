@@ -129,7 +129,7 @@
                         <!-- Navigation Menu-->
                         <ul class="navigation-menu">
                             <li <?php if($master_menu == 'home'){ echo 'class="active"';}else{echo '';} ?> >
-                                <a href="<?php echo base_url(); ?>setup/setup_home_c">
+                                <a href="<?php echo base_url(); ?>finance/finance_home_c">
                                     <i class="zmdi zmdi-view-dashboard"></i> <span> Dashboard </span> 
                                 </a>
                             </li>

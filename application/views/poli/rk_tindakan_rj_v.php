@@ -27,6 +27,8 @@
 </style>
 
 <script type="text/javascript">
+var ajax = '';
+
 $(document).ready(function(){
 	<?php if($this->session->flashdata('sukses')){?>
 		notif_simpan();
@@ -569,10 +571,14 @@ $(document).ready(function(){
 function load_tindakan(){
 	var keyword = $('#cari_tindakan').val();
 
-	$.ajax({
+	if(ajax){
+		ajax.abort();
+	}
+
+	ajax = $.ajax({
 		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/load_tindakan',
 		data : {keyword:keyword},
-		type : "POST",
+		type : "GET",
 		dataType : "json",
 		success : function(result){
 			$tr = "";
@@ -596,6 +602,10 @@ function load_tindakan(){
 
 			$('#tb_tindakan tbody').html($tr);
 		}
+	});
+
+	$('#cari_tindakan').off('keyup').keyup(function(){
+		load_tindakan();
 	});
 }
 
@@ -810,7 +820,11 @@ function hitung_jumlah2(){
 function load_penyakit_diagnosa(){
 	var keyword = $('#cari_penyakit_dg').val();
 
-	$.ajax({
+	if(ajax){
+		ajax.abort();
+	}
+
+	ajax = $.ajax({
 		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/data_penyakit',
 		data : {keyword:keyword},
 		type : "GET",
@@ -961,10 +975,14 @@ function hapus_diagnosa(id){
 function load_laborat(){
 	var keyword = $('#cari_laborat').val();
 
-	$.ajax({
+	if(ajax){
+		ajax.abort();
+	}
+
+	ajax = $.ajax({
 		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/load_laborat',
 		data : {keyword:keyword},
-		type : "POST",
+		type : "GET",
 		dataType : "json",
 		success : function(result){
 			$tr = "";
@@ -1011,10 +1029,14 @@ function klik_laborat(id){
 function load_pemeriksaan(){
 	var keyword = $('#cari_pemeriksaan').val();
 
-	$.ajax({
+	if(ajax){
+		ajax.abort();
+	}
+
+	ajax = $.ajax({
 		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/load_pemeriksaan',
 		data : {keyword:keyword},
-		type : "POST",
+		type : "GET",
 		dataType : "json",
 		success : function(result){
 			$tr = "";
@@ -1038,6 +1060,10 @@ function load_pemeriksaan(){
 
 			$('#tb_pemeriksaan tbody').html($tr);
 		}
+	});
+
+	$('#cari_pemeriksaan').off('keyup').keyup(function(){
+		load_pemeriksaan();
 	});
 }
 
@@ -1212,10 +1238,14 @@ function hapus_laborat(id){
 function load_obat(){
 	var keyword = $('#cari_resep').val();
 
-	$.ajax({
+	if(ajax){
+		ajax.abort();
+	}
+
+	ajax = $.ajax({
 		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/load_resep',
 		data : {keyword:keyword},
-		type : "POST",
+		type : "GET",
 		dataType : "json",
 		success : function(result){
 			$tr = "";
@@ -1239,6 +1269,10 @@ function load_obat(){
 
 			$('#tb_resep tbody').html($tr);
 		}
+	});
+
+	$('#cari_resep').off('keyup').keyup(function(){
+		load_obat();
 	});
 }
 
@@ -2991,7 +3025,7 @@ function data_surat_dokter_ada(){
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title" id="myModalLabel">Data Tindakan</h4>
+                <h4 class="modal-title" id="myModalLabel">Data Pemeriksaan</h4>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" role="form">

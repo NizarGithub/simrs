@@ -165,7 +165,7 @@ function data_pasien(){
 				for(var i=0; i<result.length; i++){
 					no++;
 
-					var aksi =  '<button type="button" class="btn btn-primary waves-effect waves-light btn-sm" onclick="detail_pasien('+result[i].ID+');" id="btn_history" data-toggle="modal" data-target=".bs-example-modal-lg">'+
+					var aksi =  '<button type="button" class="btn btn-primary waves-effect waves-light btn-sm" onclick="detail_pasien('+result[i].ID+');">'+
                                    '<i class="fa fa-eye"></i>'+
                                 '</button>&nbsp;'+
                                 '<button type="button" class="btn btn-success waves-effect waves-light btn-sm" onclick="ubah_pasien('+result[i].ID+');">'+
@@ -1158,8 +1158,8 @@ function Search_tgl_IGD(tgl){
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<button class="btn btn-primary" id="popup_detail" data-toggle="modal" data-target="#full-width-modal" style="display:none;">Full width Modal</button>
-<div id="full-width-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="full-width-modalLabel" aria-hidden="true" style="display: none;">
+<button class="btn btn-primary" id="popup_detail" data-toggle="modal" data-target="#full-width-modal-det" style="display:none;">Full width Modal</button>
+<div id="full-width-modal-det" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="full-width-modalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog modal-full">
         <div class="modal-content">
             <div class="modal-header">

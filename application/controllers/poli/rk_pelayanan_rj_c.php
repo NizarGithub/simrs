@@ -67,7 +67,7 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 	}
 
 	function load_tindakan(){
-		$keyword = $this->input->post('keyword');
+		$keyword = $this->input->get('keyword');
 		$data = $this->model->load_tindakan($keyword);
 		echo json_encode($data);
 	}
@@ -268,7 +268,7 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 	}
 
 	function load_laborat(){
-		$keyword = $this->input->post('keyword');
+		$keyword = $this->input->get('keyword');
 		$data = $this->model->load_laborat($keyword);
 		echo json_encode($data);
 	}
@@ -280,7 +280,7 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 	}
 
 	function load_pemeriksaan(){
-		$keyword = $this->input->post('keyword');
+		$keyword = $this->input->get('keyword');
 		$data = $this->model->load_pemeriksaan($keyword);
 		echo json_encode($data);
 	}
@@ -373,7 +373,7 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 	// RESEP
 
 	function load_resep(){
-		$keyword = $this->input->post('keyword');
+		$keyword = $this->input->get('keyword');
 		$data = $this->model->load_obat($keyword);
 		echo json_encode($data);
 	}

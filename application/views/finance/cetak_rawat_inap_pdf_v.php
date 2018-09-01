@@ -70,6 +70,40 @@ function formatTanggal($tgl){
 
     return $d."-".$strBulan."-".$y;
 }
+
+function romanic_number($integer, $upcase = true) { 
+    $table = array(
+        'M'     =>1000, 
+        'CM'    =>900, 
+        'D'     =>500, 
+        'CD'    =>400, 
+        'C'     =>100, 
+        'XC'    =>90, 
+        'L'     =>50, 
+        'XL'    =>40, 
+        'X'     =>10, 
+        'IX'    =>9, 
+        'V'     =>5, 
+        'IV'    =>4, 
+        'I'     =>1
+    ); 
+    
+    $return = ''; 
+    while($integer > 0) 
+    { 
+        foreach($table as $rom=>$arb) 
+        { 
+            if($integer >= $arb) 
+            { 
+                $integer -= $arb; 
+                $return .= $rom; 
+                break; 
+            } 
+        } 
+    } 
+
+    return $return; 
+}
 ?>
 
 <table align="left">
@@ -103,22 +137,22 @@ function formatTanggal($tgl){
     <tr>
         <td style="width:120px;">No. RM</td>
         <td>:</td>
-        <td style="width:130px;"><?php echo $data1->KODE_PASIEN; ?></td>
+        <td style="width:130px;"><?php echo $data0->KODE_PASIEN; ?></td>
         <td style="width:205px;">&nbsp;</td>
         <td style="width:85px;">Tanggal</td>
         <td>:</td>
-        <td style="width:175px;"><?php echo formatTanggal($data1->TANGGAL_MASUK); ?></td>
+        <td style="width:175px;"><?php echo formatTanggal($data0->TANGGAL_MASUK); ?></td>
     </tr>
     <tr>
         <td style="width:120px;">Nama Pasien</td>
         <td>:</td>
-        <td style="width:130px;"><?php echo $data1->NAMA_PASIEN; ?></td>
+        <td style="width:130px;"><?php echo $data0->NAMA_PASIEN; ?></td>
         <td style="width:205px;">&nbsp;</td>
         <td style="width:85px;">Jenis Kelamin</td>
         <td>:</td>
         <td style="width:175px;">
             <?php
-                if($data1->JENIS_KELAMIN == 'L'){
+                if($data0->JENIS_KELAMIN == 'L'){
                     echo "Laki - Laki";
                 }else{
                     echo "Perempuan";
@@ -129,21 +163,11 @@ function formatTanggal($tgl){
     <tr>
         <td style="width:120px;">Tgl Lahir</td>
         <td>:</td>
-        <td style="width:130px;"><?php echo formatTanggal($data1->TANGGAL_LAHIR); ?></td>
+        <td style="width:130px;"><?php echo formatTanggal($data0->TANGGAL_LAHIR); ?></td>
         <td style="width:205px;">&nbsp;</td>
         <td style="width:120px;">Umur</td>
         <td>:</td>
-        <td style="width:130px;"><?php echo $data1->UMUR; ?> Tahun</td>
-    </tr>
-</table>
-
-<br/>
-
-<table align="left">
-    <tr>
-        <td style="width:50px;">No. Lab</td>
-        <td>:</td>
-        <td style="width:175px;"><?php echo $data3->KODE_LAB; ?></td>
+        <td style="width:130px;"><?php echo $data0->UMUR; ?> Tahun</td>
     </tr>
 </table>
 
@@ -152,29 +176,112 @@ function formatTanggal($tgl){
 <table align="left" class="tabel">
     <tbody>
         <tr>
-            <th>PEMERIKSAAN</th>
-            <th>HASIL</th>
-            <th>NILAI RUJUKAN</th> 
+            <th>KETERANGAN</th>
+            <th>KELAS</th>
+            <th>HARI</th> 
             <th>BIAYA</th>
+            <th>JUMLAH</th>
         </tr>
-        <?php
-        $total = 0;
-        foreach ($data2 as $value) {
-            $total += $value->TARIF;
-        ?>
+    <?php
+        $jumlah = 0;
+        $jasa = 0;
+        $visite = 0;
+        $tarif_tdk = 0;
+        $tarif_lab = 0;
+        $tarif_resep = 0;
+        $biaya_reg = 0;
+
+        foreach ($data1 as $key => $val1) {
+           $nomor = substr($val1->KELAS, 0,1);
+           $huruf = substr($val1->KELAS, -1);
+           $kelas = romanic_number($nomor)." ".$huruf;
+           $jumlah = $val1->DIRAWAT_SELAMA * $val1->BIAYA;
+           $jasa = $val1->JASA_SARANA;
+           $visite = $val1->BIAYA_VISITE;
+           $biaya_reg = $val1->BIAYA_REG;
+    ?>
         <tr>
-            <td style="width:210px;"><?php echo $value->NAMA_PEMERIKSAAN; ?></td>
-            <td style="width:150px; text-align:center;"><?php echo $value->HASIL; ?></td>
-            <td style="width:200px; text-align:center;"><?php echo $value->NILAI_RUJUKAN; ?></td>
-            <td style="width:100px; text-align:right;"><?php echo number_format($value->TARIF,0,'.',','); ?></td>
+            <td style="width: 300px;">Kamar Rawat Inap</td>
+            <td style="width:80px; text-align: center;"><?php echo $kelas; ?></td>
+            <td style="width:80px; text-align: center;"><?php echo $val1->DIRAWAT_SELAMA; ?></td>
+            <td style="width:90px; text-align: right;"><?php echo number_format($val1->BIAYA,0,',','.'); ?></td>
+            <td style="width:90px; text-align: right;"><?php echo number_format($jumlah,0,',','.'); ?></td>
         </tr>
-        <?php
-            }
-        ?>
         <tr>
-            <td colspan="3" style="text-align: center; font-weight: bold; font-size: 11px;">TOTAL</td>
-            <td style="text-align: right; font-weight: bold; font-size: 11px;"><?php echo number_format($total,0,'.',','); ?></td>
+            <td style="width: 300px;">Jasa Sarana RS</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td style="width:90px; text-align: right;"><?php echo number_format($jasa,0,',','.'); ?></td>
+            <td style="width:90px; text-align: right;"><?php echo number_format($jasa,0,',','.'); ?></td>
         </tr>
+        <tr>
+            <td style="width: 300px;">Visite Dokter</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td style="width:90px; text-align: right;"><?php echo number_format($visite,0,',','.'); ?></td>
+            <td style="width:90px; text-align: right;"><?php echo number_format($visite,0,',','.'); ?></td>
+        </tr>
+    <?php  
+        }
+    ?>
+    <?php
+        foreach ($data2 as $key => $val2) {
+            $tarif_tdk += $val2->TARIF;
+    ?>
+        <tr>
+            <td><?php echo $val2->NAMA_TINDAKAN; ?></td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td style="text-align: right;"><?php echo number_format($val2->TARIF,0,',','.'); ?></td>
+            <td style="text-align: right;"><?php echo number_format($val2->TARIF,0,',','.'); ?></td>
+        </tr>
+    <?php
+        }
+    ?>
+    <?php
+        foreach ($data3 as $key => $val3) {
+            $tarif_lab += $val3->SUBTOTAL;
+    ?>
+        <tr>
+            <td><?php echo $val3->NAMA_PEMERIKSAAN; ?></td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td style="text-align: right;"><?php echo number_format($val3->SUBTOTAL,0,',','.'); ?></td>
+            <td style="text-align: right;"><?php echo number_format($val3->SUBTOTAL,0,',','.'); ?></td>
+        </tr>
+    <?php
+        } 
+    ?>
+    <?php
+        foreach ($data4 as $key => $val4) {
+            $tarif_resep += $val4->SUBTOTAL;
+    ?>
+        <tr>
+            <td><?php echo $val4->NAMA_OBAT; ?></td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td style="text-align: right;"><?php echo number_format($val4->SUBTOTAL,0,',','.'); ?></td>
+            <td style="text-align: right;"><?php echo number_format($val4->SUBTOTAL,0,',','.'); ?></td>
+        </tr>
+    <?php
+        }
+    ?>
+        <tr>
+            <td>Administrasi</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td style="text-align: right;"><?php echo number_format($biaya_reg,0,',','.'); ?></td>
+        </tr>
+    <tr>
+        <td colspan="4" style="text-align: right;">Subtotal</td>
+        <?php
+        $subtotal = $jumlah + $jasa + $visite + $tarif_tdk + $tarif_lab + $tarif_resep + $biaya_reg;
+        ?>
+        <td style="text-align: right;">
+            <?php echo number_format($subtotal,0,',','.'); ?>    
+        </td>
+    </tr>
     </tbody>
 </table>
 

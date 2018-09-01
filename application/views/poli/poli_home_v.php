@@ -239,7 +239,6 @@
                     <input type="hidden" id="id_antrian_now_on" value="">
                     <input type="hidden" id="kode_antrian_now_on" value="">
                     <input type="hidden" id="jml_antrian_now_on" value="">
-                    <input type="hidden" id="ke_tindakan" value="">
                     <!-- <div class="col-lg-3 col-md-6">
                         <div class="card-box widget-user">
                             <div>
@@ -526,7 +525,7 @@
         var snd = new Audio("<?php echo base_url(); ?>sound/nokia_tune_new.mp3"); // buffers automatically when created
         var timer = 0;
         var level = "<?php echo $level; ?>";
-        var tdk = $('#ke_tindakan').val();
+        var tdk = "<?php echo $view; ?>";
 
         jQuery(document).ready(function() {
             $('#datatable').dataTable();
@@ -539,19 +538,22 @@
             if(level == null || level == ""){
                 
             }else{
-                if(tdk == ""){
-                    get_antrian_offline();
-                    // get_antrian_online();
+                if(tdk == "home"){
                     get_notif_pasien();
+                    get_antrian_offline();
                     timer = setInterval(function () {
                         get_notif_pasien();
                         get_antrian_offline();
                     }, 5000);
+                }else if(tdk == 'pelayanan_rj'){
+                    get_antrian_offline();
                 }else{
                     $('#popup_pasien_baru').hide();
                     snd.pause();
                 }
             }
+
+            // console.log(level);
 
             $('#li_notif').click(function(){
                 $('#popup_pasien_baru').show();

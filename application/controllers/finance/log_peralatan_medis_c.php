@@ -5,7 +5,7 @@ class Log_peralatan_medis_c extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();
-		$this->load->model('logistik/log_peralatan_medis_m','model');
+		$this->load->model('finance/log_peralatan_medis_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
     	$id_user = $sess_user['id'];
 	    if($id_user == "" || $id_user == null){
@@ -16,17 +16,17 @@ class Log_peralatan_medis_c extends CI_Controller {
 	function index()
 	{
 		$data = array(
-			'page' => 'logistik/log_peralatan_medis_v',
+			'page' => 'finance/log_peralatan_medis_v',
 			'title' => 'Peralatan Medis',
 			'subtitle' => 'Peralatan Medis',
-			'master_menu' => 'peralatan_medis',
+			'master_menu' => 'logistik',
 			'view' => 'peralatan_medis',
-			'url_simpan' => base_url().'logistik/log_peralatan_medis_c/simpan',
-			'url_ubah' => base_url().'logistik/log_peralatan_medis_c/ubah',
-			'url_hapus' => base_url().'logistik/log_peralatan_medis_c/hapus',
+			'url_simpan' => base_url().'finance/log_peralatan_medis_c/simpan',
+			'url_ubah' => base_url().'finance/log_peralatan_medis_c/ubah',
+			'url_hapus' => base_url().'finance/log_peralatan_medis_c/hapus',
 		);
 
-		$this->load->view('logistik/log_home_v',$data);
+		$this->load->view('finance/finance_home_v',$data);
 	}
 
 	function get_edit_data(){
@@ -190,7 +190,7 @@ class Log_peralatan_medis_c extends CI_Controller {
 		);
 
 		$this->session->set_flashdata('sukses','1');
-		redirect('logistik/log_peralatan_medis_c');
+		redirect('finance/log_peralatan_medis_c');
 	}
 
 	function ubah(){
@@ -264,7 +264,7 @@ class Log_peralatan_medis_c extends CI_Controller {
 		);
 
 		$this->session->set_flashdata('ubah','1');
-		redirect('logistik/log_peralatan_medis_c');
+		redirect('finance/log_peralatan_medis_c');
 	}
 	function data_peralatan_id(){
 		$id = $this->input->post('id');
@@ -274,6 +274,6 @@ class Log_peralatan_medis_c extends CI_Controller {
 	function hapus(){
 		$id = $this->input->post('id_hapus');
 		$data = $this->model->hapus($id);
-		redirect('logistik/log_peralatan_medis_c');
+		redirect('finance/log_peralatan_medis_c');
 	}
 }

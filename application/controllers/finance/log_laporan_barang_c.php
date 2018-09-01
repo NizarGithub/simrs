@@ -6,7 +6,7 @@ class Log_laporan_barang_c extends CI_Controller {
 		parent::__construct();
     $this->load->helper('url');
 		$this->load->library('fpdf/HTML2PDF');
-    $this->load->model('logistik/log_laporan_barang_m','model');
+    $this->load->model('finance/log_laporan_barang_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
     	$id_user = $sess_user['id'];
 	    if($id_user == "" || $id_user == null){
@@ -15,14 +15,14 @@ class Log_laporan_barang_c extends CI_Controller {
 	}
 	function index(){
 		$data = array(
-			'page' => 'logistik/log_laporan_barang_v',
+			'page' => 'finance/log_laporan_barang_v',
 			'title' => 'Laporan Barang',
 			'subtitle' => 'Laporan Barang',
-			'master_menu' => 'laporan_barang',
+			'master_menu' => 'logistik',
 			'view' => 'laporan_barang',
 		);
 
-		$this->load->view('logistik/log_home_v',$data);
+		$this->load->view('finance/finance_home_v',$data);
 	}
   function data_peralatan(){
     $data = $this->model->data_peralatan();
@@ -100,7 +100,7 @@ class Log_laporan_barang_c extends CI_Controller {
 			'bulan' => $select_bulan,
 			'id_divisi' => $id_divisi
     );
-    $this->load->view('logistik/semua_pdf', $array);
+    $this->load->view('finance/semua_pdf', $array);
   }
 	function semua_excel(){
     $by = $this->input->post('by');
@@ -139,7 +139,7 @@ class Log_laporan_barang_c extends CI_Controller {
 			'bulan' => $select_bulan,
 			'id_divisi' => $id_divisi
     );
-    $this->load->view('logistik/semua_excel', $array);
+    $this->load->view('finance/semua_excel', $array);
   }
   function cetak(){
     $cetak = $this->input->post('print');

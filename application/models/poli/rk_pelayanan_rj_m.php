@@ -91,7 +91,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 			$where = $where; 
 		}
 
-		$sql = "SELECT * FROM admum_setup_tindakan WHERE $where ORDER BY ID DESC";
+		$sql = "SELECT * FROM admum_setup_tindakan WHERE $where AND AKTIF = '1' ORDER BY ID DESC";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}

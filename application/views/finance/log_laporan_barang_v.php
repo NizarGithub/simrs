@@ -77,7 +77,7 @@ function data_peralatan(){
 	}
 
 	ajax = $.ajax({
-		url : '<?php echo base_url(); ?>logistik/log_laporan_barang_c/data_peralatan',
+		url : '<?php echo base_url(); ?>finance/log_laporan_barang_c/data_peralatan',
 		type : "POST",
 		dataType : "json",
 		success : function(result){
@@ -143,7 +143,7 @@ function range_tanggal(){
   var tanggal_sekarang = $('#tanggal_sekarang').val();
   var tanggal_sampai = $('#tanggal_sampai').val();
   $.ajax({
-     url:'<?php echo base_url(); ?>logistik/log_laporan_barang_c/range_tanggal',
+     url:'<?php echo base_url(); ?>finance/log_laporan_barang_c/range_tanggal',
      data : {
        tanggal_sekarang:tanggal_sekarang,
        tanggal_sampai:tanggal_sampai
@@ -183,7 +183,7 @@ function range_bulan(){
   $('#popup_load').show();
   var select_bulan = $('#select_bulan').val();
   $.ajax({
-     url:'<?php echo base_url(); ?>logistik/log_laporan_barang_c/range_bulan',
+     url:'<?php echo base_url(); ?>finance/log_laporan_barang_c/range_bulan',
      data : {select_bulan:select_bulan},
      type : "POST",
  		 dataType : "json",
@@ -222,7 +222,7 @@ function get_departemen(){
 		ajax.abort();
 	}
 	ajax = $.ajax({
-        url : '<?php echo base_url(); ?>logistik/log_laporan_barang_c/data_departemen',
+        url : '<?php echo base_url(); ?>finance/log_laporan_barang_c/data_departemen',
         data : {keyword:keyword},
         type : "GET",
         dataType : "json",
@@ -250,7 +250,7 @@ function get_departemen(){
 function klik_departemen(id_departemen){
 	$('#tutup_departemen').click();
 	$.ajax({
-		url : '<?php echo base_url(); ?>logistik/log_laporan_barang_c/klik_departemen',
+		url : '<?php echo base_url(); ?>finance/log_laporan_barang_c/klik_departemen',
 		data : {id_departemen:id_departemen},
 		type : "POST",
 		dataType : "json",
@@ -267,7 +267,7 @@ function get_divisi(){
 	}
 			var id_departemen = $('#id_departemen').val();
 			ajax = $.ajax({
-		        url : '<?php echo base_url(); ?>logistik/log_peralatan_medis_c/data_divisi',
+		        url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/data_divisi',
 		        data : {
 										keyword:keyword,
 										id_departemen:id_departemen
@@ -298,7 +298,7 @@ function get_divisi(){
 function klik_divisi(id_divisi){
 	$('#tutup_divisi').click();
 	$.ajax({
-		url : '<?php echo base_url(); ?>logistik/log_laporan_barang_c/klik_divisi',
+		url : '<?php echo base_url(); ?>finance/log_laporan_barang_c/klik_divisi',
 		data : {id_divisi:id_divisi},
 		type : "POST",
 		dataType : "json",
@@ -312,7 +312,7 @@ function search_divisi(){
   $('#popup_load').show();
   var id_divisi = $('#id_divisi').val();
   $.ajax({
-     url:'<?php echo base_url(); ?>logistik/log_laporan_barang_c/search_divisi',
+     url:'<?php echo base_url(); ?>finance/log_laporan_barang_c/search_divisi',
      data : {id_divisi:id_divisi},
      type : "POST",
  		 dataType : "json",
@@ -353,7 +353,7 @@ function search_divisi(){
 </div>
 <div class="col-lg-12">
     <div class="card-box">
-    	<form class="form-horizontal" role="form" method="POST" action="<?php echo base_url(); ?>logistik/log_laporan_barang_c/cetak" target="_blank">
+    	<form class="form-horizontal" role="form" method="POST" action="<?php echo base_url(); ?>finance/log_laporan_barang_c/cetak" target="_blank">
         <div class="form-body">
           <div class="form-group">
               <label class="col-md-2 control-label" style="text-align:left; width: 13%;">Cetak Berdasarkan :</label>

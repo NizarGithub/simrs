@@ -30,8 +30,8 @@ class Kasir_ranap_c extends CI_Controller {
 
 	function get_pasien(){
 		$keyword = $this->input->get('keyword');
-		// $tanggal = date('d-m-Y');
-		$tanggal = '28-08-2018';
+		$tanggal = date('d-m-Y');
+		// $tanggal = '28-08-2018';
 		$data = $this->model->get_pasien($tanggal,$keyword);
 		echo json_encode($data);
 	}
@@ -133,6 +133,8 @@ class Kasir_ranap_c extends CI_Controller {
 
 	function simpan_trx(){
 		$id = $this->input->post('id_ri');
+		$id_user = $this->input->post('id_user');
+		$shift = $this->input->post('shift');
 		$invoice = $this->input->post('invoice');
 		$tanggal = date('d-m-Y');
 		$bulan = date('n');
@@ -152,9 +154,9 @@ class Kasir_ranap_c extends CI_Controller {
 		$nomor_kartu = $this->input->post('no_kartu');
 
 		if($jenis_bayar == 'Tunai'){
-			$this->model->simpan_tunai($id,$invoice,$tanggal,$bulan,$tahun,$waktu,$atas_nama,$total,$bayar,$kembali,$jenis_bayar,$sistem_bayar);
+			$this->model->simpan_tunai($id,$id_user,$shift,$invoice,$tanggal,$bulan,$tahun,$waktu,$atas_nama,$total,$bayar,$kembali,$jenis_bayar,$sistem_bayar);
 		}else{
-			$this->model->simpan_non_tunai($id,$invoice,$tanggal,$bulan,$tahun,$waktu,$atas_nama,$total,$bayar,$tambahan,$kembali,$jenis_bayar,$sistem_bayar,$kartu_kredit,$nomor_kartu);
+			$this->model->simpan_non_tunai($id,$id_user,$shift,$invoice,$tanggal,$bulan,$tahun,$waktu,$atas_nama,$total,$bayar,$tambahan,$kembali,$jenis_bayar,$sistem_bayar,$kartu_kredit,$nomor_kartu);
 		}
 
 		$this->db->query("UPDATE admum_rawat_inap SET STATUS_BAYAR = '1' WHERE ID = '$id'");
@@ -164,17 +166,21 @@ class Kasir_ranap_c extends CI_Controller {
 	}
 
 	function cetak($id){
-		$data1 = $this->model->data_rawat_inap_id($id);
-		$data2 = $this->model->data_hasil_pemeriksaan($id);
-		$data3 = $this->model->data_laborat_id($id);
+		$data0 = $this->model->data_rawat_inap_id($id);
+		$data1 = $this->model->data_cetak_ri($id);
+		$data2 = $this->model->get_tindakan($id);
+		$data3 = $this->model->get_lab($id);
+		$data4 = $this->model->get_resep($id);
 
 		$data = array(
 			'settitle' => 'Pelayanan Rawat Inap',
 			'filename' => date('dmY').'_cetak_rawat_inap',
 			'view'	=> 'ri',
+			'data0' => $data0,
 			'data1' => $data1,
 			'data2' => $data2,
 			'data3' => $data3,
+			'data4' => $data4
 		);
 
 		$this->load->view('finance/cetak_rawat_inap_pdf_v',$data);

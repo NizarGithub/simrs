@@ -13,7 +13,7 @@ class Billing_home_c extends CI_Controller {
 	        redirect(base_url());
 	    }
 
-	    $this->load->model("billing/billing_home_m", "model");
+	    $this->load->model("finance/billing_home_m", "model");
 	} 
 
 	function index()
@@ -31,11 +31,11 @@ class Billing_home_c extends CI_Controller {
 		} 
 
 		$data = array(
-			'page' => 'billing/billing_home_v',
+			'page' => 'finance/billing_home_v',
 			'title' => 'Billing / Info Pembayaran',
 			'subtitle' => 'Billing / Info Pembayaran',
-			'master_menu' => 'home',
-			'view' => 'home',
+			'master_menu' => 'billing',
+			'view' => 'billing',
 			'msg' => '',
 			'dt'  => $dt,
 			'dt_rj'  => $dt_rj,
@@ -44,7 +44,7 @@ class Billing_home_c extends CI_Controller {
 			'filter_by'  => $filter_by,
 		);
 
-		$this->load->view('billing/billing_master_home_v',$data);
+		$this->load->view('finance/finance_home_v',$data);
 	}
 
 	function bayar($sts, $id_pasien){
@@ -52,26 +52,26 @@ class Billing_home_c extends CI_Controller {
 		if($sts == "RJ"){
 			$dt  = $this->model->getDetailPasien_RJ($id_pasien);
 			$dt2 = "";
-			$url_cetak = base_url().'billing/billing_home_c/cetakBillingRJ';
+			$url_cetak = base_url().'finance/billing_home_c/cetakBillingRJ';
 			$ket = "Rawat Jalan";
 		} else if ($sts == "RI"){
 			$dt  = $this->model->getDetailPasien_RI($id_pasien);
 			$dt2 = $this->model->dataDetPasien_RI($id_pasien);
-			$url_cetak = base_url().'billing/billing_home_c/cetakBillingRI';
+			$url_cetak = base_url().'finance/billing_home_c/cetakBillingRI';
 			$ket = "Rawat Inap";
 		} else if ($sts == "IGD"){
 			$dt  = $this->model->getDetailPasien_IGD($id_pasien);
 			$dt2 = "";
-			$url_cetak = base_url().'billing/billing_home_c/cetakBillingIGD';
+			$url_cetak = base_url().'finance/billing_home_c/cetakBillingIGD';
 			$ket = "IGD";
 		}
 		
 
 		$data = array(
-			'page' => 'billing/billing_bayar_v',
+			'page' => 'finance/billing_bayar_v',
 			'title' => 'Pembayaran',
 			'subtitle' => 'Pembayaran',
-			'post_url' => 'billing/billing_home_c/proses_bayar/'.$sts.'/'.$id_pasien,
+			'post_url' => 'finance/billing_home_c/proses_bayar/'.$sts.'/'.$id_pasien,
 			'msg' => '',
 			'dt'  => $dt,
 			'dt2'  => $dt2,
@@ -82,7 +82,7 @@ class Billing_home_c extends CI_Controller {
 			'nomor_bill' => $this->model->getNomorBilling(),
 		);
 
-		$this->load->view('billing/billing_bayar_v',$data);
+		$this->load->view('finance/billing_bayar_v',$data);
 	}
 
 	function detail($sts, $id_pasien){
@@ -93,27 +93,27 @@ class Billing_home_c extends CI_Controller {
 			$dt = $this->model->getDetailPasien_RJ($id_pasien);
 			$dt2 = "";
 			$ket = "Rawat Jalan";
-			$view = "billing/billing_detail_v";
-			$url_cetak = base_url().'billing/billing_home_c/cetakBillingRJ';
+			$view = "finance/billing_detail_v";
+			$url_cetak = base_url().'finance/billing_home_c/cetakBillingRJ';
 		} else if ($sts == "RI"){
 			$dt = $this->model->getDetailPasien_RI($id_pasien);
 			$dt2 = $this->model->dataDetPasien_RI($id_pasien);
 			$ket = "Rawat Inap";
-			$view = "billing/billing_detail_ri_v";
-			$url_cetak = base_url().'billing/billing_home_c/cetakBillingRI';
+			$view = "finance/billing_detail_ri_v";
+			$url_cetak = base_url().'finance/billing_home_c/cetakBillingRI';
 		} else if ($sts == "IGD"){
 			$dt = $this->model->getDetailPasien_IGD($id_pasien);
 			$dt2 = "";
 			$ket = "IGD";
-			$view = "billing/billing_detail_igd_v";
-			$url_cetak = base_url().'billing/billing_home_c/cetakBillingIGD';
+			$view = "finance/billing_detail_igd_v";
+			$url_cetak = base_url().'finance/billing_home_c/cetakBillingIGD';
 		}
 
 		$data = array(
-			'page' => 'billing/billing_detail_v',
+			'page' => 'finance/billing_detail_v',
 			'title' => 'Detail Pembayaran',
 			'subtitle' => 'Detail Pembayaran',
-			'post_url' => 'billing/billing_home_c/proses_bayar/'.$sts.'/'.$id_pasien,
+			'post_url' => 'finance/billing_home_c/proses_bayar/'.$sts.'/'.$id_pasien,
 			'msg' => '',
 			'dt'  => $dt,
 			'dt2' => $dt2,
@@ -161,7 +161,7 @@ class Billing_home_c extends CI_Controller {
 			'nomor_bill' => $this->model->getNomorBilling(),
 		);
 
-		$this->load->view('billing/billing_bayar_print_v',$data);
+		$this->load->view('finance/billing_bayar_print_v',$data);
 	}
 
 	function next_antri(){
@@ -189,7 +189,7 @@ class Billing_home_c extends CI_Controller {
 			'dt2' => $this->model->dataDetPasien_RI($id_pasien),
 		);
 
-		$this->load->view('billing/pdf/billing_cetak_ri_pdf_v',$data);
+		$this->load->view('finance/pdf/billing_cetak_ri_pdf_v',$data);
 	}
 
 	function cetakBillingRJ(){
@@ -206,7 +206,7 @@ class Billing_home_c extends CI_Controller {
 			'dt' => $this->model->getDetailPasien_RJ($id_pasien),
 		);
 
-		$this->load->view('billing/pdf/billing_cetak_rj_pdf_v',$data);
+		$this->load->view('finance/pdf/billing_cetak_rj_pdf_v',$data);
 	}
 
 	function cetakBillingIGD(){
@@ -223,7 +223,7 @@ class Billing_home_c extends CI_Controller {
 			'dt' => $this->model->getDetailPasien_IGD($id_pasien),
 		);
 
-		$this->load->view('billing/pdf/billing_cetak_igd_pdf_v',$data);
+		$this->load->view('finance/pdf/billing_cetak_igd_pdf_v',$data);
 	}
 
 }

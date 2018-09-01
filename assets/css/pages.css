@@ -1513,12 +1513,12 @@ div.hopscotch-bubble .hopscotch-bubble-arrow-container.down .hopscotch-bubble-ar
 ============= */
 .account-pages {
   /*background: url("../images/big/bg1.jpg") center;*/
-  /*background: url("../images/big/hospitalsurface.jpg") center;*/
-  background-image: -webkit-linear-gradient(rgba(0,0,0, 0.4) 0%,rgba(0,0,0, 4) 100%), url(../images/big/shutterstock_83962294.jpg);
-  background-image:  -moz-linear-gradient(rgba(0,0,0, 0.4) 0%,rgba(0,0,0, 4) 100%), url(../images/big/shutterstock_83962294.jpg);
-  background-image:  -o-linear-gradient(rgba(0,0,0, 0.4) 0%,rgba(0,0,0,  4) 100%), url(../images/big/shutterstock_83962294.jpg);
-  background-image:  -ms-linear-gradient(rgba(0,0,0, 0.4) 0%,rgba(0,0,0,  4) 100%), url(../images/big/shutterstock_83962294.jpg);
-  background-image:  linear-gradient(rgba(0,0,0, 0.4) 0%,rgba(0,0,0,  4) 100%), url(../images/big/shutterstock_83962294.jpg);
+  background: url("../images/big/Healthcare-4.jpg") center;
+  /*background-image: -webkit-linear-gradient(rgba(0,0,0, 0.4) 0%,rgba(0,0,0, 4) 100%), url(../images/big/Healthcare-4.jpg);
+  background-image:  -moz-linear-gradient(rgba(0,0,0, 0.4) 0%,rgba(0,0,0, 4) 100%), url(../images/big/Healthcare-4.jpg);
+  background-image:  -o-linear-gradient(rgba(0,0,0, 0.4) 0%,rgba(0,0,0,  4) 100%), url(../images/big/Healthcare-4.jpg);
+  background-image:  -ms-linear-gradient(rgba(0,0,0, 0.4) 0%,rgba(0,0,0,  4) 100%), url(../images/big/Healthcare-4.jpg);
+  background-image:  linear-gradient(rgba(0,0,0, 0.4) 0%,rgba(0,0,0,  4) 100%), url(../images/big/Healthcare-4.jpg);*/
   position: absolute;
   height: 100%;
   width: 100%;
