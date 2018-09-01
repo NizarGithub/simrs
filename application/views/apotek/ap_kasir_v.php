@@ -589,7 +589,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                             <div class="form-group" id="view_tambahan">
                                                 <label class="form-label"><strong> Tambahan </strong></label>
                                                 <div class="controls">
-                                                    <input type="text" name="asd" id="asd" value="">
+                                                    <input type="hidden" name="asd" id="asd" value="">
                                                     <input type="text" name="b_tambahan" id="b_tambahan" onkeyup="FormatCurrency(this); hitung_tambahan();" class="form-control" style="font-size: 15px; font-weight: bold;">
                                                 </div>
                                             </div>
