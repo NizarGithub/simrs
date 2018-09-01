@@ -88,6 +88,12 @@ $user_detail = $this->model->get_user_detail($id_user);
 #btn_rekap_pendapatan{
   cursor: pointer;
 }
+.non_tunai_grp{
+  display: none;
+}
+#view_tambahan{
+  display: none;
+}
 </style>
 
 </head>
@@ -190,112 +196,6 @@ $user_detail = $this->model->get_user_detail($id_user);
                     <div id="panel_kanan" class="col-sm-4" style="width: 32%; background:#F0F4F8;">
                         <form id="form_pembayaran">
                             <div class="m-b-10"></div>
-
-                            <!-- <form id="form1" class="form-horizontal" parsley-validate>
-                                <div class="form-group">
-                                    <div class="col-sm-3">
-                                        <button type="button" class="btn btn-primary">Loket AP</button>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <h3 class="panel-title" style="font-size:32px;">A-1</h3>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <button type="button" class="btn btn-primary">Panggil</button>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <button type="button" class="btn btn-primary">Berikutnya</button>
-                                    </div>
-                                </div>
-                            </form> -->
-
-                            <div id="mid_head" style="margin-top: 10px; margin-bottom: 10px;">
-                                <input type="hidden" name="ppn_hidden" id="ppn_hidden" value="">
-                                <input type="hidden" name="jml_tr_baru" id="jml_tr_baru" value="0">
-                                <input type="hidden" name="tmp_sts_pesnaan" id="tmp_sts_pesnaan" value="0">
-                                <input type="hidden" name="jenis_bayar" id="jenis_bayar" value="">
-                                <center>
-                                    <span id="label_atas_nama" style="padding-bottom: 6px; padding-top: 6px; display:none;" class="label label-success">a/n : </span>
-                                    <span style="padding-bottom: 6px; padding-top: 6px;" class="label label-success" style="">
-                                        Invoice : #<b id="invoice_txt"></b>
-                                    </span>
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="window.location='<?=base_url();?>apotek/ap_kasir_rajal_c';">Reset</button>
-                                    <!-- <a class="btn btn-warning btn-sm" target="_blank" href="<?php //echo base_url();?>apotek/ap_kasir_rajal_c/struk/20161216001">Struk</a> -->
-                                </center>
-                            </div>
-
-                            <!-- TABEL -->
-                            <div id="popup_pembayaran">
-                                <div class="md-modal md-effect-10" id="modal-11">
-                                    <div class="md-content">
-                                        <h3 style="color:#FFF;"> Proses Pembayaran </h3>
-                                        <div>
-                                            <div id="warning_kelebihan" class="alert alert-danger fade in" style="width:100%; display:none;">
-                                                <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
-                                                <strong>Maaf, </strong> Jumlah bayar kurang dari total tagihan, Silahkan cek kembali
-                                            </div>
-                                            <p>
-                                                <center>
-                                                    <button type="button" id="tunai_btn" onclick="get_tunai();" style="float: left;" class="btn btn-warning">Tunai</button>
-                                                    <button type="button" id="non_tunai_btn" onclick="get_non_tunai();" style="float: left; margin-left: 50px;" class="btn btn-default">Debit/Credit Card</button>
-                                                </center>
-                                            </p>
-                                            <div class="col-md-12 col-sm-12 col-xs-12">
-                                                <div class="form-group">
-                                                    <label class="form-label"><strong>Atas Nama</strong></label>
-                                                    <div class="controls">
-                                                        <input type="text" name="b_atas_nama" id="b_atas_nama" class="form-control" style="font-weight: bold;">
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label class="form-label"><strong> Total Tagihan </strong></label>
-                                                    <div class="controls">
-                                                        <input readonly type="text" name="b_total_tagihan" id="b_total_tagihan" class="form-control" style="font-size: 15px; font-weight: bold;">
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group tunai_grp">
-                                                    <label class="form-label"><strong> Bayar </strong></label>
-                                                    <div class="controls">
-                                                        <input type="text" name="b_bayar" id="b_bayar" onkeyup="FormatCurrency(this); hitung_kembali();" class="form-control" style="font-size: 15px; font-weight: bold;">
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group tunai_grp">
-                                                    <label class="form-label"><strong> Kembali </strong></label>
-                                                    <div class="controls">
-                                                        <input type="text" readonly name="b_kembali" id="b_kembali" class="form-control" style="font-weight: bold; font-size: 20px; color: red;">
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group non_tunai_grp">
-                                                    <label class="form-label"><strong> Card / Kartu </strong></label>
-                                                    <div class="controls">
-                                                        <select id="kartu_provider" name="kartu_provider" data-width="300px" class="form-control" data-style="btn-default">
-                                                            <option value="BCA Debit Card"> BCA Debit Card</option>
-                                                            <option value="BCA Kredit Card"> BCA Kredit Card</option>
-                                                            <option value="Mandiri Debit Card"> Mandiri Debit Card</option>
-                                                            <option value="Mandiri VISA Card">  Mandiri VISA Card </option>
-                                                            <option value="VISA Card">  VISA Card </option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group non_tunai_grp">
-                                                    <label class="form-label"><strong> Nomor Kartu </strong></label>
-                                                    <div class="controls">
-                                                        <input type="text" name="no_kartu" id="no_kartu" class="form-control" style="font-weight: bold; font-size: 15px;">
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <button type="button" class="btn btn-default" onclick="$('#modal-11').removeClass('md-show'); $('#popup_pembayaran').fadeOut();" style="float: left; margin-left: 160px;">Batal</button>
-                                            <button type="button" class="btn btn-success" onclick="simpan_pembayaran();" id="btn-proses-byr" style="margin-right: 175px;">Proses</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- END TABEL -->
 
                             <div id="mid_head2" style="margin-top: -10px; margin-bottom: 10px; display:none;">
                                 <center style="padding-top: 11px; padding-bottom: 11px; background: rgb(255, 250, 205) none repeat scroll 0% 0%;">
@@ -659,12 +559,41 @@ $user_detail = $this->model->get_user_detail($id_user);
                                             </div>
                                         </div>
                                         <div class="col-md-10" style="margin-right: 10px;">
+
+                                          <div class="form-group non_tunai_grp">
+                                              <label class="form-label"><strong> Card / Kartu </strong></label>
+                                              <div class="controls">
+                                                  <select id="kartu_provider" name="kartu_provider" data-width="300px" class="form-control" data-style="btn-default">
+                                                      <option value="BCA Debit Card"> BCA Debit Card</option>
+                                                      <option value="BCA Kredit Card"> BCA Kredit Card</option>
+                                                      <option value="Mandiri Debit Card"> Mandiri Debit Card</option>
+                                                      <option value="Mandiri VISA Card">  Mandiri VISA Card </option>
+                                                      <option value="VISA Card">  VISA Card </option>
+                                                  </select>
+                                              </div>
+                                          </div>
+                                          <div class="form-group non_tunai_grp">
+                                              <label class="form-label"><strong> Nomor Kartu </strong></label>
+                                              <div class="controls">
+                                                  <input type="text" name="no_kartu" id="no_kartu" class="form-control" style="font-weight: bold; font-size: 15px;">
+                                              </div>
+                                          </div>
+
                                             <div class="form-group">
                                                 <label class="form-label"><strong>BAYAR</strong></label>
                                                 <div class="controls">
                                                     <input type="text" class="form-control" name="bayar2" id="bayar2" value="" onkeyup="get_bayar(); FormatCurrency(this);" readonly>
                                                 </div>
                                             </div>
+
+                                            <div class="form-group" id="view_tambahan">
+                                                <label class="form-label"><strong> Tambahan </strong></label>
+                                                <div class="controls">
+                                                    <input type="text" name="asd" id="asd" value="">
+                                                    <input type="text" name="b_tambahan" id="b_tambahan" onkeyup="FormatCurrency(this); hitung_tambahan();" class="form-control" style="font-size: 15px; font-weight: bold;">
+                                                </div>
+                                            </div>
+
                                             <div class="form-group" id="view_notif_bayar">
                                                 <div class="alert alert-danger" style="width: 100%;">
                                                     <p id="text_notif"></p> <strong id="text_total_notif">0</strong>
@@ -1236,6 +1165,9 @@ $(document).ready(function(){
         $('#bayar2').removeAttr('readonly');
         $('#bayar2').focus();
         $('#jenis_pembayaran').val('Tunai');
+        $('.non_tunai_grp').hide();
+        $('#btn_transfer').attr('class','btn btn-success btn-transparent');
+        $('#view_tambahan').hide();
     });
 
     $('#btn_non_tunai').click(function(){
@@ -1248,7 +1180,20 @@ $(document).ready(function(){
         $('#bayar2').val("");
         $('#kembali2').val("");
         $('#jenis_pembayaran').val('Non Tunai');
+        $('.non_tunai_grp').hide();
+        $('#btn_transfer').attr('class','btn btn-success btn-transparent');
+        $('#view_tambahan').hide();
     });
+
+    $('#btn_transfer').click(function(){
+      $('#btn_transfer').attr('class','btn btn-success');
+      $('#bayar2').removeAttr('readonly');
+      $('#bayar2').val("");
+      $('#kembali2').val("");
+      $('.non_tunai_grp').show();
+      $('#view_tambahan').hide();
+    });
+
 
     $('#btn_bayar').click(function(){
         $.ajax({
@@ -1284,6 +1229,18 @@ $(document).ready(function(){
 
     $('#btn_show_data_pembayaran').click(function(){
         data_pembayaran();
+    });
+
+    $('#btn_tutup').click(function(){
+      $('#grandtotal2').val("");
+      $('#bayar2').val("");
+			$('#kembali2').val("");
+			$('#b_tambahan').val("");
+			$('#warning_kelebihan').hide();
+			$('#view_tambahan').hide();
+      $('.non_tunai_grp').hide();
+      $('#btn_transfer').attr('class','btn btn-success btn-transparent');
+      $('#view_notif_bayar').hide();
     });
 });
 
@@ -1395,6 +1352,8 @@ function simpan_closing(){
         $('#short_shift').hide();
         $('#long_shift').show();
         $('#btn_closing_kasir').hide();
+        snd.pause();
+        $('#notif_closing').hide();
       }
     });
   });
@@ -1464,11 +1423,11 @@ function startNotifClosing() {
       $('#btn_suara_closing').click();
     }
 
-    if (jam > '13:45' && jam < '14:00') {
+    if (((parseInt(h) >= 13 || parseInt(m) >= 45)) && ((parseInt(h) < 14 || parseInt(m) < 00))) {
       $('#short_shift').show();
       $('#long_shift').hide();
       $('#btn_closing_kasir').show();
-    }else if (jam > '20:45' && jam < '21:00') {
+    }else if (((parseInt(h) >= 20 || parseInt(m) >= 45)) && ((parseInt(h) < 21 || parseInt(m) < 00))) {
       $('#short_shift').show();
       $('#long_shift').hide();
       $('#btn_closing_kasir').show();
@@ -1536,12 +1495,19 @@ function get_pasien(){
                         status_bayar = "<span class='label label-success'><b>L</b></span>";
                     }
 
+                    var kode_resep = '';
+                    if (result[i].KODE_RESEP == null || result[i].KODE_RESEP == '') {
+                      kode_resep = "Kode Resep Kosong"
+                    }else {
+                      kode_resep = "<button class='btn btn-success' type='button' onclick='klik_copy_resep("+result[i].ID+");'><i class='fa fa-print'></i> "+result[i].KODE_RESEP+"</button>"
+                    }
+
                     $tr += "<tr>"+
                                 "<td style='text-align:center;'><input type='hidden' value='"+result[i].ID_KASIR_RAJAL+"' name='id_rajal_hidden[]'>"+no+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].TANGGAL+"</td>"+
                                 "<td>"+result[i].NAMA+" "+status_bayar+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].NAMA_POLI+"</td>"+
-                                "<td align='center'><button class='btn btn-success' type='button' onclick='klik_copy_resep("+result[i].ID+");'><i class='fa fa-print'></i> "+result[i].KODE_RESEP+"</button></td>"+
+                                "<td align='center'>"+kode_resep+"</td>"+
                                 "<td align='center'>"+not_pol+"</td>"+
                                 "<td style='text-align:right;'>"+aksi+"</td>"+
                             "</tr>";
@@ -1755,16 +1721,57 @@ function get_bayar(){
         bayar = 0;
     }
 
+    var jenis_bayar = $('#jenis_pembayaran').val();
+
     if(parseFloat(bayar) < parseFloat(grandtotal)){
         var kembali = parseFloat(bayar) - parseFloat(grandtotal);
+        var s = parseFloat(grandtotal) - parseFloat(bayar);
         $('#text_notif').html('Pembayaran kurang ');
         $('#text_total_notif').html(formatNumber(kembali));
         $('#kembali2').val(formatNumber(kembali));
+        $('#asd').val(s);
         $('#view_notif_bayar').show();
         $('#btn_bayar').attr('disabled','disabled');
+
+        if (jenis_bayar == 'Non Tunai') {
+            $('#view_tambahan').show();
+        }else {
+            $('#view_tambahan').hide();
+        }
     }else{
         var kembali = parseFloat(bayar) - parseFloat(grandtotal);
         $('#kembali2').val(formatNumber(kembali));
+        $('#view_notif_bayar').hide();
+        $('#btn_bayar').removeAttr('disabled');
+        $('#view_tambahan').hide();
+    }
+}
+
+function hitung_tambahan(){
+    var tambah = $('#b_tambahan').val();
+    tambah = tambah.split(',').join('');
+
+    var sisa = $('#asd').val();
+    sisa = sisa.split(',').join('');
+
+    console.log(sisa);
+
+    var kembali = parseFloat(tambah) - parseFloat(sisa);
+
+    if(tambah == ""){
+        kembali = "";
+        $('#text_total_notif').html(formatNumber(sisa));
+    }else if(kembali < 0){
+        kembali = "";
+        $('#view_notif_bayar').show();
+        var s = parseFloat(sisa) - parseFloat(tambah);
+        $('#text_notif').html('Pembayaran kurang ');
+        $('#text_total_notif').html(formatNumber(s));
+        $('#kembali2').val(formatNumber(s));
+        $('#btn_bayar').attr('disabled','disabled');
+    }else{
+        var kembali_2 = parseFloat(tambah) - parseFloat(sisa);
+        $('#kembali2').val(NumberToMoney(kembali_2));
         $('#view_notif_bayar').hide();
         $('#btn_bayar').removeAttr('disabled');
     }
@@ -1861,10 +1868,27 @@ function hitung_kembali(){
         kembali = "";
     }
 
+    var jenis_bayar = $('#jenis_pembayaran').val();
+
+    alert(jenis_bayar);
+
     if(byr == "") {
         kembali = "";
-    } else if(kembali < 0){
+    }else if(kembali < 0){
         kembali = "";
+        $('#warning_kelebihan').show();
+        var s = parseFloat(total) - parseFloat(byr);
+        $('#jumlah_bayar').html(formatNumber(s));
+        $('#btn-proses-byr').attr('disabled','disabled');
+		if (jenis_bayar == 'Non Tunai') {
+				$('#view_tambahan').show();
+		}else {
+				$('#view_tambahan').hide();
+		}
+		}else{
+        $('#warning_kelebihan').hide();
+        $('#btn-proses-byr').removeAttr('disabled');
+				$('#view_tambahan').hide();
     }
 
     $('#b_kembali').val(NumberToMoney(kembali));

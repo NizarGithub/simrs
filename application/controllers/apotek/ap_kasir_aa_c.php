@@ -300,4 +300,117 @@ class Ap_kasir_aa_c extends CI_Controller {
 		$data = $this->model->hapus_keranjang($id);
 		echo json_encode($data);
 	}
+
+	function simpan_pembayaran(){
+		$id_gudang_obat = $this->input->post('id_gudang_obat');
+		$total_keranjang_name = $this->input->post('total_keranjang_name');
+		$jumlah_beli = $this->input->post('jumlah_beli');
+		$harga_obat = $this->input->post('harga_obat');
+
+		$invoice = $this->input->post('invoice');
+		$shift = $this->input->post('shift');
+		$id_pegawai = $this->input->post('id_pegawai');
+		$jenis_bayar = $this->input->post('jenis_bayar');
+		$kartu_provider = $this->input->post('kartu_provider');
+		$no_kartu = $this->input->post('no_kartu');
+		$total = $this->input->post('b_total_tagihan');
+		$bayar = $this->input->post('b_bayar');
+		$kembali = $this->input->post('b_kembali');
+		$tambahan = $this->input->post('b_tambahan');
+
+		if ($jenis_bayar == 'Tunai') {
+			$data = array(
+				'INVOICE' => $invoice,
+				'SHIFT' => $shift,
+				'ID_PEGAWAI' => $id_pegawai,
+				'TOTAL' => $total,
+				'BAYAR' => $bayar,
+				'KEMBALI' => $kembali,
+				'JENIS_BAYAR' => $jenis_bayar
+			);
+			$this->db->insert('ap_penjualan_obat', $data);
+			$id_penjualan_obat = $this->db->insert_id();
+
+			foreach ($id_gudang_obat as $key => $value) {
+				$this->model->simpan_pembayaran_tunai($value, $total_keranjang_name[$key], $jumlah_beli[$key], $harga_obat[$key], $id_penjualan_obat);
+			}
+
+			$sql = $this->db->query("SELECT * FROM ap_penjualan_obat WHERE ID = '$id_penjualan_obat'");
+			$back = $sql->row_array();
+			echo json_encode($back);
+		}else {
+			$data = array(
+				'INVOICE' => $invoice,
+				'SHIFT' => $shift,
+				'ID_PEGAWAI' => $id_pegawai,
+				'TOTAL' => $total,
+				'BAYAR' => $bayar,
+				'KEMBALI' => $kembali,
+				'JENIS_BAYAR' => $jenis_bayar,
+				'KARTU_PROVIDER' => $kartu_provider,
+				'NO_KARTU' => $no_kartu,
+				'TAMBAHAN' => $tambahan
+			);
+			$this->db->insert('ap_penjualan_obat', $data);
+			$id_penjualan_obat = $this->db->insert_id();
+
+			foreach ($id_gudang_obat as $key => $value) {
+				$this->model->simpan_pembayaran_non_tunai($value, $total_keranjang_name[$key], $jumlah_beli[$key], $harga_obat[$key], $id_penjualan_obat);
+			}
+
+			$sql = $this->db->query("SELECT * FROM ap_penjualan_obat WHERE ID = '$id_penjualan_obat'");
+			$back = $sql->row_array();
+			echo json_encode($back);
+		}
+		$this->insert_kode();
+		// echo "1";
+	}
+
+	function cetak($id){
+		$data = $this->model->cetak($id);
+		$data_row = $this->model->cetak_row($id);
+
+		$array = array(
+      'settitle' => 'Nota Pembelian Non Resep',
+      'filename' => date('d_m_Y').'_nota_pembelian_non_resep',
+      'data' => $data,
+			'row' => $data_row
+    );
+		$this->load->view('apotek/pdf/nota_pembelian_non_resep_pdf_v.php', $array);
+	}
+
+	function simpan_closing(){
+		$sql = $this->db->query("SELECT * FROM ap_penjualan_obat WHERE STATUS_CLOSING = '0'")->result_array();
+
+		foreach ($sql as $s) {
+			$id_kasir_aa = $s['ID'];
+			$invoice = $s['INVOICE'];
+			$tot = $s['TOTAL'];
+			$total = str_replace(',','',$tot);
+			$id_pegawai = $s['ID_PEGAWAI'];
+			$shift = $s['SHIFT'];
+
+			$data = $this->model->simpan_closing($id_kasir_aa, $invoice, $total, $id_pegawai, $shift);
+		}
+
+		echo "1";
+	}
+
+	function data_rekap_penjualan(){
+		$data = $this->model->data_rekap_penjualan();
+		echo json_encode($data);
+	}
+
+	function tanggal_filter(){
+    $tanggal_sekarang = $this->input->post('tanggal_sekarang');
+    $tanggal_sampai = $this->input->post('tanggal_sampai');
+    $data = $this->model->tanggal_filter($tanggal_sekarang, $tanggal_sampai);
+    echo json_encode($data);
+  }
+
+	function bulan_filter(){
+    $bulan = $this->input->post('result_bulan');
+    $data = $this->model->bulan_filter($bulan);
+    echo json_encode($data);
+  }
 }

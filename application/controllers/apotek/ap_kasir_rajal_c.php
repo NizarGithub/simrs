@@ -61,8 +61,8 @@ class Ap_kasir_rajal_c extends CI_Controller {
 	}
 
 	function get_pasien(){
-		// $tanggal = date('d-m-Y');
-		$tanggal = '29-08-2018';
+		$tanggal = date('d-m-Y');
+		// $tanggal = '29-08-2018';
 		$keyword = $this->input->get('keyword');
 		$data = $this->model->get_pasien($tanggal,$keyword);
 		echo json_encode($data);
@@ -276,8 +276,32 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		$biaya_lab = str_replace(',', '', $this->input->post('biaya_lab'));
 		$total = str_replace(',', '', $this->input->post('grandtotal2'));
 		$jenis_pembayaran = $this->input->post('jenis_pembayaran');
+		$bayar = str_replace(',', '', $this->input->post('bayar2'));
+		$kartu_provider = $this->input->post('kartu_provider');
+		$no_kartu = $this->input->post('no_kartu');
+		$tambahan = str_replace(',', '', $this->input->post('tambahan'));
 
-		$this->model->simpan_pembayaran($invoice,$id_rj,$id_pasien,$id_poli,$id_pegawai,$shift,$tanggal,$waktu,$biaya_poli,$biaya_tindakan,$biaya_resep,$biaya_lab,$total,$jenis_pembayaran);
+		$this->model->simpan_pembayaran(
+			$invoice,
+			$id_rj,
+			$id_pasien,
+			$id_poli,
+			$id_pegawai,
+			$shift,
+			$tanggal,
+			$waktu,
+			$biaya_poli,
+			$biaya_tindakan,
+			$biaya_resep,
+			$biaya_lab,
+			$total,
+			$jenis_pembayaran,
+			$bayar,
+			$kartu_provider,
+			$no_kartu,
+			$tambahan
+		);
+
 		$this->db->query("UPDATE admum_rawat_jalan SET STS_BAYAR = '1' WHERE ID = '$id_rj'");
 		$this->insert_kode();
 
@@ -413,7 +437,7 @@ class Ap_kasir_rajal_c extends CI_Controller {
     $by = $this->input->post('by');
     $tanggal_sekarang = $this->input->post('tanggal_sekarang');
     $tanggal_sampai = $this->input->post('tanggal_sampai');
-    $id_poli = $this->input->post('id_poli');		
+    $id_poli = $this->input->post('id_poli');
 
     $data = $this->model->print_pdf(
       $by,
@@ -441,4 +465,8 @@ class Ap_kasir_rajal_c extends CI_Controller {
     );
     $this->load->view('apotek/pdf/print_rekap_pendaftaran_pdf_v', $array);
   }
+
+	// function cetak($id){
+	//
+	// }
 }

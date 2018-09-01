@@ -339,7 +339,24 @@ class Ap_kasir_rajal_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
-	function simpan_pembayaran($invoice,$id_rj,$id_pasien,$id_poli,$id_pegawai,$shift,$tanggal,$waktu,$biaya_poli,$biaya_tindakan,$biaya_resep,$biaya_lab,$total,$jenis_pembayaran){
+	function simpan_pembayaran($invoice,
+															$id_rj,
+															$id_pasien,
+															$id_poli,
+															$id_pegawai,
+															$shift,
+															$tanggal,
+															$waktu,
+															$biaya_poli,
+															$biaya_tindakan,
+															$biaya_resep,
+															$biaya_lab,
+															$total,
+															$jenis_pembayaran,
+															$bayar,
+															$kartu_provider,
+															$no_kartu,
+															$tambahan){
 		$sql = "INSERT INTO rk_pembayaran_kasir(
 							INVOICE,
 							ID_PELAYANAN,
@@ -355,7 +372,11 @@ class Ap_kasir_rajal_m extends CI_Model {
 							BIAYA_LAB,
 							TOTAL,
 							JENIS_PEMBAYARAN,
-							TIPE
+							TIPE,
+							BAYAR,
+							KARTU_PROVIDER,
+							NO_KARTU,
+							TAMBAHAN
 						) VALUES (
 							'$invoice',
 							'$id_rj',
@@ -371,7 +392,11 @@ class Ap_kasir_rajal_m extends CI_Model {
 							'$biaya_lab',
 							'$total',
 							'$jenis_pembayaran',
-							'RJ'
+							'RJ',
+							'$bayar',
+							'$kartu_provider',
+							'$no_kartu',
+							'$tambahan'
 						)
 					";
 		$this->db->query($sql);

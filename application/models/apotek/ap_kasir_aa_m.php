@@ -368,6 +368,7 @@ class Ap_kasir_aa_m extends CI_Model {
 	function data_keranjang(){
 		$sql = $this->db->query("SELECT
 														a.*,
+														b.ID AS ID_GUDANG_OBAT,
 														b.HARGA_BELI,
 														b.HARGA_JUAL,
 														c.BARCODE,
@@ -397,6 +398,166 @@ class Ap_kasir_aa_m extends CI_Model {
 
 	function hapus_keranjang($id){
 		$this->db->where('ID', $id);
-    $this->db->delete('keranjang_beli');    
+    $this->db->delete('keranjang_beli');
+	}
+
+	function simpan_pembayaran_tunai($value, $total_keranjang_name, $jumlah_beli, $harga_obat, $id_penjualan_obat){
+		$tanggal = date('d-m-Y');
+		$tahun = date('Y');
+		$bulan = date('m');
+
+		$data_detail = array(
+			'ID_PENJUALAN_OBAT' => $id_penjualan_obat,
+			'ID_GUDANG_OBAT' => $value,
+			'JUMLAH_BELI' => $jumlah_beli,
+			'TANGGAL' => $tanggal,
+			'TAHUN' => $tahun,
+			'BULAN' => $bulan,
+			'TOTAL' => $total_keranjang_name,
+			'HARGA_OBAT' => $harga_obat
+		);
+		$this->db->insert('ap_penjualan_obat_detail', $data_detail);
+		$this->db->empty_table('keranjang_beli');
+
+		$this->db->query("UPDATE apotek_gudang_obat SET TOTAL = TOTAL - $jumlah_beli WHERE ID = '$value'");
+	}
+
+	function simpan_pembayaran_non_tunai($value, $total_keranjang_name, $jumlah_beli, $harga_obat, $id_penjualan_obat){
+		$tanggal = date('d-m-Y');
+		$tahun = date('Y');
+		$bulan = date('m');
+
+		$data_detail = array(
+			'ID_PENJUALAN_OBAT' => $id_penjualan_obat,
+			'ID_GUDANG_OBAT' => $value,
+			'JUMLAH_BELI' => $jumlah_beli,
+			'TANGGAL' => $tanggal,
+			'TAHUN' => $tahun,
+			'BULAN' => $bulan,
+			'TOTAL' => $total_keranjang_name,
+			'HARGA_OBAT' => $harga_obat
+		);
+		$this->db->insert('ap_penjualan_obat_detail', $data_detail);
+		$this->db->empty_table('keranjang_beli');
+
+		$this->db->query("UPDATE apotek_gudang_obat SET TOTAL = TOTAL - $jumlah_beli WHERE ID = '$value'");
+	}
+
+	function cetak($id){
+		$sql = $this->db->query("SELECT
+														a.TOTAL AS TOTAL_SEMUA_OBAT,
+														b.JUMLAH_BELI,
+														b.TOTAL AS TOTAL_OBAT,
+														d.NAMA_OBAT
+														FROM
+														ap_penjualan_obat a
+														LEFT JOIN ap_penjualan_obat_detail b ON a.ID = b.ID_PENJUALAN_OBAT
+														LEFT JOIN apotek_gudang_obat c ON b.ID_GUDANG_OBAT = c.ID
+														LEFT JOIN admum_setup_nama_obat d ON c.ID_SETUP_NAMA_OBAT = d.ID
+														WHERE a.ID = '$id'"
+													);
+		return $sql->result_array();
+	}
+	function cetak_row($id){
+		$sql = $this->db->query("SELECT
+														a.TOTAL AS TOTAL_SEMUA_OBAT,
+														b.JUMLAH_BELI,
+														b.TOTAL AS TOTAL_OBAT,
+														d.NAMA_OBAT
+														FROM
+														ap_penjualan_obat a
+														LEFT JOIN ap_penjualan_obat_detail b ON a.ID = b.ID_PENJUALAN_OBAT
+														LEFT JOIN apotek_gudang_obat c ON b.ID_GUDANG_OBAT = c.ID
+														LEFT JOIN admum_setup_nama_obat d ON c.ID_SETUP_NAMA_OBAT = d.ID
+														WHERE a.ID = '$id'"
+													);
+		return $sql->row_array();
+	}
+
+	function simpan_closing($id_kasir_aa, $invoice, $total, $id_pegawai, $shift){
+			$tanggal = date('d-m-Y');
+			$waktu = date('h:i');
+			$data = array(
+				'ID_KASIR_AA' => $id_kasir_aa,
+				'INVOICE' => $invoice,
+				'TOTAL' => $total,
+				'TANGGAL' => $tanggal,
+				'WAKTU' => $waktu,
+				'ID_PEGAWAI' => $id_pegawai,
+				'SHIFT' => $shift
+			);
+
+			$this->db->insert('ap_tutup_kasir_aa', $data);
+
+			$data_update = array(
+				'STATUS_CLOSING' => '1'
+			);
+			$this->db->where('ID', $id_kasir_aa);
+      $this->db->update('ap_penjualan_obat', $data_update);
+	}
+
+	function data_rekap_penjualan(){
+		$sql = $this->db->query("SELECT
+															a.INVOICE,
+															a.ID_KASIR_AA,
+															e.NAMA_OBAT,
+															a.TANGGAL,
+															a.TOTAL,
+															f.NAMA AS NAMA_PEGAWAI,
+															a.SHIFT
+															FROM
+															ap_tutup_kasir_aa a
+															LEFT JOIN ap_penjualan_obat b ON a.ID_KASIR_AA = b.ID
+															LEFT JOIN ap_penjualan_obat_detail c ON c.ID_PENJUALAN_OBAT = b.ID
+															LEFT JOIN apotek_gudang_obat d ON d.ID = c.ID_GUDANG_OBAT
+															LEFT JOIN admum_setup_nama_obat e ON e.ID = d.ID_SETUP_NAMA_OBAT
+															LEFT JOIN kepeg_pegawai f ON f.ID = a.ID_PEGAWAI
+															GROUP BY a.ID_KASIR_AA"
+														);
+		return $sql->result_array();
+	}
+	function tanggal_filter($tanggal_sekarang, $tanggal_sampai){
+		$sql = $this->db->query("SELECT
+															a.INVOICE,
+															a.ID_KASIR_AA,
+															e.NAMA_OBAT,
+															a.TANGGAL,
+															a.TOTAL,
+															f.NAMA AS NAMA_PEGAWAI,
+															a.SHIFT
+															FROM
+															ap_tutup_kasir_aa a
+															LEFT JOIN ap_penjualan_obat b ON a.ID_KASIR_AA = b.ID
+															LEFT JOIN ap_penjualan_obat_detail c ON c.ID_PENJUALAN_OBAT = b.ID
+															LEFT JOIN apotek_gudang_obat d ON d.ID = c.ID_GUDANG_OBAT
+															LEFT JOIN admum_setup_nama_obat e ON e.ID = d.ID_SETUP_NAMA_OBAT
+															LEFT JOIN kepeg_pegawai f ON f.ID = a.ID_PEGAWAI
+															WHERE STR_TO_DATE(a.TANGGAL,'%d-%m-%Y') >= STR_TO_DATE('$tanggal_sekarang','%d-%m-%Y')
+															AND STR_TO_DATE(a.TANGGAL,'%d-%m-%Y') <= STR_TO_DATE('$tanggal_sampai','%d-%m-%Y')
+															GROUP BY a.ID_KASIR_AA"
+														);
+		return $sql->result_array();
+	}
+
+	function bulan_filter($bulan){
+		$sql = $this->db->query("SELECT
+															a.INVOICE,
+															a.ID_KASIR_AA,
+															e.NAMA_OBAT,
+															a.TANGGAL,
+															a.TOTAL,
+															f.NAMA AS NAMA_PEGAWAI,
+															a.SHIFT
+															FROM
+															ap_tutup_kasir_aa a
+															LEFT JOIN ap_penjualan_obat b ON a.ID_KASIR_AA = b.ID
+															LEFT JOIN ap_penjualan_obat_detail c ON c.ID_PENJUALAN_OBAT = b.ID
+															LEFT JOIN apotek_gudang_obat d ON d.ID = c.ID_GUDANG_OBAT
+															LEFT JOIN admum_setup_nama_obat e ON e.ID = d.ID_SETUP_NAMA_OBAT
+															LEFT JOIN kepeg_pegawai f ON f.ID = a.ID_PEGAWAI
+															WHERE c.BULAN = '$bulan'
+															GROUP BY a.ID_KASIR_AA"
+														);
+		return $sql->result_array();
 	}
 }
