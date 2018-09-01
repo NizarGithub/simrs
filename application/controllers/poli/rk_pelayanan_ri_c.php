@@ -31,7 +31,8 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 
 	function data_rawat_inap(){
 		$keyword = $this->input->post('keyword');
-		$data = $this->model->data_rawat_inap($keyword);
+		$tanggal = date('d-m-Y');
+		$data = $this->model->data_rawat_inap($keyword,$tanggal);
 		echo json_encode($data);
 	}
 

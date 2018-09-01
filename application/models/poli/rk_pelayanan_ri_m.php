@@ -8,7 +8,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		$this->load->database();
 	}
 
-	function data_rawat_inap($keyword){
+	function data_rawat_inap($keyword,$tanggal){
 		$where = "1 = 1";
 
 		if($keyword != ""){
@@ -42,6 +42,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 			LEFT JOIN kepeg_pegawai PEG ON PEG.ID = RI.ID_DOKTER
 			WHERE $where
 			AND RI.STATUS_SUDAH = '0'
+			AND RI.TANGGAL_MASUK = '$tanggal'
 			ORDER BY RI.ID DESC
 		";
 		$query = $this->db->query($sql);

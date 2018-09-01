@@ -396,11 +396,11 @@ function onEnterText2(e){
 			<div class="row">
 				<ul class="nav nav-tabs">
 	                <li role="presentation" class="active">
-	                    <a href="#pasien_belum" role="tab" data-toggle="tab"><i class="fa fa-download"></i> Pasien Belum</a>
+	                    <a href="#pasien_belum" role="tab" data-toggle="tab"><i class="fa fa-list"></i> Data Pasien</a>
 	                </li>
-	                <li role="presentation" id="dt_pasien_sudah">
+	                <!-- <li role="presentation" id="dt_pasien_sudah">
 	                    <a href="#pasien_sudah" role="tab" data-toggle="tab"><i class="fa fa-upload"></i> Pasien Sudah</a>
-	                </li>
+	                </li> -->
 	            </ul>
 	            <div class="tab-content">
 	                <div role="tabpanel" class="tab-pane fade in active" id="pasien_belum">
