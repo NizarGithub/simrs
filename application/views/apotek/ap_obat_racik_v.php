@@ -229,13 +229,13 @@ function hitung_jumlah(id){
 	<form action="<?php echo $url_simpan; ?>" method="post" class="form-horizontal" role="form">
     	<div class="card-box card-tabs">
     		<div class="form-group">
-                <label class="col-md-2 control-label">SIP</label>
+                <label class="col-md-2 control-label">Nomor Resep</label>
                 <div class="col-md-4">
                     <input type="text" class="form-control" name="sip" id="sip" value="" readonly required="required">
                 </div>
             </div>
     		<div class="form-group">
-                <label class="col-md-2 control-label">Apoteker</label>
+                <label class="col-md-2 control-label">Petugas</label>
                 <div class="col-md-4">
                     <div class="input-group">
                         <input type="hidden" name="id_apoteker" id="id_apoteker" value="">
@@ -279,7 +279,7 @@ function hitung_jumlah(id){
 	                </thead>
 
 	                <tbody>
-	                    
+
 	                </tbody>
 	            </table>
 	        </div>
@@ -327,7 +327,7 @@ function hitung_jumlah(id){
 		                        </tr>
 		                    </thead>
 		                    <tbody>
-		                        
+
 		                    </tbody>
 		                </table>
             		</div>
@@ -375,7 +375,7 @@ function hitung_jumlah(id){
                                 </tr>
                             </thead>
                             <tbody>
-                                
+
                             </tbody>
                         </table>
                     </div>

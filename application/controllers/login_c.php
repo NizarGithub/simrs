@@ -33,7 +33,7 @@ class Login_c extends CI_Controller {
 				a.*,
 				b.NAMA AS JABATAN,
 				c.NAMA_DEP,
-				d.NAMA_DIV 
+				d.NAMA_DIV
 			FROM kepeg_pegawai a
 			LEFT JOIN kepeg_kel_jabatan b ON a.ID_JABATAN = b.ID
 			LEFT JOIN kepeg_departemen c ON a.ID_DEPARTEMEN = c.ID
@@ -42,7 +42,7 @@ class Login_c extends CI_Controller {
 		";
 		$qry = $this->db->query($sql);
 		$jumlah = $qry->num_rows();
-		
+
 		if($jumlah != 0){
 			$data = $qry->row();
 			$sess_array = array(
@@ -90,6 +90,8 @@ class Login_c extends CI_Controller {
 				redirect('apotek/ap_kasir_rajal_c');
 			}else if($data->LEVEL == 'Kasir Ranap'){
 				redirect('finance/kasir_ranap_c');
+			}else if($data->LEVEL == 'Finance'){
+				redirect('finance/finance_home_c');
 			}else if($data->LEVEL == 'Perawat'){
 				redirect('poli/rk_pelayanan_ri_c');
 			}else if($data->LEVEL == null){

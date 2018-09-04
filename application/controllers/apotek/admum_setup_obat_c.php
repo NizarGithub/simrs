@@ -106,12 +106,6 @@ class Admum_setup_obat_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	function data_jenis_obat(){
-		$keyword = $this->input->get('keyword');
-		$data = $this->model->data_jenis_obat($keyword);
-		echo json_encode($data);
-	}
-
 	function klik_jenis(){
 		$id_jenis = $this->input->post('id_jenis');
 		$data = $this->model->klik_jenis($id_jenis);
@@ -145,9 +139,15 @@ class Admum_setup_obat_c extends CI_Controller {
 		$kode_obat = $this->input->post('kode_obat');
 		$barcode = $this->input->post('barcode');
 		$nama_obat = $this->input->post('nama_obat');
+		$id_jenis = $this->input->post('id_jenis');
+		$expired = $this->input->post('tanggal_expired');
+		$golongan = $this->input->post('id_golongan');
+		$kategori = $this->input->post('id_kategori');
+		$status_obat = $this->input->post('status_obat');
+		$service = $this->input->post('service');
 		// $merk = $this->input->post('id_merk');
 
-		$this->model->simpan($kode_obat,$barcode,$nama_obat);
+		$this->model->simpan($kode_obat,$barcode,$nama_obat,$id_jenis,$expired,$golongan,$kategori,$status_obat,$service);
 		$this->insert_kode_obat();
 
 		$this->session->set_flashdata('sukses','1');
@@ -158,6 +158,22 @@ class Admum_setup_obat_c extends CI_Controller {
 		$id = $this->input->post('id_ubah');
 		$barcode = $this->input->post('barcode_ubah');
 		$nama_obat = $this->input->post('nama_obat_ubah');
+		$jenis = $this->input->post('id_jenis_ubah');
+		$expired = $this->input->post('tanggal_expired_ubah');
+		$golongan = $this->input->post('id_golongan_ubah');
+		$kategori = $this->input->post('id_kategori_ubah');
+		$status_racik = "";
+		if($this->input->post('checkbox2')){
+			$status_racik = $this->input->post('status_obat_ubah');
+		}else{
+			$status_racik = $this->input->post('status_obat_hidden');
+		}
+		$service = "";
+		if (empty($this->input->post('service_ubah'))) {
+			$service = $this->input->post('service_hidden');
+		}else {
+			$service = $this->input->post('service_ubah');
+		}
 		// $id_merk_ubah = $this->input->post('id_merk_ubah');
 
 		// $id_merk = "";
@@ -168,7 +184,7 @@ class Admum_setup_obat_c extends CI_Controller {
 		// 	$id_merk = $this->input->post('id_merk_lama');
 		// }
 
-		$this->model->ubah($id,$barcode,$nama_obat);
+		$this->model->ubah($id,$barcode,$nama_obat,$jenis,$expired,$golongan,$kategori,$status_racik,$service);
 
 		$this->session->set_flashdata('ubah','1');
 		redirect('apotek/admum_setup_obat_c');
@@ -188,4 +204,9 @@ class Admum_setup_obat_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function data_jenis_obat(){
+		$keyword = $this->input->get('keyword');
+		$data = $this->model->data_jenis_obat($keyword);
+		echo json_encode($data);
+	}
 }

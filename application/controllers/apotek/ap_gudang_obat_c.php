@@ -202,17 +202,13 @@ class Ap_gudang_obat_c extends CI_Controller {
 
 	function simpan(){
 		$id_nama_obat = $this->input->post('id_nama_obat');
-		$id_jenis = $this->input->post('id_jenis');
-		$id_satuan = $this->input->post('id_satuan');
 		$jumlah = str_replace(',', '', $this->input->post('jumlah'));
 		$isi = str_replace(',', '', $this->input->post('isi'));
 		$total = str_replace(',', '', $this->input->post('total'));
-		$satuan_isi = 'kaplet';
 		$jumlah_butir = str_replace(',', '', $this->input->post('jumlah_butir'));
-		$satuan_butir = 'butir';
+		$harga_pertablet = str_replace(',', '', $this->input->post('harga_pertablet'));
 		$harga_beli = str_replace(',', '', $this->input->post('harga_beli'));
 		$harga_jual = str_replace(',', '', $this->input->post('harga_jual'));
-		$kadaluarsa = $this->input->post('tanggal_expired');
 		$tanggal_masuk = date('d-m-Y');
 		$tz_object = new DateTimeZone('Asia/Jakarta');
 	    $datetime = new DateTime();
@@ -221,22 +217,16 @@ class Ap_gudang_obat_c extends CI_Controller {
 		$aktif = "";
 		// $urut_barang = "";
 		$first_out = "";
-		$status_racik = $this->input->post('status_obat');
-		$gambar = "";
-		$id_golongan = $this->input->post('id_golongan');
-		$id_kategori = $this->input->post('id_kategori');
 
 		$sq_cek = "SELECT ID FROM apotek_gudang_obat ORDER BY ID DESC LIMIT 1";
 		$qr_cek = $this->db->query($sq_cek)->row();
 		$last_id = $qr_cek->ID;
 		$id = $last_id+1;
 
-		if(!empty($_FILES['userfile']['name'])){
-			$gambar = strtolower(str_replace(' ', '_', $id.'_'.$_FILES['userfile']['name']));
-			$this->upload('userfile',$id);
-		}
 
-		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM apotek_gudang_obat WHERE ID_SETUP_NAMA_OBAT = '$id_nama_obat'";
+	foreach ($id_nama_obat as $key => $value) {
+
+		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM apotek_gudang_obat WHERE ID_SETUP_NAMA_OBAT = '$value'";
 		$qry_cek = $this->db->query($sql_cek)->row();
 		$total_data = $qry_cek->TOTAL;
 
@@ -254,28 +244,21 @@ class Ap_gudang_obat_c extends CI_Controller {
 		}
 
 		$this->model->simpan(
-			$id_nama_obat,
-			$id_jenis,
-			$id_satuan,
-			$jumlah,
-			$isi,
-			$total,
-			$satuan_isi,
-			$jumlah_butir,
-			$satuan_butir,
-			$harga_beli,
-			$harga_jual,
-			$kadaluarsa,
+			$value,
+			$jumlah[$key],
+			$isi[$key],
+			$total[$key],
+			$jumlah_butir[$key],
+			$harga_pertablet[$key],
+			$harga_beli[$key],
+			$harga_jual[$key],
 			$tanggal_masuk,
 			$waktu_masuk,
-			$aktif,
-			$first_out,
+			$aktif[$key],
+			$first_out[$key]
 			// $urut_barang,
-			$status_racik,
-			$gambar,
-			$id_golongan,
-			$id_kategori
 		);
+	}
 
 		$this->session->set_flashdata('sukses','1');
 		redirect('apotek/ap_gudang_obat_c');
@@ -326,4 +309,9 @@ class Ap_gudang_obat_c extends CI_Controller {
 		redirect('apotek/ap_gudang_obat_c');
 	}
 
+	function data_nama_supplier(){
+		$keyword = $this->input->get('keyword');
+		$data = $this->model->data_nama_supplier($keyword);
+		echo json_encode($data);
+	}
 }

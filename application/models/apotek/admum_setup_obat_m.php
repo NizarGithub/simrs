@@ -28,18 +28,6 @@ class Admum_setup_obat_m extends CI_Model {
 		return $query->row();
 	}
 
-	function data_jenis_obat($keyword){
-		$where = "1 = 1";
-
-		if($keyword != ""){
-			$where = $where." AND NAMA_JENIS LIKE '%$keyword%'";
-		}
-
-		$sql = "SELECT * FROM obat_jenis WHERE $where ORDER BY ID DESC";
-		$query = $this->db->query($sql);
-		return $query->result();
-	}
-
 	function klik_jenis($id_jenis){
 		$sql = "SELECT * FROM obat_jenis WHERE ID = '$id_jenis'";
 		$query = $this->db->query($sql);
@@ -89,35 +77,61 @@ class Admum_setup_obat_m extends CI_Model {
 				OBAT.BARCODE,
 				OBAT.NAMA_OBAT,
 				OBAT.ID_MERK,
-				SUP.MERK
+				OBAT.ID_JENIS_OBAT,
+				OBAT.EXPIRED,
+				OBAT.GOLONGAN_OBAT,
+				OBAT.KATEGORI_OBAT,
+				OBAT.STATUS_OBAT,
+				OBAT.SERVICE,
+				SUP.MERK,
+				JENIS.NAMA_JENIS
 			FROM admum_setup_nama_obat OBAT
 			LEFT JOIN obat_supplier SUP ON SUP.ID = OBAT.ID_MERK
+			LEFT JOIN obat_jenis JENIS ON JENIS.ID = OBAT.ID_JENIS_OBAT
 			WHERE OBAT.ID = '$id'
 		";
 		$query = $this->db->query($sql);
 		return $query->row();
 	}
 
-	function simpan($kode_obat,$barcode,$nama_obat){
+	function simpan($kode_obat,$barcode,$nama_obat,$id_jenis,$expired,$golongan,$kategori,$status_obat,$service){
 		$sql = "
 			INSERT INTO admum_setup_nama_obat(
 				KODE_OBAT,
 				BARCODE,
-				NAMA_OBAT
+				NAMA_OBAT,
+				ID_JENIS_OBAT,
+				EXPIRED,
+				GOLONGAN_OBAT,
+				KATEGORI_OBAT,
+				STATUS_OBAT,
+				SERVICE
 			) VALUES (
 				'$kode_obat',
 				'$barcode',
-				'$nama_obat'
+				'$nama_obat',
+				'$id_jenis',
+				'$expired',
+				'$golongan',
+				'$kategori',
+				'$status_obat',
+				'$service'
 			)
 		";
 		$this->db->query($sql);
 	}
 
-	function ubah($id,$barcode,$nama_obat){
+	function ubah($id,$barcode,$nama_obat,$jenis,$expired,$golongan,$kategori,$status_racik,$service){
 		$sql = "
 			UPDATE admum_setup_nama_obat SET
 				BARCODE = '$barcode',
-				NAMA_OBAT = '$nama_obat'
+				NAMA_OBAT = '$nama_obat',
+				ID_JENIS_OBAT = '$jenis',
+				EXPIRED = '$expired',
+				GOLONGAN_OBAT = '$golongan',
+				KATEGORI_OBAT = '$kategori',
+				STATUS_OBAT = '$status_racik',
+				SERVICE = '$service'
 			WHERE ID = '$id'";
 		$this->db->query($sql);
 	}
@@ -133,4 +147,15 @@ class Admum_setup_obat_m extends CI_Model {
 		return $query->row();
 	}
 
+	function data_jenis_obat($keyword){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND NAMA_JENIS LIKE '%$keyword%'";
+		}
+
+		$sql = "SELECT * FROM obat_jenis WHERE $where ORDER BY ID DESC";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
 }

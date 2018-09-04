@@ -27,7 +27,7 @@ class Ap_obat_racik_m extends CI_Model {
 				JBT.NAMA AS JABATAN
 			FROM kepeg_pegawai PEG
 			LEFT JOIN (
-				SELECT 
+				SELECT
 					DEP.ID,
 					DEP.NAMA_DEP,
 					DV.NAMA_DIV
@@ -54,7 +54,7 @@ class Ap_obat_racik_m extends CI_Model {
 				JBT.NAMA AS JABATAN
 			FROM kepeg_pegawai PEG
 			LEFT JOIN (
-				SELECT 
+				SELECT
 					DEP.ID,
 					DEP.NAMA_DEP,
 					DV.NAMA_DIV

@@ -4,6 +4,9 @@
 #view_tambah, #view_ubah, #tombol_reset, #view_stok, #view_status_obat, #view_gambar_obat{
 	display: none;
 }
+.view_tablet_grp{
+	display: none;
+}
 </style>
 
 <script type="text/javascript">
@@ -44,10 +47,6 @@ $(document).ready(function(){
 		window.location = "<?php echo base_url(); ?>apotek/ap_gudang_obat_c";
 	});
 
-    $('.btn_nama_obat').click(function(){
-        $('#popup_nama_obat').click();
-        get_nama_obat();
-    });
 
 	$('#jenis_obat').click(function(){
 		$('#popup_jenis').click();
@@ -106,11 +105,24 @@ $(document).ready(function(){
             $('#view_gambar_obat').hide();
         }
     });
+
 });
 
 //NAMA OBAT
+function check_tablet(number){
+	var check_tablet = $('#check_tablet_'+number).is(":checked");
+	if(check_tablet == true){
+			$('.harga_tablet_grp_'+number).show();
+			$('#harga_pertablet_'+number).removeAttr('disabled');
+	}else{
+			$('.harga_tablet_grp_'+number).hide();
+			$('#harga_pertablet_'+number).Attr('disabled','disabled');
+	}
+}
 
-function get_nama_obat(){
+function get_nama_obat(number){
+	$('#popup_nama_obat').click();
+
     var keyword = $('#cari_nama_obat').val();
 
     if(ajax){
@@ -132,7 +144,7 @@ function get_nama_obat(){
                 for(var i=0; i<result.length; i++){
                     no++;
 
-                    $tr += '<tr style="cursor:pointer;" onclick="klik_nama_obat('+result[i].ID+');">'+
+                    $tr += '<tr style="cursor:pointer;" onclick="klik_nama_obat('+result[i].ID+','+number+');">'+
                                 '<td style="text-align:center;">'+no+'</td>'+
                                 '<td>'+result[i].KODE_OBAT+'</td>'+
                                 '<td>'+result[i].BARCODE+'</td>'+
@@ -151,7 +163,7 @@ function get_nama_obat(){
     });
 }
 
-function klik_nama_obat(id){
+function klik_nama_obat(id, number){
     $('#tutup_nama_obat').click();
 
     $.ajax({
@@ -163,41 +175,25 @@ function klik_nama_obat(id){
             var ket = $('#ket').val();
 
             if(ket == 'Tambah'){
-                $('#id_nama_obat').val(id);
-                $('#kode_obat').val(row['KODE_OBAT']);
-                $('#nama_obat').val(row['NAMA_OBAT']);
+                $('#id_nama_obat_'+number).val(id);
+                $('#kode_obat_'+number).val(row['KODE_OBAT']);
+                $('#nama_obat_'+number).val(row['NAMA_OBAT']);
+								$('#jenis_obat_'+number).val(row['NAMA_JENIS']);
+								$('#expired_'+number).val(row['EXPIRED']);
+								$('#golongan_'+number).val(row['GOLONGAN_OBAT']);
+								$('#kategori_'+number).val(row['KATEGORI_OBAT']);
+								$('#service_'+number).val(row['SERVICE']);
                 // $('#id_merk').val(row['ID_MERK']);
                 // $('#merk').val(row['MERK']);
 
-                if(row['ID_GUDANG'] != null){
-                    $('#id_jenis').val(row['ID_JENIS_OBAT']);
-                    $('#jenis_obat').val(row['NAMA_JENIS']);
-                    // $('#id_satuan').val(row['ID_SATUAN_OBAT']);
-                    // $('#satuan').val(row['NAMA_SATUAN']);
-                    $('#tanggal_expired').val(row['KADALUARSA']);
-                    $('#jumlah').val(NumberToMoney(row['JUMLAH']));
-                    $('#isi').val(NumberToMoney(row['ISI']));
-                    $('#total').val(NumberToMoney(row['TOTAL']));
-                    $('#jumlah_butir').val(NumberToMoney(row['JUMLAH_BUTIR']));
-                    $('#harga_beli').val(NumberToMoney(row['HARGA_BELI']));
-                    $('#harga_jual').val(NumberToMoney(row['HARGA_JUAL']));
-                }else{
-                    $('#id_jenis').val("");
-                    $('#jenis_obat').val("");
-                    // $('#id_satuan').val("");
-                    // $('#satuan').val("");
-                    $('#tanggal_expired').val("");
-                    $('#jumlah').val("");
-                    $('#isi').val("");
-                    $('#total').val("");
-                    $('#jumlah_butir').val("");
-                    $('#harga_beli').val("");
-                    $('#harga_jual').val("");
-                }
             }else{
                 $('#id_nama_obat_ubah').val(id);
                 $('#kode_obat_ubah').val(row['KODE_OBAT']);
                 $('#nama_obat_ubah').val(row['NAMA_OBAT']);
+								$('#jenis_obat_ubah').val(row['NAMA_JENIS']);
+								$('#expired_ubah').val(row['EXPIRED']);
+								$('#golongan_ubah').val(row['GOLONGAN_OBAT']);
+								$('#kategori_ubah').val(row['KATEGORI_OBAT']);
                 // $('#id_merk_ubah').val(row['ID_MERK']);
                 // $('#merk_ubah').val(row['MERK']);
             }
@@ -515,12 +511,12 @@ function onEnterText(e){
     }
 }
 
-function hitung_total(){
+function hitung_total(number){
     var ket = $('#ket').val();
 
     if(ket == 'Tambah'){
-        var jumlah = $('#jumlah').val();
-        var isi = $('#isi').val();
+        var jumlah = $('#jumlah_'+number).val();
+        var isi = $('#isi_'+number).val();
 
         jumlah = jumlah.split(',').join('');
         isi = isi.split(',').join('');
@@ -534,7 +530,7 @@ function hitung_total(){
         }
 
         var total = parseFloat(jumlah) * parseFloat(isi);
-        $('#total').val(NumberToMoney(total));
+        $('#total_'+number).val(NumberToMoney(total));
     }else{
         var jumlah = $('#jumlah_ubah').val();
         var isi = $('#isi_ubah').val();
@@ -743,6 +739,227 @@ function detail_obat(id){
         }
     });
 }
+
+function hapus_tambah_obat(btn){
+	var row = btn.parentNode.parentNode;
+  row.parentNode.remove(row);
+	var jml_tr = $('#number').val();
+	var i = parseFloat(jml_tr)-1;
+	$('#number').val(i);
+}
+
+function tambah_obat(){
+	var jml_tr = $('#number').val();
+  var i = parseInt(jml_tr) + 1;
+		$menu_1 =
+		'<tr class="number_real">'+
+			'<td>'+
+				'<div class="col-lg-12">'+
+								'<div class="portlet">'+
+										'<div class="portlet-heading bg-default" style="background-color:#7ac142; color: white;">'+
+												'<h3 class="portlet-title">'+
+														'Obat <span id="number_span">'+i+'</span>'+
+												'</h3>'+
+												'<div class="portlet-widgets" style="color: white;">'+
+														'<a data-toggle="collapse" data-parent="#accordion1" class="collapsed" href="#bg-primary'+i+'" style="color: white;"><i class="zmdi zmdi-minus"></i></a>'+
+														'<a href="javascript:void(0);" onclick="hapus_tambah_obat(this);"><i class="zmdi zmdi-close" style="color: white;"></i></a>'+
+												'</div>'+
+												'<div class="clearfix"></div>'+
+										'</div>'+
+										'<div id="bg-primary'+i+'" class="panel-collapse collapse out">'+
+												'<div class="portlet-body">'+
+													'<div class="row">'+
+															'<div class="col-lg-6">'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Kode Obat</label>'+
+																			'<div class="col-md-8">'+
+																					'<div class="input-group">'+
+																							'<input type="hidden" name="id_nama_obat[]" id="id_nama_obat_'+i+'" value="">'+
+																							'<input type="text" class="form-control" id="kode_obat_'+i+'" value="" required="required" readonly>'+
+																							'<span class="input-group-btn">'+
+																									'<button class="btn waves-effect waves-light btn-default" type="button" onclick="get_nama_obat('+i+')">'+
+																											'<i class="fa fa-search"></i>'+
+																									'</button>'+
+																							'</span>'+
+																					'</div>'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Nama Obat</label>'+
+																			'<div class="col-md-8">'+
+																					'<input type="text" class="form-control" id="nama_obat_'+i+'" value="" readonly>'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Jenis Obat</label>'+
+																			'<div class="col-md-8">'+
+																					'<input type="text" class="form-control" id="jenis_obat_'+i+'" value="" readonly>'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Expired</label>'+
+																			'<div class="col-md-8">'+
+																					'<input type="text" class="form-control" id="expired_'+i+'" value="" readonly>'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Golongan Obat</label>'+
+																			'<div class="col-md-8">'+
+																					'<input type="text" class="form-control" id="golongan_'+i+'" value="" readonly>'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Kategori Obat</label>'+
+																			'<div class="col-md-8">'+
+																					'<input type="text" class="form-control" id="kategori_'+i+'" value="" readonly>'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Service</label>'+
+																			'<div class="col-md-8">'+
+																					'<input type="text" class="form-control" id="service_'+i+'" value="" readonly>'+
+																			'</div>'+
+																	'</div>'+
+															'</div>'+
+
+															'<div class="col-lg-6">'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Jumlah</label>'+
+																			'<div class="col-md-8">'+
+																							'<input type="text" class="form-control" name="jumlah[]" id="jumlah_'+i+'" value="" required="required" onkeyup="FormatCurrency(this); hitung_total('+i+');">'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Isi</label>'+
+																			'<div class="col-md-8">'+
+																							'<input type="text" class="form-control" name="isi[]" id="isi_'+i+'" value="" required="required" onkeyup="FormatCurrency(this); hitung_total('+i+');">'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Total</label>'+
+																			'<div class="col-md-8">'+
+																					'<input type="text" class="form-control" name="total[]" id="total_'+i+'" value="" readonly>'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Jumlah Isi</label>'+
+																			'<div class="col-md-8">'+
+																							'<input type="text" class="form-control" name="jumlah_butir[]" id="jumlah_butir_'+i+'" value="" required="required" onkeyup="FormatCurrency(this);">'+
+																							'<span class="help-block"><small>Blister / Tablet</small></span>'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-sm-2 control-label">Per Tablet</label>'+
+																			'<div class="col-sm-6">'+
+																					'<div class="checkbox checkbox-primary">'+
+																							'<input id="check_tablet_'+i+'" type="checkbox" onclick="check_tablet('+i+');">'+
+																							'<label for="check_tablet"> Dijual pertablet atau tidak </label>'+
+																					'</div>'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group view_tablet_grp harga_tablet_grp_'+i+'">'+
+																			'<label class="col-md-2 control-label">Harga Pertablet</label>'+
+																			'<div class="col-md-8">'+
+																					'<div class="input-group">'+
+																							'<span class="input-group-addon">Rp</span>'+
+																							'<input type="text" class="form-control" name="harga_pertablet" id="harga_pertablet_'+i+'" value="" required="required" onkeyup="FormatCurrency(this);" disabled="disabled">'+
+																					'</div>'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Harga Beli</label>'+
+																			'<div class="col-md-8">'+
+																					'<div class="input-group">'+
+																							'<span class="input-group-addon">Rp</span>'+
+																							'<input type="text" class="form-control" name="harga_beli" id="harga_beli_'+i+'" value="" required="required" onkeyup="FormatCurrency(this);">'+
+																					'</div>'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Harga Jual</label>'+
+																			'<div class="col-md-8">'+
+																					'<div class="input-group">'+
+																							'<span class="input-group-addon">Rp</span>'+
+																							'<input type="text" class="form-control" name="harga_jual" id="harga_jual_'+i+'" value="" required="required" onkeyup="FormatCurrency(this);">'+
+																					'</div>'+
+																			'</div>'+
+																	'</div>'+
+															'</div>'+
+													'</div>'+
+												'</div>'+
+										'</div>'+
+								'</div>'+
+						'</div>'+
+						'</td>'+
+					'</tr>';
+
+				$('#form_tambah_obat').append($menu_1);
+				$('#number').val(i);
+}
+
+function get_nama_supplier(){
+	$('#popup_nama_supplier').click();
+
+    var keyword = $('#cari_nama_supplier').val();
+
+    if(ajax){
+        ajax.abort();
+    }
+
+    ajax = $.ajax({
+        url : '<?php echo base_url(); ?>apotek/ap_gudang_obat_c/data_nama_supplier',
+        data : {keyword:keyword},
+        type : "GET",
+        dataType : "json",
+        success : function(result){
+            $tr = "";
+
+            if(result == "" || result == null){
+                $tr = "<tr><td colspan='5' style='text-align:center;'><b>Data tidak ditemukan</b></td></tr>";
+            }else{
+                var no = 0;
+                for(var i=0; i<result.length; i++){
+                    no++;
+
+                    $tr += '<tr style="cursor:pointer;" onclick="klik_nama_supplier('+result[i].ID+');">'+
+                                '<td style="text-align:center;">'+no+'</td>'+
+                                '<td>'+result[i].KODE_SUPPLIER+'</td>'+
+                                '<td>'+result[i].NAMA_SUPPLIER+'</td>'+
+                                // '<td>'+result[i].MERK+'</td>'+
+                            '</tr>';
+                }
+            }
+
+            $('#tabel_nama_supplier tbody').html($tr);
+        }
+    });
+
+    $('#cari_nama_supplier').off('keyup').keyup(function(){
+        get_nama_supplier();
+    });
+}
+
+function klik_nama_supplier(id){
+	url : '<?php echo base_url(); ?>apotek/ap_gudang_obat_c/klik_nama_supplier',
+	data : {id:id},
+	type : "POST",
+	dataType : "json",
+	success : function(row){
+			var ket = $('#ket').val();
+
+			if(ket == 'Tambah'){
+					// $().val();
+					// $('#id_merk').val(row['ID_MERK']);
+					// $('#merk').val(row['MERK']);
+
+			}else{
+					// $().val();
+					// $('#id_merk_ubah').val(row['ID_MERK']);
+					// $('#merk_ubah').val(row['MERK']);
+			}
+	}
+	});
+}
 </script>
 
 <div id="popup_load">
@@ -868,169 +1085,166 @@ function detail_obat(id){
     <div class="card-box card-tabs" id="view_tambah">
         <form class="form-horizontal" role="form" action="<?php echo $url_simpan; ?>" method="post" enctype="multipart/form-data">
         	<h4 class="header-title m-t-0 m-b-30">Tambah Obat</h4>
+					<input type="hidden" id="number" value="1">
             <hr/>
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">Kode Obat</label>
-                        <div class="col-md-8">
-                            <div class="input-group">
-                                <input type="hidden" name="id_nama_obat" id="id_nama_obat" value="">
-                                <input type="text" class="form-control" id="kode_obat" value="" required="required" readonly>
-                                <span class="input-group-btn">
-                                    <button class="btn waves-effect waves-light btn-default btn_nama_obat" type="button">
-                                        <i class="fa fa-search"></i>
-                                    </button>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">Nama Obat</label>
-                        <div class="col-md-8">
-                            <input type="text" class="form-control" id="nama_obat" value="" readonly>
-                        </div>
-                    </div>
-                    <!-- <div class="form-group">
-                        <label class="col-md-2 control-label">Merk</label>
-                        <div class="col-md-8">
-                        	<input type="hidden" name="id_merk" id="id_merk" value="">
-                            <input type="text" class="form-control" id="merk" value="" readonly>
-                        </div>
-                    </div> -->
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">Jenis Obat</label>
-                        <div class="col-md-8">
-                            <div class="input-group">
-                            	<input type="hidden" name="id_jenis" id="id_jenis" value="">
-                                <input type="text" class="form-control" id="jenis_obat" value="" required="required" readonly>
-                                <span class="input-group-btn">
-                                	<button class="btn waves-effect waves-light btn-default btn_jenis" type="button">
-                                		<i class="fa fa-search"></i>
-                                	</button>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- <div class="form-group">
-                        <label class="col-md-2 control-label">Satuan</label>
-                        <div class="col-md-8">
-                            <div class="input-group">
-                            	<input type="hidden" name="id_satuan" id="id_satuan" value="">
-                                <input type="text" class="form-control" id="satuan" value="" required="required" readonly>
-                                <span class="input-group-btn">
-                                	<button class="btn waves-effect waves-light btn-default btn_satuan" type="button">
-                                		<i class="fa fa-search"></i>
-                                	</button>
-                                </span>
-                            </div>
-                        </div>
-                    </div> -->
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">Expired</label>
-                        <div class="col-md-8">
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                <input type="text" class="form-control datepicker-here" name="tanggal_expired" id="tanggal_expired" value="" required="required" data-language="en" data-date-format="dd-mm-yyyy">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">&nbsp;</label>
-                        <div class="col-md-8">
-                            <div class="radio radio-purple radio-inline">
-                                <input type="radio" name="status_obat" value="1" id="radio_obat1">
-                                <label for="radio_obat1"> Obat Racik </label>
-                            </div>
-                            <div class="radio radio-purple radio-inline">
-                                <input type="radio" name="status_obat" value="0" id="radio_obat2">
-                                <label for="radio_obat2"> Obat Umum </label>
-                            </div>
-                        </div>
-                    </div>
-										<div class="form-group">
-                        <label class="col-md-2 control-label">Golongan Obat</label>
-                        <div class="col-md-8">
-                            <div class="input-group">
-                            	<input type="hidden" name="id_golongan" id="id_golongan" value="">
-                                <input type="text" class="form-control" id="golongan" value="" required="required" readonly>
-                                <span class="input-group-btn">
-                                	<button class="btn waves-effect waves-light btn-default btn_golongan" type="button">
-                                		<i class="fa fa-search"></i>
-                                	</button>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-										<div class="form-group">
-                        <label class="col-md-2 control-label">Kategori Obat</label>
-                        <div class="col-md-8">
-                            <div class="input-group">
-                            	<input type="hidden" name="id_kategori" id="id_kategori" value="">
-                                <input type="text" class="form-control" id="kategori" value="" required="required" readonly>
-                                <span class="input-group-btn">
-                                	<button class="btn waves-effect waves-light btn-default btn_kategori" type="button">
-                                		<i class="fa fa-search"></i>
-                                	</button>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+						<div class="form-group">
+								<label class="col-md-1 control-label">Supplier</label>
+								<div class="col-md-3">
+									<div class="input-group">
+											<input type="hidden" name="id_supplier" id="id_supplier" value="">
+											<input type="text" class="form-control" id="nama_supplier" value="" required="required" readonly>
+											<span class="input-group-btn">
+													<button class="btn waves-effect waves-light btn-default" type="button" onclick="get_nama_supplier()">
+															<i class="fa fa-search"></i>
+													</button>
+											</span>
+									</div>
+								</div>
+						</div>
+						<table style="width: 100%;" id="form_tambah_obat">
+							<tr class="number_real">
+								<td>
+									<div class="col-lg-12">
+						              <div class="portlet">
+						                  <div class="portlet-heading bg-default" style="background-color:#7ac142; color: white;">
+						                      <h3 class="portlet-title">
+						                          Obat <span id="number_span">1</span>
+						                      </h3>
+						                      <div class="portlet-widgets" style="color: white;">
+						                          <a data-toggle="collapse" data-parent="#accordion1" class="collapsed" href="#bg-primary1" style="color: white;"><i class="zmdi zmdi-minus"></i></a>
+						                      </div>
+						                      <div class="clearfix"></div>
+						                  </div>
+						                  <div id="bg-primary1" class="panel-collapse collapse out">
+						                      <div class="portlet-body">
+																		<div class="row">
+																				<div class="col-lg-6">
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Kode Obat</label>
+																								<div class="col-md-8">
+																										<div class="input-group">
+																												<input type="hidden" name="id_nama_obat[]" id="id_nama_obat_1" value="">
+																												<input type="text" class="form-control" id="kode_obat_1" value="" required="required" readonly>
+																												<span class="input-group-btn">
+																														<button class="btn waves-effect waves-light btn-default" type="button" onclick="get_nama_obat(1)">
+																																<i class="fa fa-search"></i>
+																														</button>
+																												</span>
+																										</div>
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Nama Obat</label>
+																								<div class="col-md-8">
+																										<input type="text" class="form-control" id="nama_obat_1" value="" readonly>
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Jenis Obat</label>
+																								<div class="col-md-8">
+																										<input type="text" class="form-control" id="jenis_obat_1" value="" readonly>
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Expired</label>
+																								<div class="col-md-8">
+																										<input type="text" class="form-control" id="expired_1" value="" readonly>
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Golongan Obat</label>
+																								<div class="col-md-8">
+																										<input type="text" class="form-control" id="golongan_1" value="" readonly>
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Kategori Obat</label>
+																								<div class="col-md-8">
+																										<input type="text" class="form-control" id="kategori_1" value="" readonly>
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Service</label>
+																								<div class="col-md-8">
+																										<input type="text" class="form-control" id="service_1" value="" readonly>
+																								</div>
+																						</div>
+																				</div>
 
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">Jumlah</label>
-                        <div class="col-md-8">
-                                <input type="text" class="form-control" name="jumlah" id="jumlah" value="" required="required" onkeyup="FormatCurrency(this); hitung_total(); convert_kg_to_ml();">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">Isi</label>
-                        <div class="col-md-8">
-                                <input type="text" class="form-control" name="isi" id="isi" value="" required="required" onkeyup="FormatCurrency(this); hitung_total();">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">Total</label>
-                        <div class="col-md-8">
-                            <input type="text" class="form-control" name="total" id="total" value="" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">Jumlah Isi</label>
-                        <div class="col-md-8">
-                                <input type="text" class="form-control" name="jumlah_butir" id="jumlah_butir" value="" required="required" onkeyup="FormatCurrency(this);">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">Harga Beli</label>
-                        <div class="col-md-8">
-                            <div class="input-group">
-                                <span class="input-group-addon">Rp</span>
-                                <input type="text" class="form-control" name="harga_beli" id="harga_beli" value="" required="required" onkeyup="FormatCurrency(this);">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">Harga Jual</label>
-                        <div class="col-md-8">
-                            <div class="input-group">
-                                <span class="input-group-addon">Rp</span>
-                                <input type="text" class="form-control" name="harga_jual" id="harga_jual" value="" required="required" onkeyup="FormatCurrency(this);">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label">Gambar Obat</label>
-                        <div class="col-md-8">
-                            <input type="file" class="dropify" name="userfile">
-                        </div>
-                    </div>
-                </div>
-            </div>
+																				<div class="col-lg-6">
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Jumlah</label>
+																								<div class="col-md-8">
+																												<input type="text" class="form-control" name="jumlah[]" id="jumlah_1" value="" required="required" onkeyup="FormatCurrency(this); hitung_total(1);">
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Isi</label>
+																								<div class="col-md-8">
+																												<input type="text" class="form-control" name="isi[]" id="isi_1" value="" required="required" onkeyup="FormatCurrency(this); hitung_total(1);">
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Total</label>
+																								<div class="col-md-8">
+																										<input type="text" class="form-control" name="total[]" id="total_1" value="" readonly>
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Jumlah Isi</label>
+																								<div class="col-md-8">
+																												<input type="text" class="form-control" name="jumlah_butir[]" id="jumlah_butir_1" value="" required="required" onkeyup="FormatCurrency(this);">
+																												<span class="help-block"><small>Blister / Tablet</small></span>
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-sm-2 control-label">Per Tablet</label>
+																								<div class="col-sm-6">
+																										<div class="checkbox checkbox-primary">
+																												<input id="check_tablet_1" type="checkbox" onclick="check_tablet(1);">
+																												<label for="check_tablet"> Dijual pertablet atau tidak </label>
+																										</div>
+																								</div>
+																						</div>
+																						<div class="form-group view_tablet_grp harga_tablet_grp_1">
+																								<label class="col-md-2 control-label">Harga Pertablet</label>
+																								<div class="col-md-8">
+																										<div class="input-group">
+																												<span class="input-group-addon">Rp</span>
+																												<input type="text" class="form-control" name="harga_pertablet[]" id="harga_pertablet_1" value="" required="required" onkeyup="FormatCurrency(this);" disabled="disabled">
+																										</div>
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Harga Beli</label>
+																								<div class="col-md-8">
+																										<div class="input-group">
+																												<span class="input-group-addon">Rp</span>
+																												<input type="text" class="form-control" name="harga_beli[]" id="harga_beli_1" value="" required="required" onkeyup="FormatCurrency(this);">
+																										</div>
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Harga Jual</label>
+																								<div class="col-md-8">
+																										<div class="input-group">
+																												<span class="input-group-addon">Rp</span>
+																												<input type="text" class="form-control" name="harga_jual[]" id="harga_jual_1" value="" required="required" onkeyup="FormatCurrency(this);">
+																										</div>
+																								</div>
+																						</div>
+																				</div>
+																		</div>
+						                      </div>
+						                  </div>
+						              </div>
+						          </div><!-- end col -->
+								</td>
+							</tr>
+						</table>
             <hr>
             <center>
+								<button type="button" class="btn btn-info waves-effect waves-light m-b-5" id="obat" onclick="tambah_obat();"> <i class="fa fa-plus"></i> <span>Tambah Obat</span> </button>
                 <button type="submit" class="btn btn-success waves-effect waves-light m-b-5"> <i class="fa fa-save"></i> <span>Simpan</span> </button>
                 <button type="button" class="btn btn-danger waves-effect waves-light m-b-5" id="batal"> <i class="fa fa-times"></i> <span>Batal</span> </button>
             </center>
@@ -1053,7 +1267,7 @@ function detail_obat(id){
                                 <input type="hidden" name="id_nama_obat_ubah" id="id_nama_obat_ubah" value="">
                                 <input type="text" class="form-control" id="kode_obat_ubah" value="" required="required" readonly>
                                 <span class="input-group-btn">
-                                    <button class="btn waves-effect waves-light btn-default btn_nama_obat" type="button">
+                                    <button class="btn waves-effect waves-light btn-default" type="button">
                                         <i class="fa fa-search"></i>
                                     </button>
                                 </span>
@@ -1586,6 +1800,54 @@ function detail_obat(id){
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_kategori">Tutup</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal8" id="popup_nama_supplier" style="display:none;">Standard Modal</button>
+<div id="myModa81" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">Data Nama Supplier</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="cari_nama_supplier" placeholder="Cari..." value="">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn waves-effect waves-light btn-custom" style="cursor:default;">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <div class="scroll-y">
+                        <table class="table table-hover" id="tabel_nama_supplier">
+                            <thead>
+                                <tr class="merah_popup">
+                                    <th style="text-align:center; color: #fff;" width="50">No</th>
+                                    <th style="text-align:center; color: #fff;">Kode Supplier</th>
+                                    <th style="text-align:center; color: #fff;">Nama Supplier</th>
+                                    <!-- <th style="text-align:center; color: #fff;">Merk</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_nama_supplier">Tutup</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

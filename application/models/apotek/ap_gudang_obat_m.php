@@ -40,27 +40,13 @@ class Ap_gudang_obat_m extends CI_Model {
 						NM_OBT.KODE_OBAT,
 						NM_OBT.BARCODE,
 						NM_OBT.NAMA_OBAT,
-						NM_OBT.ID_MERK,
-						SUP.MERK,
-						OBAT.ID AS ID_GUDANG,
-						OBAT.ID_JENIS_OBAT,
-						JENIS.NAMA_JENIS,
-						OBAT.ID_SATUAN_OBAT,
-						SAT.NAMA_SATUAN,
-						OBAT.KADALUARSA,
-						OBAT.JUMLAH,
-						OBAT.ISI,
-						OBAT.TOTAL,
-						OBAT.JUMLAH_BUTIR,
-						OBAT.HARGA_BELI,
-						OBAT.HARGA_JUAL
+						NM_OBT.EXPIRED,
+						NM_OBT.GOLONGAN_OBAT,
+						NM_OBT.KATEGORI_OBAT,
+						NM_OBT.SERVICE,
+						JENIS.NAMA_JENIS
 					FROM admum_setup_nama_obat NM_OBT
-					LEFT JOIN obat_supplier SUP ON SUP.ID = NM_OBT.ID_MERK
-					LEFT JOIN (
-						SELECT * FROM apotek_gudang_obat WHERE AKTIF = '1'
-					) OBAT ON OBAT.ID_SETUP_NAMA_OBAT = NM_OBT.ID
-					LEFT JOIN obat_jenis JENIS ON JENIS.ID = OBAT.ID_JENIS_OBAT
-					LEFT JOIN obat_satuan SAT ON SAT.ID = OBAT.ID_SATUAN_OBAT
+					LEFT JOIN obat_jenis JENIS ON JENIS.ID = NM_OBT.ID_JENIS_OBAT
 					WHERE NM_OBT.ID = '$id'
 		";
 		$query = $this->db->query($sql);
@@ -235,72 +221,47 @@ class Ap_gudang_obat_m extends CI_Model {
 
 
 	function simpan(
-		$id_nama_obat,
-		$id_jenis,
-		$id_satuan,
+		$value,
 		$jumlah,
 		$isi,
 		$total,
-		$satuan_isi,
 		$jumlah_butir,
-		$satuan_butir,
+		$harga_pertablet,
 		$harga_beli,
 		$harga_jual,
-		$kadaluarsa,
 		$tanggal_masuk,
 		$waktu_masuk,
 		$aktif,
-		$first_out,
-		// $urut_barang,
-		$status_racik,
-		$gambar,
-		$id_golongan,
-		$id_kategori
+		$first_out
 	){
 
 		$sql = "
 			INSERT INTO apotek_gudang_obat(
 				ID_SETUP_NAMA_OBAT,
-				ID_JENIS_OBAT,
-				ID_SATUAN_OBAT,
 				JUMLAH,
 				ISI,
 				TOTAL,
-				SATUAN_ISI,
 				JUMLAH_BUTIR,
-				SATUAN_BUTIR,
+				HARGA_PERTABLET,
 				HARGA_BELI,
 				HARGA_JUAL,
-				KADALUARSA,
 				TANGGAL_MASUK,
 				WAKTU_MASUK,
 				AKTIF,
-				FIRST_OUT,
-				STATUS_RACIK,
-				GAMBAR,
-				ID_GOLONGAN,
-				ID_KATEGORI
+				FIRST_OUT
 			) VALUES (
-				'$id_nama_obat',
-				'$id_jenis',
-				'$id_satuan',
+				'$value',
 				'$jumlah',
 				'$isi',
 				'$total',
-				'$satuan_isi',
 				'$jumlah_butir',
-				'$satuan_butir',
+				'$harga_pertablet',
 				'$harga_beli',
 				'$harga_jual',
-				'$kadaluarsa',
 				'$tanggal_masuk',
 				'$waktu_masuk',
 				'$aktif',
-				'$first_out',
-				'$status_racik',
-				'$gambar',
-				'$id_golongan',
-				'$id_kategori'
+				'$first_out'
 			)
 		";
 		$this->db->query($sql);
@@ -333,4 +294,24 @@ class Ap_gudang_obat_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
+	function data_nama_supplier($keyword){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND (a.KODE_SUPPLIER LIKE '%$keyword%' OR a.NAMA_SUPPLIER LIKE '%$keyword%')";
+		}else{
+			$where = $where;
+		}
+
+		$sql = "SELECT
+							a.ID,
+							a.KODE_SUPPLIER,
+							a.NAMA_SUPPLIER
+						FROM obat_supplier a
+						WHERE $where
+						ORDER BY a.ID DESC
+					";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
 }

@@ -115,7 +115,7 @@ function get_data_pegawai(id){
             $('#foto_head').attr('src','<?=base_url();?>files/foto_pegawai/'+res.FOTO);
 
             if(res.PASSWORD == null || res.PASSWORD == ""){
-                $("#pass1").prop('required',true); 
+                $("#pass1").prop('required',true);
                 $("#pass2").prop('required',true);
 
                 $('.pass_ada').hide();
@@ -124,7 +124,7 @@ function get_data_pegawai(id){
                 $('#sts_pass_awal').val(0);
             } else {
                 $('.pass_gk_ada').hide();
-                $('.pass_ada').show();               
+                $('.pass_ada').show();
 
                 $("#pass1").prop('required',false);
                 $("#pass2").prop('required',false);
@@ -162,7 +162,7 @@ function cek_req(sts){
 
 function cek_username(){
     var id_peg = $('#id_pegawai').val();
-    var username = $('#username').val();    
+    var username = $('#username').val();
     $.ajax({
         url : '<?php echo base_url(); ?>setting/login_pengguna_c/cek_username',
         data : {
@@ -171,7 +171,7 @@ function cek_username(){
         },
         type : "POST",
         dataType : "json",
-        success : function(result){  
+        success : function(result){
 
             $('#sts_username').val(result);
 
@@ -179,14 +179,14 @@ function cek_username(){
                 $('#warning_username').show();
             } else {
                 $('#warning_username').hide();
-            }        
-            
+            }
+
         }
     });
 }
 
 function cek_username_submit(){
-   var a = true;   
+   var a = true;
    var res = $('#sts_username').val();
 
     if(res > 0){
@@ -194,7 +194,7 @@ function cek_username_submit(){
         alert("Username tersebut telah terpakai oleh pegawai lain !");
     } else {
         a = true;
-    }  
+    }
 
     return a;
 }
@@ -256,8 +256,8 @@ function cek_username_submit(){
                             <div class="col-md-6">
                                 <input name="username" id="username" required class="form-control" value="" type="text" onkeyup="cek_username();">
                                 <span class="help-block" id="warning_username" style="display:none;">
-                                    <small style="color: red; font-weight: bold; font-size: 13px;"> 
-                                        <i class="fa fa-warning"></i> Perhatian!! Username tersebut telah terpakai oleh pegawai lain. 
+                                    <small style="color: red; font-weight: bold; font-size: 13px;">
+                                        <i class="fa fa-warning"></i> Perhatian!! Username tersebut telah terpakai oleh pegawai lain.
                                     </small>
                                 </span>
                             </div>
@@ -297,6 +297,7 @@ function cek_username_submit(){
                                     <option value="Poli">Poli</option>
                                     <option value="Laborat">Laborat</option>
                                     <option value="Farmasi">Farmasi</option>
+                                    <option value="Finance">Finance</option>
                                     <option value="Perawat">Perawat</option>
                                     <option value="Kasir AA">Kasir AA</option>
                                     <option value="Kasir Rajal">Kasir Rajal</option>
