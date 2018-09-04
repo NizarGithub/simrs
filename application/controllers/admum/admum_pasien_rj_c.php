@@ -199,12 +199,15 @@ class Admum_pasien_rj_c extends CI_Controller {
 	function simpan(){
 		$id_pasien_new = $this->input->post('id_pasien');
 		$asal_rujukan = $this->input->post('asal_rujukan');
+		$keterangan = $this->input->post('nama_rujukan');
 		$h = date('l');
 		$tanggal = date('d-m-Y');
 		$bulan = date('n');
 		$tahun = date('Y');
 		$pilihan = $this->input->post('pilihan');
 		$id_poli = $this->input->post('id_poli');
+		$sistem_bayar = $this->input->post('sistem_bayar');
+		$asuransi = $this->input->post('nama_asuransi');
 		$hari = "";
 
 		//NOMOR ANTRIAN
@@ -217,6 +220,7 @@ class Admum_pasien_rj_c extends CI_Controller {
 		$kode_antrian = $this->input->post('kode_antrian');
 		$nomor_antrian = $this->input->post('jumlah_antrian');
 		$biaya_reg = str_replace(',', '', $this->input->post('biaya_reg'));
+		$biaya_adm = str_replace(',', '', $this->input->post('biaya_adm'));
 
 		//LABORAT
 		$kode_lab = $this->input->post('kode_lab');
@@ -244,12 +248,12 @@ class Admum_pasien_rj_c extends CI_Controller {
 		}
 
 		if($pilihan == '1'){
-			$this->model->simpan_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$pilihan,$barcode,$nomor_antrian,$biaya_reg,$id_loket,$kode_antrian);
+			$this->model->simpan_rj($id_pasien_new,$asal_rujukan,$keterangan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$sistem_bayar,$asuransi,$pilihan,$barcode,$nomor_antrian,$biaya_reg,$biaya_adm,$id_loket,$kode_antrian);
 			$id_rj = $this->db->insert_id();
 			// $this->model->simpan_antrian($tanggal,$waktu,$id_pasien_new,$id_rj,$barcode,$id_loket,$kode_antrian,$nomor_antrian);
 			// $this->simpan_antrian_off();
 		}else{
-			$this->model->simpan_lab_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$pilihan,$biaya_reg);
+			$this->model->simpan_lab_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$sistem_bayar,$asuransi,$pilihan,$biaya_reg,$biaya_adm);
 			$id_rj = $this->db->insert_id();
 			$this->model->simpan_pemeriksaan($kode_lab,$id_rj,$id_poli,$id_peg_dokter,$id_pasien_new,$jenis_laborat,$total_tarif,$tanggal,$bulan,$tahun,$waktu,$tipe);
 			$id_pemeriksaan_rj = $this->db->insert_id();
@@ -274,7 +278,7 @@ class Admum_pasien_rj_c extends CI_Controller {
 	}
 
 	function load_data_pasien(){
-		$keyword = $this->input->post('keyword');
+		$keyword = $this->input->get('keyword');
 		$data = $this->model->load_data_pasien($keyword);
 		echo json_encode($data);
 	}
@@ -301,7 +305,12 @@ class Admum_pasien_rj_c extends CI_Controller {
 		$status = $this->input->post('status');
 		$sql = "SELECT * FROM admum_biaya_reg_pasien WHERE STATUS = '$status'";
 		$qry = $this->db->query($sql);
-		$row = $qry->row();
+		$row['reg'] = $qry->row();
+
+		$sql2 = "SELECT * FROM admum_biaya_reg_pasien WHERE STATUS = 'Admin'";
+		$qry2 = $this->db->query($sql2);
+		$row['adm'] = $qry2->row();
+
 		echo json_encode($row);
 	}
 
@@ -407,6 +416,18 @@ class Admum_pasien_rj_c extends CI_Controller {
 	function get_biaya_lab(){
 		$jenis = $this->input->post('jenis');
 		$data = $this->model->get_biaya_lab($jenis);
+		echo json_encode($data);
+	}
+
+	function load_asuransi(){
+		$keyword = $this->input->get('keyword');
+		$data = $this->model->load_asuransi($keyword);
+		echo json_encode($data);
+	}
+
+	function klik_asuransi(){
+		$id = $this->input->post('id');
+		$data = $this->model->klik_asuransi($id);
 		echo json_encode($data);
 	}
 

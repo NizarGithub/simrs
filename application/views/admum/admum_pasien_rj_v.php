@@ -9,13 +9,23 @@
 #view_kec2,
 #view_kab_kota2,
 #view_prov2,
-.view_lab{
+.view_lab,
+.view_rujukan,
+.view_asr{
     display: none;
 }
 
 .coba .active a {
     background: #21AFDA !important;
     color: #fff !important;
+}
+
+#popup_tabel{
+    z-index: 9999;
+    position: absolute;
+    left: 45%;
+    top: 40%;
+    display: none;
 }
 </style>
 
@@ -211,6 +221,29 @@ $(document).ready(function(){
         $('#popup_pemeriksaan').click();
         load_pemeriksaan();
     });
+
+    $('input[name="sistem_bayar"]').click(function(){
+        var c = $('input[name="sistem_bayar"]:checked').val();
+        if(c == 'Asuransi'){
+            $('.view_asr').show();
+        }else{
+            $('.view_asr').hide();
+        }
+    });
+
+    $('.btn_asuransi').click(function(){
+        $('#popup_asuransi').click();
+        load_asuransi();
+    });
+
+    $('#asal_rujukan').click(function(){
+        var cek = $('#asal_rujukan').val();
+        if(cek == 'Bidan' || cek == 'Puskesmas' || cek == 'RS Swasta'){
+            $('.view_rujukan').show();
+        }else{
+            $('.view_rujukan').hide();
+        }
+    });
 });
 
 function get_biaya_reg(status){
@@ -220,7 +253,8 @@ function get_biaya_reg(status){
         type : "POST",
         dataType : "json",
         success : function(row){
-            $('#biaya_reg').val(formatNumber(row['BIAYA'])); 
+            $('#biaya_reg').val(formatNumber(row['reg']['BIAYA']));
+            $('#biaya_adm').val(formatNumber(row['adm']['BIAYA']));
         }
     });
 }
@@ -262,6 +296,7 @@ function data_provinsi(){
 }
 
 function load_data_pasien(){
+    $('#popup_tabel').show();
     var keyword = $('#cari_pasien').val();
 
     if(ajax){
@@ -271,7 +306,7 @@ function load_data_pasien(){
     ajax = $.ajax({
         url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/load_data_pasien',
         data : {keyword:keyword},
-        type : "POST",
+        type : "GET",
         dataType : "json",
         success : function(result){
             $tr = "";
@@ -284,20 +319,27 @@ function load_data_pasien(){
                 for(var i=0; i<result.length; i++){
                     no++; 
 
-                    result[i].NAMA_ORTU = result[i].NAMA_ORTU==null?"-":result[i].NAMA_ORTU;
+                    result[i].TANGGAL_LAHIR = (result[i].TANGGAL_LAHIR==null || result[i].TANGGAL_LAHIR=='')?"-":result[i].TANGGAL_LAHIR;
+                    result[i].NAMA_AYAH = result[i].NAMA_AYAH==null?"-":result[i].NAMA_AYAH;
+                    result[i].NAMA_IBU = result[i].NAMA_IBU==null?"-":result[i].NAMA_IBU;
+                    result[i].ALAMAT = (result[i].ALAMAT==null || result[i].ALAMAT=='')?"-":result[i].ALAMAT;
 
                     $tr += "<tr style='cursor:pointer;' onclick='klik_pasien("+result[i].ID+");'>"+
                                 "<td style='text-align:center;'>"+no+"</td>"+
-                                "<td>"+result[i].KODE_PASIEN+"</td>"+
-                                "<td>"+result[i].NAMA+"</td>"+
+                                "<td style='white-space:nowrap;'>"+result[i].KODE_PASIEN+"</td>"+
+                                "<td style='white-space:nowrap;'>"+result[i].NAMA+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].JENIS_KELAMIN+"</td>"+
-                                "<td>"+result[i].NAMA_ORTU+"</td>"+
-                                "<td>"+result[i].UMUR+" Tahun</td>"+
+                                "<td style='white-space:nowrap;'>"+result[i].TANGGAL_LAHIR+"</td>"+
+                                "<td style='white-space:nowrap;'>"+result[i].UMUR+" Tahun</td>"+
+                                "<td style='white-space:nowrap;'>"+result[i].NAMA_AYAH+"</td>"+
+                                "<td style='white-space:nowrap;'>"+result[i].NAMA_IBU+"</td>"+
+                                "<td style='white-space:nowrap;'>"+result[i].ALAMAT+"</td>"+
                             "</tr>";
                 }
             }
 
             $('#tabel_pasien tbody').html($tr);
+            $('#popup_tabel').hide();
         }
     });
 
@@ -339,7 +381,8 @@ function klik_pasien(id){
             $('#tanggal_lahir').val(row['TANGGAL_LAHIR']);
             $('#umur').val(row['UMUR']);
             $('#umur_bulan').val(row['UMUR_BULAN']);
-            $('#nama_ortu').val(row['NAMA_ORTU']);
+            $('#nama_ayah').val(row['NAMA_AYAH']);
+            $('#nama_ibu').val(row['NAMA_IBU']);
             $('#telepon').val(row['TELEPON']);
             $('#kelurahan').val(row['KELURAHAN']);
             $('#kecamatan').val(row['KECAMATAN']);
@@ -946,6 +989,56 @@ function hitung_pemeriksaan(){
     });
     $('#total_tarif_pemeriksaan').val(formatNumber(total));
 }
+
+function load_asuransi(){
+    var keyword = $('#cari_asuransi').val();
+
+    $.ajax({
+        url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/load_asuransi',
+        data : {keyword:keyword},
+        type : "GET",
+        dataType : "json",
+        success : function(result){
+            $tr = "";
+
+            if(result == "" || result == null){
+                $tr = "<tr><td colspan='2' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+            }else{
+                var no = 0;
+
+                for(var i=0; i<result.length; i++){
+                    no++;
+
+                    $tr += "<tr style='cursor:pointer;' onclick='klik_asuransi("+result[i].ID+");'>"+
+                                "<td style='text-align:center;'>"+no+"</td>"+
+                                "<td>"+result[i].NAMA_ASURANSI+"</td>"+
+                            "</tr>";
+                }
+            }
+
+            $('#tabel_asuransi tbody').html($tr);
+        }
+    });
+
+    $('#cari_asuransi').off('keyup').keyup(function(){
+        load_asuransi();
+    });
+}
+
+function klik_asuransi(id){
+    $('#tutup_asuransi').click();
+
+    $.ajax({
+        url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/klik_asuransi',
+        data : {id:id},
+        type : "POST",
+        dataType : "json",
+        success : function(row){
+            $('#id_asuransi').val(id);
+            $('#nama_asuransi').val(row['NAMA_ASURANSI']);
+        }
+    });
+}
 </script>
 
 <div id="popup_load">
@@ -958,6 +1051,13 @@ function hitung_pemeriksaan(){
 <div class="row">
     <div class="col-sm-12">
         <form class="form-horizontal" role="form" action="" method="post" id="form_pasien_baru">
+            <input type="hidden" name="id_poli" id="id_poli" value="">
+            <input type="hidden" name="id_peg_dokter" id="id_peg_dokter" value="">
+            <input type="hidden" id="id_kode_antrian_off_now" name="id_kode_antrian" value="">
+            <input type="hidden" id="kode_antrian_off_now" name="kode_antrian" value="">
+            <input type="hidden" id="jml_antrian_off_now" name="jumlah_antrian" value="">
+            <input type="hidden" id="id_loket_now" name="id_loket" value="">
+            <input type="hidden" id="barcode" name="barcode" value="">
             <div class="card-box">
                 <div class="row">
             		<div class="col-lg-6">
@@ -1007,29 +1107,6 @@ function hitung_pemeriksaan(){
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-3 control-label">Alamat</label>
-                            <div class="col-md-9">
-                                <textarea rows="5" class="form-control" name="alamat" id="alamat" readonly></textarea>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">Golongan Darah</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="goldar_txt" id="goldar_txt" value="" readonly>
-                            </div>
-                        </div>
-                        <!-- <div class="form-group">
-                            <label class="col-md-3 control-label"></label>
-                            <div class="col-md-9">
-                                <button type="button" id="btn_history" onclick="get_history_medik();" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target=".bs-example-modal-lg">
-                                   <i class="fa fa-history"></i> History Rekam Medik
-                                </button>
-                            </div>
-                        </div> -->
-            		</div>
-
-            		<div class="col-lg-6">
-                        <div class="form-group">
                             <label class="col-md-3 control-label">Tempat Lahir</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" value="" readonly>
@@ -1064,15 +1141,32 @@ function hitung_pemeriksaan(){
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-3 control-label">Nama Orang Tua</label>
+                            <label class="col-md-3 control-label">Golongan Darah</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" name="nama_ortu" id="nama_ortu" value="" readonly>
+                                <input type="text" class="form-control" name="goldar_txt" id="goldar_txt" value="" readonly>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-md-3 control-label">Telepon</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control num_only" name="telepon" id="telepon" value="" maxlength="13" readonly>
+                            </div>
+                        </div>
+                        <!-- <div class="form-group">
+                            <label class="col-md-3 control-label"></label>
+                            <div class="col-md-9">
+                                <button type="button" id="btn_history" onclick="get_history_medik();" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target=".bs-example-modal-lg">
+                                   <i class="fa fa-history"></i> History Rekam Medik
+                                </button>
+                            </div>
+                        </div> -->
+            		</div>
+
+            		<div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Alamat</label>
+                            <div class="col-md-9">
+                                <textarea rows="5" class="form-control" name="alamat" id="alamat" readonly></textarea>
                             </div>
                         </div>
                         <div class="form-group">
@@ -1099,6 +1193,18 @@ function hitung_pemeriksaan(){
                                 <input type="text" class="form-control" name="provinsi" id="provinsi" value="" readonly>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Nama Ayah</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="nama_ayah" id="nama_ayah" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Nama Ibu</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="nama_ibu" id="nama_ibu" value="" readonly>
+                            </div>
+                        </div>
             		</div>
                 </div>
                 <hr>
@@ -1112,12 +1218,19 @@ function hitung_pemeriksaan(){
                         <div class="form-group">
                             <label class="col-md-3 control-label">Asal Rujukan</label>
                             <div class="col-md-9">
-                                <select class="form-control select2" name="asal_rujukan">
+                                <select class="form-control select2" name="asal_rujukan" id="asal_rujukan">
                                     <option value="Sendiri">Datang Sendiri</option>
+                                    <option value="Bidan">Bidan</option>
                                     <option value="Puskesmas">Puskesmas</option>
                                     <option value="RS Swasta">RS Swasta</option>
                                     <option value="Dokter Keluarga">Dokter Keluarga</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="form-group view_rujukan">
+                            <label class="col-md-3 control-label">&nbsp;</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="nama_rujukan" value="" placeholder="Ketik disini...">
                             </div>
                         </div>
                         <div class="form-group">
@@ -1126,11 +1239,9 @@ function hitung_pemeriksaan(){
                                 <input type="text" class="form-control" name="tanggal" id="tanggal" value="<?php echo date('d-m-Y'); ?>" readonly>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-6">
                         <div class="form-group">
-                            <label class="col-md-2 control-label">&nbsp;</label>
-                            <div class="col-md-10">
+                            <label class="col-md-3 control-label">Tujuan</label>
+                            <div class="col-md-9">
                                 <div class="radio radio-success radio-inline">
                                     <input type="radio" id="inlineRadio1" value="1" name="pilihan" checked>
                                     <label for="inlineRadio1"> Poli </label>
@@ -1141,6 +1252,8 @@ function hitung_pemeriksaan(){
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="col-lg-6">
                         <div class="form-group view_poli">
                             <label class="col-md-2 control-label">Poli Tujuan</label>
                             <div class="col-md-10">
@@ -1231,13 +1344,37 @@ function hitung_pemeriksaan(){
                             <label class="col-md-2 control-label">Biaya Reg</label>
                             <div class="col-md-10">
                                 <input type="text" class="form-control" name="biaya_reg" id="biaya_reg" value="" readonly>
-                                <input type="hidden" name="id_poli" id="id_poli" value="">
-                                <input type="hidden" name="id_peg_dokter" id="id_peg_dokter" value="">
-                                <input type="hidden" id="id_kode_antrian_off_now" name="id_kode_antrian" value="">
-                                <input type="hidden" id="kode_antrian_off_now" name="kode_antrian" value="">
-                                <input type="hidden" id="jml_antrian_off_now" name="jumlah_antrian" value="">
-                                <input type="hidden" id="id_loket_now" name="id_loket" value="">
-                                <input type="hidden" id="barcode" name="barcode" value="">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Biaya Adm</label>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" name="biaya_adm" id="biaya_adm" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">&nbsp;</label>
+                            <div class="col-md-9">
+                                <div class="radio radio-success radio-inline">
+                                    <input type="radio" id="inlineRadio3" value="Umum" name="sistem_bayar" checked>
+                                    <label for="inlineRadio3"> Umum </label>
+                                </div>
+                                <div class="radio radio-success radio-inline">
+                                    <input type="radio" id="inlineRadio4" value="Asuransi" name="sistem_bayar">
+                                    <label for="inlineRadio4"> Asuransi </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group view_asr">
+                            <label class="col-md-2 control-label">Nama Asuransi</label>
+                            <div class="col-md-9">
+                                <div class="input-group">
+                                    <input type="hidden" name="id_asuransi" id="id_asuransi" value="">
+                                    <input type="text" class="form-control" name="nama_asuransi" id="nama_asuransi" value="" readonly>
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default btn_asuransi"><i class="fa fa-search"></i></button>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1280,17 +1417,23 @@ function hitung_pemeriksaan(){
                         </div>
                     </div>
                 </form>
+                <div id="popup_tabel">
+                    <img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
+                </div>
                 <div class="table-responsive">
-                    <div class="scroll-y">
+                    <div class="scroll-xy">
                         <table class="table table-hover table-bordered" id="tabel_pasien">
                             <thead>
                                 <tr class="merah_popup">
                                     <th style="text-align:center; color: #fff;" width="50">No</th>
-                                    <th style="text-align:center; color: #fff;">No. RM</th>
-                                    <th style="text-align:center; color: #fff;">Nama Pasien</th>
-                                    <th style="text-align:center; color: #fff;">Jenis Kelamin</th>
-                                    <th style="text-align:center; color: #fff;">Nama Orang Tua</th>
-                                    <th style="text-align:center; color: #fff;">Umur</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">No. RM</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">Nama Pasien</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">Jenis Kelamin</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">Tanggal Lahir</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">Umur</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">Nama Ayah</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">Nama Ibu</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">Alamat</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1563,3 +1706,51 @@ function hitung_pemeriksaan(){
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!-- //LOAD ASURANSI -->
+<button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal5" id="popup_asuransi" style="display:none;">Standard Modal</button>
+<div id="myModal5" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">Data Asuransi</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="cari_asuransi" placeholder="Cari..." value="">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn waves-effect waves-light btn-custom" style="cursor:default;">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <div class="scroll-y">
+                        <table class="table table-hover table-bordered" id="tabel_asuransi">
+                            <thead>
+                                <tr class="merah_popup">
+                                    <th style="text-align:center; color: #fff;" width="50">No</th>
+                                    <th style="text-align:center; color: #fff;">Nama Asuransi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_asuransi">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- // -->

@@ -1120,14 +1120,16 @@ function hitung_pemeriksaan(){
 
                     <ul class="nav nav-tabs">
                         <li class="active" role="presentation">
-                            <a data-toggle="tab" role="tab" href="#home1"><i class="fa fa-book"></i> Dari Admission <span class="badge badge-primary" id="tot_dari_adm">0</span></a>
+                            <a data-toggle="tab" role="tab" href="#home1">
+                                <i class="fa fa-book"></i> Dari Admission <!-- <span class="badge badge-primary" id="tot_dari_adm">0</span> -->
+                            </a>
                         </li>
                         <li role="presentation">
                             <a data-toggle="tab" role="tab" href="#profile1" id="btn_tambah_lab"><i class="fa fa-user"></i> Datang Sendiri</a>
                         </li>
                         <li role="presentation" id="dt_dari_poli">
                             <a data-toggle="tab" role="tab" href="#profile2">
-                                <i class="fa fa-home"></i> Dari Poli <span class="badge badge-danger" id="tot_dari_poli">0</span>
+                                <i class="fa fa-home"></i> Dari Poli <!-- <span class="badge badge-danger" id="tot_dari_poli">0</span> -->
                             </a>
                         </li>
                     </ul>

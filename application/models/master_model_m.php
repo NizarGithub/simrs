@@ -221,7 +221,7 @@ class Master_model_m extends CI_Model
 			LEFT JOIN kepeg_divisi b ON b.ID = a.ID_DIVISI
 			WHERE a.STS_LOGIN = '1'
 			ORDER BY a.ID DESC
-			LIMIT 5
+			LIMIT 10
 		";
 		return $this->db->query($sql)->result();
 	}

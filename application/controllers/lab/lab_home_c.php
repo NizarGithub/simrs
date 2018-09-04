@@ -5,6 +5,7 @@ class Lab_home_c extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();
+		date_default_timezone_set('Asia/Jakarta');
 		$this->load->helper('url');
 		$this->load->library('fpdf/HTML2PDF');
 		$this->load->model('lab/lab_home_m','model');
@@ -23,7 +24,7 @@ class Lab_home_c extends CI_Controller {
 			'title' => 'Laboratorium',
 			'subtitle' => 'Laboratorium',
 			'master_menu' => 'home',
-			'view' => '',
+			'view' => 'home',
 		);
 
 		$this->load->view('lab/lab_home_v',$data); 
@@ -129,8 +130,8 @@ class Lab_home_c extends CI_Controller {
 	}
 
 	function get_notif_pasien(){
-		// $now = date('d-m-Y');
-		$now = '23-08-2018';
+		$now = date('d-m-Y');
+		// $now = '23-08-2018';
 		$posisi = '2';
 
 		$data = $this->model->get_notif_pasien($posisi,$now);
@@ -138,8 +139,8 @@ class Lab_home_c extends CI_Controller {
 	}
 
 	function data_pasien(){
-		// $now = date('d-m-Y');
-		$now = '23-08-2018';
+		$now = date('d-m-Y');
+		// $now = '23-08-2018';
 		$keyword = $this->input->get('keyword');
 		$posisi = '2';
 

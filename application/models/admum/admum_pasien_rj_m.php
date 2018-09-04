@@ -123,7 +123,8 @@ class Admum_pasien_rj_m extends CI_Model {
 			$where = $where." AND (
 				NAMA LIKE '%$keyword%' OR
 				KODE_PASIEN LIKE '%$keyword%' OR 
-				NAMA_ORTU LIKE '%$keyword%' OR 
+				NAMA_AYAH LIKE '%$keyword%' OR 
+				NAMA_IBU LIKE '%$keyword%' OR 
 				ALAMAT LIKE '%$keyword%'
 			)
 			";
@@ -137,8 +138,11 @@ class Admum_pasien_rj_m extends CI_Model {
 				KODE_PASIEN,
 				NAMA,
 				JENIS_KELAMIN,
+				TANGGAL_LAHIR,
 				UMUR,
-				NAMA_ORTU,
+				NAMA_AYAH,
+				NAMA_IBU,
+				ALAMAT,
 				SUBSTR(KODE_PASIEN,4,3) AS KODE,
 				SUBSTR(TANGGAL_DAFTAR,4,2) AS BULAN
 			FROM rk_pasien WHERE $where
@@ -205,36 +209,62 @@ class Admum_pasien_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_rj($id_pasien,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$posisi,$barcode,$nomor_antrian,$biaya_reg,$id_loket,$kd_antrian){
+	function load_asuransi($keyword){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND NAMA_ASURANSI LIKE '%$keyword%'";
+		}
+
+		$sql = "SELECT * FROM asr_setup_asuransi WHERE $where";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function klik_asuransi($id){
+		$sql = "SELECT * FROM asr_setup_asuransi WHERE ID = '$id'";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function simpan_rj($id_pasien,$asal_rujukan,$keterangan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$sistem_bayar,$asuransi,$posisi,$barcode,$nomor_antrian,$biaya_reg,$biaya_adm,$id_loket,$kd_antrian){
 		$sql = "
 			INSERT INTO admum_rawat_jalan(
 				ID_PASIEN,
 				ASAL_RUJUKAN,
+				KETERANGAN,
 				HARI,
 				TANGGAL,
 				BULAN,
 				TAHUN,
 				WAKTU,
 				ID_POLI,
+				SISTEM_BAYAR,
+				NAMA_ASURANSI,
 				STS_POSISI,
 				BARCODE,
 				NOMOR_ANTRIAN,
 				BIAYA_REG,
+				BIAYA_ADMIN,
 				ID_LOKET,
 				KD_ANTRIAN
 			) VALUES(
 				'$id_pasien',
 				'$asal_rujukan',
+				'$keterangan',
 				'$hari',
 				'$tanggal',
 				'$bulan',
 				'$tahun',
 				'$waktu',
 				'$id_poli',
+				'$sistem_bayar',
+				'$asuransi',
 				'$posisi',
 				'$barcode',
 				'$nomor_antrian',
 				'$biaya_reg',
+				'$biaya_adm',
 				'$id_loket',
 				'$kd_antrian'
 			)
@@ -321,7 +351,7 @@ class Admum_pasien_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_lab_rj($id_pasien,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$posisi,$biaya_reg){
+	function simpan_lab_rj($id_pasien,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$sistem_bayar,$asuransi,$posisi,$biaya_reg,$biaya_adm){
 		$sql = "
 			INSERT INTO admum_rawat_jalan(
 				ID_PASIEN,
@@ -332,8 +362,11 @@ class Admum_pasien_rj_m extends CI_Model {
 				TAHUN,
 				WAKTU,
 				ID_POLI,
+				SISTEM_BAYAR,
+				NAMA_ASURANSI,
 				STS_POSISI,
-				BIAYA_REG
+				BIAYA_REG,
+				BIAYA_ADMIN
 			) VALUES(
 				'$id_pasien',
 				'$asal_rujukan',
@@ -343,8 +376,11 @@ class Admum_pasien_rj_m extends CI_Model {
 				'$tahun',
 				'$waktu',
 				'$id_poli',
+				'$sistem_bayar',
+				'$asuransi',
 				'$posisi',
-				'$biaya_reg'
+				'$biaya_reg',
+				'$biaya_adm'
 			)
 		";
 		$this->db->query($sql);

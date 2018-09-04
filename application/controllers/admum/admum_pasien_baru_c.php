@@ -187,12 +187,13 @@ class Admum_pasien_baru_c extends CI_Controller {
 		$tanggal_lahir = $this->input->post('tanggal_lahir');
 		$umur = $this->input->post('umur');
 		$umur_bulan = $this->input->post('umur_bulan');
-		$nama_ortu = $this->input->post('nama_ortu');
+		$nama_ayah = addslashes($this->input->post('nama_ayah'));
+		$nama_ibu = addslashes($this->input->post('nama_ibu'));
 		$telepon = $this->input->post('telepon');
 		$kelurahan = addslashes($this->input->post('kelurahan'));
 		$kecamatan = addslashes($this->input->post('kecamatan'));
 		$kota = addslashes($this->input->post('kota'));
-		$provinsi = $this->input->post('provinsi');
+		$provinsi = addslashes($this->input->post('provinsi'));
 
 		$this->model->simpan(
 			$kode_pasien,
@@ -208,12 +209,14 @@ class Admum_pasien_baru_c extends CI_Controller {
 			$tanggal_lahir,
 			$umur,
 			$umur_bulan,
-			$nama_ortu,
+			$nama_ayah,
+			$nama_ibu,
 			$telepon,
 			$kelurahan,
 			$kecamatan,
 			$kota,
-			$provinsi);
+			$provinsi
+		);
 
 		$this->insert_kode_pasien();
 		$this->simpan_log('daftar');

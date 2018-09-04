@@ -89,12 +89,12 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
           <div class="menu-and-user">
             <div class="logged-user-w">
               <div class="avatar-w">
-                <img alt="" src="<?php echo $base_url2; ?>picture/plus.gif">
+                <img alt="" src="<?php echo $base_url2; ?>picture/hospital_red_98257.jpg">
               </div>
               
               <div class="logged-user-menu">
                 <div class="avatar-w">
-                  <img alt="" src="<?php echo $base_url2; ?>picture/plus.gif">
+                  <img alt="" src="<?php echo $base_url2; ?>picture/hospital_red_98257.jpg">
                 </div>
                 <div class="logged-user-info-w">
                   <div class="logged-user-name">

@@ -419,6 +419,7 @@
         var snd = new Audio("<?php echo base_url(); ?>sound/nokia_tune_new.mp3"); // buffers automatically when created
         var timer = 0;
         var level = "<?php echo $level; ?>";
+        var tdk = "<?php echo $view; ?>";
 
         jQuery(document).ready(function() {
             $('#datatable').dataTable();
@@ -427,6 +428,31 @@
             $('#datatable-scroller').DataTable( { ajax: "<?php echo base_url(); ?>assets/plugins/datatables/json/scroller-demo.json", deferRender: true, scrollY: 380, scrollCollapse: true, scroller: true } );
             var table = $('#datatable-fixed-header').DataTable( { fixedHeader: true } );
             $(".select2").select2();
+
+            if(level == null || level == ""){
+                
+            }else{
+                if(tdk == "home"){
+                    get_notif_pasien();
+                    timer = setInterval(function () {
+                        get_notif_pasien();
+                    }, 5000);
+                }else{
+                    $('#popup_pasien_baru').hide();
+                    snd.pause();
+                }
+            }
+
+            $('#show_notif').click(function(){
+                $('#popup_pasien_baru').show();
+                data_pasien_baru();
+            });
+
+            $('#tutup_pas').click(function(){
+                $('#popup_pasien_baru').fadeOut();
+                snd.pause();
+                clearInterval(timer);
+            });
         });
 
         TableManageButtons.init();
@@ -455,9 +481,9 @@
                         for(var i=0; i<res.length; i++){
                             if(res[i].STS_TERIMA == '0'){
                                 $('#ketap_ketip').show();
-                                snd.play();
-                                $('#popup_pasien_baru').show();
-                                data_pasien_baru();
+                                // snd.play();
+                                // $('#popup_pasien_baru').show();
+                                // data_pasien_baru();
                             }else{
                                 $('#ketap_ketip').hide();
                             }

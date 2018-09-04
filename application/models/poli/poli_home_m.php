@@ -142,9 +142,9 @@ class Poli_home_m extends CI_Model {
 			LEFT JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
 			LEFT JOIN admum_poli c ON c.ID = b.ID_POLI
 			LEFT JOIN kepeg_divisi d ON d.ID = c.ID_DIVISI
-			JOIN rk_antrian_pasien e ON e.ID_PELAYANAN = b.ID
+			JOIN rk_antrian_pasien e ON e.ID_PASIEN = PSN.ID
 			WHERE $where
-			ORDER BY b.ID DESC
+			ORDER BY b.ID ASC
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -271,7 +271,8 @@ class Poli_home_m extends CI_Model {
 		$sql = "
 			SELECT
 				a.*,
-				b.NAMA_POLI
+				b.NAMA_POLI,
+				c.NAMA
 			FROM rk_antrian_pasien a
 			JOIN (
 				SELECT
@@ -280,6 +281,7 @@ class Poli_home_m extends CI_Model {
 				FROM admum_rawat_jalan a
 				JOIN admum_poli b ON b.ID = a.ID_POLI
 			) b ON b.ID = a.ID_PELAYANAN
+			JOIN rk_pasien c ON c.ID = a.ID_PASIEN
 			WHERE a.ID_PELAYANAN = '$id_rj'
 		";
 		$query = $this->db->query($sql);
@@ -305,10 +307,9 @@ class Poli_home_m extends CI_Model {
 				e.KODE_ANTRIAN,
 				e.NOMOR_ANTRIAN
 			FROM admum_rawat_jalan b
-			LEFT JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
-			LEFT JOIN admum_poli c ON c.ID = b.ID_POLI
-			LEFT JOIN kepeg_divisi d ON d.ID = c.ID_DIVISI
-			JOIN rk_antrian_pasien e ON e.ID_PELAYANAN = b.ID
+			JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
+			JOIN admum_poli c ON c.ID = b.ID_POLI
+			JOIN rk_antrian_pasien e ON e.ID_PASIEN = PSN.ID
 			WHERE $where
 			AND b.STS_TERIMA = '0'
 		";

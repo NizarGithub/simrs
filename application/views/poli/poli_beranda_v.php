@@ -500,10 +500,12 @@ function panggil_pasien(id){
         success : function(row){
             var kode_antrian = row['KODE_ANTRIAN'];
             var jml_antrian = row['NOMOR_ANTRIAN'];
+            var nomor = kode_antrian+jml_antrian;
             var poli = row['NAMA_POLI'];
+            var nama = row['NAMA'];
 
             responsiveVoice.speak(
-              "Pengunjung dengan nomor antrian, "+kode_antrian+","+jml_antrian+", silahkan menuju ke "+poli+". Terima kasih. ",
+              "Pengunjung dengan nomor antrian "+nomor+". Silahkan menuju ke "+poli+". Terima kasih. ",
               "Indonesian Female",
               {
                pitch: 1, 
@@ -799,7 +801,8 @@ function get_total_all(){
     var total_tindakan = $('#total_tindakan').val();
     var total_resep = $('#total_resep').val();
     var total_poli = $('#total_poli').val();
-    var tot_all = parseFloat(total_tindakan) + parseFloat(total_resep) + parseFloat(total_poli);
+    var total_lab = $('#total_lab').val();
+    var tot_all = parseFloat(total_tindakan) + parseFloat(total_resep) + parseFloat(total_poli) + parseFloat(total_lab);
     $('#grand_tot').html(formatNumber(tot_all));
     $('#loading_spin').hide();
 }

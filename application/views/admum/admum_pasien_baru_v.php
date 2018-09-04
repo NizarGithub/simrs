@@ -787,25 +787,31 @@ function Search_tgl_RI(tgl){
                                 </div>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Tempat Lahir</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" value="" required="required">
+                            </div>
+                        </div>
                         <div class="form-group" id="view_pendidikan1">
                             <label class="col-md-3 control-label">Pendidikan</label>
                             <div class="col-md-9">
                                 <select class="form-control select2" name="pendidikan">
+                                    <option value="Belum Ada">-</option>
                                     <option value="TK">TK</option>
                                     <option value="SD">SD</option>
                                     <option value="SMP">SMP</option>
                                     <option value="SMK/SMA">SMK / SMA</option>
                                     <option value="Kuliah">Kuliah</option>
-                                    <option value="Belum Ada">Belum Ada</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group" id="view_pendidikan2">
+                        <!-- <div class="form-group" id="view_pendidikan2">
                             <label class="col-md-3 control-label">Pendidikan</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control" name="pendidikan_txt" id="pendidikan_txt" value="" readonly>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="form-group" id="view_agama1">
                             <label class="col-md-3 control-label">Agama</label>
                             <div class="col-md-9">
@@ -819,16 +825,34 @@ function Search_tgl_RI(tgl){
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group" id="view_agama2">
+                        <!-- <div class="form-group" id="view_agama2">
                             <label class="col-md-3 control-label">Agama</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control" name="agama_txt" id="agama_txt" value="" readonly>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">Alamat</label>
+                        </div> -->
+                        <div class="form-group" id="view_goldar1">
+                            <label class="col-md-3 control-label">Golongan Darah</label>
                             <div class="col-md-9">
-                                <textarea rows="5" class="form-control" name="alamat" id="alamat" required="required"></textarea>
+                                <select class="form-control select2" name="golongan_darah">
+                                    <option value="Tidak Tahu">-</option>
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="O">O</option>
+                                    <option value="AB">AB</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- <div class="form-group" id="view_goldar2">
+                            <label class="col-md-3 control-label">Golongan Darah</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="goldar_txt" id="goldar_txt" value="" readonly>
+                            </div>
+                        </div> -->
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Telepon</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control num_only" name="telepon" id="telepon" value="" maxlength="13" required="required">
                             </div>
                         </div>
                         <!-- <div class="form-group">
@@ -842,34 +866,10 @@ function Search_tgl_RI(tgl){
             		</div>
 
             		<div class="col-lg-6">
-                        <div class="form-group" id="view_goldar1">
-                            <label class="col-md-3 control-label">Golongan Darah</label>
-                            <div class="col-md-9">
-                                <select class="form-control select2" name="golongan_darah">
-                                    <option value="A">A</option>
-                                    <option value="B">B</option>
-                                    <option value="O">O</option>
-                                    <option value="AB">AB</option>
-                                    <option value="Tidak Tahu">-</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group" id="view_goldar2">
-                            <label class="col-md-3 control-label">Golongan Darah</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="goldar_txt" id="goldar_txt" value="" readonly>
-                            </div>
-                        </div>
                         <div class="form-group">
-                            <label class="col-md-3 control-label">Telepon</label>
+                            <label class="col-md-3 control-label">Alamat</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control num_only" name="telepon" id="telepon" value="" maxlength="13" required="required">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">Tempat Lahir</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" value="" required="required">
+                                <textarea rows="5" class="form-control" name="alamat" id="alamat" required="required"></textarea>
                             </div>
                         </div>
                         <div class="form-group">
@@ -937,9 +937,15 @@ function Search_tgl_RI(tgl){
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-3 control-label">Nama Orang Tua</label>
+                            <label class="col-md-3 control-label">Nama Ayah</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" name="nama_ortu" id="nama_ortu" value="" required="required">
+                                <input type="text" class="form-control" name="nama_ayah" id="nama_ayah" value="" required="required">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Nama Ibu</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="nama_ibu" id="nama_ibu" value="" required="required">
                             </div>
                         </div>
             		</div>

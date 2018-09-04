@@ -611,7 +611,9 @@ class Lab_home_m extends CI_Model {
 				TAHUN,
 				WAKTU,
 				ID_POLI,
-				STS_POSISI
+				STS_POSISI,
+				ID_LOKET,
+				KD_ANTRIAN
 			) VALUES(
 				'$id_pasien',
 				'$asal_rujukan',
@@ -621,7 +623,9 @@ class Lab_home_m extends CI_Model {
 				'$tahun',
 				'$waktu',
 				'$id_poli',
-				'$posisi'
+				'$posisi',
+				'3',
+				'A'
 			)
 		";
 		$this->db->query($sql);

@@ -40,6 +40,8 @@ function get_dokter(){
                   }else{
                     stt = '<a class="btn btn-danger btn-sm" href="javascript:;">Offline</a>';
                   }
+
+                  res[i].NAMA_DIV = res[i].NAMA_DIV==null?"-":res[i].NAMA_DIV;
                   
                   $div += '<div class="col-md-6">'+
                             '<div class="element-wrapper">'+
