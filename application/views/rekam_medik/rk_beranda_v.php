@@ -1,80 +1,232 @@
-<style type="text/css">
-a {
-    color: #0e5fd8;
-    text-decoration: none;
-}
+<script type="text/javascript" src="<?php echo base_url(); ?>js-devan/jquery-1.11.1.min.js"></script>
 
-#dashboard-depan {
-    width: 100%;
-    height: 400px;
-    background-color: #fff;
-    border-radius: 5px;
-}
-.tile-depan {
-    text-align: center;
-    float: left;
-    margin: 10px 0;
-    color: #07A;
-    font: bold 12px tahoma;
-    height: 150px;
-    width: 148px;
-}
-.tile-depan img {
-    width: 120px;
-    height: 120px;
-    padding: 10px;
-    -moz-border-radius: 10px;
-    -webkit-border-radius: 10px;
-    border-radius: 10px;
-    margin-bottom: 5px;
-}
-.tile-depan a:hover {
-    color: #e32934;
-}
-.tile-depan a:hover img {
-    border: 2px solid #fb0a2a;
-    background: #f5756c;
-}
+<style type="text/css">
+#tombol_reset{
+    display: none;
+}    
 </style>
 
-<?PHP 
-    $sess_user = $this->session->userdata('masuk_rs');
-    $id_user = $sess_user['id'];
-    $user = $this->master_model_m->get_user_info($id_user);
-?>
+<script type="text/javascript">
+$(document).ready(function(){
+    get_data_rm();
 
-<div class="col-md-12">
-    <div id="dashboard-depan">
-    <?PHP 
-        $get_menu2 = $this->master_model_m->get_menu_2($id_user, 3);
-        foreach ($get_menu2 as $key => $menu2) {
-            $link = base_url().$menu2->LINK;
-            $icon = base_url().$menu2->GAMBAR_ICON;
-            if($menu2->LINK != null || $menu2->LINK != ""){
-    ?>
-        <div class="tile-depan">
-            <a href="<?php echo $link; ?>">
-                <img src="<?php echo $icon; ?>"><br />
-                <?php echo $menu2->NAMA; ?>
-            </a>
-        </div>
-    <?php
-            }else{
-                $get_menu3 = $this->master_model_m->get_menu_3($id_user, $menu2->ID);
-                foreach ($get_menu3 as $key => $menu3) {
-                    $link3 = base_url().$menu3->LINK;
-                    $icon3 = base_url().$menu3->GAMBAR_ICON;
-    ?>
-                    <div class="tile-depan">
-                        <a href="<?php echo $link3; ?>">
-                            <img src="<?php echo $icon3; ?>"><br />
-                            <?php echo $menu3->NAMA; ?>
-                        </a>
-                    </div>
-    <?php
-                }
+    $('#jumlah_tampil').change(function(){
+        get_data_rm();
+    });
+
+    $('#tombol_cari').click(function(){
+        get_data_rm();
+        $('#tombol_reset').show();
+        $('#tombol_cari').hide();
+    });
+
+    $('#tombol_reset').click(function(){
+        $('#cari_pasien').val("");
+        get_data_rm();
+        $('#tombol_reset').hide();
+        $('#tombol_cari').show();
+    });
+
+    toastr.options = {
+      "closeButton": false,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": true,
+      "positionClass": "toast-bottom-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+
+});
+
+function pagingData($selector){
+    var jumlah_tampil = $('#jumlah_tampil').val();
+
+    if(typeof $selector == 'undefined')
+    {
+        $selector = $("#tabel_pasien_rm tbody tr"); 
+    }
+
+    window.tp = new Pagination('#tablePaging', {
+        itemsCount:$selector.length,
+        pageSize : parseInt(jumlah_tampil),
+        onPageSizeChange: function (ps) {
+            console.log('changed to ' + ps);
+        },
+        onPageChange: function (paging) {
+            //custom paging logic here
+            //console.log(paging);
+            var start = paging.pageSize * (paging.currentPage - 1),
+                end = start + paging.pageSize,
+                $rows = $selector;
+
+            $rows.hide();
+
+            for (var i = start; i < end; i++) {
+                $rows.eq(i).show();
             }
         }
-    ?>
+    });
+}
+
+function get_data_rm(){
+    $('#popup_load').show();
+    var keyword = $('#cari_pasien').val();
+
+    $.ajax({
+        url : '<?php echo base_url(); ?>rekam_medik/rk_home_c/get_data_rm',
+        data : {keyword:keyword},
+        type : "GET",
+        dataType : "json",
+        success : function(result){
+            $tr = "";
+
+            if(result == "" || result == null){
+                $tr = "<tr><td colspan='6' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+            }else{
+                var no = 0;
+
+                for(var i=0; i<result.length; i++){
+                    no++;
+
+                    var aksi = '';
+
+                    result[i].WAKTU = result[i].WAKTU==null?"00:00":result[i].WAKTU;
+                    result[i].JENIS_KELAMIN = result[i].JENIS_KELAMIN=="L"?"Laki - Laki":"Perempuan";
+
+                    if(result[i].STS_APPROVE_RM == '0'){
+                        aksi = '<button type="button" class="btn btn-primary waves-effect btn-sm" onclick="klik_approve('+result[i].ID+','+result[i].STS+');">Approve</button>';
+                    }else{
+                        aksi = '<span class="label label-success"><i class="fa fa-check"></i> Sudah Approve</span>';
+                    }
+
+                    $tr +=  '<tr>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+no+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+result[i].KODE_PASIEN+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+result[i].TANGGAL+' - '+result[i].WAKTU+'</td>'+
+                            '   <td style="vertical-align:middle;">'+result[i].NAMA+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
+                            '   <td style="vertical-align:middle;">'+result[i].NAMA_POLI+'</td>'+
+                            '   <td align="center">'+aksi+'</td>'+
+                            '</tr>';
+                }
+            }
+
+            $('#tabel_pasien_rm tbody').html($tr);
+            pagingData();
+            $('#total_pasien').html(formatNumber(result.length));
+            $('#popup_load').fadeOut();
+        }
+    });
+}
+
+function onEnterText(e){
+    if (e.keyCode == 13) {
+        get_data_rm();
+        $('#tombol_reset').show();
+        $('#tombol_cari').hide();
+        return false;
+    }
+}
+
+function klik_approve(id,sts){
+    $.ajax({
+        url : '<?php echo base_url(); ?>rekam_medik/rk_home_c/klik_approve',
+        data : {
+            id:id,
+            sts:sts
+        },
+        type : "POST",
+        dataType : "json",
+        success : function(res){
+            toastr["success"]("Rekam Medik Telah Diterima!", "Berhasil");
+            get_data_rm();
+        }
+    });
+}
+</script>
+
+<div id="popup_load">
+    <div class="window_load">
+        <img src="<?=base_url()?>picture/progress.gif" height="100" width="125">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card-box">
+            <h4 class="header-title m-t-0">Daftar Pasien</h4>
+            <br>
+            <form class="form-horizontal" role="form">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="cari_pasien" id="cari_pasien" placeholder="Cari pasien..." value="" onkeypress="return onEnterText(event);">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn waves-effect waves-light btn-default" id="tombol_cari">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                                <button type="button" class="btn waves-effect waves-light btn-warning" id="tombol_reset" data-original-title="Reset Pencarian" title="" data-placement="top" data-toggle="tooltip">
+                                    <i class="fa fa-refresh"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <span class="help-block"><small><i>*ketikkan Nomor RM / Nama Pasien untuk pencarian data, lalu tekan Enter</i></small></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered" id="tabel_pasien_rm">
+                                <thead>
+                                    <tr class="biru_popup">
+                                        <th style="color:#fff; text-align:center; vertical-align: middle;">No</th>
+                                        <th style="color:#fff; text-align:center; vertical-align: middle;">No. RM</th>
+                                        <th style="color:#fff; text-align:center; vertical-align: middle;">Tgl / Waktu</th>
+                                        <th style="color:#fff; text-align:center; vertical-align: middle;">Nama Pasien</th>
+                                        <th style="color:#fff; text-align:center; vertical-align: middle;">Jenis Kelamin</th>
+                                        <th style="color:#fff; text-align:center; vertical-align: middle;">Poli Tujuan</th>
+                                        <th style="color:#fff; text-align:center; vertical-align: middle;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-10">
+                        <div id="tablePaging"> </div>
+                    </div>
+                    <div class="col-md-2">
+                        <h4 class="header-title pull-right">Total Pasien : <b id="total_pasien"></b></h4>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-9">
+                        
+                    </div>
+                    <label class="col-md-2 control-label">Jumlah Tampil</label>
+                    <div class="col-md-1 pull-right">
+                        <select class="form-control" id="jumlah_tampil">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

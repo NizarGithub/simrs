@@ -5,6 +5,9 @@ class Admum_data_pasien_c extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();
+		date_default_timezone_set('Asia/Jakarta');
+		$this->load->helper('url');
+		$this->load->library('fpdf/HTML2PDF');
 		$this->load->model('admum/admum_data_pasien_m','model');
 		$this->load->model('master_model_m','m_master');
 		$sess_user = $this->session->userdata('masuk_rs');
@@ -25,7 +28,7 @@ class Admum_data_pasien_c extends CI_Controller {
 			'view' => 'data_pasien',
 			'url_ubah' => base_url().'admum/admum_data_pasien_c/ubah',
 			'url_hapus' => base_url().'admum/admum_data_pasien_c/hapus',
-			'url_cetak' => base_url().'admum/admum_data_pasien_c/cetak_excel_pasien_umum',
+			'url_cetak' => base_url().'admum/admum_data_pasien_c/cetak_pasien',
 		);
 
 		$this->load->view('admum/admum_home_v',$data); 
@@ -127,23 +130,19 @@ class Admum_data_pasien_c extends CI_Controller {
 		redirect('admum/admum_data_pasien_c');
 	}
 
-	//PASIEN UMUM
-	function data_pasien(){
-		$id_klien = "";
+	//PASIEN PER POLI
+	function data_pasien_per_poli(){
 		$keyword = $this->input->get('keyword');
-		$urutkan = $this->input->get('urutkan');
-		$pilih_umur = $this->input->get('pilih_umur');
-		$pilih_status = $this->input->get('pilih_status');
-		$now = $this->input->get('now');
+		$now = date('d-m-Y');
 
-		$data = $this->model->data_pasien($id_klien,$keyword,$urutkan,$pilih_umur,$pilih_status,$now);
+		$data = $this->model->data_pasien_per_poli($keyword,$now);
 		echo json_encode($data);
 	}
 
-	function data_pasien_id(){
-		$id_klien = "";
+	function data_pasien_per_poli_id(){
 		$id = $this->input->post('id');
-		$data = $this->model->data_pasien_id($id,$id_klien);
+		$data['pl'] = $this->model->data_poli_id($id);
+		$data['ps'] = $this->model->data_pasien_per_poli_id($id);
 		echo json_encode($data);
 	}
 
@@ -201,14 +200,11 @@ class Admum_data_pasien_c extends CI_Controller {
 	}
 	//
 
-	// PASIEN RAWAT JALAN
+	// PASIEN RJ
 	function data_pasien_rj(){
-		$id_klien = "";
 		$keyword = $this->input->get('keyword');
-		$urutkan = $this->input->get('urutkan');
-		$pilih_umur = $this->input->get('pilih_umur');
-		$status = "RJ";
-		$data = $this->model->data_pasien($id_klien,$keyword,$urutkan,$pilih_umur,$status);
+		$now = date('d-m-Y');
+		$data = $this->model->data_pasien_rj($keyword,$now);
 		echo json_encode($data);
 	}
 
@@ -260,12 +256,8 @@ class Admum_data_pasien_c extends CI_Controller {
 
 	// PASIEN RAWAT INAP
 	function data_pasien_ri(){
-		$id_klien = "";
 		$keyword = $this->input->get('keyword');
-		$urutkan = $this->input->get('urutkan');
-		$pilih_umur = $this->input->get('pilih_umur');
-		$status = "RI";
-		$data = $this->model->data_pasien($id_klien,$keyword,$urutkan,$pilih_umur,$status);
+		$data = $this->model->data_pasien_ri($keyword);
 		echo json_encode($data);
 	}
 
@@ -372,23 +364,43 @@ class Admum_data_pasien_c extends CI_Controller {
 	}
 	//
 
-	//CETAK EXCEL
-	function cetak_excel_pasien_umum(){
-		$id_klien = "";
+	//CETAK PASIEN
+	function cetak_pasien(){
+		$cetak = $this->input->post('pilihan_cetak');
+		if($cetak == 'Excel'){
+			$this->cetak_excel();
+		}else{
+			$this->cetak_pdf();
+		}
+	}
+
+	function cetak_excel(){
 		$keyword = $this->input->post('cari_pasien');
-		$urutkan = $this->input->post('urutkan');
-		$pilih_umur = $this->input->post('pilih_umur');
-		$status = "Umum";
-		$now = date('dmY');
+		$now = date('d-m-Y');
 
 		$data = array(
 			'title' => 'Data Pasien',
 			'subtitle' => 'Data Pasien',
-			'dt' => $this->model->data_pasien($id_klien,$keyword,$urutkan,$pilih_umur,$status),
-			'filename' => $now.'_laporan_data_pasien',
+			'dt' => $this->model->data_pasien_per_poli($keyword,$now),
+			'filename' => date('dmY').'_laporan_pasien_per_poli'
 		);
 
-		$this->load->view('admum/excel/excel_data_pasien_umum',$data); 
+		$this->load->view('admum/excel/excel_data_pasien',$data); 
+	}
+
+	function cetak_pdf(){
+		$keyword = $this->input->post('cari_pasien');
+		$now = date('d-m-Y');
+
+		$data = array(
+			'title' => 'Data Pasien',
+			'subtitle' => 'Data Pasien',
+			'dt' => $this->model->data_pasien_per_poli($keyword,$now),
+			'settitle' => 'Laporan Pasien Per Poli',
+			'filename' => date('dmY').'_laporan_pasien_per_poli'
+		);
+
+		$this->load->view('admum/pdf/cetak_pasien_per_poli_pdf',$data);
 	}
 
 	function cetak_excel_pasien_rj(){
@@ -445,18 +457,9 @@ class Admum_data_pasien_c extends CI_Controller {
 		$this->load->view('admum/excel/excel_data_pasien_igd',$data);
 	}
 
-	function get_history_medik(){
+	function get_history_medik_rj(){
 		$id_pasien = $this->input->post('id_pasien');
-		$data = array();
 		$data['detail_RJ'] = $this->model->getDetailLayananRJ($id_pasien, '');
-		$data['detail_IGD'] = $this->model->getDetailLayananIGD($id_pasien, '');
-
-		$data['detail_RI'] = $this->model->getDetailLayananRI($id_pasien, '');
-		$data['dataDetVisite_RI'] = $this->model->dataDetVisite_RI($id_pasien, '');
-		$data['dataDetGizi_RI'] = $this->model->dataDetGizi_RI($id_pasien, '');
-		$data['dataDetOksigen_RI'] = $this->model->dataDetOksigen_RI($id_pasien, '');
-		$data['dataDetDiagnosa_RI'] = $this->model->dataDetDiagnosa_RI($id_pasien, '');
-		$data['dataDetResep_RI'] = $this->model->dataDetResep_RI($id_pasien, '');
 
 		echo json_encode($data);
 	}

@@ -51,6 +51,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				PASIEN.KODE_PASIEN,
 				PASIEN.NAMA AS NAMA_PASIEN,
 				PASIEN.JENIS_KELAMIN,
+				PASIEN.TANGGAL_LAHIR,
 				PASIEN.UMUR,
 				PASIEN.STATUS,
 				PASIEN.PEKERJAAN,
@@ -65,7 +66,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				PEG.ID AS ID_DOKTER,
 				PEG.NAMA AS NAMA_DOKTER,
 				RJ.HARI,
-				RJ.TANGGAL,
+				RJ.TANGGAL AS TANGGAL_MASUK,
 				RJ.SISTEM_BAYAR,
 				AP.KODE_ANTRIAN,
 				AP.NOMOR_ANTRIAN
@@ -356,7 +357,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 			$where = $where;
 		}
 
-		$sql = "SELECT * FROM admum_setup_jenis_laborat WHERE $where ORDER BY ID DESC";
+		$sql = "SELECT * FROM admum_setup_jenis_laborat WHERE $where ORDER BY ID ASC";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
@@ -367,22 +368,43 @@ class Rk_pelayanan_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function load_pemeriksaan($keyword){
+	function load_pemeriksaan($id_jenis_lab,$keyword){
 		$where = "1 = 1";
 
 		if($keyword != ""){
-			$where = $where." AND (NAMA_PEMERIKSAAN LIKE '%$keyword%' OR KODE LIKE '%$keyword%')";
+			$where = $where." AND (a.NAMA_PEMERIKSAAN LIKE '%$keyword%')";
 		}else{
 			$where = $where;
 		}
 
-		$sql = "SELECT * FROM admum_setup_pemeriksaan WHERE $where ORDER BY ID DESC";
+		$sql = "
+			SELECT 
+				a.ID,
+				a.NAMA_PEMERIKSAAN,
+				b.NILAI_NORMAL,
+				a.TARIF
+			FROM admum_setup_pemeriksaan a
+			JOIN admum_setup_pemeriksaan_nilai b ON b.ID_PEMERIKSAAN = a.ID
+			WHERE $where 
+			AND a.ID_JENIS_LAB = '$id_jenis_lab'
+			ORDER BY a.ID ASC
+		";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
 
-	function klik_pemeriksaan($id){
-		$sql = "SELECT * FROM admum_setup_pemeriksaan WHERE ID = '$id'";
+	function klik_pemeriksaan($id_jenis_lab){
+		$sql = "
+			SELECT 
+				a.ID,
+				a.NAMA_PEMERIKSAAN,
+				b.NILAI_NORMAL,
+				a.TARIF
+			FROM admum_setup_pemeriksaan a
+			JOIN admum_setup_pemeriksaan_nilai b ON b.ID_PEMERIKSAAN = a.ID
+			WHERE a.ID_JENIS_LAB = '$id_jenis_lab'
+			ORDER BY a.ID ASC
+		";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
@@ -422,11 +444,12 @@ class Rk_pelayanan_rj_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
-	function simpan_pemeriksaan_detail($id_pemeriksaan_rj,$pemeriksaan,$tanggal,$bulan,$tahun,$subtotal,$waktu){
+	function simpan_pemeriksaan_detail($id_pemeriksaan_rj,$pemeriksaan,$nilai_rujukan,$tanggal,$bulan,$tahun,$subtotal,$waktu){
 		$sql = "
 			INSERT INTO rk_laborat_rj_detail(
 				ID_PEMERIKSAAN_RJ,
 				PEMERIKSAAN,
+				NILAI_RUJUKAN,
 				TANGGAL,
 				BULAN,
 				TAHUN,
@@ -435,6 +458,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 			) VALUES (
 				'$id_pemeriksaan_rj',
 				'$pemeriksaan',
+				'$nilai_rujukan',
 				'$tanggal',
 				'$bulan',
 				'$tahun',
@@ -534,18 +558,13 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				OBAT.JUMLAH,
 				OBAT.ISI,
 				OBAT.TOTAL,
-				OBAT.SATUAN_ISI,
 				OBAT.JUMLAH_BUTIR,
-				OBAT.SATUAN_BUTIR,
 				OBAT.HARGA_BELI,
 				OBAT.HARGA_JUAL,
-				OBAT.KADALUARSA,
 				OBAT.TANGGAL_MASUK,
 				OBAT.WAKTU_MASUK,
 				OBAT.AKTIF,
-				OBAT.URUT_BARANG,
-				OBAT.STATUS_RACIK,
-				OBAT.GAMBAR
+				OBAT.URUT_BARANG
 			FROM apotek_gudang_obat OBAT
 			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
 			WHERE $where
@@ -564,18 +583,13 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				OBAT.JUMLAH,
 				OBAT.ISI,
 				OBAT.TOTAL,
-				OBAT.SATUAN_ISI,
 				OBAT.JUMLAH_BUTIR,
-				OBAT.SATUAN_BUTIR,
 				OBAT.HARGA_BELI,
 				OBAT.HARGA_JUAL,
-				OBAT.KADALUARSA,
 				OBAT.TANGGAL_MASUK,
 				OBAT.WAKTU_MASUK,
 				OBAT.AKTIF,
-				OBAT.URUT_BARANG,
-				OBAT.STATUS_RACIK,
-				OBAT.GAMBAR
+				OBAT.URUT_BARANG
 			FROM apotek_gudang_obat OBAT
 			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
 			WHERE OBAT.ID = '$id'

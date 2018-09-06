@@ -155,6 +155,11 @@ class Poli_home_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
+	function ubah_stt_panggil($id_rj,$tanggal){
+		$sql = "UPDATE rk_antrian_pasien SET STATUS_PANGGIL = '1' WHERE ID_PELAYANAN = '$id_rj' AND TANGGAL = '$tanggal'";
+		$this->db->query($sql);
+	}
+
 	function ubah_jenis_pasien($id_pasien){
 		$sql = "UPDATE rk_pasien SET JENIS_PASIEN = 'Lama' WHERE ID = '$id_pasien'";
 		$this->db->query($sql);
@@ -262,11 +267,6 @@ class Poli_home_m extends CI_Model {
 		return $query->result();
 	}
 
-	function ubah_stt_panggil($id_rj,$tanggal){
-		$sql = "UPDATE rk_antrian_pasien SET STATUS_PANGGIL = '1' WHERE ID_PELAYANAN = '$id_rj' AND TANGGAL = '$tanggal'";
-		$this->db->query($sql);
-	}
-
 	function panggil_pasien($id_rj){
 		$sql = "
 			SELECT
@@ -288,6 +288,29 @@ class Poli_home_m extends CI_Model {
 		return $query->row();
 	}
 
+	function notif_pasien_baru($level,$id_divisi,$posisi,$now){
+		$where = "1 = 1";
+
+		if($level == null){
+			$where = $where;
+		}else{
+			$where = $where." AND c.ID_DIVISI = '$id_divisi' AND b.STS_POSISI = '$posisi' AND b.TANGGAL = '$now'";
+		}
+
+		$sql = "
+			SELECT 
+				COUNT(*) AS TOTAL
+			FROM admum_rawat_jalan b
+			JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
+			JOIN admum_poli c ON c.ID = b.ID_POLI
+			JOIN rk_antrian_pasien e ON e.ID_PASIEN = PSN.ID
+			WHERE $where
+			AND b.STS_TERIMA = '0'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
 	function data_pasien_baru($level,$id_divisi,$posisi,$now){
 		$where = "1 = 1";
 
@@ -299,13 +322,17 @@ class Poli_home_m extends CI_Model {
 
 		$sql = "
 			SELECT 
-				PSN.*,
-				b.ID AS ID_RJ,
+				b.ID,
 				b.ID_POLI,
 				c.ID_DIVISI,
+				b.TANGGAL,
+				b.WAKTU,
 				b.STS_TERIMA,
 				e.KODE_ANTRIAN,
-				e.NOMOR_ANTRIAN
+				e.NOMOR_ANTRIAN,
+				PSN.KODE_PASIEN,
+				PSN.NAMA,
+				PSN.JENIS_KELAMIN
 			FROM admum_rawat_jalan b
 			JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
 			JOIN admum_poli c ON c.ID = b.ID_POLI

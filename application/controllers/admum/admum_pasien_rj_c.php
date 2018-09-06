@@ -216,8 +216,10 @@ class Admum_pasien_rj_c extends CI_Controller {
 		$format = $datetime->setTimezone($tz_object);
 		$waktu = $format->format('H:i:s');
 		$barcode = $this->input->post('barcode');
-		$id_loket = $this->input->post('id_loket');
-		$kode_antrian = $this->input->post('kode_antrian');
+		$id_loket = '3';
+		$kode_antrian = 'A';
+		// $id_loket = $this->input->post('id_loket');
+		// $kode_antrian = $this->input->post('kode_antrian');
 		$nomor_antrian = $this->input->post('jumlah_antrian');
 		$biaya_reg = str_replace(',', '', $this->input->post('biaya_reg'));
 		$biaya_adm = str_replace(',', '', $this->input->post('biaya_adm'));

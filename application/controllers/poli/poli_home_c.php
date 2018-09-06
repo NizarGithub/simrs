@@ -86,14 +86,31 @@ class Poli_home_c extends CI_Controller {
 	}
 
 	function notif_pasien_baru(){
-        $level = $this->input->get('level');
-    	$id_divisi = $this->input->get('id_divisi'); //ID POLI
-		$keyword = $this->input->get('keyword');
+        $level = $this->input->post('level');
+    	$id_divisi = $this->input->post('id_divisi'); //ID POLI
+		$posisi = '1';
+		$now = date('d-m-Y');
+
+		$data = $this->model->notif_pasien_baru($level,$id_divisi,$posisi,$now);
+		echo json_encode($data);
+	}
+
+	function data_pasien_baru(){
+		$level = $this->input->post('level');
+    	$id_divisi = $this->input->post('id_divisi'); //ID POLI
 		$posisi = '1';
 		$now = date('d-m-Y');
 
 		$data = $this->model->data_pasien_baru($level,$id_divisi,$posisi,$now);
 		echo json_encode($data);
+	}
+
+	function terima_pasien(){
+		$id = $this->input->post('id');
+		$tanggal = date('d-m-Y');
+		$this->model->terima_pasien($id);
+		$this->model->ubah_stt_panggil($id,$tanggal);
+		echo '1';
 	}
 
 	function data_pasien_id(){
@@ -118,14 +135,6 @@ class Poli_home_c extends CI_Controller {
 
 		$data = $this->model->data_pasien_terima($keyword,$posisi,$now,$id_divisi,$poli,$level,$hasil_cek,$tanggal_awal,$tanggal_akhir,$bulan,$tahun);
 		echo json_encode($data);
-	}
-
-	function terima_pasien(){
-		$id = $this->input->post('id');
-		$tanggal = date('d-m-Y');
-		$this->model->terima_pasien($id);
-		$this->model->ubah_stt_panggil($id,$tanggal);
-		echo '1';
 	}
 
 	function ubah_jenis_pasien(){

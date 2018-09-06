@@ -65,6 +65,12 @@ class Admum_setup_kamar_rawat_inap_m extends CI_Model {
 		return $query->row();
 	}
 
+	function cek_nomor_kamar($nomor){
+		$sql = "SELECT * FROM admum_kamar_rawat_inap WHERE KODE_KAMAR = '$nomor'";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
 	function data_bed($id_kamar_rawat_inap){
 		$sql = "SELECT * FROM admum_bed_rawat_inap WHERE ID_KAMAR_RAWAT_INAP = '$id_kamar_rawat_inap'";
 		$query = $this->db->query($sql);
@@ -131,9 +137,10 @@ class Admum_setup_kamar_rawat_inap_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
-	function ubah($id,$kelas,$biaya,$visite_dokter,$biaya_visite,$jasa_sarana,$peruntukan_kamar,$jumlah_bed){
+	function ubah($id,$kode_kamar,$kelas,$biaya,$visite_dokter,$biaya_visite,$jasa_sarana,$peruntukan_kamar,$jumlah_bed){
 		$sql = "
 			UPDATE admum_kamar_rawat_inap SET
+				KODE_KAMAR = '$kode_kamar',
 				KELAS = '$kelas',
 				BIAYA = '$biaya',
 				VISITE_DOKTER = '$visite_dokter',

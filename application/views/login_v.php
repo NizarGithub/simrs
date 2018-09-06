@@ -61,7 +61,7 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
                         </div>
                         <?php } ?>
 
-                        <div class="form-group ">
+                        <div class="form-group">
                             <div class="col-xs-12">
                                 <input class="form-control" type="text" required="" name="username" placeholder="Username">
                             </div>
@@ -69,11 +69,16 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
 
                         <div class="form-group">
                             <div class="col-xs-12">
-                                <input class="form-control" type="password" required="" name="password" placeholder="Password">
+                                <div class="input-group">
+                                    <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" id="showHide"><i class="fa fa-eye"></i></button>
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="form-group ">
+                        <div class="form-group">
                             <div class="col-xs-12">
                                 <div class="checkbox checkbox-custom">
                                     <input id="checkbox-signup" type="checkbox">
@@ -116,6 +121,7 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
         </script>
 
         <!-- jQuery  -->
+        <script type="text/javascript" src="<?php echo base_url(); ?>js-devan/jquery-1.11.1.min.js"></script>
         <script src="<?php echo $base_url2; ?>assets/js/jquery.min.js"></script>
         <script src="<?php echo $base_url2; ?>assets/js/bootstrap.min.js"></script>
         <script src="<?php echo $base_url2; ?>assets/js/detect.js"></script>
@@ -130,6 +136,21 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
         <!-- App js -->
         <script src="<?php echo $base_url2; ?>assets/js/jquery.core.js"></script>
         <script src="<?php echo $base_url2; ?>assets/js/jquery.app.js"></script>
-	
+
+        <script type="text/javascript">
+        $(document).ready(function() {
+          $("#showHide").click(function() {
+            if ($("#password").attr("type") == "password") {
+              $("#password").attr("type", "text");
+              $('#showHide').removeClass('btn-default');
+              $('#showHide').addClass('btn-success');
+            } else {
+              $("#password").attr("type", "password");
+              $('#showHide').removeClass('btn-success');
+              $('#showHide').addClass('btn-default');
+            }
+          });
+        });
+        </script>
 	</body>
 </html>

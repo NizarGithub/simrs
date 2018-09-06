@@ -8,6 +8,114 @@ class Rk_input_rekam_medik_m extends CI_Model {
 		$this->load->database();
 	}
 
+	function get_notif_pasien_baru($now){
+		$sql = "
+			SELECT
+				b.*
+			FROM(
+				SELECT
+					b.ID,
+					b.TANGGAL,
+					b.WAKTU,
+					b.ID_POLI,
+					c.ID_DIVISI,
+					c.NAMA AS NAMA_POLI,
+					b.STS_APPROVE_RM,
+					PSN.KODE_PASIEN,
+					PSN.NAMA,
+					PSN.JENIS_KELAMIN,
+					'1' AS STS,
+					'RJ' AS TIPE,
+					b.STS_LIHAT
+				FROM admum_rawat_jalan b
+				JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
+				JOIN admum_poli c ON c.ID = b.ID_POLI
+
+				UNION ALL
+
+				SELECT
+					b.ID,
+					b.TANGGAL_MASUK AS TANGGAL,
+					b.WAKTU,
+					'' AS ID_POLI,
+					'' AS ID_DIVISI,
+					'' AS NAMA_POLI,
+					'' AS STS_APPROVE_RM,
+					PSN.KODE_PASIEN,
+					PSN.NAMA,
+					PSN.JENIS_KELAMIN,
+					'2' AS STS,
+					'RI' AS TIPE,
+					b.STS_LIHAT
+				FROM admum_rawat_inap b
+				JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
+			) b
+			WHERE $where
+			AND b.TANGGAL = '$now'
+			AND b.STS_LIHAT = '0'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function get_data_rm($keyword,$now){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND (b.KODE_PASIEN LIKE '%$keyword%' OR b.NAMA LIKE '%$keyword%')";
+		}else{
+			$where = $where;
+		}
+
+		$sql = "
+			SELECT
+				b.*
+			FROM(
+				SELECT
+					b.ID,
+					b.TANGGAL,
+					b.WAKTU,
+					b.ID_POLI,
+					c.ID_DIVISI,
+					c.NAMA AS NAMA_POLI,
+					b.STS_APPROVE_RM,
+					PSN.KODE_PASIEN,
+					PSN.NAMA,
+					PSN.JENIS_KELAMIN,
+					'1' AS STS,
+					'RJ' AS TIPE,
+					b.STS_LIHAT
+				FROM admum_rawat_jalan b
+				JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
+				JOIN admum_poli c ON c.ID = b.ID_POLI
+
+				UNION ALL
+
+				SELECT
+					b.ID,
+					b.TANGGAL_MASUK AS TANGGAL,
+					b.WAKTU,
+					'' AS ID_POLI,
+					'' AS ID_DIVISI,
+					'' AS NAMA_POLI,
+					'' AS STS_APPROVE_RM,
+					PSN.KODE_PASIEN,
+					PSN.NAMA,
+					PSN.JENIS_KELAMIN,
+					'2' AS STS,
+					'RI' AS TIPE,
+					b.STS_LIHAT
+				FROM admum_rawat_inap b
+				JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
+			) b
+			WHERE $where
+			AND b.TANGGAL = '$now'
+			AND b.STS_LIHAT = '1'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
 	function load_data_pasien($keyword){ 
 		$where = "1 = 1";
 
@@ -133,6 +241,16 @@ class Rk_input_rekam_medik_m extends CI_Model {
 		";
 		$query = $this->db->query($sql);
 		return $query->row();
+	}
+
+	function ubah_sts_approve_rj($id){
+		$sql = "UPDATE admum_rawat_jalan SET STS_APPROVE_RM = '1' WHERE ID = '$id'";
+		$this->db->query($sql);
+	}
+
+	function ubah_sts_approve_ri($id){
+		$sql = "UPDATE admum_rawat_inap SET STS_APPROVE_RM = '1' WHERE ID = '$id'";
+		$this->db->query($sql);
 	}
 
 }

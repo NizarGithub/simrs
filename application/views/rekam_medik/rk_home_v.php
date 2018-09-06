@@ -46,11 +46,35 @@
         <![endif]-->
 
         <script src="<?php echo base_url(); ?>assets/js/modernizr.min.js"></script>
+
+        <style type="text/css">
+        #ketap_ketip{
+            display: none;
+        }
+
+        #popup_pasien_baru {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            background: rgba(0,0,0,.7);
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            display: none;
+        }
+        .window_pasien_baru {
+            width:50%;
+            height:auto;
+            position: relative;
+            padding: 10px;
+            margin: 2% auto;
+            background-color: #fff;
+        }
+        </style>
     </head>
 
 
     <body>
-
         <!-- Navigation Bar-->
         <header id="topnav">
             <div class="topbar-main" style="background-color:#ff4c4c; height:60px;">
@@ -60,6 +84,7 @@
                         $id_user = $sess_user['id'];
                         $user = $this->master_model_m->get_user_info($id_user);
                         $is_operator = $this->master_model_m->is_operator($id_user, 'rekam_medik');
+                        $level = $user->LEVEL;
                     ?>
                     <!-- LOGO -->
                     <div class="topbar-left">
@@ -69,44 +94,7 @@
                     </div>
                     <!-- End Logo container-->
 
-                    <!-- LOKET -->
-                    <?PHP 
-                    if(count($is_operator) > 0){ 
-                        $get_loket = $this->master_model_m->getLoket($id_user, 'rekam_medik');
-                        $get_jml_antrian = $this->master_model_m->getJmlAntrian($get_loket->KODE_ANTRIAN);
-                    ?>
-                    <center>
-                    <div style="width: 87%; position: absolute; float: left; margin-top: 7px;">
-                        <button type="button" class="btn btn-warning waves-effect waves-light w-md m-b-5" style="padding-top: 10px; padding-bottom: 10px;"> 
-                            <b id="nama_loket_antrian_txt"> <?=strtoupper($get_loket->NAMA_LOKET);?> </b> 
-                        </button>
-
-                        <button type="button" class="btn btn-danger" style="margin-left: 100px; font-size: 32px; margin-top: -8px;"> 
-                            <b><?=$get_loket->KODE;?>-<font id="jml_antrian_txt"><?=count($get_jml_antrian) + 1;?></font></b> 
-
-                            <input type="hidden" id="kode_antrian_now" value="<?=$get_loket->KODE;?>" />
-                            <input type="hidden" id="jml_antrian_now" value="<?=count($get_jml_antrian) + 1;?>" />
-                            <input type="hidden" id="id_antrian_now" value="<?=$get_loket->KODE_ANTRIAN;?>" />
-                        </button>
-
-                        <button class="btn btn-purple waves-effect waves-light m-b-5" style="margin-left: 40px;" onclick="panggil_antrian();"> 
-                           <i class="fa fa-bullhorn m-r-5"></i>   <span> Panggil </span> 
-                        </button>
-
-                        <button class="btn btn-primary waves-effect waves-light m-b-5" style="margin-left: 10px;" data-toggle="modal" data-target="#next_antrian"> 
-                            <span> Berikutnya </span> <i class="fa fa-chevron-circle-right m-r-5"></i>  
-                        </button>
-                    </div>
-                    </center>
-                    <?PHP } ?>
-                    <!-- END OF LOKET -->
-
                     <div class="menu-extras">
-                        <?PHP 
-                            $sess_user = $this->session->userdata('masuk_rs');
-                            $id_user = $sess_user['id'];
-                            $user = $this->master_model_m->get_user_info($id_user);
-                        ?>
                         <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#bb1e10; height:60px;">
                             <li>
                                 <form role="search" class="navbar-left app-search pull-left hidden-xs" style="margin-right:0px; margin-top:0px;">
@@ -120,12 +108,33 @@
                                 </a>
 
                                 <ul class="dropdown-menu">
+                                    <?php if($level == null){ ?>
                                     <li><a href="<?php echo base_url(); ?>portal"><i class="fa fa-th m-r-5"></i> Portal Depan</a></li>
+                                    <?php } ?>
                                     <li><a href="javascript:void(0)"><i class="ti-user m-r-5"></i> Profile</a></li>
                                     <li><a href="javascript:void(0)"><i class="ti-settings m-r-5"></i> Settings</a></li>
                                     <li><a href="javascript:void(0)"><i class="ti-lock m-r-5"></i> Lock screen</a></li>
                                     <li><a href="<?php echo base_url(); ?>logout"><i class="ti-power-off m-r-5"></i> Logout</a></li>
                                 </ul>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <!-- Notification -->
+                                <div class="notification-box">
+                                    <ul class="list-inline m-b-0">
+                                        <li id="li_notif">
+                                            <a class="right-bar-toggle" href="javascript:void(0);">
+                                                <i class="fa fa-bell-o"></i>
+                                            </a>
+                                            <span class="badge badge-success" id="tot_pasien">0</span>
+                                            <div class="noti-dot">
+                                                <span class="dot" id="ketap_ketip"></span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- End Notification bar -->
                             </li>
                         </ul>
                         <div class="menu-item">
@@ -204,9 +213,7 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <?php $this->load->view($page); ?>
-                </div>
+                <?php $this->load->view($page); ?>
 
                 <!-- Footer -->
                 <footer class="footer text-right">
@@ -217,9 +224,11 @@
                             </div>
                             <div class="col-xs-6">
                                 <ul class="pull-right list-inline m-b-0">
+                                    <?php if($level == null){ ?>
                                     <li>
                                         <a href="<?php echo base_url(); ?>portal" style="color:#887d59;"><i class="fa fa-th"></i> Portal Depan</a>
                                     </li>
+                                    <?php } ?>
                                     <li>
                                         <a href="#" style="color:#887d59;"><i class="fa fa-info-circle"></i> Tentang</a>
                                     </li>
@@ -238,80 +247,6 @@
 
             </div>
             <!-- end container -->
-
-            <!-- Right Sidebar -->
-            <div class="side-bar right-bar">
-                <a href="javascript:void(0);" class="right-bar-toggle">
-                    <i class="zmdi zmdi-close-circle-o"></i>
-                </a>
-                <h4 class="">T`H`E`M`E`L`O`C`K`.`C`O`M`</h4>
-                <div class="notification-list nicescroll">
-                    <ul class="list-group list-no-border user-list">
-                        <li class="list-group-item">
-                            <a href="#" class="user-list-item">
-                                <div class="avatar">
-                                    <img src="assets/images/users/avatar-2.jpg" alt="">
-                                </div>
-                                <div class="user-desc">
-                                    <span class="name">Michael Zenaty</span>
-                                    <span class="desc">There are new settings available</span>
-                                    <span class="time">2 hours ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="#" class="user-list-item">
-                                <div class="icon bg-info">
-                                    <i class="zmdi zmdi-account"></i>
-                                </div>
-                                <div class="user-desc">
-                                    <span class="name">New Signup</span>
-                                    <span class="desc">There are new settings available</span>
-                                    <span class="time">5 hours ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="#" class="user-list-item">
-                                <div class="icon bg-pink">
-                                    <i class="zmdi zmdi-comment"></i>
-                                </div>
-                                <div class="user-desc">
-                                    <span class="name">New Message received</span>
-                                    <span class="desc">There are new settings available</span>
-                                    <span class="time">1 day ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="list-group-item active">
-                            <a href="#" class="user-list-item">
-                                <div class="avatar">
-                                    <img src="assets/images/users/avatar-3.jpg" alt="">
-                                </div>
-                                <div class="user-desc">
-                                    <span class="name">James Anderson</span>
-                                    <span class="desc">There are new settings available</span>
-                                    <span class="time">2 days ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="list-group-item active">
-                            <a href="#" class="user-list-item">
-                                <div class="icon bg-warning">
-                                    <i class="zmdi zmdi-settings"></i>
-                                </div>
-                                <div class="user-desc">
-                                    <span class="name">Settings</span>
-                                    <span class="desc">There are new settings available</span>
-                                    <span class="time">1 day ago</span>
-                                </div>
-                            </a>
-                        </li>
-
-                    </ul>
-                </div>
-            </div>
-            <!-- /Right-bar -->
 
         </div>
 
@@ -339,6 +274,55 @@
             </div>
         </div>
         <!-- End Of Next Antrian Modal -->
+
+        <!-- Modal -->
+        <div id="popup_pasien_baru">
+            <div class="window_pasien_baru">
+                <div class="row" id="view_data">
+                    <div class="col-md-12">
+                        <div class="card-box">
+                            <form class="form-horizontal" role="form">
+                                <div class="form-group">
+                                    <h4 class="header-title m-t-0">Daftar Pasien Baru</h4>
+                                </div>
+                                <div class="form-group">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover table-bordered tabel_pasien_home">
+                                            <thead>
+                                                <tr class="kuning_popup">
+                                                    <!-- <th style="text-align:center; vertical-align: middle;"> -->
+                                                        <!-- <div class="checkbox checkbox-primary">
+                                                            <input id="checkboxAll" type="checkbox" name="centang_semua">
+                                                            <label for="checkboxAll">
+                                                                &nbsp;
+                                                            </label>
+                                                        </div> -->
+                                                    </th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">No</th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">No. RM</th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Tgl / Waktu</th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Nama Pasien</th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">JK</th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Antrian</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <center>
+                                        <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal" id="tutup_pas">Tutup</button>
+                                    </center>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- jQuery  -->
         <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
@@ -396,62 +380,130 @@
         <script src="http://code.responsivevoice.org/responsivevoice.js"></script>
 
         <script type="text/javascript">
+            var snd = new Audio("<?php echo base_url(); ?>sound/nokia_tune_new.mp3"); // buffers automatically when created
+        var timer = 0;
+        var level = "<?php echo $level; ?>";
+
         jQuery(document).ready(function() {
             $(".select2").select2();
+
+            get_notif_pasien();
+
+            toastr.options = {
+              "closeButton": false,
+              "debug": false,
+              "newestOnTop": false,
+              "progressBar": true,
+              "positionClass": "toast-bottom-right",
+              "preventDuplicates": false,
+              "onclick": null,
+              "showDuration": "300",
+              "hideDuration": "1000",
+              "timeOut": "5000",
+              "extendedTimeOut": "1000",
+              "showEasing": "swing",
+              "hideEasing": "linear",
+              "showMethod": "fadeIn",
+              "hideMethod": "fadeOut"
+            }
+
+            if(level == null || level == ""){
+                
+            }else{
+                timer = setInterval(function () {
+                    get_notif_pasien();
+                }, 5000);
+            }
+
+            $('#tutup_pas').click(function(){
+                $.ajax({
+                    url : '<?php echo base_url(); ?>rekam_medik/rk_home_c/dilihat',
+                    type : "POST",
+                    dataType : "json",
+                    success : function(res){
+                        $('#popup_pasien_baru').fadeOut();
+                        snd.pause();
+                    }
+                });
+            });
+
         });
 
-        function next_antri(){
-            var kode_antrian = $('#kode_antrian_now').val();
-            var jml_antrian  = $('#jml_antrian_now').val();
-            var id_antrian   = $('#id_antrian_now').val();
-            var nama_loket_antrian_txt   = $('#nama_loket_antrian_txt').html();
+        function get_notif_pasien(){
+            var keyword = "";
+            var level = "<?php echo $level; ?>";
 
             $.ajax({
-                url : '<?php echo base_url(); ?>rekam_medik/rk_home_c/next_antri',
+                url : '<?php echo base_url(); ?>rekam_medik/rk_home_c/notif_pasien_baru',
                 data : {
-                    kode_antrian:kode_antrian,
-                    jml_antrian:jml_antrian,
-                    id_antrian:id_antrian,
+                    keyword:keyword,
+                    level:level
                 },
-                type : "POST",
+                type : "GET",
                 dataType : "json",
-                success : function(row){
-                    if(row == 1){
-                        var jml_antrian_next = parseInt(jml_antrian) + 1;
-                        $('#jml_antrian_txt').html(jml_antrian_next);
-                        $('#jml_antrian_now').val(jml_antrian_next);
-
-                        $('#close_next_antrian').click();
-
-                        responsiveVoice.speak(
-                          "Pengunjung dengan nomor antrian, "+kode_antrian+","+jml_antrian_next+", silahkan menuju ke "+nama_loket_antrian_txt+". Terima kasih.",
-                          "Indonesian Female",
-                          {
-                           pitch: 1, 
-                           rate: 1, 
-                           volume: 1
-                          }
-                         );
-
+                success : function(res){
+                    if(res.length == 0){
+                        $('#ketap_ketip').hide();
+                        snd.pause();
+                        $('#popup_pasien_baru').hide();
+                    }else{
+                        for(var i=0; i<res.length; i++){
+                            if(res[i].STS_LIHAT == '0'){
+                                $('#ketap_ketip').show();
+                                snd.play();
+                                $('#popup_pasien_baru').show();
+                                data_pasien_baru();
+                            }else{
+                                $('#ketap_ketip').hide();
+                                snd.pause();
+                                $('#popup_pasien_baru').hide();
+                            }
+                        }
                     }
+
+                    $('#tot_pasien').html(res.length);
                 }
             });
         }
 
-        function panggil_antrian(){
-            var kode_antrian = $('#kode_antrian_now').val();
-            var jml_antrian  = $('#jml_antrian_now').val();
-            var nama_loket_antrian_txt   = $('#nama_loket_antrian_txt').html();
+        function data_pasien_baru(){
+            $.ajax({
+                url : '<?php echo base_url(); ?>rekam_medik/rk_home_c/notif_pasien_baru',
+                type : "POST",
+                dataType : "json",
+                success : function(result){
+                    $tr = "";
 
-            responsiveVoice.speak(
-              "Pengunjung dengan nomor antrian, "+kode_antrian+","+jml_antrian+", silahkan menuju ke "+nama_loket_antrian_txt+". Terima kasih.",
-              "Indonesian Female",
-              {
-               pitch: 1, 
-               rate: 1, 
-               volume: 1
-              }
-             );
+                    if(result == "" || result == null){
+                        $tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+                    }else{
+                        var no = 0;
+
+                        for(var i=0; i<result.length; i++){
+                            no++;
+
+                            var aksi = '<div class="checkbox checkbox-primary">'+
+                                        '    <input id="checkbox'+result[i].ID_RJ+'" type="checkbox" name="centang[]" value="'+result[i].ID_RJ+'" onclick="terima_pasien('+result[i].ID_RJ+');">'+
+                                        '    <label for="checkbox'+result[i].ID_RJ+'">&nbsp;</label>'+
+                                        '</div>';
+
+                            result[i].WAKTU = result[i].WAKTU==null?"00:00":result[i].WAKTU;
+                            var antrian = result[i].KODE_ANTRIAN+' - '+result[i].NOMOR_ANTRIAN;
+
+                            $tr +=  '<tr>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].KODE_PASIEN+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL+' - '+result[i].WAKTU+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+antrian+'</td>'+
+                                    '</tr>';
+                        }
+                    }
+
+                    $('.tabel_pasien_home tbody').html($tr);
+                }
+            });
         }
         </script>
     </body>

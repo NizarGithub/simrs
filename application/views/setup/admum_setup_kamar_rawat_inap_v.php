@@ -21,6 +21,24 @@ $(document).ready(function(){
 
 	data_kamar();
 
+	toastr.options = {
+      "closeButton": false,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": false,
+      "positionClass": "toast-bottom-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+
 	$('#tombol_cari').click(function(){
 		data_kamar();
 		$('#tombol_reset').show();
@@ -35,7 +53,6 @@ $(document).ready(function(){
 	});
 
 	$('#btn_tambah').click(function(){
-		get_kode_kamar();
 		$('#view_tambah').show();
 		$('#view_data').hide();
 	});
@@ -137,13 +154,24 @@ $(document).ready(function(){
 	});
 });
 
-function get_kode_kamar(){
+function cek_nomor_kamar(){
+	var nomor = $('#kode_kamar').val();
+
 	$.ajax({
-		url : '<?php echo base_url(); ?>setup/admum_setup_kamar_rawat_inap_c/kode_kamar',
+		url : '<?php echo base_url(); ?>setup/admum_setup_kamar_rawat_inap_c/cek_nomor_kamar',
+		data : {nomor:nomor},
 		type : "POST",
 		dataType : "json",
-		success : function(kode){
-			$('#kode_kamar').val(kode);
+		success : function(res){
+			if(res.length != 0){
+				var ket = "Nomor kamar "+res['KODE_KAMAR']+' ini! Sudah ada.';
+				toastr["error"](ket, "Notifikasi");
+				$('#btn_simpan').attr('disabled','disabled');
+				$('#border_kode_kamar').addClass('has-error');
+			}else{
+				$('#btn_simpan').removeAttr('disabled');
+				$('#border_kode_kamar').removeClass('has-error');
+			}
 		}
 	});
 }
@@ -531,7 +559,7 @@ function hapus_bed(id,id_kamar){
 		                <thead>
 		                    <tr class="biru">
 		                        <th style="color:#fff; text-align:center;" width="50">No</th>
-		                        <th style="color:#fff; text-align:center;">Kode Kamar</th>
+		                        <th style="color:#fff; text-align:center;">Nomor Kamar</th>
 		                        <th style="color:#fff; text-align:center;">Kelas</th>
 		                        <th style="color:#fff; text-align:center;">Biaya</th>
 		                        <th style="color:#fff; text-align:center;">Visite Dokter Sp.</th>
@@ -591,12 +619,12 @@ function hapus_bed(id,id_kamar){
     	<h4 class="header-title m-t-0 m-b-30">Tambah Kamar</h4>
 		<hr/>
     	<form class="form-horizontal" role="form" action="<?php echo $url_simpan; ?>" method="post">
-        	<div class="form-group">
-                <label class="col-md-2 control-label">Kode Kamar</label>
+        	<div class="form-group" id="border_kode_kamar">
+                <label class="col-md-2 control-label">Nomor Kamar</label>
                 <div class="col-md-6">
                 	<div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                    	<input type="text" class="form-control" name="kode_kamar" id="kode_kamar" value="" readonly>
+                    	<input type="text" class="form-control" name="kode_kamar" id="kode_kamar" value="" onkeyup="cek_nomor_kamar();">
                     </div>
                 </div>
             </div>
@@ -692,8 +720,8 @@ function hapus_bed(id,id_kamar){
             <div class="form-group">
                 <label class="col-md-2 control-label">&nbsp;</label>
                 <div class="col-md-3">
-                	<button type="submit" class="btn btn-success waves-effect waves-light m-b-5"> <i class="fa fa-save"></i> <span>Simpan</span> </button>
-                	<button type="button" class="btn btn-danger waves-effect waves-light m-b-5" id="batal"> <i class="fa fa-times"></i> <span>Batal</span> </button>
+                	<button type="submit" class="btn btn-success" id="btn_simpan"> <i class="fa fa-save"></i> <span>Simpan</span> </button>
+                	<button type="button" class="btn btn-danger" id="batal"> <i class="fa fa-times"></i> <span>Batal</span> </button>
                 </div>
             </div>
     	</form>
@@ -707,11 +735,11 @@ function hapus_bed(id,id_kamar){
     	<form class="form-horizontal" role="form" action="<?php echo $url_ubah; ?>" method="post">
     		<input type="hidden" name="id_ubah" id="id_ubah" value="">
         	<div class="form-group">
-                <label class="col-md-2 control-label">Kode Kamar</label>
+                <label class="col-md-2 control-label">Nomor Kamar</label>
                 <div class="col-md-6">
                 	<div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                    	<input type="text" class="form-control" id="kode_kamar_ubah" value="" readonly>
+                    	<input type="text" class="form-control" name="kode_kamar_ubah" id="kode_kamar_ubah" value="">
                     </div>
                 </div>
             </div>

@@ -535,6 +535,24 @@
             var table = $('#datatable-fixed-header').DataTable( { fixedHeader: true } );
             $(".select2").select2();
             // console.log(level);
+
+            toastr.options = {
+              "closeButton": false,
+              "debug": false,
+              "newestOnTop": false,
+              "progressBar": true,
+              "positionClass": "toast-bottom-left",
+              "preventDuplicates": false,
+              "showDuration": "300",
+              "hideDuration": "1000",
+              "timeOut": "5000",
+              "extendedTimeOut": "1000",
+              "showEasing": "swing",
+              "hideEasing": "linear",
+              "showMethod": "fadeIn",
+              "hideMethod": "fadeOut"
+            }
+
             if(level == null || level == ""){
                 
             }else{
@@ -556,6 +574,7 @@
             // console.log(level);
 
             $('#li_notif').click(function(){
+                snd.pause();
                 $('#popup_pasien_baru').show();
                 data_pasien_baru();
             });
@@ -563,7 +582,6 @@
             $('#tutup_pas').click(function(){
                 $('#popup_pasien_baru').fadeOut();
                 snd.pause();
-                clearInterval(timer);
             });
 
             $('#btn_closing').click(function(){
@@ -653,46 +671,89 @@
             });
         }
 
-        function get_antrian_online(){
-            var id_user = "<?php echo $id_user; ?>";
+        function get_notif_pasien(){
+            var level = "<?php echo $level; ?>";
+            var id_divisi = "<?php echo $id_divisi; ?>";
 
             $.ajax({
-                url : '<?php echo base_url(); ?>poli/poli_home_c/get_antrian_online',
-                data : {id_user:id_user},
-                type : "POST",
-                dataType : "json",
-                success : function(res){
-                    $('#loket_online').html(res['data']['NAMA_LOKET']);
-                    var id_kode_antrian = res['data']['KODE_ANTRIAN'];
-                    get_nomor_online(id_kode_antrian);
-                }
-            });
-        }
-
-        function get_nomor_online(id_kode_antrian){
-            var id_user = "<?php echo $id_user; ?>";
-
-            $.ajax({
-                url : '<?php echo base_url(); ?>poli/poli_home_c/get_nomor_online',
+                url : '<?php echo base_url(); ?>poli/poli_home_c/notif_pasien_baru',
                 data : {
-                    id_kode_antrian:id_kode_antrian,
-                    id_user:id_user
+                    level:level,
+                    id_divisi:id_divisi
                 },
                 type : "POST",
                 dataType : "json",
                 success : function(res){
-                    $('#id_antrian_now_on').val(id_kode_antrian);
-                    if(res == null || res == ""){
-                        $('#kode_antrian_now_on').val('A');
-                        $('#jml_antrian_now_on').val('1');
-                        $('#nomor_online').html('A-1');
+                    if(res['TOTAL'] == 0){
+                        $('#ketap_ketip').hide();
+                        snd.pause();
                     }else{
-                        for(var i=0; i<res.length; i++){
-                            $('#kode_antrian_now_on').val(res[i].KODE);
-                            $('#jml_antrian_now_on').val(res[i].URUT);
-                            $('#nomor_online').html(res[i].KODE+'-'+res[i].URUT);
+                        toastr["success"]("Ada pasien baru!");
+                        $('#ketap_ketip').show();
+                        snd.play();
+                    }
+
+                    $('#tot_pasien').html(res['TOTAL']);
+                }
+            });
+        }
+
+        function data_pasien_baru(){
+            var level = "<?php echo $level; ?>";
+            var id_divisi = "<?php echo $id_divisi; ?>";
+
+            $.ajax({
+                url : '<?php echo base_url(); ?>poli/poli_home_c/data_pasien_baru',
+                data : {
+                    level:level,
+                    id_divisi:id_divisi
+                },
+                type : "POST",
+                dataType : "json",
+                success : function(result){
+                    $tr = "";
+
+                    if(result == "" || result == null){
+                        $tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+                    }else{
+                        var no = 0;
+
+                        for(var i=0; i<result.length; i++){
+                            no++;
+
+                            var aksi = '<button class="btn btn-success waves-effect waves-light btn-sm" type="button" onclick="terima_pasien('+result[i].ID+');">Proses Tindakan</button>';
+
+                            result[i].WAKTU = result[i].WAKTU==null?"00:00":result[i].WAKTU;
+                            var antrian = result[i].KODE_ANTRIAN+' - '+result[i].NOMOR_ANTRIAN;
+
+                            $tr +=  '<tr>'+
+                                    '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].KODE_PASIEN+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL+' - '+result[i].WAKTU+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+antrian+'</td>'+
+                                    '</tr>';
                         }
                     }
+
+                    $('#tabel_pasien_home tbody').html($tr);
+                }
+            });
+        }
+
+        function terima_pasien(id){
+            $.ajax({
+                url : '<?php echo base_url(); ?>poli/poli_home_c/terima_pasien',
+                data : {id:id},
+                type : "POST",
+                dataType : "json",
+                success : function(res){
+                    $('#popup_pasien_baru').fadeOut();
+                    get_notif_pasien();
+                    data_pasien_baru();
+                    data_pasien();
                 }
             });
         }
@@ -777,132 +838,6 @@
                         //   }
                         // );
                     }
-                }
-            });
-        }
-
-        function get_notif_pasien(){
-            var keyword = "";
-            var level = "<?php echo $level; ?>";
-            var id_divisi = "<?php echo $id_divisi; ?>";
-
-            $.ajax({
-                url : '<?php echo base_url(); ?>poli/poli_home_c/notif_pasien_baru',
-                data : {
-                    keyword:keyword,
-                    level:level,
-                    id_divisi:id_divisi
-                },
-                type : "GET",
-                dataType : "json",
-                success : function(res){
-                    if(res.length == 0){
-                        $('#ketap_ketip').hide();
-                    }else{
-                        for(var i=0; i<res.length; i++){
-                            if(res[i].STS_TERIMA == '0'){
-                                $('#ketap_ketip').show();
-                                snd.play();
-                                notif_pasien_baru();
-                                $('#popup_pasien_baru').show();
-                                data_pasien_baru();
-                            }else{
-                                $('#ketap_ketip').hide();
-                            }
-                        }
-                    }
-
-                    $('#tot_pasien').html(res.length);
-                }
-            });
-        }
-
-        function data_pasien_baru(){
-            $.ajax({
-                url : '<?php echo base_url(); ?>poli/poli_home_c/notif_pasien_baru',
-                type : "POST",
-                dataType : "json",
-                success : function(result){
-                    $tr = "";
-
-                    if(result == "" || result == null){
-                        $tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
-                    }else{
-                        var no = 0;
-
-                        for(var i=0; i<result.length; i++){
-                            no++;
-
-                            var aksi = '<div class="checkbox checkbox-primary">'+
-                                        '    <input id="checkbox'+result[i].ID_RJ+'" type="checkbox" name="centang[]" value="'+result[i].ID_RJ+'" onclick="terima_pasien('+result[i].ID_RJ+');">'+
-                                        '    <label for="checkbox'+result[i].ID_RJ+'">&nbsp;</label>'+
-                                        '</div>';
-
-                            result[i].WAKTU_DAFTAR = result[i].WAKTU_DAFTAR==null?"00:00":result[i].WAKTU_DAFTAR;
-                            var antrian = result[i].KODE_ANTRIAN+' - '+result[i].NOMOR_ANTRIAN;
-
-                            $tr +=  '<tr>'+
-                                    '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].KODE_PASIEN+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL_DAFTAR+' - '+result[i].WAKTU_DAFTAR+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+antrian+'</td>'+
-                                    '</tr>';
-                        }
-                    }
-
-                    $('#tabel_pasien_home tbody').html($tr);
-                }
-            });
-        }
-
-        function terima_pasien(id){
-            var keyword = "";
-            var level = "<?php echo $level; ?>";
-            var id_divisi = "<?php echo $id_divisi; ?>";
-
-            $.ajax({
-                url : '<?php echo base_url(); ?>poli/poli_home_c/terima_pasien',
-                data : {id:id},
-                type : "POST",
-                dataType : "json",
-                success : function(res){
-                    snd.pause();
-                    $('#popup_pasien_baru').fadeOut();
-                    // console.log(res);
-                    data_pasien();
-                    data_pasien_baru();
-                }
-            });
-
-            $.ajax({
-                url : '<?php echo base_url(); ?>poli/poli_home_c/notif_pasien_baru',
-                data : {
-                    keyword:keyword,
-                    level:level,
-                    id_divisi:id_divisi
-                },
-                type : "GET",
-                dataType : "json",
-                success : function(res){
-                    if(res.length == 0){
-                        $('#ketap_ketip').hide();
-                    }else{
-                        for(var i=0; i<res.length; i++){
-                            if(res[i].STS_TERIMA == '0'){
-                                $('#ketap_ketip').show();
-                                notif_pasien_baru();
-                                $('#popup_pasien_baru').show();
-                                data_pasien_baru();
-                            }else{
-                                $('#ketap_ketip').hide();
-                            }
-                        }
-                    }
-
-                    $('#tot_pasien').html(res.length);
                 }
             });
         }

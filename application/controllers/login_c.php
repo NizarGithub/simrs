@@ -84,8 +84,10 @@ class Login_c extends CI_Controller {
 				redirect('lab/lab_home_c');
 			}else if($data->LEVEL == 'Farmasi'){
 				redirect('apotek/ap_home_c');
+			}else if($data->LEVEL == 'Rekam Medik'){
+				redirect('rekam_medik/rk_home_c');
 			}else if($data->LEVEL == 'Kasir AA'){
-				redirect('apotek/ap_kasir_aa_c');
+				redirect('apotek/ap_portal_kasir_aa_c');
 			}else if($data->LEVEL == 'Kasir Rajal'){
 				redirect('apotek/ap_kasir_rajal_c');
 			}else if($data->LEVEL == 'Kasir Ranap'){

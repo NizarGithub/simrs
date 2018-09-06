@@ -19,14 +19,6 @@
     background: #21AFDA !important;
     color: #fff !important;
 }
-
-#popup_tabel{
-    z-index: 9999;
-    position: absolute;
-    left: 45%;
-    top: 40%;
-    display: none;
-}
 </style>
 
 <script type="text/javascript">

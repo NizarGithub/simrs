@@ -137,6 +137,12 @@ class Admum_setup_kamar_rawat_inap_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function cek_nomor_kamar(){
+		$nomor = $this->input->post('nomor');
+		$data = $this->model->cek_nomor_kamar($nomor);
+		echo json_encode($data);
+	}
+
 	function data_bed(){
 		$id_kamar_rawat_inap = $this->input->post('id');
 		$data['detail'] = $this->model->data_kamar_id($id_kamar_rawat_inap);
@@ -164,7 +170,7 @@ class Admum_setup_kamar_rawat_inap_c extends CI_Controller {
 		$tahun = date('Y');
 
 		$this->model->simpan($kode_kamar,$kelas,$biaya,$visite_dokter,$biaya_visite,$jasa_sarana,$peruntukan_kamar,$jumlah_bed,$tanggal,$bulan,$tahun);
-		$this->insert_kode_kamar();
+		// $this->insert_kode_kamar();
 
 		$this->session->set_flashdata('sukses','1');
 		redirect('setup/admum_setup_kamar_rawat_inap_c');
@@ -191,6 +197,7 @@ class Admum_setup_kamar_rawat_inap_c extends CI_Controller {
 
 	function ubah(){
 		$id = $this->input->post('id_ubah');
+		$kode_kamar = $this->input->post('kode_kamar_ubah');
 		$kelas = $this->input->post('kelas_kamar_ubah');
 		$biaya = str_replace(',', '', $this->input->post('biaya_ubah'));
 		$visite_dokter = $this->input->post('visite_ubah');
@@ -199,7 +206,7 @@ class Admum_setup_kamar_rawat_inap_c extends CI_Controller {
 		$peruntukan_kamar = $this->input->post('peruntukan_kamar_ubah');
 		$jumlah_bed = str_replace(',', '', $this->input->post('jumlah_bed_ubah'));
 
-		$this->model->ubah($id,$kelas,$biaya,$visite_dokter,$biaya_visite,$jasa_sarana,$peruntukan_kamar,$jumlah_bed);
+		$this->model->ubah($id,$kode_kamar,$kelas,$biaya,$visite_dokter,$biaya_visite,$jasa_sarana,$peruntukan_kamar,$jumlah_bed);
 
 		$this->session->set_flashdata('ubah','1');
 		redirect('setup/admum_setup_kamar_rawat_inap_c');

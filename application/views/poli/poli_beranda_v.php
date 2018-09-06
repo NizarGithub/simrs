@@ -381,6 +381,7 @@ function data_pasien(){
 
                     result[i].WAKTU = result[i].WAKTU==null?"00:00":result[i].WAKTU;
                     result[i].ALAMAT = (result[i].ALAMAT=="" || result[i].ALAMAT==null)?"-":result[i].ALAMAT;
+                    result[i].JENIS_KELAMIN = result[i].JENIS_KELAMIN=="L"?"Laki - Laki":"Perempuan";
 
                     $tr +=  '<tr>'+
                             '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
@@ -418,72 +419,77 @@ function detail_pasien(id){
         dataType : "json",
         success : function(row){
             row['JENIS_KELAMIN'] = row['JENIS_KELAMIN']=='L'?'Laki - Laki':'Perempuan';
-            row['NAMA_ORTU'] = row['NAMA_ORTU']==null?'-':row['NAMA_ORTU'];
+            row['NAMA_AYAH'] = row['NAMA_AYAH']==null?'-':row['NAMA_AYAH'];
+            row['NAMA_IBU'] = row['NAMA_IBU']==null?'-':row['NAMA_IBU'];
             row['TELEPON'] = row['TELEPON']==null?'-':row['TELEPON'];
+            var umur = row['UMUR']+' Tahun '+row['UMUR_BULAN']+' Bulan';
 
             $tr = "<tr>"+
                     "<td><b>No. RM</b></td>"+
-                    "<td class='success'>"+row['KODE_PASIEN']+"</td>"+
+                    "<td>"+row['KODE_PASIEN']+"</td>"+
                   "</tr>"+
                   "<tr>"+
                     "<td><b>Nama Lengkap</b></td>"+
-                    "<td class='success'>"+row['NAMA']+"</td>"+
+                    "<td>"+row['NAMA']+"</td>"+
                   "</tr>"+
                   "<tr>"+
                     "<td><b>Jenis Kelamin</b></td>"+
-                    "<td class='success'>"+row['JENIS_KELAMIN']+"</td>"+
-                  "</tr>"+
-                  "<tr>"+
-                    "<td><b>Pendidikan</b></td>"+
-                    "<td class='success'>"+row['PENDIDIKAN']+"</td>"+
-                  "</tr>"+
-                  "<tr>"+
-                    "<td><b>Agama</b></td>"+
-                    "<td class='success'>"+row['AGAMA']+"</td>"+
-                  "</tr>"+
-                  "<tr>"+
-                    "<td><b>Alamat</b></td>"+
-                    "<td class='success'>"+row['ALAMAT']+"</td>"+
-                  "</tr>"+
-                  "<tr>"+
-                    "<td><b>Nama Orang Tua</b></td>"+
-                    "<td class='success'>"+row['NAMA_ORTU']+"</td>"+
-                  "</tr>"+
-                  "<tr>"+
-                    "<td><b>Telepon</b></td>"+
-                    "<td class='success'>"+row['TELEPON']+"</td>"+
-                  "</tr>";
-
-            $('#tabel_detail tbody').html($tr);
-            var umur = row['UMUR']+' Tahun '+row['UMUR_BULAN']+' Bulan';
-
-            $tr2 = "<tr>"+
-                    "<td><b>Tempat Lahir</b></td>"+
-                    "<td class='success'>"+row['TEMPAT_LAHIR']+"</td>"+
+                    "<td>"+row['JENIS_KELAMIN']+"</td>"+
                   "</tr>"+
                   "<tr>"+
                     "<td><b>Tanggal Lahir</b></td>"+
-                    "<td class='success'>"+formatTanggal(row['TANGGAL_LAHIR'])+"</td>"+
+                    "<td>"+formatTanggal(row['TANGGAL_LAHIR'])+"</td>"+
                   "</tr>"+
                   "<tr>"+
                     "<td><b>Umur</b></td>"+
-                    "<td class='success'>"+umur+"</td>"+
+                    "<td>"+umur+"</td>"+
                   "</tr>"+
                   "<tr>"+
                     "<td><b>Golongan Darah</b></td>"+
-                    "<td class='success'>"+row['GOLONGAN_DARAH']+"</td>"+
+                    "<td>"+row['GOLONGAN_DARAH']+"</td>"+
+                  "</tr>"+
+                  "<tr>"+
+                    "<td><b>Pendidikan</b></td>"+
+                    "<td>"+row['PENDIDIKAN']+"</td>"+
+                  "</tr>"+
+                  "<tr>"+
+                    "<td><b>Agama</b></td>"+
+                    "<td>"+row['AGAMA']+"</td>"+
+                  "</tr>";
+
+            $('#tabel_detail tbody').html($tr);
+
+            $tr2 = "<tr>"+
+                    "<td><b>Nama Ayah</b></td>"+
+                    "<td>"+row['NAMA_AYAH']+"</td>"+
+                  "</tr>"+
+                  "<tr>"+
+                    "<td><b>Nama Ibu</b></td>"+
+                    "<td>"+row['NAMA_IBU']+"</td>"+
+                  "</tr>"+
+                  "<tr>"+
+                    "<td><b>Telepon</b></td>"+
+                    "<td>"+row['TELEPON']+"</td>"+
+                  "</tr>"+
+                  "<tr>"+
+                    "<td><b>Tempat Lahir</b></td>"+
+                    "<td>"+row['TEMPAT_LAHIR']+"</td>"+
+                  "</tr>"+
+                  "<tr>"+
+                    "<td><b>Alamat</b></td>"+
+                    "<td>"+row['ALAMAT']+"</td>"+
                   "</tr>"+
                   "<tr>"+
                     "<td><b>Kelurahan</b></td>"+
-                    "<td class='success'>"+row['KELURAHAN']+"</td>"+
+                    "<td>"+row['KELURAHAN']+"</td>"+
                   "</tr>"+
                   "<tr>"+
                     "<td><b>Kecamatan</b></td>"+
-                    "<td class='success'>"+row['KECAMATAN']+"</td>"+
+                    "<td>"+row['KECAMATAN']+"</td>"+
                   "</tr>"+
                   "<tr>"+
                     "<td><b>Provinsi</b></td>"+
-                    "<td class='success'>"+row['PROVINSI']+"</td>"+
+                    "<td>"+row['PROVINSI']+"</td>"+
                   "</tr>";
 
             $('#tabel_detail2 tbody').html($tr2);
@@ -500,12 +506,12 @@ function panggil_pasien(id){
         success : function(row){
             var kode_antrian = row['KODE_ANTRIAN'];
             var jml_antrian = row['NOMOR_ANTRIAN'];
-            var nomor = kode_antrian+jml_antrian;
+            var nomor = kode_antrian+'.'+jml_antrian;
             var poli = row['NAMA_POLI'];
             var nama = row['NAMA'];
 
             responsiveVoice.speak(
-              "Pengunjung dengan nomor antrian "+nomor+". Silahkan menuju ke "+poli+". Terima kasih. ",
+              "Pengunjung dengan nomor antrian. "+nomor+". Silahkan menuju ke "+poli+". Terima kasih. ",
               "Indonesian Female",
               {
                pitch: 1, 
@@ -1001,9 +1007,9 @@ function get_total_all(){
     </div>
 </div>
 
-<button class="btn btn-primary" id="popup_detail" data-toggle="modal" data-target="#full-width-modal" style="display:none;">Full width Modal</button>
-<div id="full-width-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="full-width-modalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog modal-full">
+<button class="btn btn-primary" id="popup_detail" data-toggle="modal" data-target="#custom-width-modal" style="display:none;">Full width Modal</button>
+<div id="custom-width-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog" style="width:55%;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>

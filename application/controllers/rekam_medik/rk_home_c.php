@@ -5,6 +5,14 @@ class Rk_home_c extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();
+		date_default_timezone_set('Asia/Jakarta');
+		$this->load->model('rekam_medik/rk_input_rekam_medik_m','model');
+		$this->load->model('master_model_m','m_master');
+		$sess_user = $this->session->userdata('masuk_rs');
+		$id_user = $sess_user['id'];
+		if($id_user == "" || $id_user == null){
+	        redirect(base_url());
+	    }
 	}
 
 	function index()
@@ -20,16 +28,34 @@ class Rk_home_c extends CI_Controller {
 		$this->load->view('rekam_medik/rk_home_v',$data);
 	}
 
-	function next_antri(){
-		$kode_antrian = $this->input->post('kode_antrian');
-		$jml_antrian  = $this->input->post('jml_antrian');
-		$id_antrian   = $this->input->post('id_antrian');
-		$tgl = date('d-m-Y');
+	function notif_pasien_baru(){
+		$now = date('d-m-Y');
+		$data = $this->model->get_notif_pasien_baru($now);
+		echo json_encode($data);
+	}
 
-		$sql = "INSERT INTO kepeg_antrian(ID_KODE,KODE,URUT,TGL) VALUES ('$id_antrian','$kode_antrian','$jml_antrian','$tgl')";
-		$this->db->query($sql);
+	function get_data_rm(){
+		$keyword = $this->input->get('keyword');
+		$now = date('d-m-Y');
 
-		echo json_encode(1);
+		$data = $this->model->get_data_rm($keyword,$now);
+		echo json_encode($data);
+	}
+
+	function klik_approve(){
+		$id = $this->input->post('id');
+		$sts = $this->input->post('sts');
+		if($sts == '1'){
+			$this->model->ubah_sts_approve_rj($id);
+		}else{
+			$this->model->ubah_sts_approve_ri($id);
+		}
+		echo '1';
+	}
+
+	function dilihat(){
+		$this->db->query("UPDATE admum_rawat_jalan SET STS_LIHAT = '1' WHERE STS_LIHAT = '0'");
+		echo '1';
 	}
 
 }

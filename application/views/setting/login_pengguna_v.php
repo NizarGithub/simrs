@@ -302,6 +302,7 @@ function cek_username_submit(){
                                     <option value="Kasir AA">Kasir AA</option>
                                     <option value="Kasir Rajal">Kasir Rajal</option>
                                     <option value="Kasir Ranap">Kasir Ranap</option>
+                                    <option value="Super Admin">Super Admin</option>
                                 </select>
                             </div>
                         </div>

@@ -10,7 +10,7 @@ class Data_asuransi_c extends CI_Controller {
 		if($id_user == "" || $id_user == null){
 	        redirect(base_url());
 	    }
-		$this->load->model('asuransi/data_asuransi_m', 'model');
+		$this->load->model('finance/data_asuransi_m', 'model');
 	} 
 
 	function index()
@@ -47,7 +47,7 @@ class Data_asuransi_c extends CI_Controller {
 						$_FILES['userfile']['tmp_name'] = $value['tmp_name'][$s];
 						$_FILES['userfile']['error']    = $value['error'][$s];
 						$_FILES['userfile']['size']    	= $value['size'][$s];  
-						$config['upload_path'] = './files/asuransi/';
+						$config['upload_path'] = './files/finance/';
 						$config['allowed_types'] = 'gif|jpg|png';
 						$config['max_size']	= '200000';
 						$config['max_width']  = '10000';
@@ -85,7 +85,7 @@ class Data_asuransi_c extends CI_Controller {
 					$_FILES['userfile']['tmp_name'] = $value['tmp_name'][$s];
 					$_FILES['userfile']['error']    = $value['error'][$s];
 					$_FILES['userfile']['size']    	= $value['size'][$s];  
-					$config['upload_path'] = './files/asuransi/';
+					$config['upload_path'] = './files/finance/';
 					$config['allowed_types'] = 'gif|jpg|png';
 					$config['max_size']	= '200000';
 					$config['max_width']  = '10000';
@@ -111,7 +111,7 @@ class Data_asuransi_c extends CI_Controller {
 		$dt = $this->model->get_data_asuransi();
 
 		$data = array(
-			'page' => 'asuransi/data_asuransi_v',
+			'page' => 'finance/data_asuransi_v',
 			'title' => 'Setup Asuransi',
 			'subtitle' => 'Setup Asuransi',
 			'master_menu' => 'master_data',
@@ -122,10 +122,10 @@ class Data_asuransi_c extends CI_Controller {
 			'kode_asr' => $kode_asr,
 			'nama_asr' => $nama_asr,
 			'uraian' => $uraian,
-			'post_url' => 'asuransi/data_asuransi_c',
+			'post_url' => 'finance/data_asuransi_c',
 		);
 
-		$this->load->view('asuransi/asr_home_v',$data);
+		$this->load->view('finance/finance_home_v',$data);
 	}
 
 	function get_data_asuransi(){

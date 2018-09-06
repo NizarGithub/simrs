@@ -8,65 +8,136 @@ class Admum_data_pasien_m extends CI_Model {
 		$this->load->database();
 	}
 
-	function data_pasien($id_klien,$keyword,$urutkan,$pilih_umur,$sts_byr,$now){
+	function data_pasien_per_poli($keyword,$now){
 		$where = "1 = 1";
 		$order = "";
 
 		if($keyword != ""){
-			$where = $where." AND (
-				PSN.KODE_PASIEN LIKE '%$keyword%' 
-				OR PSN.NAMA LIKE '%$keyword%' 
-				OR PSN.UMUR LIKE '%$keyword%'
-				OR PSN.ALAMAT LIKE '%$keyword%'
-			)";
+			$where = $where." AND a.NAMA LIKE '%$keyword%'";
 		}else{
 			$where = $where;
-		}
-
-		if($urutkan == 'Default'){
-			$order = "ORDER BY PSN.ID DESC"; 
-		}else if($urutkan == 'Nama Pasien'){
-			$order = "ORDER BY PSN.NAMA ASC";
-		}else if($urutkan == 'Umur'){
-			if($pilih_umur == 'Balita'){
-				$where = $where." AND PSN.UMUR >= 0 AND PSN.UMUR <= 5";
-			}else if($pilih_umur == 'Anak'){
-				$where = $where." AND PSN.UMUR >= 6 AND PSN.UMUR <= 16";
-			}else if($pilih_umur == 'Remaja'){
-				$where = $where." AND PSN.UMUR >= 17 AND PSN.UMUR <= 25";
-			}else if($pilih_umur == 'Dewasa'){
-				$where = $where." AND PSN.UMUR >= 26 AND PSN.UMUR <= 50";
-			}else if($pilih_umur == 'Tua'){
-				$where = $where." AND PSN.UMUR > 50";
-			}
-			$order = "ORDER BY PSN.UMUR ASC";
-		}else if($urutkan == 'Status'){
-			$where = $where." AND STS_BAYAR = '$sts_byr'";
-			$order = "ORDER BY PSN.ID DESC";
-		}
-
-		if($now != ""){
-			$where = $where." AND PSN.TANGGAL_DAFTAR = '$now'";
-		}else{
-			$where = $where;
-			$order = " ORDER BY PSN.ID DESC";
 		}
 
 		$sql = "
-			SELECT 
-				PSN.*
-			FROM rk_pasien PSN
+			SELECT
+				a.ID,
+				a.NAMA AS NAMA_POLI,
+				COUNT(b.ID_PASIEN) AS JUMLAH_PASIEN
+			FROM admum_poli a
+			LEFT JOIN(
+				SELECT ID,ID_PASIEN,ID_POLI FROM admum_rawat_jalan
+				WHERE TANGGAL = '$now'
+			) b ON b.ID_POLI = a.ID
 			WHERE $where
-			$order
+			GROUP BY a.ID
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
 
-	function data_pasien_id($id,$id_klien){
-		$sql = "SELECT * FROM rk_pasien WHERE ID = '$id'";
+	function data_poli_id($id){
+		$sql = "SELECT * FROM admum_poli WHERE ID = '$id'";
 		$query = $this->db->query($sql);
 		return $query->row();
+	}
+
+	function data_pasien_per_poli_id($id){
+		$sql = "
+			SELECT
+				a.ID,
+				a.NAMA AS NAMA_POLI,
+				b.*
+			FROM admum_poli a
+			JOIN(
+				SELECT 
+					a.ID AS ID_RJ,
+					a.ID_PASIEN,
+					a.ID_POLI,
+					b.KODE_PASIEN,
+					b.NAMA AS NAMA_PASIEN,
+					b.JENIS_KELAMIN,
+					b.TANGGAL_LAHIR,
+					b.UMUR,
+					b.UMUR_BULAN,
+					b.NAMA_AYAH,
+					b.NAMA_IBU
+				FROM admum_rawat_jalan a
+				LEFT JOIN rk_pasien b ON b.ID = a.ID_PASIEN
+				WHERE a.ID_POLI = '$id'
+			) b ON b.ID_POLI = a.ID
+			WHERE a.ID = '$id'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function data_pasien_rj($keyword,$now){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND (b.KODE_PASIEN LIKE '%$keyword%' OR b.NAMA LIKE '%$keyword%' OR b.NAMA_AYAH LIKE '%$keyword%' OR b.NAMA_IBU LIKE '%$keyword%')";
+		}else{
+			$where = $where;
+		}
+
+		$sql = "
+			SELECT
+				a.ID,
+				a.TANGGAL,
+				a.STS_APPROVE_RM,
+				b.KODE_PASIEN,
+				b.NAMA,
+				b.JENIS_KELAMIN,
+				b.TANGGAL_LAHIR,
+				b.UMUR,
+				b.ALAMAT,
+				b.NAMA_AYAH,
+				b.NAMA_IBU,
+				c.NAMA AS NAMA_POLI
+			FROM admum_rawat_jalan a
+			JOIN rk_pasien b ON b.ID = a.ID_PASIEN
+			LEFT JOIN admum_poli c ON c.ID = a.ID_POLI
+			WHERE $where
+			AND a.TANGGAL = '$now'
+			ORDER BY a.ID DESC
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function data_pasien_ri($keyword){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND (b.KODE_PASIEN LIKE '%$keyword%' OR b.NAMA LIKE '%$keyword%')";
+		}else{
+			$where = $where;
+		}
+
+		$sql = "
+			SELECT
+				a.ID,
+				a.TANGGAL_MASUK,
+				a.TANGGAL_KELUAR,
+				a.STS_APPROVE_RM,
+				b.KODE_PASIEN,
+				b.NAMA,
+				b.JENIS_KELAMIN,
+				b.TANGGAL_LAHIR,
+				b.UMUR,
+				c.KODE_KAMAR,
+				c.KELAS,
+				d.NOMOR_BED
+			FROM admum_rawat_inap a
+			JOIN rk_pasien b ON b.ID = a.ID_PASIEN
+			LEFT JOIN admum_kamar_rawat_inap c ON c.ID = a.ID_KAMAR
+			LEFT JOIN admum_bed_rawat_inap d ON d.ID = a.ID_BED
+			WHERE $where
+			ORDER BY a.ID DESC
+		";
+
+		$query = $this->db->query($sql);
+		return $query->result();
 	}
 
 	function ubah_pasien(

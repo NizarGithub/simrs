@@ -281,7 +281,8 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 
 	function load_pemeriksaan(){
 		$keyword = $this->input->get('keyword');
-		$data = $this->model->load_pemeriksaan($keyword);
+		$id_jenis_lab = $this->input->get('id_jenis_lab');
+		$data = $this->model->load_pemeriksaan($id_jenis_lab,$keyword);
 		echo json_encode($data);
 	}
 
@@ -314,11 +315,11 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 
 		$this->model->simpan_pemeriksaan($kode_lab,$id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$jenis_laborat,$total_tarif,$cito,$tanggal,$bulan,$tahun,$waktu);
 		$id_pemeriksaan_rj = $this->db->insert_id();
-		/*$hasil = $this->input->post('hasil_periksa');
-		$nilai_rujukan = $this->input->post('nilai_rujukan');*/
+		/*$hasil = $this->input->post('hasil_periksa');*/
+		$nilai_rujukan = $this->input->post('nilai_normal');
 
 		foreach ($pemeriksaan as $key => $value) {
-			$this->model->simpan_pemeriksaan_detail($id_pemeriksaan_rj,$value,$tanggal,$bulan,$tahun,$subtotal[$key],$waktu);
+			$this->model->simpan_pemeriksaan_detail($id_pemeriksaan_rj,$value,$nilai_rujukan[$key],$tanggal,$bulan,$tahun,$subtotal[$key],$waktu);
 		}
 
 		$this->insert_kode_lab();

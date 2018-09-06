@@ -167,7 +167,7 @@ $(document).ready(function(){
 		    toastr["error"]("Jenis Laborat harus diisi!", "Notifikasi");
 		}else if(pemeriksaan == 0){
 			toastr["error"]("Pemeriksaan harus diisi!", "Notifikasi");
-		}else if(total_tarif == "" || total_tarif == "0"){
+		}else if(total_tarif == "" || total_tarif == '0'){
 			toastr["error"]("Hitung total tarif dengan benar!", "Notifikasi");
 		}else if(cito == false){
 			toastr["error"]("Cito belum dipilih!", "Notifikasi");
@@ -1022,48 +1022,8 @@ function klik_laborat(id){
 		success : function(row){
 			$('#id_laborat').val(id);
 			$('#jenis_laborat').val(row['JENIS_LABORAT']);
+			klik_pemeriksaan(id);
 		}
-	});
-}
-
-function load_pemeriksaan(){
-	var keyword = $('#cari_pemeriksaan').val();
-
-	if(ajax){
-		ajax.abort();
-	}
-
-	ajax = $.ajax({
-		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/load_pemeriksaan',
-		data : {keyword:keyword},
-		type : "GET",
-		dataType : "json",
-		success : function(result){
-			$tr = "";
-
-			if(result == "" || result == null){
-				$tr = "<tr><td colspan='4' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
-			}else{
-				var no = 0;
-
-				for(var i=0; i<result.length; i++){
-					no++;
-
-					$tr += "<tr style='cursor:pointer;' onclick='klik_pemeriksaan("+result[i].ID+");'>"+
-								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td>"+result[i].KODE+"</td>"+
-								"<td>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
-								"<td style='text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
-							"</tr>";
-				}
-			}
-
-			$('#tb_pemeriksaan tbody').html($tr);
-		}
-	});
-
-	$('#cari_pemeriksaan').off('keyup').keyup(function(){
-		load_pemeriksaan();
 	});
 }
 
@@ -1083,24 +1043,19 @@ function klik_pemeriksaan(id){
 
 				var aksi = "<button type='button' class='btn waves-light btn-danger btn-sm' onclick='deleteRow2(this);'><i class='fa fa-times'></i></button>";
 
-				if(jumlah_data > 0){
-					var jumlah = $('#jumlah_pemeriksaan_'+result[i].ID).val();
-					$('#jumlah_pemeriksaan_'+result[i].ID).val(parseInt(jumlah)+1);
-				}else{
-					$tr = "<tr id='tr2_"+result[i].ID+"'>"+
+				$tr += "<tr id='tr2_"+result[i].ID+"'>"+
 							"<input type='hidden' name='id_pemeriksaan[]' value='"+result[i].ID+"'>"+
+							"<input type='hidden' name='nilai_normal[]' value='"+result[i].NILAI_NORMAL+"'>"+
 							"<input type='hidden' name='tarif_pemeriksaan[]' value='"+result[i].TARIF+"'>"+
 							"<td style='vertical-align:middle;'>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
-							// "<td align='center'><input type='text' class='form-control' name='hasil_periksa[]' value='' style='width:200px;'></td>"+
-							// "<td align='center'><input type='text' class='form-control' name='nilai_rujukan[]' value='' style='width:200px;'></td>"+
+							"<td style='vertical-align:middle;'>"+result[i].NILAI_NORMAL+"</td>"+
 							"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
 							"<td style='vertical-align:middle; text-align:right;'><b>"+formatNumber(result[i].TARIF)+"</b></td>"+
 							"<td align='center'>"+aksi+"</td>"+
 						  "</tr>";
-				}
 			}
 
-			$('#tabel_tambah_pemeriksaan tbody').append($tr);
+			$('#tabel_tambah_pemeriksaan tbody').html($tr);
 			hitung_pemeriksaan();
 		}
 	});
@@ -1121,6 +1076,52 @@ function hitung_pemeriksaan(){
 	$('#total_tarif_pemeriksaan').val(formatNumber(total));
 }
 
+function load_pemeriksaan(){
+	var keyword = $('#cari_pemeriksaan').val();
+	var id_jenis_lab = $('#id_laborat').val();
+
+	if(ajax){
+		ajax.abort();
+	}
+
+	ajax = $.ajax({
+		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/load_pemeriksaan',
+		data : {
+			id_jenis_lab:id_jenis_lab,
+			keyword:keyword
+		},
+		type : "GET",
+		dataType : "json",
+		success : function(result){
+			$tr = "";
+			var kosong = "";
+
+			if(result == "" || result == null){
+				$tr = "<tr><td colspan='3' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+			}else{
+				var no = 0;
+
+				for(var i=0; i<result.length; i++){
+					no++;
+
+					$tr += "<tr style='cursor:pointer;' onclick='klik_pemeriksaan("+result[i].ID+");'>"+
+								"<td style='text-align:center;'>"+no+"</td>"+
+								"<td>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
+								"<td>"+result[i].NILAI_NORMAL+"</td>"+
+								"<td style='text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
+							"</tr>";
+				}
+			}
+
+			$('#tb_pemeriksaan tbody').html($tr);
+		}
+	});
+
+	$('#cari_pemeriksaan').off('keyup').keyup(function(){
+		load_pemeriksaan();
+	});
+}
+
 function data_laborat(){
 	$('#popup_load').show();
 	var id = "<?php echo $id; ?>";
@@ -1137,7 +1138,12 @@ function data_laborat(){
 
 			if(result == "" || result == null){
 				$tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+				$('#checkboxLab').removeAttr('checked');
+				$('.view_lab').hide();
 			}else{
+				$('#checkboxLab').attr('checked','checked');
+				$('.view_lab').show();
+
 				var no = 0;
 
 				for(var i=0; i<result.length; i++){
@@ -1167,7 +1173,7 @@ function data_laborat(){
 								"<td style='vertical-align:middle;'>"+tanggal+"</td>"+
 								"<td style='vertical-align:middle;'>"+result[i].JENIS_LABORAT+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+cito+"</td>"+
-								"<td style='vertical-align:middle;'>"+formatNumber(result[i].TOTAL_TARIF)+"</td>"+
+								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TOTAL_TARIF)+"</td>"+
 								"<td align='center'>"+cetak+"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
 							"</tr>";
@@ -2526,7 +2532,7 @@ function data_surat_dokter_ada(){
 		                            </div>
 		                        </div>
 		                    </div>
-		                    <div class="form-group">
+		                    <!-- <div class="form-group">
 		                        <label class="col-md-2 control-label">Pemeriksaan</label>
 		                        <div class="col-md-5">
 		                            <div class="input-group">
@@ -2536,7 +2542,7 @@ function data_surat_dokter_ada(){
 		                                </span>
 		                            </div>
 		                        </div>
-		                    </div>
+		                    </div> -->
 		                    <div class="form-group">
 		                        <label class="col-md-2 control-label">&nbsp;</label>
 		                        <div class="col-md-8">
@@ -2545,8 +2551,7 @@ function data_surat_dokter_ada(){
 							                <thead>
 							                    <tr class="kuning_tr">
 							                        <th style="color:#fff; text-align:center;">Pemeriksaan</th>
-							                        <!-- <th style="color:#fff; text-align:center;">Hasil</th>
-							                        <th style="color:#fff; text-align:center;">Nilai Rujukan</th> -->
+							                        <th style="color:#fff; text-align:center;">Nilai Normal</th>
 							                        <th style="color:#fff; text-align:center;">Tarif</th>
 							                        <th style="color:#fff; text-align:center;">Sub Total</th>
 							                        <th style="color:#fff; text-align:center;">#</th>
@@ -3048,8 +3053,8 @@ function data_surat_dokter_ada(){
 		                    <thead>
 		                        <tr class="hijau_popup">
 		                            <th style="text-align:center; color: #fff;" width="50">No</th>
-		                            <th style="text-align:center; color: #fff;">Kode</th>
 		                            <th style="text-align:center; color: #fff;">Pemeriksaan</th>
+		                            <th style="text-align:center; color: #fff;">Nilai Normal</th>
 		                            <th style="text-align:center; color: #fff;">Tarif</th>
 		                        </tr>
 		                    </thead>
