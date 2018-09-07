@@ -15,8 +15,7 @@ class Ap_kasir_aa_c extends CI_Controller {
 	    }
 	}
 
-	function index()
-	{
+	function index(){
 		$keterangan = 'KODE-TRX-OBAT';
 		$tanggal = date('d');
 		$bulan = date('n');

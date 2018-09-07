@@ -42,6 +42,9 @@ a {
     $id_user = $sess_user['id'];
     $user = $this->master_model_m->get_user_info($id_user);
 ?>
+<div class="col-sm-12">
+    <h4 class="page-title">Beranda</h4>
+</div>
 <div class="col-md-12">
     <div id="dashboard-depan">
     <?PHP

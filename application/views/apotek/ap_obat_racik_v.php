@@ -108,14 +108,6 @@ function data_bahan_racik(){
 				for(var i=0; i<result.length; i++){
 					no++;
 
-					var satuan = "";
-
-					if(result[i].JUMLAH_BUTIR != 0){
-						satuan = result[i].SATUAN_ISI;
-					}else{
-						satuan = result[i].NAMA_SATUAN;
-					}
-
 					$tr += "<tr style='cursor:pointer;' onclick='klik_racikan("+result[i].ID+");'>"+
 								"<td style='text-align:center;'>"+no+"</td>"+
 								"<td>"+result[i].KODE_OBAT+"</td>"+
@@ -123,7 +115,7 @@ function data_bahan_racik(){
 									result[i].NAMA_OBAT+"<br>"+
 									"<small>"+result[i].BARCODE+"</small>"+
 								"</td>"+
-								"<td>"+NumberToMoney(result[i].TOTAL)+"&nbsp;"+satuan+"</td>"+
+								"<td>"+NumberToMoney(result[i].TOTAL)+"</td>"+
 							"</tr>";
 				}
 			}
@@ -146,21 +138,15 @@ function klik_racikan(id){
 		dataType : "json",
 		success : function(result){
 			$tr = "";
+			var tot = 0;
 
 			for(var i=0; i<result.length; i++){
 				var jumlah_data = $('#tr_'+result[i].ID).length;
 				var id_satuan = "";
 				var satuan = "";
+				tot += parseFloat(result[i].TOTAL_JUAL);
 
-				if(result[i].JUMLAH_BUTIR != 0){
-					id_satuan = 0;
-					satuan = result[i].SATUAN_ISI;
-				}else{
-					id_satuan = result[i].ID_SATUAN;
-					satuan = result[i].NAMA_SATUAN;
-				}
-
-				var aksi = "<button type='button' class='btn waves-light btn-danger' onclick='deleteRow(this);'><i class='fa fa-times'></i></button>";
+				var aksi = "<button type='button' class='btn waves-light btn-danger' onclick='deleteRow(this,"+result[i].ID+");'><i class='fa fa-times'></i></button>";
 
 				if(jumlah_data > 0){
 					var jumlah = $('#jumlah_'+result[i].ID).val();
@@ -169,40 +155,67 @@ function klik_racikan(id){
 					$tr = "<tr id='tr_"+result[i].ID+"'>"+
 							"<input type='hidden' name='id_gudang[]' value='"+result[i].ID+"'>"+
 							"<input type='hidden' name='id_nama_obat[]' value='"+result[i].ID_NAMA_OBAT+"'>"+
-							"<input type='hidden' name='id_satuan[]' value='"+id_satuan+"'>"+
 							"<td style='vertical-align:middle;'>"+result[i].KODE_OBAT+"</td>"+
 							"<td style='vertical-align:middle;'>"+result[i].NAMA_OBAT+"</td>"+
-							"<td style='vertical-align:middle; text-align:center;'>"+NumberToMoney(result[i].TOTAL)+"&nbsp;"+satuan+"</td>"+
+							"<td style='vertical-align:middle; text-align:center;'>"+NumberToMoney(result[i].TOTAL)+"</td>"+
 							"<td>"+
 								"<div class='col-md-12'>"+
 									"<div class='input-group'>"+
-									"	 <input type='hidden' name='jumlah_txt[]' id='jumlah_txt_"+result[i].ID+"' value='"+result[i].TOTAL+"'>"+
-				                    "    <input type='text' class='form-control' name='jumlah[]' id='jumlah_"+result[i].ID+"' value='1' onkeyup='FormatCurrency(this); hitung_jumlah("+result[i].ID+");'>"+
-				                    "    <span class='input-group-btn'>"+
-				                    "        <button class='btn waves-effect waves-light btn-default' type='button' style='cursor:pointer:default;'>"+
-				                    			satuan+
-				                    "        </button>"+
-				                    "    </span>"+
-				                    "</div>"+
-			                    "</div>"+
+									"<input type='hidden' name='jumlah_txt[]' id='jumlah_txt_"+result[i].ID+"' value='"+result[i].TOTAL+"'>"+
+				          "<input type='hidden' class='form-control' name='jumlah[]' id='jumlah_"+result[i].ID+"' value='1' onkeyup='FormatCurrency(this); hitung_jumlah("+result[i].ID+");'>"+
+                  "</div>"+
+			           "</div>"+
+							"</td>"+
+							"<td style='vertical-align:middle; text-align:center;'>"+
+								"<input type='hidden' value='"+result[i].TOTAL_JUAL+"' id='harga_jual_"+result[i].ID+"'>"+
+								"<input type='hidden' class='total_harga_jual' value='"+result[i].TOTAL_JUAL+"' id='total_harga_jual_"+result[i].ID+"'>"+
+								"Rp. <span id='span_total_"+result[i].ID+"'>"+NumberToMoney(result[i].TOTAL_JUAL)+"</span>"+
 							"</td>"+
 							"<td align='center'>"+aksi+"</td>"+
 						  "</tr>";
 				}
 			}
 			$('#tabel_racikan tbody').append($tr);
+			$('#total_semua_harga').html(NumberToMoney(tot));
+			$('#total_semua_harga_id').val(tot);
 		}
 	});
+
+
 }
 
-function deleteRow(btn){
-  var row = btn.parentNode.parentNode;
-  row.parentNode.removeChild(row);
+function deleteRow(btn,id){
+	var harga = $('#total_harga_jual_'+id).val();
+	var total = $('#total_semua_harga_id').val();
+
+	var kurang = parseFloat(total) - parseFloat(harga);
+	$('#total_semua_harga').html(NumberToMoney(kurang));
+	$('#total_semua_harga_id').val(kurang);
+
+	var row = btn.parentNode.parentNode;
+	row.parentNode.removeChild(row);
 }
 
 function hitung_jumlah(id){
 	var jumlah_txt = $('#jumlah_txt_'+id).val();
 	var jumlah = $('#jumlah_'+id).val();
+	var harga = $('#harga_jual_'+id).val();
+
+	if (jumlah == '') {
+		jumlah = 0;
+	}
+
+	var hitung_jumlah = parseFloat(jumlah) * parseFloat(harga);
+	$('#total_harga_jual_'+id).val(hitung_jumlah);
+	$('#span_total_'+id).html(formatNumber(hitung_jumlah));
+
+	var total = 0;
+	$('.total_harga_jual').each(function(idx, elm){
+		console.log(elm.value);
+		total += parseFloat(elm.value);
+	});
+	$('#total_semua_harga').html(formatNumber(total));
+	$('#total_semua_harga_id').val(total);
 
 	if(jumlah == ""){
 		jumlah = 0;
@@ -274,6 +287,7 @@ function hitung_jumlah(id){
 	                        <th style="color:#fff; text-align:center;">Nama Obat</th>
 	                        <th style="color:#fff; text-align:center;">Stok</th>
 	                        <th style="color:#fff; text-align:center;" width="200">Jumlah Pakai</th>
+													<th style="color:#fff; text-align:center;">Harga</th>
 	                        <th style="color:#fff; text-align:center;">#</th>
 	                    </tr>
 	                </thead>
@@ -281,6 +295,13 @@ function hitung_jumlah(id){
 	                <tbody>
 
 	                </tbody>
+									<tfoot>
+										<tr>
+											<th colspan="4"></th>
+											<th>TOTAL : Rp. <span id="total_semua_harga"></span><input type="hidden" value="" id="total_semua_harga_id"></th>
+											<th></th>
+										</tr>
+									</tfoot>
 	            </table>
 	        </div>
 	        <hr>

@@ -77,48 +77,47 @@ class Ap_obat_racik_m extends CI_Model {
 			$where = $where." AND (NM_OBT.KODE_OBAT LIKE '%$keyword%' OR NM_OBT.NAMA_OBAT LIKE '%$keyword%')";
 		}
 
-		$sql = "
-			SELECT
-				OBT.ID,
-				NM_OBT.KODE_OBAT,
-				NM_OBT.BARCODE,
-				NM_OBT.NAMA_OBAT,
-				OBT.TOTAL,
-				SAT.NAMA_SATUAN,
-				OBT.ISI,
-				OBT.SATUAN_ISI,
-				OBT.JUMLAH_BUTIR,
-				OBT.SATUAN_BUTIR
-			FROM apotek_gudang_obat OBT
-			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBT.ID_SETUP_NAMA_OBAT
-			LEFT JOIN obat_satuan SAT ON SAT.ID = OBT.ID_SATUAN_OBAT
-			WHERE $where
-			AND OBT.STATUS_RACIK = '1'
-		";
-		$query = $this->db->query($sql);
-		return $query->result();
+		$sql = "SELECT
+						OBT.ID,
+						NM_OBT.KODE_OBAT,
+						NM_OBT.BARCODE,
+						NM_OBT.NAMA_OBAT,
+						NM_OBT.SERVICE,
+						OBT.HARGA_JUAL,
+						OBT.TOTAL,
+						OBT.ISI,
+						OBT.SATUAN_ISI,
+						OBT.JUMLAH_BUTIR,
+						OBT.SATUAN_BUTIR,
+						(OBT.HARGA_JUAL + NM_OBT.SERVICE) AS TOTAL_JUAL
+					FROM apotek_gudang_obat OBT
+					LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBT.ID_SETUP_NAMA_OBAT
+					WHERE $where
+					AND OBT.STATUS_RACIK = '1'
+				";
+				$query = $this->db->query($sql);
+				return $query->result();
 	}
 
 	function klik_racikan($id){
-		$sql = "
-			SELECT
-				OBT.ID,
-				NM_OBT.ID AS ID_NAMA_OBAT,
-				NM_OBT.KODE_OBAT,
-				NM_OBT.BARCODE,
-				NM_OBT.NAMA_OBAT,
-				OBT.TOTAL,
-				SAT.ID AS ID_SATUAN,
-				SAT.NAMA_SATUAN,
-				OBT.ISI,
-				OBT.SATUAN_ISI,
-				OBT.JUMLAH_BUTIR,
-				OBT.SATUAN_BUTIR
-			FROM apotek_gudang_obat OBT
-			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBT.ID_SETUP_NAMA_OBAT
-			LEFT JOIN obat_satuan SAT ON SAT.ID = OBT.ID_SATUAN_OBAT
-			WHERE OBT.ID = '$id'
-		";
+		$sql = "SELECT
+							OBT.ID,
+							NM_OBT.KODE_OBAT,
+							NM_OBT.BARCODE,
+							NM_OBT.NAMA_OBAT,
+							NM_OBT.SERVICE,
+							NM_OBT.ID AS ID_NAMA_OBAT,
+							OBT.HARGA_JUAL,
+							OBT.TOTAL,
+							OBT.ISI,
+							OBT.SATUAN_ISI,
+							OBT.JUMLAH_BUTIR,
+							OBT.SATUAN_BUTIR,
+							(OBT.HARGA_JUAL + NM_OBT.SERVICE) AS TOTAL_JUAL
+						FROM apotek_gudang_obat OBT
+						LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBT.ID_SETUP_NAMA_OBAT
+						WHERE OBT.ID = '$id'
+					";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}

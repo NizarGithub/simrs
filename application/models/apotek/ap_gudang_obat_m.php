@@ -88,7 +88,7 @@ class Ap_gudang_obat_m extends CI_Model {
 		$order = "";
 
 		if($urutkan == 'Default'){
-			$order = "ORDER BY OBAT.ID ASC, STR_TO_DATE('%d-%m-%Y',OBAT.KADALUARSA) ASC";
+			$order = "ORDER BY OBAT.ID ASC, STR_TO_DATE('%d-%m-%Y',NM_OBT.EXPIRED) ASC";
 		}else if($urutkan == 'Nama Obat'){
 			$order = "ORDER BY NM_OBT.NAMA_OBAT ASC";
 		}else if($urutkan == 'Stok'){
@@ -98,45 +98,35 @@ class Ap_gudang_obat_m extends CI_Model {
 				$order = "ORDER BY OBAT.TOTAL DESC";
 			}
 		}else if($urutkan == 'Expired'){
-			$order = "ORDER BY STR_TO_DATE('%d-%m-%Y',OBAT.KADALUARSA) ASC";
+			$order = "ORDER BY STR_TO_DATE('%d-%m-%Y',NM_OBT.EXPIRED) ASC";
 		}
 
 		if($keyword != ""){
 			$where = $where." AND (NM_OBT.NAMA_OBAT LIKE '%$keyword' OR NM_OBT.BARCODE LIKE '%$keyword%' OR NM_OBT.KODE_OBAT LIKE '%$keyword%')";
 		}
 
-		$sql = "
-			SELECT
-				OBAT.ID,
-				NM_OBT.KODE_OBAT,
-				NM_OBT.BARCODE,
-				NM_OBT.NAMA_OBAT,
-				SUP.MERK,
-				JENIS.NAMA_JENIS,
-				SAT.NAMA_SATUAN,
-				OBAT.JUMLAH,
-				OBAT.ISI,
-				OBAT.TOTAL,
-				OBAT.SATUAN_ISI,
-				OBAT.JUMLAH_BUTIR,
-				OBAT.SATUAN_BUTIR,
-				OBAT.HARGA_BELI,
-				OBAT.HARGA_JUAL,
-				OBAT.KADALUARSA,
-				OBAT.TANGGAL_MASUK,
-				OBAT.WAKTU_MASUK,
-				OBAT.AKTIF,
-				OBAT.URUT_BARANG,
-				OBAT.STATUS_RACIK,
-				OBAT.GAMBAR
-			FROM apotek_gudang_obat OBAT
-			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
-			LEFT JOIN obat_supplier SUP ON SUP.ID = NM_OBT.ID_MERK
-			LEFT JOIN obat_jenis JENIS ON JENIS.ID = OBAT.ID_JENIS_OBAT
-			LEFT JOIN obat_satuan SAT ON SAT.ID = OBAT.ID_SATUAN_OBAT
-			WHERE $where
-			$order
-		";
+		$sql = "SELECT
+							OBAT.ID,
+							NM_OBT.KODE_OBAT,
+							NM_OBT.BARCODE,
+							NM_OBT.NAMA_OBAT,
+							NM_OBT.EXPIRED,
+							JENIS.NAMA_JENIS,
+							OBAT.JUMLAH,
+							OBAT.ISI,
+							OBAT.TOTAL,
+							OBAT.JUMLAH_BUTIR,
+							OBAT.HARGA_BELI,
+							OBAT.HARGA_JUAL,
+							OBAT.HARGA_PERTABLET,
+							OBAT.TANGGAL_MASUK,
+							OBAT.WAKTU_MASUK
+						FROM faktur_detail OBAT
+						LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
+						LEFT JOIN obat_jenis JENIS ON JENIS.ID = NM_OBT.ID_JENIS_OBAT
+						WHERE $where
+						$order
+					";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
@@ -168,7 +158,7 @@ class Ap_gudang_obat_m extends CI_Model {
 				OBAT.URUT_BARANG,
 				OBAT.STATUS_RACIK,
 				OBAT.GAMBAR
-			FROM apotek_gudang_obat OBAT
+			FROM faktur_detail OBAT
 			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
 			LEFT JOIN obat_supplier SUP ON SUP.ID = NM_OBT.ID_MERK
 			LEFT JOIN obat_jenis JENIS ON JENIS.ID = OBAT.ID_JENIS_OBAT
@@ -186,32 +176,27 @@ class Ap_gudang_obat_m extends CI_Model {
 				NM_OBT.KODE_OBAT,
 				NM_OBT.BARCODE,
 				NM_OBT.NAMA_OBAT,
-				NM_OBT.ID_MERK,
-				SUP.MERK,
-				OBAT.ID_JENIS_OBAT,
+				NM_OBT.ID_JENIS_OBAT,
+				NM_OBT.EXPIRED,
+				NM_OBT.GOLONGAN_OBAT,
+				NM_OBT.KATEGORI_OBAT,
+				NM_OBT.SERVICE,
 				JENIS.NAMA_JENIS,
-				OBAT.ID_SATUAN_OBAT,
-				SAT.NAMA_SATUAN,
 				OBAT.JUMLAH,
 				OBAT.ISI,
 				OBAT.TOTAL,
-				OBAT.SATUAN_ISI,
 				OBAT.JUMLAH_BUTIR,
-				OBAT.SATUAN_BUTIR,
 				OBAT.HARGA_BELI,
 				OBAT.HARGA_JUAL,
-				OBAT.KADALUARSA,
+				OBAT.HARGA_PERTABLET,
 				OBAT.TANGGAL_MASUK,
 				OBAT.WAKTU_MASUK,
-				OBAT.STATUS_RACIK,
-				OBAT.GAMBAR,
-				OBAT.ID_GOLONGAN,
-				OBAT.ID_KATEGORI
-			FROM apotek_gudang_obat OBAT
+				OBAT.ID_SUPPLIER,
+				SUP.NAMA_SUPPLIER
+			FROM faktur_detail OBAT
 			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
-			LEFT JOIN obat_supplier SUP ON SUP.ID = NM_OBT.ID_MERK
-			LEFT JOIN obat_jenis JENIS ON JENIS.ID = OBAT.ID_JENIS_OBAT
-			LEFT JOIN obat_satuan SAT ON SAT.ID = OBAT.ID_SATUAN_OBAT
+			LEFT JOIN obat_supplier SUP ON SUP.ID = OBAT.ID_SUPPLIER
+			LEFT JOIN obat_jenis JENIS ON JENIS.ID = NM_OBT.ID_JENIS_OBAT
 			WHERE OBAT.ID = '$id'
 		";
 		$query = $this->db->query($sql);
@@ -221,6 +206,7 @@ class Ap_gudang_obat_m extends CI_Model {
 
 
 	function simpan(
+		$insert_id,
 		$value,
 		$jumlah,
 		$isi,
@@ -230,67 +216,84 @@ class Ap_gudang_obat_m extends CI_Model {
 		$harga_beli,
 		$harga_jual,
 		$tanggal_masuk,
-		$waktu_masuk,
-		$aktif,
-		$first_out
+		$waktu_masuk
 	){
 
-		$sql = "
-			INSERT INTO apotek_gudang_obat(
-				ID_SETUP_NAMA_OBAT,
-				JUMLAH,
-				ISI,
-				TOTAL,
-				JUMLAH_BUTIR,
-				HARGA_PERTABLET,
-				HARGA_BELI,
-				HARGA_JUAL,
-				TANGGAL_MASUK,
-				WAKTU_MASUK,
-				AKTIF,
-				FIRST_OUT
-			) VALUES (
-				'$value',
-				'$jumlah',
-				'$isi',
-				'$total',
-				'$jumlah_butir',
-				'$harga_pertablet',
-				'$harga_beli',
-				'$harga_jual',
-				'$tanggal_masuk',
-				'$waktu_masuk',
-				'$aktif',
-				'$first_out'
-			)
-		";
-		$this->db->query($sql);
+		// print_r($harga_beli);
+		// die();
+		$data_faktur_detail = array(
+			'ID_FAKTUR' => $insert_id,
+			'ID_SETUP_NAMA_OBAT' => $value,
+			'JUMLAH' => $jumlah,
+			'ISI' => $isi,
+			'TOTAL' => $total,
+			'JUMLAH_BUTIR' => $jumlah_butir,
+			'HARGA_PERTABLET' => $harga_pertablet,
+			'HARGA_BELI' => $harga_beli,
+			'HARGA_JUAL' => $harga_jual,
+			'TANGGAL_MASUK' => $tanggal_masuk,
+			'WAKTU_MASUK' => $waktu_masuk
+		);
+		$this->db->insert('faktur_detail', $data_faktur_detail);
+		$id_faktur = $this->db->insert_id();
+
+		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM apotek_gudang_obat WHERE ID_SETUP_NAMA_OBAT = '$value'";
+		$qry_cek = $this->db->query($sql_cek)->row();
+		$total_data = $qry_cek->TOTAL;
+
+		if ($total_data == 0) {
+			$data_gudang = array(
+				'ID_SETUP_NAMA_OBAT' => $value,				
+				'TANGGAL_MASUK' => $tanggal_masuk,
+				'WAKTU_MASUK' => $waktu_masuk,
+				'AKTIF' => '1',
+				'STOK' => $total
+			);
+			$this->db->insert('apotek_gudang_obat', $data_gudang);
+		}else {
+			$sql_stok = $this->db->query("SELECT * FROM apotek_gudang_obat WHERE ID_SETUP_NAMA_OBAT = '$value'")->row_array();
+			$id_gudang = $sql_stok['ID'];
+			$stok = $sql_stok['STOK'];
+
+			$jumlah_stok = $total + $stok;
+			$data_gudang = array(
+				'STOK' => $jumlah_stok
+			);
+			$this->db->where('ID', $id_gudang);
+      $this->db->update('apotek_gudang_obat', $data_gudang);
+		}
 	}
 
-	function ubah($id,$id_nama_obat,$id_jenis,$id_satuan,$jumlah,$isi,$total,$jumlah_butir,$harga_beli,$harga_jual,$kadaluarsa,$status_racik,$gambar,$id_golongan,$id_kategori){
+	function ubah(
+		$id,
+		$id_supplier,
+		$id_nama_obat,
+		$jumlah,
+		$isi,
+		$total,
+		$jumlah_butir,
+		$harga_pertablet,
+		$harga_beli,
+		$harga_jual
+	){
 		$sql = "
-			UPDATE apotek_gudang_obat SET
+			UPDATE faktur_detail SET
+				ID_SUPPLIER = '$id_supplier',
 				ID_SETUP_NAMA_OBAT = '$id_nama_obat',
-				ID_JENIS_OBAT = '$id_jenis',
-				ID_SATUAN_OBAT = '$id_satuan',
 				JUMLAH = '$jumlah',
 				ISI = '$isi',
 				TOTAL = '$total',
 				JUMLAH_BUTIR = '$jumlah_butir',
+				HARGA_PERTABLET = '$harga_pertablet',
 				HARGA_BELI = '$harga_beli',
-				HARGA_JUAL = '$harga_jual',
-				KADALUARSA = '$kadaluarsa',
-				STATUS_RACIK = '$status_racik',
-				GAMBAR = '$gambar',
-				ID_GOLONGAN = '$id_golongan',
-				ID_KATEGORI = '$id_kategori'
+				HARGA_JUAL = '$harga_jual'
 			WHERE ID = '$id'
 		";
 		$this->db->query($sql);
 	}
 
 	function hapus($id){
-		$sql = "DELETE FROM apotek_gudang_obat WHERE ID = '$id'";
+		$sql = "DELETE FROM faktur_detail WHERE ID = '$id'";
 		$this->db->query($sql);
 	}
 
@@ -313,5 +316,16 @@ class Ap_gudang_obat_m extends CI_Model {
 					";
 		$query = $this->db->query($sql);
 		return $query->result();
+	}
+	function klik_nama_supplier($id){
+		$sql = "SELECT
+							a.ID,
+							a.KODE_SUPPLIER,
+							a.NAMA_SUPPLIER
+						FROM obat_supplier a
+						WHERE a.ID = '$id'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
 	}
 }

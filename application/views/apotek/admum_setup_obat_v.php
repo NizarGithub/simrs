@@ -463,6 +463,7 @@ function ubah_obat(id){
 			$('#id_kategori_ubah').val(row['KATEGORI_OBAT']);
 			$('#kategori_ubah').val(row['KATEGORI_OBAT']);
 			$('#service_hidden').val(row['SERVICE']);
+			$('#no_batch_ubah').val(row['NO_BATCH']);
 			// $('#id_merk_lama').val(row['ID_MERK']);
 			// $('#merk_txt').val(row['MERK']);
 		}
@@ -606,6 +607,12 @@ function cek_barcode(){
                     </span>
                 </div>
             </div>
+						<div class="form-group">
+                <label class="col-md-2 control-label">No Batch</label>
+                <div class="col-md-8">
+                    <input type="text" class="form-control" name="no_batch" id="no_batch" value="" required="required">
+                </div>
+            </div>
             <div class="form-group">
                 <label class="col-md-2 control-label">Nama Obat</label>
                 <div class="col-md-8">
@@ -735,6 +742,12 @@ function cek_barcode(){
                 <label class="col-md-2 control-label">Barcode</label>
                 <div class="col-md-8">
                     <input type="text" class="form-control" name="barcode_ubah" id="barcode_ubah" value="">
+                </div>
+            </div>
+						<div class="form-group">
+                <label class="col-md-2 control-label">No Batch</label>
+                <div class="col-md-8">
+                    <input type="text" class="form-control" name="no_batch_ubah" id="no_batch_ubah" value="">
                 </div>
             </div>
             <div class="form-group">
