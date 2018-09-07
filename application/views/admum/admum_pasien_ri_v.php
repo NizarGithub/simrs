@@ -1371,7 +1371,7 @@ function Search_tgl_RI(tgl){
                             <thead>
                                 <tr class="merah_popup">
                                     <th style="text-align:center; color: #fff;" width="50">No</th>
-                                    <th style="text-align:center; color: #fff;">Kode Kamar</th>
+                                    <th style="text-align:center; color: #fff;">Nomor Kamar</th>
                                     <th style="text-align:center; color: #fff;">Kelas</th>
                                     <th style="text-align:center; color: #fff;">Biaya</th>
                                     <th style="text-align:center; color: #fff;">Visite Dokter Sp.</th>

@@ -32,7 +32,7 @@ $(document).ready(function(){
     });
 
     $('#batal').click(function(){
-		window.location = "<?php echo base_url(); ?>setup/admum_setup_supplier_barang_c";
+		window.location = "<?php echo base_url(); ?>finance/admum_setup_supplier_barang_c";
 	});
 
 	$("#jumlah_tampil").change(function(){
@@ -67,7 +67,7 @@ function get_kode_supplier(){
 	}
 
 	$.ajax({
-        url : '<?php echo base_url(); ?>setup/admum_setup_supplier_barang_c/kode_supplier',
+        url : '<?php echo base_url(); ?>finance/admum_setup_supplier_barang_c/kode_supplier',
         data : {jenis_barang:jenis_barang},
         type : "POST",
         dataType : "json",
@@ -120,7 +120,7 @@ function data_supplier(){
 	}
 
 	ajax = $.ajax({
-        url : '<?php echo base_url(); ?>setup/admum_setup_supplier_barang_c/get_data_supplier',
+        url : '<?php echo base_url(); ?>finance/admum_setup_supplier_barang_c/get_data_supplier',
         data : {keyword:keyword},
         type : "GET",
         dataType : "json",
@@ -193,7 +193,7 @@ function ubah_supplier(id){
 	$('#ket').val('Ubah');
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>setup/admum_setup_supplier_barang_c/data_supplier_id',
+		url : '<?php echo base_url(); ?>finance/admum_setup_supplier_barang_c/data_supplier_id',
 		data : {id:id},
 		type : "POST",
 		dataType : "json",
@@ -225,7 +225,7 @@ function hapus_supplier(id){
 	$('#popup_hps').click();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>setup/admum_setup_supplier_barang_c/data_supplier_id',
+		url : '<?php echo base_url(); ?>finance/admum_setup_supplier_barang_c/data_supplier_id',
 		data : {id:id},
 		type : "POST",
 		dataType : "json",

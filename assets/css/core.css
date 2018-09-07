@@ -599,7 +599,7 @@ textarea.form-control {
 }
 .form-control {
   background-color: #FFFFFF;
-  border: 1px solid #E3E3E3;
+  border: 1px solid #61b3de;
   border-radius: 4px;
   color: #565656;
   padding: 7px 12px;
@@ -615,7 +615,7 @@ textarea.form-control {
 }
 .form-control:focus {
   background-color: #FFFFFF;
-  border: 1px solid #AAAAAA;
+  border: 1px solid #47cf73;
   -webkit-box-shadow: none;
   box-shadow: none;
   outline: 0 !important;

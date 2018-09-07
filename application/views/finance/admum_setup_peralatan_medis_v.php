@@ -31,7 +31,7 @@ $(document).ready(function(){
 	});
 
 	$('#batal').click(function(){
-		// window.location = "<?php echo base_url(); ?>setup/admum_setup_peralatan_medis_c";
+		// window.location = "<?php echo base_url(); ?>finance/admum_setup_peralatan_medis_c";
         $('#view_tambah').hide();
         $('#view_data').show();
 	});
@@ -77,7 +77,7 @@ $(document).ready(function(){
 
 function get_kode_peralatan(){
 	$.ajax({
-        url : '<?php echo base_url(); ?>setup/admum_setup_peralatan_medis_c/kode_peralatan',
+        url : '<?php echo base_url(); ?>finance/admum_setup_peralatan_medis_c/kode_peralatan',
         type : "POST",
         dataType : "json",
         success : function(kode){
@@ -96,7 +96,7 @@ function get_merk(){
 	}
 
 	ajax = $.ajax({
-        url : '<?php echo base_url(); ?>setup/admum_setup_peralatan_medis_c/data_merk',
+        url : '<?php echo base_url(); ?>finance/admum_setup_peralatan_medis_c/data_merk',
         data : {keyword:keyword},
         type : "GET",
         dataType : "json",
@@ -130,7 +130,7 @@ function klik_merk(id_merk){
 	$('#tutup_merk').click();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>setup/admum_setup_peralatan_medis_c/klik_merk',
+		url : '<?php echo base_url(); ?>finance/admum_setup_peralatan_medis_c/klik_merk',
 		data : {id_merk:id_merk},
 		type : "POST",
 		dataType : "json",
@@ -193,7 +193,7 @@ function data_peralatan(){
 	}
 
 	ajax = $.ajax({
-		url : '<?php echo base_url(); ?>setup/admum_setup_peralatan_medis_c/get_data_alat',
+		url : '<?php echo base_url(); ?>finance/admum_setup_peralatan_medis_c/get_data_alat',
         data : {keyword:keyword},
         type : "GET",
         dataType : "json",
@@ -261,7 +261,7 @@ function ubah_alat(id){
 	$('#view_data').hide();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>setup/admum_setup_peralatan_medis_c/data_alat_id',
+		url : '<?php echo base_url(); ?>finance/admum_setup_peralatan_medis_c/data_alat_id',
 		data : {id:id},
 		type : "POST",
 		dataType : "json",
@@ -287,7 +287,7 @@ function hapus_alat(id){
 	$('#popup_hps').click();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>setup/admum_setup_peralatan_medis_c/data_alat_id',
+		url : '<?php echo base_url(); ?>finance/admum_setup_peralatan_medis_c/data_alat_id',
 		data : {id:id},
 		type : "POST",
 		dataType : "json",
@@ -302,7 +302,7 @@ function hapus_alat(id){
 function cek_barcode(){
     var barcode = $('#barcode').val();
     $.ajax({
-        url : '<?php echo base_url(); ?>setup/admum_setup_peralatan_medis_c/cek_barcode',
+        url : '<?php echo base_url(); ?>finance/admum_setup_peralatan_medis_c/cek_barcode',
         data : {barcode:barcode},
         type : "POST",
         dataType : "json",

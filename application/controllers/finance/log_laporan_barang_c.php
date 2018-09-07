@@ -18,7 +18,7 @@ class Log_laporan_barang_c extends CI_Controller {
 			'page' => 'finance/log_laporan_barang_v',
 			'title' => 'Laporan Barang',
 			'subtitle' => 'Laporan Barang',
-			'master_menu' => 'logistik',
+			'master_menu' => 'laporan_barang',
 			'view' => 'laporan_barang',
 		);
 

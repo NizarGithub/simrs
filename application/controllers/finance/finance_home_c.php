@@ -18,7 +18,7 @@ class Finance_home_c extends CI_Controller {
 			'page' => 'finance/finance_beranda_v',
 			'title' => 'Menu Setup',
 			'subtitle' => 'Menu Setup',
-			'master_menu' => '',
+			'master_menu' => 'home',
 			'view' => ''
 		);
 

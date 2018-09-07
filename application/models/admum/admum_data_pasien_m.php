@@ -127,7 +127,8 @@ class Admum_data_pasien_m extends CI_Model {
 				b.UMUR,
 				c.KODE_KAMAR,
 				c.KELAS,
-				d.NOMOR_BED
+				d.NOMOR_BED,
+				a.STS_APPROVE_RM
 			FROM admum_rawat_inap a
 			JOIN rk_pasien b ON b.ID = a.ID_PASIEN
 			LEFT JOIN admum_kamar_rawat_inap c ON c.ID = a.ID_KAMAR

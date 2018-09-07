@@ -770,7 +770,7 @@ function Search_tgl_RI(tgl){
                         </div>
                         <div class="form-group">
                             <label class="col-md-3 control-label">Umur</label>
-                            <div class="col-md-3">
+                            <div class="col-md-3 m-b-10">
                                 <div class="input-group">
                                     <input type="text" class="form-control num_only" name="umur" id="umur" value="" maxlength="3" readonly>
                                     <span class="input-group-btn">

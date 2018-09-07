@@ -19,7 +19,7 @@ class Log_peralatan_medis_c extends CI_Controller {
 			'page' => 'finance/log_peralatan_medis_v',
 			'title' => 'Peralatan Medis',
 			'subtitle' => 'Peralatan Medis',
-			'master_menu' => 'logistik',
+			'master_menu' => 'pengadaan_barang',
 			'view' => 'peralatan_medis',
 			'url_simpan' => base_url().'finance/log_peralatan_medis_c/simpan',
 			'url_ubah' => base_url().'finance/log_peralatan_medis_c/ubah',

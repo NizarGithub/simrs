@@ -343,22 +343,22 @@ function get_data_pasien(){
 
                     var warna = '';
                     if(result[i].STS_APPROVE_RM == '1'){
-                        warna = 'class="warning"';
+                        warna = 'class="kuning"';
                     }else{
                         warna = "";
                     }
 
                     $tr +=  '<tr '+warna+'>'+
-                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA_POLI+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].KODE_PASIEN+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL_LAHIR+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].UMUR+' Tahun</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].ALAMAT+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA_AYAH+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA_IBU+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+no+'</td>'+
+                            '   <td style="vertical-align:middle;">'+result[i].NAMA_POLI+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+result[i].KODE_PASIEN+'</td>'+
+                            '   <td style="vertical-align:middle;">'+result[i].NAMA+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+result[i].TANGGAL_LAHIR+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+result[i].UMUR+' Tahun</td>'+
+                            '   <td style="vertical-align:middle;">'+result[i].ALAMAT+'</td>'+
+                            '   <td style="vertical-align:middle;">'+result[i].NAMA_AYAH+'</td>'+
+                            '   <td style="vertical-align:middle;">'+result[i].NAMA_IBU+'</td>'+
                             '   <td style="vertical-align:middle;" align="center">'+rekam_medik+'</td>'+
                             '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
                             '</tr>';
@@ -428,7 +428,7 @@ function get_history_medik_rj(id_pasien){
                     }
 
                     no++;
-                    
+
                     isine += '<tr>'+
                                 '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
                                 '<td>'+RJ.TANGGAL+'</td>'+
@@ -445,7 +445,6 @@ function get_history_medik_rj(id_pasien){
             // END OF RAWAT JALAN
         }
     });
-
 }
 
 function get_data_pasien_ri(){
@@ -489,16 +488,23 @@ function get_data_pasien_ri(){
                     result[i].JENIS_KELAMIN = result[i].JENIS_KELAMIN=="L"?"Laki - Laki":"Perempuan";
                     result[i].TANGGAL_KELUAR = result[i].TANGGAL_KELUAR==null?"-":result[i].TANGGAL_KELUAR;
 
-                    $tr +=  '<tr>'+
-                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].KODE_PASIEN+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL_MASUK+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL_KELUAR+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].KODE_KAMAR+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].KELAS+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].NOMOR_BED+'</td>'+
+                    var warna = '';
+                    if(result[i].STS_APPROVE_RM == '1'){
+                        warna = 'class="kuning"';
+                    }else{
+                        warna = "";
+                    }
+
+                    $tr +=  '<tr '+warna+'>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+no+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+result[i].KODE_PASIEN+'</td>'+
+                            '   <td style="vertical-align:middle;">'+result[i].NAMA+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+result[i].TANGGAL_MASUK+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+result[i].TANGGAL_KELUAR+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+result[i].KODE_KAMAR+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+result[i].KELAS+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+result[i].NOMOR_BED+'</td>'+
                             '   <td style="vertical-align:middle;" align="center">'+rekam_medik+'</td>'+
                             '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
                             '</tr>';
@@ -873,51 +879,6 @@ function Search_tgl_RI(tgl){
         }
     });
 }
-
-function Search_tgl_IGD(tgl){
-    $('#ord_tmp').val(''); 
-    var id_pasien = $('#id_pasien2').val();
-    $.ajax({
-        url : '<?php echo base_url(); ?>admum/admum_data_pasien_c/get_history_medik_by_search_igd',
-        data : {
-            id_pasien:id_pasien,
-            tgl : tgl
-        },
-        type : "POST",
-        dataType : "json",
-        success : function(result){
-            var isine = "";
-            var isine_igd = "";
-            var isine_ri = "";
-            var no = 0;
-            var det_IGD = result['detail_IGD'];
-            if(det_IGD.length > 0){
-                var ord2 = $('#ord_tmp').val(); 
-                $.each(det_IGD,function(i,IGD){                    
-                    var ord  = IGD.ORD;
-                    var ord2 = $('#ord_tmp').val(); 
-
-                    if(ord != ord2){
-                        isine_igd += '<tr><td colspan="3"> <b>'+ord+'</b> </td></tr>';
-                        no = 0;
-                    }
-
-                    no++;
-                    isine_igd += '<tr>'+
-                                '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
-                                '<td>'+IGD.TANGGAL+'</td>'+
-                                '<td>'+IGD.KET+'</td>'+
-                             '</tr>';
-
-                    $('#ord_tmp').val(IGD.ORD);     
-                });
-            } else {
-                isine_igd = '<tr><td colspan="3" align="center" style="text-align:center;"> <b>Tidak ada history / info medik pada pasien ini </b> </td></tr>';
-            }
-            $('#isi_history_igd').html(isine_igd);             
-        }
-    });
-}
 </script>
 <?php
     $sess_user = $this->session->userdata('masuk_rs');
@@ -1059,7 +1020,7 @@ function Search_tgl_IGD(tgl){
                         <div class="form-group">
                             <div class="col-md-12">
                                 <div class="table-responsive">
-                                    <table id="tabel_pasien2" class="table table-hover table-bordered">
+                                    <table id="tabel_pasien2" class="table table-bordered">
                                         <thead>
                                             <tr class="hijau">
                                                 <th style="color:#fff; text-align:center;">No</th>
@@ -1105,6 +1066,24 @@ function Search_tgl_IGD(tgl){
                                 </select>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <div class="col-md-4">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr class="active">
+                                            <th style="text-align:center;">Warna</th>
+                                            <th style="text-align:center;">Keterangan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="kuning">Kuning</td>
+                                            <td>Status Pasien telah di Approve oleh Rekam Medik</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </form>
                 </div>
 
@@ -1131,7 +1110,7 @@ function Search_tgl_IGD(tgl){
                         <div class="form-group">
                             <div class="col-md-12">
                                 <div class="table-responsive">
-                                    <table id="tabel_pasien3" class="table table-hover table-bordered">
+                                    <table id="tabel_pasien3" class="table table-bordered">
                                         <thead>
                                             <tr class="merah">
                                                 <th style="color:#fff; text-align:center;">No</th>
@@ -1174,6 +1153,24 @@ function Search_tgl_IGD(tgl){
                                     <option value="50">50</option>
                                     <option value="100">100</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-4">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr class="active">
+                                            <th style="text-align:center;">Warna</th>
+                                            <th style="text-align:center;">Keterangan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="kuning">Kuning</td>
+                                            <td>Status Pasien telah di Approve oleh Rekam Medik</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </form>

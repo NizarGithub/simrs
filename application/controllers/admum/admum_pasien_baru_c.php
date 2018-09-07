@@ -69,32 +69,29 @@ class Admum_pasien_baru_c extends CI_Controller {
 
 	function kode_pasien(){
 		$keterangan = 'PASIEN-BARU';
-		$tanggal = date('d');
-		$bulan = date('n');
-		$tahun = date('Y');
 
 		$sql = "
 			SELECT 
 				COUNT(*) AS TOTAL 
 			FROM nomor 
 			WHERE KETERANGAN = '$keterangan'
-			AND BULAN = '$bulan' 
-			AND TAHUN = '$tahun'
 		";
 		$qry = $this->db->query($sql);
 		$total = $qry->row()->TOTAL;
 		$kode = "";
 
-		//PA-001/IX/28/2016
+		//055634
 		if($total == 0){
-			$no = $this->add_leading_zero(1,3);
-			$kode = "PA-".$no."/".$this->romanic_number($bulan)."/".$tanggal."/".$tahun;
+			$no = $this->add_leading_zero(1,6);
+			// $kode = "PA-".$no."/".$this->romanic_number($bulan)."/".$tanggal."/".$tahun;
+			$kode = $no;
 		}else{
-			$s = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan' AND BULAN = '$bulan' AND TAHUN = '$tahun'";
+			$s = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan'";
 			$q = $this->db->query($s)->row();
 			$next = $q->NEXT+1;
-			$no = $this->add_leading_zero($next,3);
-			$kode = "PA-".$no."/".$this->romanic_number($bulan)."/".$tanggal."/".$tahun;
+			$no = $this->add_leading_zero($next,6);
+			// $kode = "PA-".$no."/".$this->romanic_number($bulan)."/".$tanggal."/".$tahun;
+			$kode = $no;
 		}
 
 		echo json_encode($kode);
@@ -109,16 +106,14 @@ class Admum_pasien_baru_c extends CI_Controller {
 			SELECT 
 				COUNT(*) AS TOTAL 
 			FROM nomor
-			WHERE BULAN = '$bulan' 
-			AND TAHUN = '$tahun'
-			AND KETERANGAN = '$keterangan'
+			WHERE KETERANGAN = '$keterangan'
 		";
 		$total = $this->db->query($sql_cek)->row()->TOTAL;
 
 		if($total == 0){
 			$this->db->query("INSERT INTO nomor(NEXT,KETERANGAN,BULAN,TAHUN) VALUES ('1','$keterangan','$bulan','$tahun')");
 		}else{
-			$sql = "SELECT * FROM nomor WHERE BULAN = '$bulan' AND TAHUN = '$tahun' AND KETERANGAN = '$keterangan'";
+			$sql = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan'";
 			$query = $this->db->query($sql)->row();
 			$next = $query->NEXT+1;
 			$id = $query->ID;

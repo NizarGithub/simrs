@@ -28,7 +28,7 @@ var ajax = "";
 
 function get_kode_satuan(){
 	$.ajax({
-        url : '<?php echo base_url(); ?>setup/admum_satuan_barang_c/kode_satuan',
+        url : '<?php echo base_url(); ?>finance/admum_satuan_barang_c/kode_satuan',
         type : "POST",
         dataType : "json",
         success : function(kode){
@@ -76,7 +76,7 @@ function data_satuan(){
 	}
 
 	ajax = $.ajax({
-        url : '<?php echo base_url(); ?>setup/admum_satuan_barang_c/get_data_satuan',
+        url : '<?php echo base_url(); ?>finance/admum_satuan_barang_c/get_data_satuan',
         data : {keyword:keyword},
         type : "GET",
         dataType : "json",
@@ -149,7 +149,7 @@ function ubah_satuan(id){
 	$('#view_data').hide();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>setup/admum_satuan_barang_c/data_satuan_id',
+		url : '<?php echo base_url(); ?>finance/admum_satuan_barang_c/data_satuan_id',
 		data : {id:id},
 		type : "POST",
 		dataType : "json",
@@ -170,7 +170,7 @@ function hapus_satuan(id){
 	$('#popup_hps').click();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>setup/admum_satuan_barang_c/data_satuan_id',
+		url : '<?php echo base_url(); ?>finance/admum_satuan_barang_c/data_satuan_id',
 		data : {id:id},
 		type : "POST",
 		dataType : "json",

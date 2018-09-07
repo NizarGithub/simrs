@@ -5,7 +5,7 @@ class Admum_satuan_barang_c extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();
-		$this->load->model('setup/admum_satuan_barang_m','model');
+		$this->load->model('finance/admum_satuan_barang_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
 		$id_user = $sess_user['id'];
 		if($id_user == "" || $id_user == null){
@@ -16,19 +16,19 @@ class Admum_satuan_barang_c extends CI_Controller {
 	function index()
 	{
 		$data = array(
-			'page' => 'setup/admum_satuan_barang_v',
+			'page' => 'finance/admum_satuan_barang_v',
 			'title' => 'Setup Satuan Barang',
 			'subtitle' => 'Setup Satuan Barang',
 			'childtitle' => '',
-			'master_menu' => 'setup',
+			'master_menu' => 'master_setup',
 			'view' => 'satuan_barang',
-			'url_simpan' => base_url().'setup/admum_satuan_barang_c/simpan',
-			'url_ubah' => base_url().'setup/admum_satuan_barang_c/ubah',
-			'url_hapus' => base_url().'setup/admum_satuan_barang_c/hapus',
-			'url_cetak' => base_url().'setup/admum_satuan_barang_c/cetak_excel',
+			'url_simpan' => base_url().'finance/admum_satuan_barang_c/simpan',
+			'url_ubah' => base_url().'finance/admum_satuan_barang_c/ubah',
+			'url_hapus' => base_url().'finance/admum_satuan_barang_c/hapus',
+			'url_cetak' => base_url().'finance/admum_satuan_barang_c/cetak_excel',
 		);
 
-		$this->load->view('setup/setup_home_v',$data);
+		$this->load->view('finance/finance_home_v',$data);
 	}
 
 	function cetak_excel(){
@@ -36,7 +36,7 @@ class Admum_satuan_barang_c extends CI_Controller {
 			'dt' => $this->model->data_kode_satuan(''),
 		);
 
-		$this->load->view('setup/excel/excel_satuan_barang_xls',$data);
+		$this->load->view('finance/excel/excel_satuan_barang_xls',$data);
 	}
 
 	function add_leading_zero($value, $threshold = 2) {
@@ -118,7 +118,7 @@ class Admum_satuan_barang_c extends CI_Controller {
 		$this->insert_kode_satuan();
 
 		$this->session->set_flashdata('sukses','1');
-		redirect('setup/admum_satuan_barang_c');
+		redirect('finance/admum_satuan_barang_c');
 	}
 
 	function ubah(){
@@ -129,7 +129,7 @@ class Admum_satuan_barang_c extends CI_Controller {
 		$this->model->ubah($id,$kode_satuan,$nama_satuan);
 
 		$this->session->set_flashdata('ubah','1');
-		redirect('setup/admum_satuan_barang_c');
+		redirect('finance/admum_satuan_barang_c');
 	}
 
 	function hapus(){
@@ -137,7 +137,7 @@ class Admum_satuan_barang_c extends CI_Controller {
 		$this->model->hapus($id);
 
 		$this->session->set_flashdata('hapus','1');
-		redirect('setup/admum_satuan_barang_c');
+		redirect('finance/admum_satuan_barang_c');
 	}
 
 }

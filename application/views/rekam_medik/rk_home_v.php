@@ -94,7 +94,44 @@
                     </div>
                     <!-- End Logo container-->
 
+                    <!-- LOKET -->
+                    <?PHP 
+                    if(count($is_operator) > 0){ 
+                        $get_loket = $this->master_model_m->getLoket($id_user, 'rekam_medik');
+                        $get_jml_antrian = $this->master_model_m->getJmlAntrian($get_loket->KODE_ANTRIAN);
+                    ?>
+                    <center>
+                    <div style="width: 87%; position: absolute; float: left; margin-top: 7px;">
+                        <button type="button" class="btn btn-warning waves-effect waves-light w-md m-b-5" style="padding-top: 10px; padding-bottom: 10px;"> 
+                            <b id="nama_loket_antrian_txt"> <?=strtoupper($get_loket->NAMA_LOKET);?> </b> 
+                        </button>
+
+                        <button type="button" class="btn btn-danger" style="margin-left: 100px; font-size: 32px; margin-top: -8px;"> 
+                            <b><?=$get_loket->KODE;?>-<font id="jml_antrian_txt"><?=count($get_jml_antrian) + 1;?></font></b> 
+
+                            <input type="hidden" id="kode_antrian_now" value="<?=$get_loket->KODE;?>" />
+                            <input type="hidden" id="jml_antrian_now" value="<?=count($get_jml_antrian) + 1;?>" />
+                            <input type="hidden" id="id_antrian_now" value="<?=$get_loket->KODE_ANTRIAN;?>" />
+                        </button>
+
+                        <button class="btn btn-purple waves-effect waves-light m-b-5" style="margin-left: 40px;" onclick="panggil_antrian();"> 
+                           <i class="fa fa-bullhorn m-r-5"></i>   <span> Panggil </span> 
+                        </button>
+
+                        <button class="btn btn-primary waves-effect waves-light m-b-5" style="margin-left: 10px;" data-toggle="modal" data-target="#next_antrian"> 
+                            <span> Berikutnya </span> <i class="fa fa-chevron-circle-right m-r-5"></i>  
+                        </button>
+                    </div>
+                    </center>
+                    <?PHP } ?>
+                    <!-- END OF LOKET -->
+
                     <div class="menu-extras">
+                        <?PHP 
+                            $sess_user = $this->session->userdata('masuk_rs');
+                            $id_user = $sess_user['id'];
+                            $user = $this->master_model_m->get_user_info($id_user);
+                        ?>
                         <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#bb1e10; height:60px;">
                             <li>
                                 <form role="search" class="navbar-left app-search pull-left hidden-xs" style="margin-right:0px; margin-top:0px;">
@@ -213,7 +250,9 @@
                     </div>
                 </div>
 
-                <?php $this->load->view($page); ?>
+                <div class="row">
+                    <?php $this->load->view($page); ?>
+                </div>
 
                 <!-- Footer -->
                 <footer class="footer text-right">
@@ -303,7 +342,7 @@
                                                     <th style="color:#fff; text-align:center; vertical-align: middle;">Tgl / Waktu</th>
                                                     <th style="color:#fff; text-align:center; vertical-align: middle;">Nama Pasien</th>
                                                     <th style="color:#fff; text-align:center; vertical-align: middle;">JK</th>
-                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Antrian</th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Umur</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -394,9 +433,8 @@
               "debug": false,
               "newestOnTop": false,
               "progressBar": true,
-              "positionClass": "toast-bottom-right",
+              "positionClass": "toast-bottom-left",
               "preventDuplicates": false,
-              "onclick": null,
               "showDuration": "300",
               "hideDuration": "1000",
               "timeOut": "5000",
@@ -415,88 +453,76 @@
                 }, 5000);
             }
 
-            $('#tutup_pas').click(function(){
+            $('#li_notif').click(function(){
+                snd.pause();
+                $('#popup_pasien_baru').show();
+                data_pasien_baru();
+
                 $.ajax({
-                    url : '<?php echo base_url(); ?>rekam_medik/rk_home_c/dilihat',
+                    url : '<?php echo base_url(); ?>rekam_medik/rk_home_c/ubah_sts_lihat',
                     type : "POST",
                     dataType : "json",
                     success : function(res){
-                        $('#popup_pasien_baru').fadeOut();
-                        snd.pause();
+                        
                     }
                 });
+            });
+
+            $('#tutup_pas').click(function(){
+                $('#popup_pasien_baru').fadeOut();
+                get_data_rm();
             });
 
         });
 
         function get_notif_pasien(){
-            var keyword = "";
-            var level = "<?php echo $level; ?>";
-
             $.ajax({
                 url : '<?php echo base_url(); ?>rekam_medik/rk_home_c/notif_pasien_baru',
-                data : {
-                    keyword:keyword,
-                    level:level
-                },
-                type : "GET",
+                type : "POST",
                 dataType : "json",
                 success : function(res){
-                    if(res.length == 0){
+                    var total = 0;
+                    if(res['rj']['TOTAL'] == 0){
                         $('#ketap_ketip').hide();
                         snd.pause();
-                        $('#popup_pasien_baru').hide();
                     }else{
-                        for(var i=0; i<res.length; i++){
-                            if(res[i].STS_LIHAT == '0'){
-                                $('#ketap_ketip').show();
-                                snd.play();
-                                $('#popup_pasien_baru').show();
-                                data_pasien_baru();
-                            }else{
-                                $('#ketap_ketip').hide();
-                                snd.pause();
-                                $('#popup_pasien_baru').hide();
-                            }
-                        }
+                        $('#ketap_ketip').show();
+                        snd.play();
+                        total = res['rj']['TOTAL'];
+                        toastr["success"]("Ada pasien baru!");
                     }
 
-                    $('#tot_pasien').html(res.length);
+                    $('#tot_pasien').html(total);
                 }
             });
         }
 
         function data_pasien_baru(){
             $.ajax({
-                url : '<?php echo base_url(); ?>rekam_medik/rk_home_c/notif_pasien_baru',
+                url : '<?php echo base_url(); ?>rekam_medik/rk_home_c/data_pasien_baru',
                 type : "POST",
                 dataType : "json",
                 success : function(result){
                     $tr = "";
 
-                    if(result == "" || result == null){
+                    if(result['rj'] == "" || result['rj'] == null){
                         $tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
                     }else{
                         var no = 0;
 
-                        for(var i=0; i<result.length; i++){
+                        for(var i=0; i<result['rj'].length; i++){
                             no++;
 
-                            var aksi = '<div class="checkbox checkbox-primary">'+
-                                        '    <input id="checkbox'+result[i].ID_RJ+'" type="checkbox" name="centang[]" value="'+result[i].ID_RJ+'" onclick="terima_pasien('+result[i].ID_RJ+');">'+
-                                        '    <label for="checkbox'+result[i].ID_RJ+'">&nbsp;</label>'+
-                                        '</div>';
-
-                            result[i].WAKTU = result[i].WAKTU==null?"00:00":result[i].WAKTU;
-                            var antrian = result[i].KODE_ANTRIAN+' - '+result[i].NOMOR_ANTRIAN;
+                            result['rj'][i].WAKTU = result['rj'][i].WAKTU==null?"00:00":result['rj'][i].WAKTU;
+                            result['rj'][i].JENIS_KELAMIN = result['rj'][i].JENIS_KELAMIN=="L"?"Laki - Laki":"Perempuan";
 
                             $tr +=  '<tr>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].KODE_PASIEN+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL+' - '+result[i].WAKTU+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+antrian+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result['rj'][i].KODE_PASIEN+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result['rj'][i].TANGGAL+' - '+result['rj'][i].WAKTU+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result['rj'][i].NAMA+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result['rj'][i].JENIS_KELAMIN+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result['rj'][i].UMUR+' Tahun</td>'+
                                     '</tr>';
                         }
                     }
