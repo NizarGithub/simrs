@@ -127,21 +127,57 @@ class Data_pegawai_m extends CI_Model {
 
 	}
 
-	function ubah_data_pegawai($id, $id_dep, $id_div, $nip, $nama, $kota_lahir, $tgl_lahir, $alamat, $telpon, $status, $id_jabatan, $id_pangkat){
+	function ubah_data_pegawai(
+		$id,
+		$nip, 
+		$id_dep, 
+		$id_div,
+		$id_jabatan, 
+		$id_pangkat,
+		$status, 
+		$nama, 
+		$kota_lahir, 
+		$tgl_lahir, 
+		$alamat, 
+		$telpon, 
+		$id_pendidikan, 
+		$sk_pangkat, 
+		$tgl_sk_pangkat, 
+		$tgl_awal_pangkat, 
+		$tgl_akhir_pangkat, 
+		$sts_jabatan, 
+		$sk_jabatan, 
+		$tgl_sk_jabatan, 
+		$tgl_awal_jabatan, 
+		$tgl_akhir_jabatan, 
+		$id_gol_pajak
+		){
+
 		$sql = "
-		UPDATE kepeg_pegawai SET 
-			ID_DEPARTEMEN = '$id_dep',
-			ID_DIVISI = '$id_div',
-			NIP = '$nip',
-			NAMA = '$nama',
-			KOTA_LAHIR = '$kota_lahir',
-			TGL_LAHIR = '$tgl_lahir',
-			ALAMAT = '$alamat',
-			TELPON = '$telpon',
-			STATUS = '$status',
-			ID_JABATAN = '$id_jabatan',
-			ID_PANGKAT = '$id_pangkat'
-		WHERE ID = '$id'
+			UPDATE kepeg_pegawai SET 
+				NIP = '$nip',
+				ID_DEPARTEMEN = '$id_dep',
+				ID_DIVISI = '$id_div',
+				ID_JABATAN = '$id_jabatan',
+				ID_PANGKAT = '$id_pangkat',
+				STATUS = '$status',
+				NAMA = '$nama',
+				KOTA_LAHIR = '$kota_lahir',
+				TGL_LAHIR = '$tgl_lahir',
+				ALAMAT = '$alamat',
+				TELPON = '$telpon',
+				ID_PENDIDIKAN = '$id_pendidikan',
+				SK_PANGKAT = '$sk_pangkat',
+				TGL_SK_PANGKAT = '$tgl_sk_pangkat',
+				TGL_AWAL_PANGKAT = '$tgl_awal_pangkat',
+				TGL_AKHIR_PANGKAT = '$tgl_akhir_pangkat',
+				STS_JABATAN = '$sts_jabatan',
+				SK_JABATAN = '$sk_jabatan',
+				TGL_SK_JABATAN = '$tgl_sk_jabatan',
+				TGL_AWAL_JABATAN = '$tgl_awal_jabatan',
+				TGL_AKHIR_JABATAN = '$tgl_akhir_jabatan',
+				ID_GOL_PAJAK = '$id_gol_pajak'
+			WHERE ID = '$id'
 		";
 
 		$this->db->query($sql);

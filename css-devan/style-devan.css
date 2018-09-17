@@ -46,7 +46,71 @@
     margin-left: 20%;
 }
 
-#popup_tabel{
+.load_tabel{
+    z-index: 9999;
+    position: absolute;
+    left: 45%;
+    top: 40%;
+    display: none;
+}
+
+.load_tabel_poli{
+    z-index: 9999;
+    position: absolute;
+    left: 40%;
+    top: 40%;
+    display: none;
+}
+
+.load_tabel_dokter{
+    z-index: 9999;
+    position: absolute;
+    left: 40%;
+    top: 40%;
+    display: none;
+}
+
+.loading_tabel_tdk{
+    z-index: 9999;
+    position: absolute;
+    left: 45%;
+    top: 40%;
+    display: none;
+}
+
+.loading_tabel_dg{
+    z-index: 9999;
+    position: absolute;
+    left: 45%;
+    top: 40%;
+    display: none;
+}
+
+.loading_tabel_lab{
+    z-index: 9999;
+    position: absolute;
+    left: 45%;
+    top: 40%;
+    display: none;
+}
+
+.loading_tabel_rsp{
+    z-index: 9999;
+    position: absolute;
+    left: 45%;
+    top: 40%;
+    display: none;
+}
+
+.loading_tabel_ka{
+    z-index: 9999;
+    position: absolute;
+    left: 45%;
+    top: 40%;
+    display: none;
+}
+
+.loading_tabel_vis{
     z-index: 9999;
     position: absolute;
     left: 45%;

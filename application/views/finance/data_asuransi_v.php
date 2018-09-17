@@ -61,7 +61,7 @@
         <div class="card-box table-responsive">
             <div class="dropdown pull-right">
                 <a href="#" class="dropdown-toggle card-drop" data-toggle="dropdown" aria-expanded="false">
-                    <button type="button" class="btn btn-primary waves-effect waves-light w-md m-b-5">Cetak</button>
+                    <button type="button" class="btn btn-danger waves-effect waves-light w-md m-b-5">Cetak</button>
                 </a>
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="#">Cetak Excel</a></li>
@@ -78,62 +78,44 @@
                     <tr>
                         <th style="text-align:center;">No</th>
                         <th style="text-align:center;">Logo</th>
-                        <th style="text-align:center;">Kode Asuransi</th>
                         <th style="text-align:center;">Nama Asuransi</th>
                         <th style="text-align:center;">Uraian</th>
                         <th style="text-align:center;">Aksi</th>
                     </tr>
                 </thead>
-
                 <tbody>
-                    <?PHP 
-                        $no = 0;
-                        foreach ($dt as $key => $row) { 
-                            $no++;
-                    ?>
-
+                <?PHP 
+                    $no = 0;
+                    foreach ($dt as $key => $row) { 
+                        $no++;
+                        $logo = '';
+                        if($row->LOGO == null || $row->LOGO == ""){
+                            $logo = base_url().'picture/noimage.png';
+                        }else{
+                            $logo = base_url()."files/asuransi/".$row->LOGO;
+                        }
+                ?>
                     <tr>
-                        <td style="vertical-align:middle;"> <?=$no;?> </td>
-                        <td align="center" style="vertical-align:middle;"> <img width="80" height="80" src="<?=base_url();?>files/asuransi/<?=$row->LOGO;?>"/> </td>
-                        <td style="vertical-align:middle;"> <?=$row->KODE;?> </td>
+                        <td style="vertical-align:middle; text-align: center;"> <?=$no;?> </td>
+                        <td align="center" style="vertical-align:middle;"> <img width="80" height="80" src="<?=$logo;?>"/> </td>
                         <td style="vertical-align:middle;"> <?=$row->NAMA_ASURANSI;?> </td>
                         <td style="vertical-align:middle;"> <?=$row->URAIAN;?> </td>
                         <td style="vertical-align:middle;" align="center"> 
                             <div class="btn-group">
                                 <button type="button" class="btn btn-primary dropdown-toggle waves-effect" data-toggle="dropdown" aria-expanded="false"> Aksi <span class="caret"></span> </button>
                                 <ul class="dropdown-menu">
-                                    <li><a onclick="ubah_asr(<?=$row->ID;?>);" data-toggle="modal" data-target="#edit_modal" href="#"> Ubah </a></li>
-                                    <li><a onclick="$('#dialog-btn').click(); $('#id_hapus').val('<?=$row->ID;?>');" href="javascript:;"> Hapus </a></li>
+                                    <li><a onclick="ubah_asr(<?=$row->ID;?>);" data-toggle="modal" data-target="#edit_modal" href="javascript:;"> Ubah </a></li>
+                                    <li><a onclick="hapus('<?=$row->ID;?>');" href="javascript:;"> Hapus </a></li>
                                 </ul>
                             </div>
                         </td>
                     </tr>
-
-                    <?PHP } ?>
+                <?PHP } ?>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-
-<!-- HAPUS MODAL -->
-<a id="dialog-btn" href="javascript:;" class="cd-popup-trigger" style="display:none;">View Pop-up</a>
-<div class="cd-popup" role="alert">
-    <div class="cd-popup-container">
-
-        <form id="delete" method="post" action="<?=base_url().$post_url;?>">
-            <input type="hidden" name="id_hapus" id="id_hapus" value="" />
-        </form>   
-         
-        <p>Apakah anda yakin ingin menghapus data ini?</p>
-        <ul class="cd-buttons">            
-            <li><a href="javascript:;" onclick="$('#delete').submit();">Ya</a></li>
-            <li><a onclick="$('.cd-popup-close').click(); $('#id_hapus').val('');" href="javascript:;">Tidak</a></li>
-        </ul>
-        <a href="#0" onclick="$('#id_hapus').val('');" class="cd-popup-close img-replace">Close</a>
-    </div> <!-- cd-popup-container -->
-</div> <!-- cd-popup -->
-<!-- END HAPUS MODAL -->
 
 <!-- Edit Modal -->
 <div id="edit_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
@@ -194,10 +176,42 @@
 </div>
 <!-- /.modal -->
 
+<button id="popup_hps" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#custom-width-modal" style="display:none;">Custom width Modal</button>
+<div id="custom-width-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="custom-width-modalLabel">Konfirmasi Hapus</h4>
+            </div>
+            <div class="modal-body">
+                <p id="msg"></p>
+            </div>
+            <div class="modal-footer">
+                <form action="<?php echo base_url(); ?>finance/data_asuransi_c/hapus" method="post">
+                    <input type="hidden" name="id_hapus" id="id_hapus" value="">
+                    <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Tidak</button>
+                    <button type="submit" class="btn btn-danger waves-effect waves-light">Ya</button>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript" src="<?php echo base_url(); ?>js-devan/jquery-1.11.1.min.js"></script>
 <script type="text/javascript">
+$(document).ready(function(){
+    <?php if($this->session->flashdata('sukses')){?>
+        notif_simpan();
+    <?php }else if($this->session->flashdata('ubah')){?>
+        notif_ubah();
+    <?php }else if($this->session->flashdata('hapus')){ ?>
+        notif_hapus();
+    <?php } ?>
+});
+
 function ubah_asr(id) {
     $.ajax({
-        url : '<?php echo base_url(); ?>asuransi/data_asuransi_c/get_data_asuransi',
+        url : '<?php echo base_url(); ?>finance/data_asuransi_c/get_data_asuransi',
         data : {id:id},
         type : "POST",
         dataType : "json",
@@ -206,6 +220,21 @@ function ubah_asr(id) {
             $('#ed_kode_asr').val(res.KODE);
             $('#ed_nama_asr').val(res.NAMA_ASURANSI);
             $('#ed_uraian').val(res.URAIAN);
+        }
+    });
+}
+
+function hapus(id){
+    $('#popup_hps').click();
+
+    $.ajax({
+        url : '<?php echo base_url(); ?>finance/data_asuransi_c/get_data_asuransi',
+        data : {id:id},
+        type : "POST",
+        dataType : "json",
+        success : function(res){
+            $('#id_hapus').val(id);
+            $('#msg').html('Apakah <b>'+res['NAMA_ASURANSI']+'</b> ingin dihapus?');
         }
     });
 }

@@ -129,22 +129,22 @@ class Lab_home_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	function get_notif_pasien(){
+	function notif_pasien_baru(){
 		$now = date('d-m-Y');
 		// $now = '23-08-2018';
 		$posisi = '2';
+		$dari = 'Admission';
 
-		$data = $this->model->get_notif_pasien($posisi,$now);
+		$data = $this->model->notif_pasien_baru($posisi,$now,$dari);
 		echo json_encode($data);
 	}
 
-	function data_pasien(){
+	function data_pasien_baru(){
 		$now = date('d-m-Y');
 		// $now = '23-08-2018';
-		$keyword = $this->input->get('keyword');
 		$posisi = '2';
 
-		$data = $this->model->data_pasien($keyword,$posisi,$now);
+		$data = $this->model->data_pasien_baru($posisi,$now);
 		echo json_encode($data);
 	}
 
@@ -494,6 +494,70 @@ class Lab_home_c extends CI_Controller {
 		}
 
 		echo '1';
+	}
+
+	function get_tindakan_rj(){
+		$id_pasien = $this->input->post('id_pasien');
+		$tanggal = $this->input->post('tanggal');
+		$data = $this->model->get_tindakan_rj($id_pasien,$tanggal);
+		echo json_encode($data);
+	}
+
+	function get_diagnosa_rj(){
+		$id_pasien = $this->input->post('id_pasien');
+		$tanggal = $this->input->post('tanggal');
+		$data = $this->model->get_diagnosa_rj($id_pasien,$tanggal);
+		echo json_encode($data);
+	}
+
+	function get_laborat_rj(){
+		$id_pasien = $this->input->post('id_pasien');
+		$tanggal = $this->input->post('tanggal');
+		$data = $this->model->get_laborat_rj($id_pasien,$tanggal);
+		echo json_encode($data);
+	}
+
+	function get_pemeriksaan_lab(){
+		$id_lab = $this->input->post('id_lab');
+		$data = $this->model->get_pemeriksaan_lab($id_lab);
+		echo json_encode($data);
+	}
+
+	function get_resep_rj(){
+		$id_pasien = $this->input->post('id_pasien');
+		$tanggal = $this->input->post('tanggal');
+		$data = $this->model->get_resep_rj($id_pasien,$tanggal);
+		echo json_encode($data);
+	}
+
+	function get_resep_obat_rj(){
+		$id_resep = $this->input->post('id_resep');
+		$data = $this->model->get_resep_obat_rj($id_resep);
+		echo json_encode($data);
+	}
+
+	function get_history_medik_by_search_rj(){
+		$id_pasien = $this->input->post('id_pasien');
+		$tgl = addslashes($this->input->post('tgl'));
+		$data = array();
+		$data['detail_RJ'] = $this->model->getDetailLayananRJ($id_pasien, $tgl);
+		echo json_encode($data);
+	}
+
+	function det_rm($id){
+		$id_pasien = $this->decode(base64_decode($id));
+
+		$data = array(
+			'page' => 'lab/lab_history_rekam_medik_v',
+			'title' => 'Laboratorium',
+			'subtitle' => 'Laboratorium',
+			'master_menu' => 'home',
+			'view' => 'det_rm',
+			'id_pasien' => $id_pasien,
+			'data_pasien' => $this->model->data_pasien_id($id_pasien)
+		);
+
+		$this->load->view('lab/lab_home_v',$data);
 	}
 
 }

@@ -69,7 +69,7 @@ class Admum_pasien_ri_m extends CI_Model {
 		$where = "1 = 1";
 
 		if($keyword != ""){
-			$where = $where." AND (NAMA LIKE '%$keyword%' OR KODE_PASIEN LIKE '%$keyword%')";
+			$where = $where." AND (NAMA LIKE '%$keyword%' OR NAMA_AYAH LIKE '%$keyword%' OR NAMA_IBU LIKE '%$keyword%')";
 		}else{
 			$where = $where;
 		}
@@ -80,14 +80,15 @@ class Admum_pasien_ri_m extends CI_Model {
 				KODE_PASIEN,
 				NAMA,
 				JENIS_KELAMIN,
+				TANGGAL_LAHIR,
 				UMUR,
-				SUBSTR(KODE_PASIEN,4,3) AS KODE,
-				SUBSTR(TANGGAL_DAFTAR,4,2) AS BULAN
+				JENIS_KELAMIN,
+				ALAMAT,
+				NAMA_AYAH,
+				NAMA_IBU
 			FROM rk_pasien 
 			WHERE $where
-			ORDER BY
-				BULAN ASC,
-				KODE ASC
+			ORDER BY ID DESC
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -187,7 +188,7 @@ class Admum_pasien_ri_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_ri($id_pasien,$tanggal_masuk,$waktu,$bulan,$tahun,$nama_pjawab,$telepon,$sistem_bayar,$asal_rujukan,$id_dokter,$id_asuransi,$kelas,$id_kamar,$id_bed){
+	function simpan_ri($id_pasien,$tanggal_masuk,$waktu,$bulan,$tahun,$nama_pjawab,$telepon,$sistem_bayar,$asal_rujukan,$id_dokter,$id_asuransi,$kelas,$id_kamar,$id_bed,$biaya_kamar,$biaya_adm){
 		$sql = "
 			INSERT INTO admum_rawat_inap(
 				ID_PASIEN,
@@ -203,7 +204,9 @@ class Admum_pasien_ri_m extends CI_Model {
 				ID_ASURANSI,
 				KELAS,
 				ID_KAMAR,
-				ID_BED
+				ID_BED,
+				BIAYA_KAMAR_FIX,
+				BIAYA_REG
 			) VALUES(
 				'$id_pasien',
 				'$tanggal_masuk',
@@ -218,36 +221,30 @@ class Admum_pasien_ri_m extends CI_Model {
 				'$id_asuransi',
 				'$kelas',
 				'$id_kamar',
-				'$id_bed'
+				'$id_bed',
+				'$biaya_kamar',
+				'$biaya_adm'
 			)
 		";
 		$this->db->query($sql);
 	}
 
-	function simpan_asuransi($id_ri,$id_asuransi,$asuransi,$no_kpa,$nama,$perusahaan,$bp_poli,$asal_cabang,$status_pasien,$jumlah){
+	function simpan_asuransi($id_ri,$id_asuransi,$no_polis,$no_peserta,$nama,$status_pasien){
 		$sql = "
 			INSERT INTO asr_asuransi(
 				ID_RAWAT_INAP,
 				ID_ASURANSI,
-				ASURANSI,
-				NO_KPA,
+				NO_POLIS,
+				NO_PESERTA,
 				NAMA,
-				PERUSAHAAN,
-				BP_POLI,
-				ASAL_CABANG,
-				STATUS_PASIEN,
-				JML_KLAIM
+				STATUS_PASIEN
 			) VALUES (
 				'$id_ri',
 				'$id_asuransi',
-				'$asuransi',
-				'$no_kpa',
+				'$no_polis',
+				'$no_peserta',
 				'$nama',
-				'$perusahaan',
-				'$bp_poli',
-				'$asal_cabang',
-				'$status_pasien',
-				'$jumlah'
+				'$status_pasien'
 			)
 		";
 		$this->db->query($sql);

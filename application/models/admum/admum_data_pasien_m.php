@@ -8,6 +8,12 @@ class Admum_data_pasien_m extends CI_Model {
 		$this->load->database();
 	}
 
+	function data_pasien_id($id){
+		$sql = "SELECT * FROM rk_pasien WHERE ID = '$id'";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
 	function data_pasien_per_poli($keyword,$now){
 		$where = "1 = 1";
 		$order = "";
@@ -85,6 +91,7 @@ class Admum_data_pasien_m extends CI_Model {
 				a.ID,
 				a.TANGGAL,
 				a.STS_APPROVE_RM,
+				b.ID AS ID_PASIEN,
 				b.KODE_PASIEN,
 				b.NAMA,
 				b.JENIS_KELAMIN,
@@ -93,10 +100,12 @@ class Admum_data_pasien_m extends CI_Model {
 				b.ALAMAT,
 				b.NAMA_AYAH,
 				b.NAMA_IBU,
-				c.NAMA AS NAMA_POLI
+				c.NAMA AS NAMA_POLI,
+				d.INVOICE
 			FROM admum_rawat_jalan a
 			JOIN rk_pasien b ON b.ID = a.ID_PASIEN
 			LEFT JOIN admum_poli c ON c.ID = a.ID_POLI
+			LEFT JOIN rk_pembayaran_kasir d ON d.ID_PELAYANAN = a.ID
 			WHERE $where
 			AND a.TANGGAL = '$now'
 			ORDER BY a.ID DESC
@@ -120,6 +129,7 @@ class Admum_data_pasien_m extends CI_Model {
 				a.TANGGAL_MASUK,
 				a.TANGGAL_KELUAR,
 				a.STS_APPROVE_RM,
+				b.ID AS ID_PASIEN,
 				b.KODE_PASIEN,
 				b.NAMA,
 				b.JENIS_KELAMIN,
@@ -249,28 +259,28 @@ class Admum_data_pasien_m extends CI_Model {
 
 		$sql = "
 		SELECT a.TANGGAL, a.KET, a.JUMLAH, a.HARGA, a.TARIF, a.ORD, a.TAB FROM(
-			SELECT a.TANGGAL, b.JENIS_LABORAT AS KET, 1 AS JUMLAH, 0 AS HARGA, SUM(a.TOTAL_TARIF) AS TARIF, 'LABORAT' AS ORD, 4 AS TAB  FROM rk_laborat_rj a
+			SELECT a.TANGGAL, c.NAMA_TINDAKAN AS KET, b.JUMLAH, 0 AS HARGA, b.SUBTOTAL AS TARIF, 'TINDAKAN' AS ORD, 1 AS TAB  FROM rk_tindakan_rj a 
+			JOIN rk_tindakan_rj_detail b ON a.ID = b.ID_TINDAKAN_RJ
+			JOIN admum_setup_tindakan c ON b.TINDAKAN = c.ID
+			WHERE a.ID_PASIEN = $id_pasien
+
+			UNION ALL
+
+			SELECT a.TANGGAL, a.DIAGNOSA AS KET, 0 AS JUMLAH, 0 AS HARGA, 0 AS TARIF, 'DIAGNOSA' AS ORD, 2 AS TAB  FROM rk_diagnosa_rj a 
+			WHERE a.ID_PASIEN = $id_pasien
+
+			UNION ALL
+
+			SELECT a.TANGGAL, b.JENIS_LABORAT AS KET, 1 AS JUMLAH, 0 AS HARGA, SUM(a.TOTAL_TARIF) AS TARIF, 'LABORAT' AS ORD, 3 AS TAB  FROM rk_laborat_rj a
 			LEFT JOIN admum_setup_jenis_laborat b ON a.JENIS_LABORAT = b.ID
 			WHERE a.ID_PASIEN = $id_pasien
 			GROUP BY b.JENIS_LABORAT
 
 			UNION ALL 
 
-			SELECT a.TANGGAL, c.NAMA_TINDAKAN AS KET, b.JUMLAH, 0 AS HARGA, b.SUBTOTAL AS TARIF, 'TINDAKAN' AS ORD, 2 AS TAB  FROM rk_tindakan_rj a 
-			JOIN rk_tindakan_rj_detail b ON a.ID = b.ID_TINDAKAN_RJ
-			JOIN admum_setup_tindakan c ON b.TINDAKAN = c.ID
-			WHERE a.ID_PASIEN = $id_pasien
-
-			UNION ALL 
-
-			SELECT a.TANGGAL, c.NAMA_OBAT AS KET, b.JUMLAH_BELI AS JUMLAH, b.HARGA, b.SUBTOTAL AS TARIF, 'OBAT' AS ORD, 3 AS TAB  FROM rk_resep_rj a 
+			SELECT a.TANGGAL, c.NAMA_OBAT AS KET, b.JUMLAH_BELI AS JUMLAH, b.HARGA, b.SUBTOTAL AS TARIF, 'RESEP' AS ORD, 4 AS TAB  FROM rk_resep_rj a 
 			JOIN rk_resep_detail_rj b ON b.ID_RESEP = a.ID
 			JOIN admum_setup_nama_obat c ON b.ID_OBAT = c.ID
-			WHERE a.ID_PASIEN = $id_pasien
-
-			UNION ALL 
-
-			SELECT a.TANGGAL, a.DIAGNOSA AS KET, 0 AS JUMLAH, 0 AS HARGA, 0 AS TARIF, 'DIAGNOSA' AS ORD, 1 AS TAB  FROM rk_diagnosa_rj a 
 			WHERE a.ID_PASIEN = $id_pasien
 		) a
 		WHERE $where
@@ -287,14 +297,16 @@ class Admum_data_pasien_m extends CI_Model {
 		}
 
 		$sql = "
-		SELECT a.TANGGAL, a.KET, a.JUMLAH, a.TARIF, a.ORD FROM(
-			SELECT a.TANGGAL, c.NAMA_TINDAKAN AS KET, b.JUMLAH, b.SUBTOTAL AS TARIF, 'TINDAKAN' AS ORD  FROM rk_ri_tindakan a 
-			JOIN rk_ri_tindakan_detail b ON a.ID = b.ID_TINDAKAN
-			JOIN admum_setup_tindakan c ON b.ID_SETUP_TINDAKAN = c.ID
-			WHERE a.ID_PASIEN = $id_pasien
-		) a
+		SELECT 
+			a.TANGGAL, 
+			c.NAMA_TINDAKAN AS KET, 
+			b.JUMLAH, b.SUBTOTAL AS TARIF  
+		FROM rk_ri_tindakan a 
+		JOIN rk_ri_tindakan_detail b ON a.ID = b.ID_TINDAKAN
+		JOIN admum_setup_tindakan c ON b.ID_SETUP_TINDAKAN = c.ID
 		WHERE $where
-		ORDER BY a.ORD ASC, a.TANGGAL DESC
+		AND a.ID_PASIEN = $id_pasien
+		ORDER BY a.TANGGAL DESC
 		";
 
 		return $this->db->query($sql)->result();
@@ -396,20 +408,18 @@ class Admum_data_pasien_m extends CI_Model {
 		$sql = "
 			SELECT
 				DET.ID,
-				RSP.ID_PASIEN,
 				RSP.TANGGAL,
-				DET.ID_RESEP,
-				DET.ID_OBAT,
-				STP.NAMA_OBAT,
-				SAT.NAMA_SATUAN,
-				DET.HARGA,
-				DET.JUMLAH_BELI,
-				DET.SUBTOTAL
+				b.NAMA_OBAT,
+				DET.JUMLAH_BELI
 			FROM rk_ri_resep_detail DET
 			LEFT JOIN rk_ri_resep RSP ON RSP.ID = DET.ID_RESEP
-			LEFT JOIN apotek_gudang_obat OBAT ON OBAT.ID = DET.ID_OBAT
-			LEFT JOIN admum_setup_nama_obat STP ON STP.ID = OBAT.ID_SETUP_NAMA_OBAT
-			LEFT JOIN obat_satuan SAT ON SAT.ID = OBAT.ID_SATUAN_OBAT
+			LEFT JOIN (
+				SELECT
+					a.ID,
+					b.NAMA_OBAT
+				FROM apotek_gudang_obat a
+				LEFT JOIN admum_setup_nama_obat b ON b.ID = a.ID_SETUP_NAMA_OBAT
+			) b ON b.ID = DET.ID_OBAT
 			WHERE RSP.ID_PASIEN = '$id_pasien' AND $where
 		";
 		$query = $this->db->query($sql);

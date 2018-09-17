@@ -66,7 +66,7 @@
     <body>
         <!-- Navigation Bar-->
         <header id="topnav">
-            <div class="topbar-main" style="background-color:#faae40; height:60px;">
+            <div class="topbar-main" style="background-color:#ff78cb; height:60px;">
                 <div class="container">
                     <!-- LOGO -->
                     <div class="topbar-left">
@@ -77,7 +77,7 @@
                     <!-- End Logo container-->
 
                     <div class="menu-extras">                        
-                        <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#f1632a; height:60px;">
+                        <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#e01563; height:60px;">
                             <li>
                                 <form role="search" class="navbar-left app-search pull-left hidden-xs" style="margin-right:0px; margin-top:0px;">
                                 <?php

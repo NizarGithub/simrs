@@ -45,6 +45,13 @@ class Admum_home_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function nomor_antrian_adm(){
+		$id_loket = '3';
+		$kode_antrian = 'A';
+		$data = $this->master_model_m->nomor_antrian_adm($id_loket,$kode_antrian);
+		echo json_encode($data);
+	}
+
 	function get_antrian_online(){
 		$id_user = $this->input->post('id_user');
 		$akses = 'admum';

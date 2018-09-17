@@ -130,6 +130,12 @@ class Admum_data_pasien_c extends CI_Controller {
 		redirect('admum/admum_data_pasien_c');
 	}
 
+	function data_pasien_id(){
+		$id = $this->input->post('id');
+		$data = $this->model->data_pasien_id($id);
+		echo json_encode($data);
+	}
+
 	//PASIEN PER POLI
 	function data_pasien_per_poli(){
 		$keyword = $this->input->get('keyword');
@@ -203,8 +209,25 @@ class Admum_data_pasien_c extends CI_Controller {
 	// PASIEN RJ
 	function data_pasien_rj(){
 		$keyword = $this->input->get('keyword');
+		// $now = '05-09-2018';
 		$now = date('d-m-Y');
 		$data = $this->model->data_pasien_rj($keyword,$now);
+		echo json_encode($data);
+	}
+
+	function get_history_medik_rj(){
+		$id_pasien = $this->input->post('id_pasien');
+		$data['detail_RJ'] = $this->model->getDetailLayananRJ($id_pasien, '');
+		$data['ps'] = $this->model->data_pasien_id($id_pasien);
+
+		echo json_encode($data);
+	}
+
+	function get_history_medik_by_search_rj(){
+		$id_pasien = $this->input->post('id_pasien');
+		$tgl = addslashes($this->input->post('tgl'));
+		$data = array();
+		$data['detail_RJ'] = $this->model->getDetailLayananRJ($id_pasien, $tgl);
 		echo json_encode($data);
 	}
 
@@ -258,6 +281,33 @@ class Admum_data_pasien_c extends CI_Controller {
 	function data_pasien_ri(){
 		$keyword = $this->input->get('keyword');
 		$data = $this->model->data_pasien_ri($keyword);
+		echo json_encode($data);
+	}
+
+	function get_history_medik_ri(){
+		$id_pasien = $this->input->post('id_pasien');
+		$tgl = '';
+		$data['ps'] = $this->model->data_pasien_id($id_pasien);
+		$data['detail_RI'] = $this->model->getDetailLayananRI($id_pasien, $tgl);
+		$data['dataDetDiagnosa_RI'] = $this->model->dataDetDiagnosa_RI($id_pasien, $tgl);
+		$data['dataDetVisite_RI'] = $this->model->dataDetVisite_RI($id_pasien, $tgl);
+		$data['dataDetResep_RI'] = $this->model->dataDetResep_RI($id_pasien, $tgl);
+		$data['dataDetOksigen_RI'] = $this->model->dataDetOksigen_RI($id_pasien, $tgl);
+		$data['dataDetGizi_RI'] = $this->model->dataDetGizi_RI($id_pasien, $tgl);
+
+		echo json_encode($data);
+	}
+
+	function get_history_medik_by_search_ri(){
+		$id_pasien = $this->input->post('id_pasien');
+		$tgl = addslashes($this->input->post('tgl'));
+		$data['detail_RI'] = $this->model->getDetailLayananRI($id_pasien, $tgl);
+		$data['dataDetDiagnosa_RI'] = $this->model->dataDetDiagnosa_RI($id_pasien, $tgl);
+		$data['dataDetVisite_RI'] = $this->model->dataDetVisite_RI($id_pasien, $tgl);
+		$data['dataDetResep_RI'] = $this->model->dataDetResep_RI($id_pasien, $tgl);
+		$data['dataDetOksigen_RI'] = $this->model->dataDetOksigen_RI($id_pasien, $tgl);
+		$data['dataDetGizi_RI'] = $this->model->dataDetGizi_RI($id_pasien, $tgl);
+
 		echo json_encode($data);
 	}
 
@@ -457,40 +507,11 @@ class Admum_data_pasien_c extends CI_Controller {
 		$this->load->view('admum/excel/excel_data_pasien_igd',$data);
 	}
 
-	function get_history_medik_rj(){
-		$id_pasien = $this->input->post('id_pasien');
-		$data['detail_RJ'] = $this->model->getDetailLayananRJ($id_pasien, '');
-
-		echo json_encode($data);
-	}
-
-	function get_history_medik_by_search_rj(){
-		$id_pasien = $this->input->post('id_pasien');
-		$tgl = addslashes($this->input->post('tgl'));
-		$data = array();
-		$data['detail_RJ'] = $this->model->getDetailLayananRJ($id_pasien, $tgl);
-		echo json_encode($data);
-	}
-
 	function get_history_medik_by_search_igd(){
 		$id_pasien = $this->input->post('id_pasien');
 		$tgl = addslashes($this->input->post('tgl'));
 		$data = array();
 		$data['detail_IGD'] = $this->model->getDetailLayananIGD($id_pasien, $tgl);
-		echo json_encode($data);
-	}
-
-	function get_history_medik_by_search_ri(){
-		$id_pasien = $this->input->post('id_pasien');
-		$tgl = addslashes($this->input->post('tgl'));
-		$data = array();
-		$data['detail_RI'] = $this->model->getDetailLayananRI($id_pasien, $tgl);
-		$data['dataDetVisite_RI'] = $this->model->dataDetVisite_RI($id_pasien, $tgl);
-		$data['dataDetGizi_RI'] = $this->model->dataDetGizi_RI($id_pasien, $tgl);
-		$data['dataDetOksigen_RI'] = $this->model->dataDetOksigen_RI($id_pasien, $tgl);
-		$data['dataDetDiagnosa_RI'] = $this->model->dataDetDiagnosa_RI($id_pasien, $tgl);
-		$data['dataDetResep_RI'] = $this->model->dataDetResep_RI($id_pasien, $tgl);
-
 		echo json_encode($data);
 	}
 

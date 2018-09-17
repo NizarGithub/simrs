@@ -25,14 +25,6 @@
 #view_laborat_tambah{
 	display: none;
 }
-
-.loading_tabel img{
-	margin-top: 75px;
-	left: 45%;
-	position: absolute;
-    z-index: 9999;
-    display: none;
-}
 </style>
 
 <?php
@@ -91,6 +83,7 @@ $(document).ready(function(){
     //TINDAKAN
 
     data_tindakan();
+    // get_hari_tindakan();
 
     $('#btn_tambah').click(function(){
 		$('#view_tindakan_tambah').show();
@@ -124,6 +117,7 @@ $(document).ready(function(){
 		$('#view_tindakan').show();
 		$('#view_tindakan_ubah').hide();
 		$('#tabel_tambah_tindakan tbody tr').remove();
+		$('#total_tindakan').val("");
 	});
 
 	$('.btn_tindakan').click(function(){
@@ -1053,7 +1047,7 @@ function klik_pelaksana(id){
 }
 
 function load_tindakan(){
-	$('.loading_tabel').show();
+	$('.loading_tabel_tdk').show();
 	var keyword = $('#cari_tindakan').val();
 
 	$.ajax({
@@ -1082,12 +1076,13 @@ function load_tindakan(){
 			}
 
 			$('#tb_tindakan tbody').html($tr);
-			$('.loading_tabel').hide();
+			$('.loading_tabel_tdk').hide();
 		}
 	});
 }
 
 function klik_tindakan(id){
+	$('#popup_load').show();
 	$('#tutup_tindakan').click();
 	var id_ubah = $('#id_ubah').val();
 
@@ -1129,6 +1124,7 @@ function klik_tindakan(id){
 				$('#tabel_tambah_tindakan tbody').append($tr);
 				hitung_jumlah(id);
 				hitung_total_tindakan();
+				$('#popup_load').hide();
 			}
 		});
 	}else{
@@ -1200,6 +1196,19 @@ function hitung_total_tindakan(){
 	$('#total_tindakan').val(formatNumber(total));
 }
 
+function get_hari_tindakan(){
+	var id_tindakan = "<?php echo $id; ?>";
+	$.ajax({
+		url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/get_hari_tindakan',
+		data : {id_tindakan:id_tindakan},
+		type : "POST",
+		dataType : "json",
+		success : function(hari){
+			$('#hari_ke').val(hari);
+		}
+	});
+}
+
 function data_tindakan(){
 	$('#popup_load').show();
 	var id_tindakan = "<?php echo $id; ?>";
@@ -1212,28 +1221,27 @@ function data_tindakan(){
 		success : function(result){
 			$tr = "";
 
-			if(result == "" || result == null){
-				$tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+			if(result['dt'] == "" || result['dt'] == null){
+				$tr = "<tr><td colspan='6' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
 				var no = 0;
 
-				for(var i=0; i<result.length; i++){
+				for(var i=0; i<result['dt'].length; i++){
 					no++;
 
-					var aksi =  '<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_tindakan('+result[i].ID+');">'+
+					var aksi =  '<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_tindakan('+result['dt'][i].ID+');">'+
 									'<i class="fa fa-pencil"></i>'+
 								'</button>&nbsp;'+
-						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_tindakan('+result[i].ID+');">'+
+						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_tindakan('+result['dt'][i].ID+');">'+
 						   			'<i class="fa fa-trash"></i>'+
 						   		'</button>';
 
 					$tr += "<tr>"+
 								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td style='text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
-								"<td>"+result[i].NAMA_TINDAKAN+"</td>"+
-								"<td style='text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
-								"<td style='text-align:center;'>"+result[i].JUMLAH+"</td>"+
-								"<td style='text-align:right;'>"+formatNumber(result[i].SUBTOTAL)+"</td>"+
+								"<td>"+result['dt'][i].NAMA_TINDAKAN+"</td>"+
+								"<td style='text-align:right;'>"+formatNumber(result['dt'][i].TARIF)+"</td>"+
+								"<td style='text-align:center;'>"+result['dt'][i].JUMLAH+"</td>"+
+								"<td style='text-align:right;'>"+formatNumber(result['dt'][i].SUBTOTAL)+"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
 							"</tr>";
 				}
@@ -2307,6 +2315,7 @@ function hapus_diagnosa(id){
 // LABORAT
 
 function load_laborat(){
+	$('.loading_tabel_lab').show();
 	var keyword = $('#cari_laborat').val();
 
 	$.ajax({
@@ -2325,14 +2334,23 @@ function load_laborat(){
 				for(var i=0; i<result.length; i++){
 					no++;
 
+					var jenis_laborat = '';
+
+					if(result[i].PER_ITEM == '1'){
+						jenis_laborat = result[i].JENIS_LABORAT+' (Per Item)';
+					}else{
+						jenis_laborat = result[i].JENIS_LABORAT;
+					}
+
 					$tr += "<tr style='cursor:pointer;' onclick='klik_laborat("+result[i].ID+");'>"+
 								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td>"+result[i].JENIS_LABORAT+"</td>"+
+								"<td>"+jenis_laborat+"</td>"+
 							"</tr>";
 				}
 			}
 
 			$('#tb_laborat tbody').html($tr);
+			$('.loading_tabel_lab').hide();
 		}
 	});
 
@@ -2342,6 +2360,7 @@ function load_laborat(){
 }
 
 function klik_laborat(id){
+	$('#popup_load').show();
 	$('#tutup_laborat').click();
 
 	$.ajax({
@@ -2352,8 +2371,42 @@ function klik_laborat(id){
 		success : function(row){
 			$('#id_laborat').val(id);
 			$('#jenis_laborat').val(row['JENIS_LABORAT']);
+			klik_pemeriksaan(id);
 		}
 	});
+}
+
+function klik_pemeriksaan(id){
+    $('#tutup_pemeriksaan').click();
+
+    $.ajax({
+        url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/klik_pemeriksaan',
+        data : {id:id},
+        type : "POST",
+        dataType : "json",
+        success : function(result){
+            $tr = "";
+
+            for(var i=0; i<result.length; i++){
+                var jumlah_data = $('#tr2_'+result[i].ID).length;
+
+                var aksi = "<button type='button' class='btn waves-light btn-danger btn-sm' onclick='deleteRow2(this);'><i class='fa fa-times'></i></button>";
+
+                $tr += "<tr id='tr2_"+result[i].ID+"'>"+
+                            "<input type='hidden' name='id_pemeriksaan[]' value='"+result[i].ID+"'>"+
+                            "<input type='hidden' name='tarif_pemeriksaan[]' value='"+result[i].TARIF+"'>"+
+                            "<td style='vertical-align:middle;'>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
+                            "<td style='vertical-align:middle;'>"+result[i].NILAI_NORMAL+"</td>"+
+                            "<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
+                            "<td align='center'>"+aksi+"</td>"+
+                          "</tr>";
+            }
+
+            $('#tabel_tambah_pemeriksaan tbody').html($tr);
+            hitung_pemeriksaan();
+            $('#popup_load').hide();
+        }
+    });
 }
 
 function load_pemeriksaan(){
@@ -2385,45 +2438,6 @@ function load_pemeriksaan(){
 			}
 
 			$('#tb_pemeriksaan tbody').html($tr);
-		}
-	});
-}
-
-function klik_pemeriksaan(id){
-	$('#tutup_pemeriksaan').click();
-
-	$.ajax({
-		url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/klik_pemeriksaan',
-		data : {id:id},
-		type : "POST",
-		dataType : "json",
-		success : function(result){
-			$tr = "";
-
-			for(var i=0; i<result.length; i++){
-				var jumlah_data = $('#tr2_'+result[i].ID).length;
-
-				var aksi = "<button type='button' class='btn waves-light btn-danger btn-sm' onclick='deleteRow2(this);'><i class='fa fa-times'></i></button>";
-
-				if(jumlah_data > 0){
-					var jumlah = $('#jumlah_pemeriksaan_'+result[i].ID).val();
-					$('#jumlah_pemeriksaan_'+result[i].ID).val(parseInt(jumlah)+1);
-				}else{
-					$tr = "<tr id='tr2_"+result[i].ID+"'>"+
-							"<input type='hidden' name='id_pemeriksaan[]' value='"+result[i].ID+"'>"+
-							"<input type='hidden' name='tarif_pemeriksaan[]' value='"+result[i].TARIF+"'>"+
-							"<td style='vertical-align:middle;'>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
-							// "<td align='center'><input type='text' class='form-control' name='hasil_periksa[]' value='' style='width:200px;'></td>"+
-							// "<td align='center'><input type='text' class='form-control' name='nilai_rujukan[]' value='' style='width:200px;'></td>"+
-							"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
-							"<td style='vertical-align:middle; text-align:right;'><b>"+formatNumber(result[i].TARIF)+"</b></td>"+
-							"<td align='center'>"+aksi+"</td>"+
-						  "</tr>";
-				}
-			}
-
-			$('#tabel_tambah_pemeriksaan tbody').append($tr);
-			hitung_pemeriksaan();
 		}
 	});
 }
@@ -2563,12 +2577,13 @@ function hapus_laborat(id){
 //RESEP
 
 function load_obat(){
+	$('.loading_tabel_rsp').show();
 	var keyword = $('#cari_resep').val();
 
 	$.ajax({
 		url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/load_resep',
 		data : {keyword:keyword},
-		type : "POST",
+		type : "GET",
 		dataType : "json",
 		success : function(result){
 			$tr = "";
@@ -2583,14 +2598,19 @@ function load_obat(){
 
 					$tr += "<tr style='cursor:pointer;' onclick='klik_obat("+result[i].ID+");'>"+
 								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td style='text-align:center;'>"+result[i].KODE_OBAT+"</td>"+
 								"<td>"+result[i].NAMA_OBAT+"</td>"+
+								"<td style='text-align:right;'>"+result[i].HARGA+"</td>"+
 							"</tr>";
 				}
 			}
 
 			$('#tb_resep tbody').html($tr);
+			$('.loading_tabel_rsp').hide();
 		}
+	});
+
+	$('#cari_resep').off('keyup').keyup(function(){
+		load_obat();
 	});
 }
 
@@ -2999,58 +3019,82 @@ function hapus_surat_dokter(id){
 </div>
 
 <div class="row">
-	<div class="col-md-6">
-        <div class="card-box">
-        	<h4><i class="fa fa-user"></i> Pasien</h4>
-        	<hr/>
-            <div>
-                <div class="text-left">
-                    <p class="text-muted font-13">
-                    	<strong>NO. RM :</strong> <span class="m-l-15" style="color:#0066b2;"><?php echo $dt->KODE_PASIEN; ?></span>
-                    </p>
-                    <p class="text-muted font-13">
-                    	<strong>NAMA :</strong><span class="m-l-15" style="color:#0066b2;"><?php echo $dt->NAMA_PASIEN; ?></span>
-                    </p>
-                    <p class="text-muted font-13">
-                    	<?php
-                    		$jk = "";
-                    		if($dt->JENIS_KELAMIN=="L"){$jk="Laki - Laki";}else{$jk="Perempuan";}
-                    	?>
-                    	<strong>JENIS KELAMIN :</strong> <span class="m-l-15" style="color:#0066b2;"><?php echo $jk; ?></span>
-                    </p>
-                    <p class="text-muted font-13">
-                    	<strong>UMUR :</strong> <span class="m-l-15" style="color:#0066b2;"><?php echo $dt->UMUR; ?> Tahun</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card-box">
-        	<h4><i class="fa fa-list"></i> Keterangan</h4>
-        	<hr/>
-            <div>
-                <div class="text-left">
-                	<p class="text-muted font-13">
-                    	<strong>ASAL RUJUKAN :</strong> <span class="m-l-15" style="color:#0066b2;"><?php echo $dt->ASAL_RUJUKAN; ?></span>
-                    </p>
-                    <p class="text-muted font-13">
-                    	<strong>DOKTER :</strong> <span class="m-l-15" style="color:#0066b2;"><?php echo $dt->NAMA_DOKTER; ?></span>
-                    </p>
-                    <p class="text-muted font-13">
-                    	<strong>KELAS :</strong>
-                    	<span class="m-l-15" style="color:#0066b2;"><?php echo $dt->KELAS; ?> - <?php echo $dt->VISITE_DOKTER; ?></span>
-                    	&nbsp;&nbsp;
-                    	<strong>NO BED :</strong>
-                    	<span class="m-l-15" style="color:#0066b2;"><?php echo $dt->NOMOR_BED; ?></span>
-                    </p>
-                    <p class="text-muted font-13">
-                    	<strong>PELAYANAN :</strong> <span class="m-l-15" style="color:#0066b2;"><?php echo $dt->STATUS; ?></span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="col-lg-12">
+		<div class="row">
+			<div class="col-md-8">
+	            <div class="card-box">
+	            	<h4><i class="fa fa-user"></i> Rekam Medik Pasien</h4>
+	            	<hr/>
+	            	<table class="table table-striped">
+	            		<thead>
+	            			<tr class="success">
+	            				<th style="text-align: center;">NO. RM</th>
+	            				<th style="text-align: center;">NAMA</th>
+	            				<th style="text-align: center;">JENIS KELAMIN</th>
+	            				<th style="text-align: center;">TANGGAL LAHIR</th>
+	            				<th style="text-align: center;">UMUR</th>
+	            				<th style="text-align: center;">TANGGAL MRS</th>
+	            			</tr>
+	            		</thead>
+	            		<tbody>
+	            			<tr>
+	            				<td style="text-align: center;">
+	            					<span style="color:#0066b2;"><?php echo $dt->KODE_PASIEN; ?></span>
+	            				</td>
+	            				<td style="text-align: center;">
+	            					<span style="color:#0066b2;"><?php echo $dt->NAMA_PASIEN; ?></span>
+	            				</td>
+	            				<td style="text-align: center;">
+	            					<?php
+			                    		$jk = "";
+			                    		if($dt->JENIS_KELAMIN=="L"){$jk="Laki - Laki";}else{$jk="Perempuan";}
+			                    	?>
+	            					<span style="color:#0066b2;"><?php echo $jk; ?></span>
+	            				</td>
+	            				<td style="text-align: center;">
+	            					<span style="color:#0066b2;"><?php echo $dt->TANGGAL_LAHIR; ?></span>
+	            				</td>
+	            				<td style="text-align: center;">
+	            					<span style="color:#0066b2;"><?php echo $dt->UMUR; ?> Tahun</span>
+	            				</td>
+	            				<td style="text-align: center;">
+	            					<span style="color:#0066b2;"><?php echo $dt->TANGGAL_MASUK; ?></span>
+	            				</td>
+	            			</tr>
+	            		</tbody>
+	            	</table>
+	            </div>
+	        </div>
+	        <div class="col-md-4">
+	            <div class="card-box">
+	            	<h4><i class="fa fa-user-md"></i> Dokter</h4>
+	            	<hr/>
+	            	<table class="table">
+	            		<thead>
+	            			<tr class="info">
+	            				<th style="text-align: center;">DOKTER</th>
+	            				<th style="text-align: center;">PELAYANAN</th>
+	            				<th style="text-align: center;">ASAL RUJUKAN</th>
+	            			</tr>
+	            		</thead>
+	            		<tbody>
+		            		<tr>
+		            			<td style="text-align: center;">
+		            				<span style="color:#0066b2;"><?php echo $dt->NAMA_DOKTER; ?>
+		            			</td>
+		            			<td style="text-align: center;">
+		            				<span style="color:#0066b2;"><?php echo $dt->STATUS; ?>
+		            			</td>
+		            			<td style="text-align: center;">
+		            				<span style="color:#0066b2;"><?php echo $dt->ASAL_RUJUKAN; ?>
+		            			</td>
+		            		</tr>
+	            		</tbody>
+	            	</table>
+	            </div>
+	        </div>
+		</div>
+	</div>
 </div>
 
 <div class="row">
@@ -3060,9 +3104,22 @@ function hapus_surat_dokter(id){
                 <li role="presentation" class="active">
                     <a href="#tindakan1" role="tab" data-toggle="tab"><i class="fa fa-stethoscope"></i>&nbsp;Tindakan</a>
                 </li>
-                <!-- <li role="presentation" id="dt_visite">
-                    <a href="#visite1" role="tab" data-toggle="tab"><i class="fa fa-user-md"></i>&nbsp;Visite</a>
+                <li role="presentation" id="dt_diagnosa">
+                    <a href="#diagnosa1" role="tab" data-toggle="tab"><i class="fa fa-heartbeat"></i>&nbsp;Diagnosa</a>
                 </li>
+                <li role="presentation" id="dt_laborat">
+                    <a href="#laborat1" role="tab" data-toggle="tab"><i class="fa fa-building"></i>&nbsp;Laborat</a>
+                </li>
+                <li role="presentation" id="dt_visite">
+                    <a href="#visite1" role="tab" data-toggle="tab"><i class="fa fa-user-md"></i>&nbsp;Visite Dokter</a>
+                </li>
+                <li role="presentation" id="dt_resep">
+                    <a href="#resep1" role="tab" data-toggle="tab"><i class="fa fa-medkit"></i></i>&nbsp;Resep</a>
+                </li>
+                <li role="presentation" id="dt_kondisi_akhir">
+                    <a href="#kondisi_akhir1" role="tab" data-toggle="tab"><i class="fa fa-check-square-o"></i>&nbsp;Kondisi Akhir</a>
+                </li>
+                <!-- 
                 <li role="presentation" id="dt_gizi">
                     <a href="#gizi1" role="tab" data-toggle="tab"><i class="fa fa-cutlery"></i>&nbsp;Gizi</a>
                 </li>
@@ -3074,20 +3131,7 @@ function hapus_surat_dokter(id){
                 </li>
                 <li role="presentation" id="dt_jasa_prwt">
                     <a href="#jasaprwt1" role="tab" data-toggle="tab"><i class="fa fa-hand-paper-o"></i>&nbsp;Jasa Perawat</a>
-                </li> -->
-                <li role="presentation" id="dt_diagnosa">
-                    <a href="#diagnosa1" role="tab" data-toggle="tab"><i class="fa fa-heartbeat"></i>&nbsp;Diagnosa</a>
                 </li>
-                <li role="presentation" id="dt_laborat">
-                    <a href="#laborat1" role="tab" data-toggle="tab"><i class="fa fa-building"></i>&nbsp;Laborat</a>
-                </li>
-                <li role="presentation" id="dt_resep">
-                    <a href="#resep1" role="tab" data-toggle="tab"><i class="fa fa-medkit"></i></i>&nbsp;Resep</a>
-                </li>
-                <li role="presentation" id="dt_kondisi_akhir">
-                    <a href="#kondisi_akhir1" role="tab" data-toggle="tab"><i class="fa fa-check-square-o"></i>&nbsp;Kondisi Akhir</a>
-                </li>
-                <!--
                 <li role="presentation" id="dt_surat_dokter">
                     <a href="#surat_dokter1" role="tab" data-toggle="tab"><i class="fa fa-file-text-o"></i>&nbsp;Surat Dokter</a>
                 </li>
@@ -3107,13 +3151,18 @@ function hapus_surat_dokter(id){
                     		</div>
                     	</div>
                     	<div class="form-group">
-                    		<div class="col-md-12"> 
+                    		<div class="col-md-2">
+                    			<label for="example-input1-group1" class="control-label">Hari Ke</label>
+                    			<input type="text" class="form-control" name="hari_ke" id="hari_ke" value="" readonly>
+                    		</div>
+                    	</div>
+                    	<div class="form-group">
+                    		<div class="col-md-12">
 			                    <div class="table-responsive">
 						            <table id="tabel_tindakan" class="table table-bordered">
 						                <thead>
 						                    <tr class="merah">
 						                        <th style="color:#fff; text-align:center;">No</th>
-						                        <th style="color:#fff; text-align:center;">Tanggal</th>
 						                        <th style="color:#fff; text-align:center;">Tindakan</th>
 						                        <th style="color:#fff; text-align:center;">Tarif</th>
 						                        <th style="color:#fff; text-align:center;">Jumlah</th>
@@ -3888,7 +3937,7 @@ function hapus_surat_dokter(id){
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-md-2 control-label">Tindakan</label>
+							<label class="col-md-2 control-label">Anjuran</label>
 							<div class="col-md-8">
 								<textarea class="form-control" rows="5" id="tindakan_dg" name="tindakan_dg"></textarea>
 							</div>
@@ -4038,7 +4087,7 @@ function hapus_surat_dokter(id){
 	                            </div>
 	                        </div>
 	                    </div>
-	                    <div class="form-group">
+	                    <!-- <div class="form-group">
 	                        <label class="col-md-2 control-label">Pemeriksaan</label>
 	                        <div class="col-md-5">
 	                            <div class="input-group">
@@ -4048,7 +4097,7 @@ function hapus_surat_dokter(id){
 	                                </span>
 	                            </div>
 	                        </div>
-	                    </div>
+	                    </div> -->
 	                    <div class="form-group">
 	                        <label class="col-md-2 control-label">&nbsp;</label>
 	                        <div class="col-md-8">
@@ -4466,61 +4515,6 @@ function hapus_surat_dokter(id){
     </div>
 </div>
 
-<!-- TINDAKAN -->
-<button class="btn btn-primary" data-toggle="modal" data-target="#myModal1" id="popup_tindakan" style="display:none;">Standard Modal</button>
-<div id="myModal1" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog" style="width:50%;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title" id="myModalLabel">Data Tindakan</h4>
-            </div>
-            <div class="modal-body">
-                <form class="form-horizontal" role="form">
-		            <div class="form-group">
-		                <div class="col-md-12">
-			                <div class="input-group">
-			                    <input type="text" class="form-control" id="cari_tindakan" placeholder="Cari..." value="">
-			                    <span class="input-group-btn">
-			                    	<button type="button" class="btn waves-effect waves-light btn-custom" style="cursor:default;">
-			                    		<i class="fa fa-search"></i>
-			                    	</button>
-			                    </span>
-			                </div>
-		                </div>
-		            </div>
-		        </form>
-            	<div class="table-responsive">
-			        <div class="loading_tabel">
-			        	<center>
-			        		<img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 75px; height: 75px;">
-			        	</center>
-			        </div>
-            		<div class="scroll-y">
-		                <table class="table table-hover table-bordered" id="tb_tindakan">
-		                    <thead>
-		                        <tr class="hijau_popup">
-		                            <th style="text-align:center; color: #fff;" width="50">No</th>
-		                            <th style="text-align:center; color: #fff;">Kode</th>
-		                            <th style="text-align:center; color: #fff;">Tindakan</th>
-		                            <th style="text-align:center; color: #fff;">Tarif</th>
-		                        </tr>
-		                    </thead>
-		                    <tbody>
-		                        
-		                    </tbody>
-		                </table>
-            		</div>
-            	</div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_tindakan">Tutup</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<!-- // -->
-
 <button class="btn btn-primary" data-toggle="modal" data-target="#myModal2" id="popup_pelaksana" style="display:none;">Standard Modal</button>
 <div id="myModal2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
     <div class="modal-dialog" style="width:50%;">
@@ -4592,6 +4586,59 @@ function hapus_surat_dokter(id){
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!-- TINDAKAN -->
+<button class="btn btn-primary" data-toggle="modal" data-target="#myModal1" id="popup_tindakan" style="display:none;">Standard Modal</button>
+<div id="myModal1" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog" style="width:50%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">Data Tindakan</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+		            <div class="form-group">
+		                <div class="col-md-12">
+			                <div class="input-group">
+			                    <input type="text" class="form-control" id="cari_tindakan" placeholder="Cari..." value="">
+			                    <span class="input-group-btn">
+			                    	<button type="button" class="btn waves-effect waves-light btn-custom" style="cursor:default;">
+			                    		<i class="fa fa-search"></i>
+			                    	</button>
+			                    </span>
+			                </div>
+		                </div>
+		            </div>
+		        </form>
+		        <div class="loading_tabel_tdk">
+		        	<img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
+		        </div>
+            	<div class="table-responsive">
+            		<div class="scroll-y">
+		                <table class="table table-hover table-bordered" id="tb_tindakan">
+		                    <thead>
+		                        <tr class="hijau_popup">
+		                            <th style="text-align:center; color: #fff;" width="50">No</th>
+		                            <th style="text-align:center; color: #fff;">Kode</th>
+		                            <th style="text-align:center; color: #fff;">Tindakan</th>
+		                            <th style="text-align:center; color: #fff;">Tarif</th>
+		                        </tr>
+		                    </thead>
+		                    <tbody>
+		                        
+		                    </tbody>
+		                </table>
+            		</div>
+            	</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_tindakan">Tutup</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- // -->
 
 <!-- VISITE -->
 <button class="btn btn-primary" data-toggle="modal" data-target="#myModal3" id="popup_visite" style="display:none;">Standard Modal</button>
@@ -4923,6 +4970,9 @@ function hapus_surat_dokter(id){
 		                </div>
 		            </div>
 		        </form>
+		        <div class="loading_tabel_lab">
+		        	<img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
+		        </div>
             	<div class="table-responsive">
             		<div class="scroll-y">
 		                <table class="table table-hover table-bordered" id="tb_laborat">
@@ -5061,7 +5111,7 @@ function hapus_surat_dokter(id){
 <!-- RESEP -->
 <button id="popup_resep" class="btn btn-primary" data-toggle="modal" data-target="#myModal2_resep" style="display:none;">Standard Modal</button>
 <div id="myModal2_resep" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog" style="width:50%;">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -5082,14 +5132,17 @@ function hapus_surat_dokter(id){
 		                </div>
 		            </div>
 		        </form>
+		        <div class="loading_tabel_rsp">
+		        	<img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
+		        </div>
             	<div class="table-responsive">
             		<div class="scroll-y">
 		                <table class="table table-bordered table-hover" id="tb_resep">
 		                    <thead>
 		                        <tr class="hijau_popup">
 		                            <th style="text-align:center; color: #fff;" width="50">No</th>
-		                            <th style="text-align:center; color: #fff;">Kode</th>
 		                            <th style="text-align:center; color: #fff;">Nama Obat</th>
+		                            <th style="text-align:center; color: #fff;">Harga</th>
 		                        </tr>
 		                    </thead>
 		                    <tbody>

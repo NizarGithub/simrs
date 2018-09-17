@@ -546,28 +546,22 @@ class Rk_pelayanan_rj_m extends CI_Model {
 		$where = "1 = 1";
 
 		if($keyword != ""){
-			$where = $where." AND (NM_OBT.BARCODE LIKE '%$keyword%' OR NM_OBT.NAMA_OBAT LIKE '%$keyword%')";
+			$where = $where." AND (a.NAMA_OBAT LIKE '%$keyword%')";
 		}
 
 		$sql = "
-			SELECT 
-				OBAT.ID,
-				NM_OBT.KODE_OBAT,
-				NM_OBT.BARCODE,
-				NM_OBT.NAMA_OBAT,
-				OBAT.JUMLAH,
-				OBAT.ISI,
-				OBAT.TOTAL,
-				OBAT.JUMLAH_BUTIR,
-				OBAT.HARGA_BELI,
-				OBAT.HARGA_JUAL,
-				OBAT.TANGGAL_MASUK,
-				OBAT.WAKTU_MASUK,
-				OBAT.AKTIF,
-				OBAT.URUT_BARANG
-			FROM apotek_gudang_obat OBAT
-			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
+			SELECT
+				a.ID,
+				a.KODE_OBAT,
+				a.NAMA_OBAT,
+				IFNULL(b.STOK,0) AS STOK,
+				IFNULL(c.HARGA_JUAL,0) AS HARGA_JUAL,
+				a.SERVICE
+			FROM admum_setup_nama_obat a
+			LEFT JOIN apotek_gudang_obat b ON b.ID_SETUP_NAMA_OBAT = a.ID
+			LEFT JOIN faktur_detail c ON c.ID_SETUP_NAMA_OBAT = a.ID
 			WHERE $where
+			GROUP BY a.ID
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -575,24 +569,18 @@ class Rk_pelayanan_rj_m extends CI_Model {
 
 	function klik_obat($id){
 		$sql = "
-			SELECT 
-				OBAT.ID,
-				NM_OBT.KODE_OBAT,
-				NM_OBT.BARCODE,
-				NM_OBT.NAMA_OBAT,
-				OBAT.JUMLAH,
-				OBAT.ISI,
-				OBAT.TOTAL,
-				OBAT.JUMLAH_BUTIR,
-				OBAT.HARGA_BELI,
-				OBAT.HARGA_JUAL,
-				OBAT.TANGGAL_MASUK,
-				OBAT.WAKTU_MASUK,
-				OBAT.AKTIF,
-				OBAT.URUT_BARANG
-			FROM apotek_gudang_obat OBAT
-			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
-			WHERE OBAT.ID = '$id'
+			SELECT
+				a.ID,
+				a.KODE_OBAT,
+				a.NAMA_OBAT,
+				IFNULL(b.STOK,0) AS STOK,
+				IFNULL(c.HARGA_JUAL,0) AS HARGA_JUAL,
+				a.SERVICE
+			FROM admum_setup_nama_obat a
+			LEFT JOIN apotek_gudang_obat b ON b.ID_SETUP_NAMA_OBAT = a.ID
+			LEFT JOIN faktur_detail c ON c.ID_SETUP_NAMA_OBAT = a.ID
+			WHERE a.ID = '$id'
+			GROUP BY a.ID
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -614,76 +602,90 @@ class Rk_pelayanan_rj_m extends CI_Model {
 		$sql = "
 			SELECT
 				DET.ID,
-				NM_OBT.KODE_OBAT,
-				NM_OBT.NAMA_OBAT,
+				b.NAMA_OBAT,
+				DET.JUMLAH_BELI,
+				DET.SUBTOTAL,
 				DET.TAKARAN,
 				DET.ATURAN_MINUM,
 				DET.HARGA
 			FROM rk_resep_detail_rj DET
-			LEFT JOIN apotek_gudang_obat GD ON GD.ID = DET.ID_OBAT
-			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = GD.ID_SETUP_NAMA_OBAT
+			LEFT JOIN admum_setup_nama_obat b ON b.ID = DET.ID_OBAT
 			WHERE DET.ID_RESEP = '$id_resep'
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
 
-	function simpan_resep($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$alergi,$kode_resep,$diminum_selama,$tanggal,$bulan,$tahun,$total){
+	function simpan_resep($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$kode_resep,$alergi,$uraian,$banyaknya_resep,$diminum_selama,$tanggal,$bulan,$tahun,$total,$total_dgn_service){
 		$sql = "
 			INSERT INTO rk_resep_rj(
 				ID_PELAYANAN,
 				ID_POLI,
 				ID_PEG_DOKTER,
 				ID_PASIEN,
-				ALERGI_OBAT,
 				KODE_RESEP,
+				ALERGI_OBAT,
+				URAIAN,
+				BANYAKNYA_RESEP,
 				DIMINUM_SELAMA,
 				TANGGAL,
 				BULAN,
 				TAHUN,
-				TOTAL
+				TOTAL,
+				TOTAL_DGN_SERVICE
 			) VALUES (
 				'$id_pelayanan',
 				'$id_poli',
 				'$id_peg_dokter',
 				'$id_pasien',
-				'$alergi',
 				'$kode_resep',
+				'$alergi',
+				'$uraian',
+				'$banyaknya_resep',
 				'$diminum_selama',
 				'$tanggal',
 				'$bulan',
 				'$tahun',
-				'$total'
+				'$total',
+				'$total_dgn_service'
 			)
 		";
 		$this->db->query($sql);
 	}
 
-	function simpan_resep_det($id_resep,$id_obat,$harga,$jumlah,$subtotal,$takaran,$aturan_umum){
+	function simpan_resep_det($id_resep,$id_obat,$harga,$service,$jumlah,$subtotal,$takaran,$aturan_umum,$tanggal,$tahun,$bulan){
 		$sql = "
 			INSERT INTO rk_resep_detail_rj(
 				ID_RESEP,
 				ID_OBAT,
 				HARGA,
+				SERVICE,
 				JUMLAH_BELI,
 				SUBTOTAL,
 				TAKARAN,
-				ATURAN_MINUM
+				ATURAN_MINUM,
+				TANGGAL,
+				TAHUN,
+				BULAN
 			) VALUES (
 				'$id_resep',
 				'$id_obat',
 				'$harga',
+				'$service',
 				'$jumlah',
 				'$subtotal',
 				'$takaran',
-				'$aturan_umum'
+				'$aturan_umum',
+				'$tanggal',
+				'$tahun',
+				'$bulan'
 			)
 		";
 		$this->db->query($sql);
 	}
 
 	function ubah_stok_obat($id,$jumlah){
-		$sql = "UPDATE apotek_gudang_obat SET TOTAL = TOTAL - $jumlah WHERE ID = '$id'";
+		$sql = "UPDATE apotek_gudang_obat SET STOK = STOK - $jumlah WHERE ID = '$id'";
 		$this->db->query($sql);
 	}
 
@@ -1009,6 +1011,12 @@ class Rk_pelayanan_rj_m extends CI_Model {
 			LEFT JOIN kepeg_pegawai PEG ON PEG.ID = SD.ID_PEG_DOKTER
 			WHERE SD.ID_PASIEN = '$id'
 		";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function get_surat_dokter_id($id_rj){
+		$sql = "SELECT * FROM rk_surat_dokter_rj WHERE ID_PELAYANAN = '$id_rj'";
 		$query = $this->db->query($sql);
 		return $query->row();
 	}

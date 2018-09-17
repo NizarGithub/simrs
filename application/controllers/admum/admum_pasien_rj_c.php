@@ -206,6 +206,7 @@ class Admum_pasien_rj_c extends CI_Controller {
 		$tahun = date('Y');
 		$pilihan = $this->input->post('pilihan');
 		$id_poli = $this->input->post('id_poli');
+		$id_dokter = $this->input->post('id_dokter');
 		$sistem_bayar = $this->input->post('sistem_bayar');
 		$asuransi = $this->input->post('nama_asuransi');
 		$hari = "";
@@ -232,6 +233,7 @@ class Admum_pasien_rj_c extends CI_Controller {
 		$tipe = 'Dari Admission';
 		$pemeriksaan = $this->input->post('id_pemeriksaan');
 		$subtotal = str_replace(',', '', $this->input->post('tarif_pemeriksaan'));
+		$dari = 'Admission';
 
 		if($h == 'Monday'){
 			$hari = "Senin";
@@ -250,12 +252,32 @@ class Admum_pasien_rj_c extends CI_Controller {
 		}
 
 		if($pilihan == '1'){
-			$this->model->simpan_rj($id_pasien_new,$asal_rujukan,$keterangan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$sistem_bayar,$asuransi,$pilihan,$barcode,$nomor_antrian,$biaya_reg,$biaya_adm,$id_loket,$kode_antrian);
+			$this->model->simpan_rj(
+				$id_pasien_new,
+				$asal_rujukan,
+				$keterangan,
+				$hari,
+				$tanggal,
+				$bulan,
+				$tahun,
+				$waktu,
+				$id_poli,
+				$id_dokter,
+				$sistem_bayar,
+				$asuransi,
+				$pilihan,
+				$barcode,
+				$nomor_antrian,
+				$biaya_reg,
+				$biaya_adm,
+				$id_loket,
+				$kode_antrian);
+			
 			$id_rj = $this->db->insert_id();
 			// $this->model->simpan_antrian($tanggal,$waktu,$id_pasien_new,$id_rj,$barcode,$id_loket,$kode_antrian,$nomor_antrian);
 			// $this->simpan_antrian_off();
 		}else{
-			$this->model->simpan_lab_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$sistem_bayar,$asuransi,$pilihan,$biaya_reg,$biaya_adm);
+			$this->model->simpan_lab_rj($id_pasien_new,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$sistem_bayar,$asuransi,$pilihan,$biaya_reg,$biaya_adm,$dari,$id_loket,$kode_antrian);
 			$id_rj = $this->db->insert_id();
 			$this->model->simpan_pemeriksaan($kode_lab,$id_rj,$id_poli,$id_peg_dokter,$id_pasien_new,$jenis_laborat,$total_tarif,$tanggal,$bulan,$tahun,$waktu,$tipe);
 			$id_pemeriksaan_rj = $this->db->insert_id();
@@ -263,6 +285,14 @@ class Admum_pasien_rj_c extends CI_Controller {
 			foreach ($pemeriksaan as $key => $value) {
 				$this->model->simpan_pemeriksaan_detail($id_pemeriksaan_rj,$value,$tanggal,$bulan,$tahun,$subtotal[$key],$waktu);
 			}
+		}
+
+		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM admum_rawat_jalan WHERE ID_PASIEN = '$id_pasien_new'";
+		$qry_cek = $this->db->query($sql_cek)->row();
+		$total = $qry_cek->TOTAL;
+
+		if($total != 0){
+			$this->db->query("UPDATE rk_pasien SET JENIS_PASIEN = 'Lama' WHERE ID = '$id_pasien_new'");
 		}
 
 		$this->simpan_log('rj',$id_pasien_new);
@@ -303,17 +333,29 @@ class Admum_pasien_rj_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function load_dokter(){
+		$keyword = $this->input->post('keyword');
+		$data = $this->model->load_dokter($keyword);
+		echo json_encode($data);
+	}
+
+	function klik_dokter(){
+		$id = $this->input->post('id');
+		$data = $this->model->klik_dokter($id);
+		echo json_encode($data);
+	}
+
 	function get_biaya_reg(){
 		$status = $this->input->post('status');
-		$sql = "SELECT * FROM admum_biaya_reg_pasien WHERE STATUS = '$status'";
-		$qry = $this->db->query($sql);
-		$row['reg'] = $qry->row();
-
-		$sql2 = "SELECT * FROM admum_biaya_reg_pasien WHERE STATUS = 'Admin'";
-		$qry2 = $this->db->query($sql2);
-		$row['adm'] = $qry2->row();
+		$row['reg'] = $this->master_model_m->get_biaya_reg($status);
 
 		echo json_encode($row);
+	}
+
+	function get_biaya_adm(){
+		$sistem_bayar = $this->input->post('sistem_bayar');
+		$data = $this->master_model_m->get_biaya_adm($sistem_bayar);
+		echo json_encode($data);
 	}
 
 	function struk_antrian(){
@@ -326,8 +368,8 @@ class Admum_pasien_rj_c extends CI_Controller {
 		$data = array(
 			'settitle' => 'Struk Antrian',
 			'filename' => 'strukAntrian',
-			'loket'	=> $loket->KODE,
-			'kode_antrian' => $loket->KODE_ANTRIAN,
+			'loket'	=> '3',
+			'kode_antrian' => 'A',
 			'status' => 'offline',
 			'id_user' => $id_user
 		);

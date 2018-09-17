@@ -415,11 +415,11 @@
             $(".select2").select2();
 
             <?php if($view == 'pasien_rj'){ ?>
-            get_antrian_offline();
+            get_nomor_offline();
             // get_antrian_online();
 
             setInterval(function () {
-                get_antrian_offline();
+                get_nomor_offline();
             }, 5000);
             <?php } ?>
         });
@@ -458,30 +458,18 @@
                 type : "POST",
                 dataType : "json",
                 success : function(res){
-                    if(res['cek'].length != 0){
-                        // $('#loket_offline').html(res['data']['NAMA_LOKET']);
-                        var id_kode_antrian = res['data']['KODE_ANTRIAN'];
-                        get_nomor_offline(id_kode_antrian);
-                    }
+                    // $('#loket_offline').html(res['data']['NAMA_LOKET']);
+                    var id_kode_antrian = res['data']['KODE_ANTRIAN'];
                 }
             });
         }
 
-        function get_nomor_offline(id_kode_antrian){
-            var id_user = "<?php echo $id_user; ?>";
-
+        function get_nomor_offline(){
             $.ajax({
-                url : '<?php echo base_url(); ?>admum/admum_home_c/get_nomor_offline',
-                data : {
-                    id_kode_antrian:id_kode_antrian,
-                    id_user:id_user
-                },
+                url : '<?php echo base_url(); ?>admum/admum_home_c/nomor_antrian_adm',
                 type : "POST",
                 dataType : "json",
                 success : function(res){
-                    $('#id_antrian_now').val(id_kode_antrian);
-                    $('#id_kode_antrian_off_now').val(id_kode_antrian);
-
                     if(res == null || res == ""){
                         $('#kode_antrian_now').val('A');
                         $('#jml_antrian_now').val('1');
@@ -490,15 +478,14 @@
                         $('#kode_antrian_off_now').val('A');
                         $('#jml_antrian_off_now').val('1');
                     }else{
-                        for(var i=0; i<res.length; i++){
-                            $('#kode_antrian_now').val(res[i].KODE);
-                            $('#jml_antrian_now').val(res[i].URUT);
-                            $('#id_loket_now').val(res[i].ID);
-                            $('#nomor_offline').html(res[i].KODE+'-'+res[i].URUT);
-                            
-                            $('#kode_antrian_off_now').val(res[i].KODE);
-                            $('#jml_antrian_off_now').val(parseInt(res[i].URUT)+1);
-                        }
+                        var next = parseInt(res['URUT'])+1;
+                        $('#kode_antrian_now').val(res['KODE']);
+                        $('#jml_antrian_now').val(res['URUT']);
+                        $('#id_loket_now').val(res['ID_KODE']);
+                        $('#nomor_offline').html(res['KODE']+'-'+next);
+                        
+                        $('#kode_antrian_off_now').val(res['KODE']);
+                        $('#jml_antrian_off_now').val(next);
                     }
                 }
             });
@@ -608,7 +595,7 @@
                             var jml_antrian_next = parseInt(jml_antrian) + 1;
                             $('#nomor_offline').html(kode_antrian+'-'+jml_antrian_next);
                             $('#jml_antrian_now').val(jml_antrian_next);
-                            get_antrian_online();
+                            // get_antrian_online();
                         }else{
                             var jml_antrian_next = parseInt(jml_antrian2) + 1;
                             $('#nomor_online').html(kode_antrian+'-'+jml_antrian_next);

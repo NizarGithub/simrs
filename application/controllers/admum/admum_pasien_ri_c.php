@@ -180,23 +180,20 @@ class Admum_pasien_ri_c extends CI_Controller {
 		$kelas = $this->input->post('kelas_kamar');
 		$id_kamar = $this->input->post('id_ruangan');
 		$id_bed = $this->input->post('id_bed');
+		$biaya_kamar = str_replace(',', '', $this->input->post('biaya'));
+		$biaya_adm = str_replace(',', '', $this->input->post('biaya_adm'));
 
-		$id_asuransi = $this->input->post('id_kerjasama');
-		$asuransi = $this->input->post('nama_asuransi');
-		$no_kpa = $this->input->post('nomor_kpa');
-		$nama = $this->input->post('nama');
-		$perusahaan = $this->input->post('perusahaan');
-		$bp_poli = $this->input->post('bp_poli');
-		$asal_cabang = $this->input->post('asal_cabang');
-		$status_pasien = $this->input->post('status_pasien');
-		$jumlah = str_replace(',', '', $this->input->post('jumlah_klaim'));
-
-		$this->model->simpan_ri($id_pasien,$tanggal_masuk,$waktu,$bulan,$tahun,$nama_pjawab,$telepon,$sistem_bayar,$asal_rujukan,$id_dokter,$id_asuransi,$kelas,$id_kamar,$id_bed);
+		$this->model->simpan_ri($id_pasien,$tanggal_masuk,$waktu,$bulan,$tahun,$nama_pjawab,$telepon,$sistem_bayar,$asal_rujukan,$id_dokter,$id_asuransi,$kelas,$id_kamar,$id_bed,$biaya_kamar,$biaya_adm);
 		$this->model->update_stt_pakai($id_bed);
 		$id_ri = $this->db->insert_id();
+		$id_asuransi = $this->input->post('id_kerjasama');
+		$no_polis = $this->input->post('nomor_polis');
+		$no_peserta = $this->input->post('nomor_peserta');
+		$nama = $this->input->post('nama');
+		$status_pasien = $this->input->post('status_pasien');
 
 		if($sistem_bayar == '2'){
-			$this->model->simpan_asuransi($id_ri,$id_asuransi,$asuransi,$no_kpa,$nama,$perusahaan,$bp_poli,$asal_cabang,$status_pasien,$jumlah);
+			$this->model->simpan_asuransi($id_ri,$id_asuransi,$no_polis,$no_peserta,$nama,$status_pasien);
 		}
 
 		$this->simpan_log('ri',$id_pasien);
@@ -270,6 +267,12 @@ class Admum_pasien_ri_c extends CI_Controller {
 	function klik_asuransi(){
 		$id = $this->input->post('id');
 		$data = $this->model->klik_asuransi($id);
+		echo json_encode($data);
+	}
+
+	function get_biaya_adm(){
+		$sistem_bayar = $this->input->post('sistem_bayar');
+		$data = $this->master_model_m->get_biaya_adm($sistem_bayar);
 		echo json_encode($data);
 	}
 

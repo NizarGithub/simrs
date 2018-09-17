@@ -96,17 +96,18 @@
                                         <label class="col-md-3 control-label" style="color: #0099e5;"> Status Pegawai </label>
                                         <div class="col-md-9">
                                             <select class="form-control" name="status" id="status">
-                                                    <option value=""> -- Pilih </option>  
-                                                    <option value="-"> - </option>
-                                                    <option value="PNS">PNS</option>
-                                                    <option value="CPNS">CPNS</option>
-                                                    <option value="DOKTER PNS">DOKTER PNS</option>
-                                                    <option value="DOKTER SWASTA">DOKTER SWASTA</option>
-                                                    <option value="HONORER">HONORER</option>
-                                                    <option value="OUTSOURCING">OUTSOURCING</option>
-                                                    <option value="PENSIUN">PENSIUN</option>
-                                                    <option value="BERHENTI/PINDAH">BERHENTI/PINDAH</option>
-                                                    <option value="MENINGGAL DUNIA">MENINGGAL DUNIA</option>                                          
+                                                <option value=""> -- Pilih </option>  
+                                                <option value=""> - </option>
+                                                <option value="PNS PUSAT">PNS PUSAT</option>
+                                                <option value="CPNS PUSAT">CPNS PUSAT</option>
+                                                <option value="PNS DAERAH">PNS DAERAH</option>
+                                                <option value="CPNS DAERAH">CPNS DAERAH</option>
+                                                <option value="HONORER">HONORER</option>
+                                                <option value="OUTSOURCING">OUTSOURCING</option>
+                                                <!-- <option value="PENSIUN">PENSIUN</option>
+                                                <option value="BERHENTI/PINDAH">BERHENTI/PINDAH</option>
+                                                <option value="">MENINGGAL DUNIA</option>
+                                                <option value="12">-</option>  -->                                           
                                             </select>
                                         </div>
                                     </div>

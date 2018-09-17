@@ -22,16 +22,35 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 			'page' => 'poli/rk_pelayanan_ri_v',
 			'title' => 'Pelayanan Rawat Inap',
 			'subtitle' => 'Pelayanan Rawat Inap',
-			'master_menu' => 'pelayanan',
+			'master_menu' => 'home',
 			'view' => 'pelayanan_ri',
 		);
 
 		$this->load->view('poli/poli_home_v',$data);
 	}
 
+	function notif_pasien_baru(){
+		$tanggal = date('d-m-Y');
+		$data = $this->model->notif_pasien_baru($tanggal);
+		echo json_encode($data);
+	}
+
+	function data_pasien_baru(){
+		$tanggal = date('d-m-Y');
+		$data = $this->model->data_pasien_baru($tanggal);
+		echo json_encode($data);
+	}
+
+	function terima_pasien(){
+		$id = $this->input->post('id');
+		$this->db->query("UPDATE admum_rawat_inap SET STS_TERIMA = '1' WHERE ID = '$id'");
+		echo '1';
+	}
+
 	function data_rawat_inap(){
 		$keyword = $this->input->post('keyword');
-		$tanggal = date('d-m-Y');
+		// $tanggal = date('d-m-Y');
+		$tanggal = '13-09-2018';
 		$data = $this->model->data_rawat_inap($keyword,$tanggal);
 		echo json_encode($data);
 	}
@@ -61,7 +80,7 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 			'page' => 'poli/rk_tindakan_ri_v',
 			'title' => 'Pelayanan Rawat Inap',
 			'subtitle' => 'Pelayanan Rawat Inap',
-			'master_menu' => 'pelayanan',
+			'master_menu' => 'home',
 			'view' => 'pelayanan_ri',
 			'id' => $id,
 			'dt' => $this->model->data_rawat_inap_id($id),
@@ -99,9 +118,30 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function get_hari_tindakan(){
+		$id_tindakan = $this->input->post('id_tindakan');
+		$hari_ke = '';
+		//cek tindakan di hari 1
+		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM rk_ri_tindakan WHERE ID_PELAYANAN = '$id_tindakan' AND HARI_KE = '1'";
+		$qry_cek = $this->db->query($sql_cek);
+		$total = $qry_cek->row()->TOTAL;
+		if($total != '0'){ //jika tindakan hari 1 ada
+			$sql = "SELECT ID,HARI_KE FROM rk_ri_tindakan WHERE ID_PELAYANAN = '$id_tindakan' ORDER BY HARI_KE DESC LIMIT 1";
+			$qry = $this->db->query($sql);
+			$row = $qry->row();
+			$hari_ke = $row->HARI_KE + 1;
+		}else{
+			$hari_ke = '1';
+		}
+
+		echo json_encode($hari_ke);
+	}
+
 	function data_tindakan_ri(){
 		$id_tindakan = $this->input->post('id_tindakan');
-		$data = $this->model->data_tindakan_ri($id_tindakan);
+		$tanggal = date('d-m-Y');
+		$data['hr'] = $this->model->get_hari_tindakan($id_tindakan);
+		$data['dt'] = $this->model->data_tindakan_ri($id_tindakan,$tanggal);
 		echo json_encode($data);
 	}
 
@@ -119,16 +159,29 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		$tahun = date('Y');
 		$id_pelaksana = $this->input->post('id_user');
 		$total = str_replace(',', '', $this->input->post('total_tindakan'));
-
 		$id_setup_tindakan = $this->input->post('id_setup_tindakan');
+		$hari_ke = '';
 
-		$this->model->simpan_tindakan($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$id_pelaksana,$total);
+		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM rk_ri_tindakan WHERE ID_PELAYANAN = '$id_pelayanan' AND HARI_KE = '1'";
+		$qry_cek = $this->db->query($sql_cek);
+		$total_cek = $qry_cek->row()->TOTAL;
+
+		if($total_cek != '0'){
+			$sql = "SELECT ID,HARI_KE FROM rk_ri_tindakan WHERE ID_PELAYANAN = '$id_pelayanan' ORDER BY HARI_KE DESC LIMIT 1";
+			$qry = $this->db->query($sql);
+			$row = $qry->row();
+			$hari_ke = $row->HARI_KE + 1;
+		}else{
+			$hari_ke = '1';
+		}
+
+		$this->model->simpan_tindakan($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$id_pelaksana,$total,$hari_ke);
 		$id_tindakan = $this->db->insert_id();
 		$jumlah = $this->input->post('jumlah');
 		$subtotal = $this->input->post('subtotal');
 
 		foreach ($id_setup_tindakan as $key => $value) {
-			$this->model->simpan_det_tindakan($id_tindakan,$value,$tanggal,$bulan,$tahun,$jumlah[$key],$subtotal[$key]);
+			$this->model->simpan_det_tindakan($id_tindakan,$value,$tanggal,$bulan,$tahun,$jumlah[$key],$subtotal[$key],$hari_ke);
 		}
 
 		// $this->session->set_flashdata('sukses','1');
@@ -595,8 +648,22 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		$tahun = date('Y');
 		$diagnosa = addslashes($this->input->post('diagnosa'));
 		$tindakan = addslashes($this->input->post('tindakan_dg'));
+		$hari_ke = '';
 
-		$this->model->simpan_diagnosa($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$diagnosa,$tindakan);
+		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM rk_ri_diagnosa WHERE ID_PELAYANAN = '$id_pelayanan' AND HARI_KE = '1'";
+		$qry_cek = $this->db->query($sql_cek);
+		$total_cek = $qry_cek->row()->TOTAL;
+
+		if($total_cek != '0'){
+			$sql = "SELECT ID,HARI_KE FROM rk_ri_diagnosa WHERE ID_PELAYANAN = '$id_pelayanan' ORDER BY HARI_KE DESC LIMIT 1";
+			$qry = $this->db->query($sql);
+			$row = $qry->row();
+			$hari_ke = $row->HARI_KE + 1;
+		}else{
+			$hari_ke = '1';
+		}
+
+		$this->model->simpan_diagnosa($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$diagnosa,$tindakan,$hari_ke);
 
 		echo '1';
 	}
@@ -709,6 +776,20 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		$tanggal = date('d-m-Y');
 		$bulan = date('n');
 		$tahun = date('Y');
+		$hari_ke = '';
+
+		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM rk_ri_laborat WHERE ID_PELAYANAN = '$id_pelayanan' AND HARI_KE = '1'";
+		$qry_cek = $this->db->query($sql_cek);
+		$total_cek = $qry_cek->row()->TOTAL;
+
+		if($total_cek != '0'){
+			$sql = "SELECT ID,HARI_KE FROM rk_ri_laborat WHERE ID_PELAYANAN = '$id_pelayanan' ORDER BY HARI_KE DESC LIMIT 1";
+			$qry = $this->db->query($sql);
+			$row = $qry->row();
+			$hari_ke = $row->HARI_KE + 1;
+		}else{
+			$hari_ke = '1';
+		}
 
 		$pemeriksaan = $this->input->post('id_pemeriksaan');
 		$subtotal = str_replace(',', '', $this->input->post('tarif_pemeriksaan'));
@@ -718,13 +799,13 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		$format = $datetime->setTimezone($tz_object);
 		$waktu = $format->format('H:i:s');
 
-		$this->model->simpan_pemeriksaan($kode_lab,$id_pelayanan,$id_peg_dokter,$id_pasien,$jenis_laborat,$total_tarif,$cito,$tanggal,$bulan,$tahun,$waktu);
+		$this->model->simpan_pemeriksaan($kode_lab,$id_pelayanan,$id_peg_dokter,$id_pasien,$jenis_laborat,$total_tarif,$cito,$tanggal,$bulan,$tahun,$waktu,$hari_ke);
 		$id_pemeriksaan_rj = $this->db->insert_id();
 		/*$hasil = $this->input->post('hasil_periksa');
 		$nilai_rujukan = $this->input->post('nilai_rujukan');*/
 
 		foreach ($pemeriksaan as $key => $value) {
-			$this->model->simpan_pemeriksaan_detail($id_pemeriksaan_rj,$value,$tanggal,$bulan,$tahun,$subtotal[$key],$waktu);
+			$this->model->simpan_pemeriksaan_detail($id_pemeriksaan_rj,$value,$tanggal,$bulan,$tahun,$subtotal[$key],$waktu,$hari_ke);
 		}
 
 		$this->insert_kode_lab();
@@ -779,7 +860,7 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 	//RESEP
 
 	function load_resep(){
-		$keyword = $this->input->post('keyword');
+		$keyword = $this->input->get('keyword');
 		$data = $this->model->load_obat($keyword);
 		echo json_encode($data);
 	}

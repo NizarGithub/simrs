@@ -53,12 +53,19 @@ foreach ($get_data_asuransi as $key => $asr) {
     }else{
         $label = 'label label-purple';
     }
+
+    $logo = '';
+    if($asr->LOGO == null || $asr->LOGO == ""){
+        $logo = base_url().'picture/noimage.png';
+    }else{
+        $logo = base_url()."files/asuransi/".$asr->LOGO;
+    }
 ?>
     <div class="col-md-3">
         <div class="text-center card-box">
             <a href="<?php echo base_url();?>asuransi/list_asuransi_c/index/<?=$asr->ID;?>">
                 <div>
-                    <img alt="profile-image" class="img-circle thumb-xl img-thumbnail m-b-10" src="<?=base_url();?>files/asuransi/<?=$asr->LOGO;?>" style="width: 75px; height: 75px;">
+                    <img alt="profile-image" class="img-circle thumb-xl img-thumbnail m-b-10" src="<?=$logo;?>" style="width: 75px; height: 75px;">
                     <p class="text-muted font-14">
                         <span class="<?php echo $label; ?>"><?=$asr->NAMA_ASURANSI;?></span>
                     </p>

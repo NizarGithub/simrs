@@ -100,58 +100,37 @@ class Lab_home_m extends CI_Model {
 		return $query->row();
 	}
 
-	function get_notif_pasien($posisi,$now){
+	function notif_pasien_baru($posisi,$now,$dari){
 		$sql = "
 			SELECT 
-				PSN.*,
-				b.ID AS ID_RJ,
-				b.TANGGAL,
-				b.WAKTU AS WAKTU_RJ,
-				b.STS_POSISI,
-				b.STS_TERIMA,
-				c.TIPE
+				COUNT(*) AS TOTAL
 			FROM admum_rawat_jalan b
 			JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
 			JOIN rk_laborat_rj c ON c.ID_PELAYANAN = b.ID
-			WHERE b.STS_POSISI = '$posisi'
-			AND b.STS_TERIMA = '0'
-			AND b.TANGGAL = '$now'
+			WHERE b.TANGGAL = '$now'
+			AND b.STS_TERIMA_LAB = '0'
 		";
 		$query = $this->db->query($sql);
-		return $query->result();
+		return $query->row();
 	}
 
-	function data_pasien($keyword,$posisi,$now){
-		$where = "1 = 1";
-		$order = "";
-
-		if($keyword != ""){
-			$where = $where." AND (
-				PSN.KODE_PASIEN LIKE '%$keyword%' 
-				OR PSN.NAMA LIKE '%$keyword%' 
-				OR PSN.UMUR LIKE '%$keyword%'
-				OR PSN.ALAMAT LIKE '%$keyword%'
-			)";
-		}else{
-			$where = $where;
-		}
-
+	function data_pasien_baru($posisi,$now){
 		$sql = "
 			SELECT 
-				PSN.*,
-				b.ID AS ID_RJ,
+				b.ID,
 				b.TANGGAL,
-				b.WAKTU AS WAKTU_RJ,
+				b.WAKTU,
 				b.STS_POSISI,
 				b.STS_TERIMA,
-				c.TIPE
+				c.TIPE,
+				PSN.KODE_PASIEN,
+				PSN.NAMA,
+				PSN.JENIS_KELAMIN
 			FROM admum_rawat_jalan b
 			JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
 			JOIN rk_laborat_rj c ON c.ID_PELAYANAN = b.ID
-			WHERE $where
-			AND b.STS_POSISI = '$posisi'
-			AND b.STS_TERIMA = '0'
-			AND b.TANGGAL = '$now'
+			WHERE b.TANGGAL = '$now'
+			AND b.STS_TERIMA_LAB = '0'
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -165,15 +144,14 @@ class Lab_home_m extends CI_Model {
 			JOIN rk_laborat_rj b ON b.ID_PELAYANAN = a.ID
 			WHERE a.TANGGAL = '$tanggal'
 			AND b.TIPE = '$tipe'
-			AND a.STS_POSISI = '2'
-			AND a.STS_TERIMA = '2'
+			AND a.STS_TERIMA_LAB = '1'
 		";
 		$query = $this->db->query($sql);
 		return $query->row();
 	}
 
 	function terima_pasien($id){
-		$sql = "UPDATE admum_rawat_jalan SET STS_TERIMA = '2' WHERE ID = '$id'";
+		$sql = "UPDATE admum_rawat_jalan SET STS_TERIMA = '2', STS_TERIMA_LAB = '1' WHERE ID = '$id'";
 		$this->db->query($sql);
 	}
 
@@ -198,47 +176,50 @@ class Lab_home_m extends CI_Model {
 				if($tanggal_awal != "" && $tanggal_akhir != ""){
 					$where = $where." 
 						AND STR_TO_DATE(b.TANGGAL, '%d-%m-%Y') >= STR_TO_DATE('$tanggal_awal', '%d-%m-%Y') 
-						AND STR_TO_DATE(b.TANGGAL, '%d-%m-%Y') <= STR_TO_DATE('$tanggal_akhir', '%d-%m-%Y') 
-						AND b.STS_POSISI = '$posisi'
+						AND STR_TO_DATE(b.TANGGAL, '%d-%m-%Y') <= STR_TO_DATE('$tanggal_akhir', '%d-%m-%Y')
 					";
 				}else if($bulan != 0 && $tahun != ""){
 					$where = $where." 
 						AND b.BULAN = '$bulan' 
 						AND b.TAHUN = '$tahun'
-						AND b.STS_POSISI = '$posisi'
 					";
 				}
 			}else{
 				if($tanggal_awal != "" && $tanggal_akhir != ""){
 					$where = $where." 
 						AND STR_TO_DATE(b.TANGGAL, '%d-%m-%Y') >= STR_TO_DATE('$tanggal_awal', '%d-%m-%Y') 
-						AND STR_TO_DATE(b.TANGGAL, '%d-%m-%Y') <= STR_TO_DATE('$tanggal_akhir', '%d-%m-%Y') 
-						AND b.STS_POSISI = '$posisi' 
-						AND b.STS_TERIMA = '2'
+						AND STR_TO_DATE(b.TANGGAL, '%d-%m-%Y') <= STR_TO_DATE('$tanggal_akhir', '%d-%m-%Y')
+						AND b.STS_TERIMA_LAB = '1'
 					";
 				}else if($bulan != 0 && $tahun != ""){
 					$where = $where." 
 						AND b.BULAN = '$bulan' 
-						AND b.TAHUN = '$tahun' 
-						AND b.STS_POSISI = '$posisi' 
-						AND b.STS_TERIMA = '2'
+						AND b.TAHUN = '$tahun'
+						AND b.STS_TERIMA_LAB = '1'
 					";
 				}else{
-					$where = $where." AND b.STS_POSISI = '$posisi' AND b.TANGGAL = '$now' AND b.STS_TERIMA = '2'";
+					$where = $where." AND b.TANGGAL = '$now' AND b.STS_TERIMA_LAB = '1'";
 				}
 			}
 		}
 
 		$sql = "
 			SELECT 
-				PSN.*,
-				b.ID AS ID_RJ,
+				b.ID,
 				b.TANGGAL,
 				b.BULAN,
 				b.TAHUN,
-				b.WAKTU AS WAKTU_RJ,
+				b.WAKTU,
 				b.ID_POLI,
-				c.ID_DIVISI
+				b.PASIEN_DARI,
+				c.ID_DIVISI,
+				PSN.ID AS ID_PASIEN,
+				PSN.KODE_PASIEN,
+				PSN.NAMA,
+				PSN.JENIS_KELAMIN,
+				PSN.ALAMAT,
+				PSN.NAMA_AYAH,
+				PSN.NAMA_IBU
 			FROM admum_rawat_jalan b
 			LEFT JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
 			LEFT JOIN admum_poli c ON c.ID = b.ID_POLI
@@ -698,6 +679,183 @@ class Lab_home_m extends CI_Model {
 	function hapus_lab_det($id){
 		$sql = "DELETE FROM rk_laborat_rj_detail WHERE ID = '$id'";
 		$this->db->query($sql);
+	}
+
+	function getDetailLayananRJ($id_pasien, $tgl){
+
+		$where = "1=1";
+		if($tgl != "" || $tgl != null){
+			$where = $where." AND a.TANGGAL LIKE '%$tgl%'";
+		}
+
+		$sql = "
+		SELECT a.TANGGAL, a.KET, a.JUMLAH, a.HARGA, a.TARIF, a.ORD, a.TAB FROM(
+			SELECT a.TANGGAL, c.NAMA_TINDAKAN AS KET, b.JUMLAH, 0 AS HARGA, b.SUBTOTAL AS TARIF, 'TINDAKAN' AS ORD, 1 AS TAB  FROM rk_tindakan_rj a 
+			JOIN rk_tindakan_rj_detail b ON a.ID = b.ID_TINDAKAN_RJ
+			JOIN admum_setup_tindakan c ON b.TINDAKAN = c.ID
+			WHERE a.ID_PASIEN = $id_pasien
+
+			UNION ALL
+
+			SELECT a.TANGGAL, a.DIAGNOSA AS KET, 0 AS JUMLAH, 0 AS HARGA, 0 AS TARIF, 'DIAGNOSA' AS ORD, 2 AS TAB  FROM rk_diagnosa_rj a 
+			WHERE a.ID_PASIEN = $id_pasien
+
+			UNION ALL
+
+			SELECT a.TANGGAL, b.JENIS_LABORAT AS KET, 1 AS JUMLAH, 0 AS HARGA, SUM(a.TOTAL_TARIF) AS TARIF, 'LABORAT' AS ORD, 3 AS TAB  FROM rk_laborat_rj a
+			LEFT JOIN admum_setup_jenis_laborat b ON a.JENIS_LABORAT = b.ID
+			WHERE a.ID_PASIEN = $id_pasien
+			GROUP BY b.JENIS_LABORAT
+
+			UNION ALL 
+
+			SELECT a.TANGGAL, c.NAMA_OBAT AS KET, b.JUMLAH_BELI AS JUMLAH, b.HARGA, b.SUBTOTAL AS TARIF, 'RESEP' AS ORD, 4 AS TAB  FROM rk_resep_rj a 
+			JOIN rk_resep_detail_rj b ON b.ID_RESEP = a.ID
+			JOIN admum_setup_nama_obat c ON b.ID_OBAT = c.ID
+			WHERE a.ID_PASIEN = $id_pasien
+		) a
+		WHERE $where
+		ORDER BY a.TAB ASC, a.TANGGAL DESC
+		";
+
+		return $this->db->query($sql)->result();
+	}
+
+	function get_tindakan_rj($id_pasien,$tgl){
+		$where = "1=1";
+		
+		if($tgl != "" || $tgl != null){
+			$where = $where." AND a.TANGGAL LIKE '%$tgl%'";
+		}
+
+		$sql = "
+			SELECT 
+				a.ID,
+				a.TANGGAL, 
+				c.NAMA_TINDAKAN, 
+				b.JUMLAH, 
+				b.SUBTOTAL,
+				d.NAMA AS NAMA_POLI,
+				e.NAMA
+			FROM rk_tindakan_rj a 
+			JOIN rk_tindakan_rj_detail b ON a.ID = b.ID_TINDAKAN_RJ
+			JOIN admum_setup_tindakan c ON b.TINDAKAN = c.ID
+			LEFT JOIN admum_poli d ON d.ID = a.ID_POLI
+			LEFT JOIN kepeg_pegawai e ON e.ID = a.ID_PEG_DOKTER
+			WHERE $where 
+			AND a.ID_PASIEN = '$id_pasien'
+		";
+		return $this->db->query($sql)->result();
+	}
+
+	function get_diagnosa_rj($id_pasien,$tgl){
+		$where = "1=1";
+		
+		if($tgl != "" || $tgl != null){
+			$where = $where." AND a.TANGGAL LIKE '%$tgl%'";
+		}
+
+		$sql = "
+			SELECT 
+				a.ID,
+				a.TANGGAL, 
+				a.DIAGNOSA,
+				a.TINDAKAN,
+				d.URAIAN,
+				b.NAMA AS NAMA_POLI,
+				c.NAMA
+			FROM rk_diagnosa_rj a 
+			LEFT JOIN admum_poli b ON b.ID = a.ID_POLI
+			LEFT JOIN kepeg_pegawai c ON c.ID = a.ID_PEG_DOKTER
+			LEFT JOIN admum_jenis_penyakit d ON d.ID = a.ID_PENYAKIT
+			WHERE $where
+			AND a.ID_PASIEN = '$id_pasien'
+		";
+		return $this->db->query($sql)->result();
+	}
+
+	function get_laborat_rj($id_pasien,$tgl){
+		$where = "1=1";
+		
+		if($tgl != "" || $tgl != null){
+			$where = $where." AND a.TANGGAL LIKE '%$tgl%'";
+		}
+
+		$sql = "
+			SELECT 
+				a.ID,
+				a.KODE_LAB,
+				a.TANGGAL, 
+				b.JENIS_LABORAT,
+				a.CITO,
+				SUM(a.TOTAL_TARIF) AS TARIF
+			FROM rk_laborat_rj a
+			LEFT JOIN admum_setup_jenis_laborat b ON a.JENIS_LABORAT = b.ID
+			WHERE $where 
+			AND a.ID_PASIEN = '$id_pasien'
+			GROUP BY b.JENIS_LABORAT
+		";
+		return $this->db->query($sql)->result();
+	}
+
+	function get_pemeriksaan_lab($id_lab){
+		$sql = "
+			SELECT
+				a.ID,
+				a.ID_PEMERIKSAAN_RJ,
+				a.TANGGAL,
+				b.NAMA_PEMERIKSAAN,
+				b.NILAI_NORMAL,
+				a.HASIL
+			FROM rk_laborat_rj_detail a
+			JOIN (
+				SELECT
+					a.*,
+					b.NILAI_NORMAL
+				FROM admum_setup_pemeriksaan a
+				JOIN admum_setup_pemeriksaan_nilai b ON b.ID_PEMERIKSAAN = a.ID
+			) b ON a.PEMERIKSAAN = b.ID
+			WHERE a.ID_PEMERIKSAAN_RJ = '$id_lab'
+			ORDER BY a.ID ASC
+		";
+		return $this->db->query($sql)->result();
+	}
+
+	function get_resep_rj($id_pasien,$tgl){
+		$where = "1=1";
+		
+		if($tgl != "" || $tgl != null){
+			$where = $where." AND a.TANGGAL LIKE '%$tgl%'";
+		}
+
+		$sql = "
+			SELECT 
+				a.ID,
+				a.KODE_RESEP,
+				a.TANGGAL,
+				a.DIMINUM_SELAMA,
+				a.ALERGI_OBAT,
+				d.NAMA AS NAMA_POLI,
+				e.NAMA
+			FROM rk_resep_rj a
+			LEFT JOIN admum_poli d ON d.ID = a.ID_POLI
+			LEFT JOIN kepeg_pegawai e ON e.ID = a.ID_PEG_DOKTER
+			WHERE $where
+			AND a.ID_PASIEN = '$id_pasien'
+		";
+		return $this->db->query($sql)->result();
+	}
+
+	function get_resep_obat_rj($id_resep){
+		$sql = "
+			SELECT
+				a.*,
+				b.NAMA_OBAT
+			FROM rk_resep_detail_rj a
+			LEFT JOIN admum_setup_nama_obat b ON b.ID = a.ID_OBAT
+			WHERE a.ID_RESEP = '$id_resep'
+		";
+		return $this->db->query($sql)->result();
 	}
 
 }

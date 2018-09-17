@@ -54,8 +54,8 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 			'page' => 'poli/rk_tindakan_rj_v',
 			'title' => 'Pelayanan Rawat Jalan',
 			'subtitle' => 'Pelayanan Rawat Jalan',
-			'master_menu' => 'pelayanan',
-			'view' => 'pelayanan_rj',
+			'master_menu' => 'home',
+			'view' => 'home',
 			'dt' => $this->model->data_rawat_jalan_id($idx),
 			'id' => $idx,
 			'url_simpan' => base_url().'poli/rk_pelayanan_rj_c/simpan_tindakan',
@@ -324,6 +324,8 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 
 		$this->insert_kode_lab();
 
+		$this->db->query("UPDATE admum_rawat_jalan SET PASIEN_DARI = 'Poli' WHERE ID = '$id_pelayanan'");
+
 		echo '1';
 	}
 
@@ -456,26 +458,31 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		$id_poli = $this->input->post('id_poli');
 		$id_peg_dokter = $this->input->post('id_dokter');
 		$id_pasien = $this->input->post('id_pasien');
-		$alergi = $this->input->post('alergi');
 		$kode_resep = $this->input->post('kode_resep');
+		$alergi = $this->input->post('alergi');
+		$uraian = $this->input->post('alergi_obat');
+		$banyaknya_resep = $this->input->post('banyak_resep');
 		$diminum_selama = $this->input->post('diminum_selama');
 		$tanggal = date('d-m-Y');
 		$bulan = date('n');
 		$tahun = date('Y');
 		$total = str_replace(',', '', $this->input->post('grandtotal_resep'));
+		$tot_service = $this->input->post('total_biaya_service');
+		$total_biaya_service = $total + $tot_service;
 
 		$id_obat = $this->input->post('id_obat_resep');
 		$harga = $this->input->post('harga_obat');
+		$service = $this->input->post('service');
 		$jumlah = $this->input->post('jumlah_obat');
 		$takaran = $this->input->post('takaran_resep');
 		$aturan_umum = $this->input->post('aturan_minum');
 
-		$this->model->simpan_resep($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$alergi,$kode_resep,$diminum_selama,$tanggal,$bulan,$tahun,$total);
+		$this->model->simpan_resep($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$kode_resep,$alergi,$uraian,$banyaknya_resep,$diminum_selama,$tanggal,$bulan,$tahun,$total,$total_biaya_service);
 		$id_resep = $this->db->insert_id();
 
 		foreach ($id_obat as $key => $value) {
 			$subtotal = $harga[$key] * $jumlah[$key];
-			$this->model->simpan_resep_det($id_resep,$value,$harga[$key],$jumlah[$key],$subtotal,$takaran[$key],$aturan_umum[$key]);
+			$this->model->simpan_resep_det($id_resep,$value,$harga[$key],$service[$key],$jumlah[$key],$subtotal,$takaran[$key],$aturan_umum[$key],$tanggal,$tahun,$bulan);
 			$this->model->ubah_stok_obat($value,$jumlah[$key]);
 		}
 
@@ -672,6 +679,12 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function get_surat_dokter_id(){
+		$id_rj = $this->input->post('id');
+		$data = $this->model->get_surat_dokter_id($id_rj);
+		echo json_encode($data);
+	}
+
 	function cek_surat_dokter(){
 		$id_pasien = $this->input->post('id_pasien');
 		$tanggal = date('d-m-Y');
@@ -695,12 +708,19 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		$mulai_tanggal = $this->input->post('mulai_tgl_sd');
 		$sampai_tanggal = $this->input->post('sampai_tgl_sd');
 
-		$this->model->simpan_surat_dokter($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$tanggal,$bulan,$tahun,$waktu_istirahat,$mulai_tanggal,$sampai_tanggal);
+		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM rk_surat_dokter_rj WHERE ID_PELAYANAN = '$id_pelayanan'";
+		$qry_cek = $this->db->query($sql_cek);
+		$total = $qry_cek->row()->TOTAL;
+
+		if($total == 0){
+			$this->model->simpan_surat_dokter($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$tanggal,$bulan,$tahun,$waktu_istirahat,$mulai_tanggal,$sampai_tanggal);
+		}
 		
 		echo '1';
 	}
 
-	function surat_dokter($id_pasien){
+	function surat_dokter($id){
+		$id_pasien = $this->decode($id);
 		$data1 = $this->model->data_surat_dokter_id($id_pasien);
 
 		$data = array(

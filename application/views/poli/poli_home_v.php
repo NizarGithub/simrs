@@ -30,6 +30,7 @@
         <link href="<?php echo base_url(); ?>assets/plugins/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
         <link href="<?php echo base_url(); ?>assets/plugins/select2/dist/css/select2.css" rel="stylesheet" type="text/css">
         <link href="<?php echo base_url(); ?>assets/plugins/select2/dist/css/select2-bootstrap.css" rel="stylesheet" type="text/css">
+        <link href="<?php echo base_url(); ?>assets/plugins/timepicker/bootstrap-timepicker.min.css" rel="stylesheet">
 
         <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <link href="<?php echo base_url(); ?>assets/css/core.css" rel="stylesheet" type="text/css" />
@@ -54,25 +55,6 @@
         <style type="text/css">
         #ketap_ketip{
             display: none;
-        }
-
-        #popup_pasien_baru {
-            width: 100%;
-            height: 100%;
-            position: fixed;
-            background: rgba(0,0,0,.7);
-            top: 0;
-            left: 0;
-            z-index: 9999;
-            display: none;
-        }
-        .window_pasien_baru {
-            width:50%;
-            height:auto;
-            position: relative;
-            padding: 10px;
-            margin: 2% auto;
-            background-color: #fff;
         }
         </style>
         <script src="<?php echo base_url(); ?>assets/js/modernizr.min.js"></script>
@@ -169,7 +151,7 @@
                             </li>
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
-                            <li>
+                            <li data-original-title="Notifikasi Pasien Baru" title="" data-placement="bottom" data-toggle="tooltip">
                                 <!-- Notification -->
                                 <div class="notification-box">
                                     <ul class="list-inline m-b-0">
@@ -221,6 +203,41 @@
                                 </a>
                             </li>
                             <?php } ?>
+
+                            <?PHP 
+                            $get_menu2 = $this->master_model_m->get_menu_2($id_user, 9);
+                            foreach ($get_menu2 as $key => $menu2) {
+                            ?>
+
+                                <?PHP if($menu2->LINK == null || $menu2->LINK == ""){ ?>
+                                    <li <?php if($master_menu == $menu2->MASTER){ echo 'class="has-submenu active"';}else{echo 'class="has-submenu"';} ?> >
+                                        <a href="#"><i class="<?=$menu2->ICON;?>"></i><span> <?=$menu2->NAMA;?> </span> </a>
+                                        <ul class="submenu">
+
+                                            <?PHP 
+                                                $get_menu3 = $this->master_model_m->get_menu_3($id_user, $menu2->ID);
+                                                foreach ($get_menu3 as $key => $menu3) {
+                                            ?>
+
+                                            <li <?php if($view == $menu3->VIEW){ echo 'class="active"';}else{echo '';} ?> >
+                                                <a href="<?php echo base_url().$menu3->LINK; ?>">
+                                                    <i class="fa fa-caret-right"></i> &nbsp; <?=$menu3->NAMA;?>
+                                                </a>
+                                            </li>
+
+                                            <?PHP } ?>
+
+                                        </ul>
+                                    </li>
+                                <?PHP } else { ?>
+                                    <li <?php if($view == $menu2->VIEW){ echo 'class="active"';}else{echo '';} ?> >
+                                        <a href="<?php echo base_url().$menu2->LINK;?>">
+                                            <i class="<?=$menu2->ICON;?>"></i> <span> <?=$menu2->NAMA;?> </span> 
+                                        </a>
+                                    </li>
+                                <?PHP } ?>
+
+                            <?PHP } ?>
                         </ul>
                         <!-- End navigation menu  --> 
                     </div>
@@ -257,14 +274,14 @@
                     <div class="col-lg-4 col-md-6">
                         <div class="card-box widget-user">
                             <div>
-                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/small-queue-management.png">
+                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/antrian.png">
                                 <div class="wid-u-info">
                                     <h4 class="m-t-0 m-b-5"> Nomor Antrian <!-- <b id="loket_offline"></b> --></h4>
                                     <!-- <h2 class="text-success" id="nomor_offline">0</h2> -->
                                     <button type="button" class="btn btn-purple waves-effect waves-light m-t-15" data-original-title="Nomor antrian sekarang" title="" data-placement="top" data-toggle="tooltip">
                                         <b id="nomor_offline"></b>
                                     </button>
-                                    <button type="button" class="btn btn-success waves-effect waves-light m-t-15" id="btn_closing" data-original-title="Digunakan untuk menghentikan Nomor Antrian dan me-reset ulang." title="" data-placement="top" data-toggle="tooltip">
+                                    <button type="button" class="btn btn-success waves-effect waves-light m-t-15" id="btn_closing" data-original-title="Digunakan untuk menghentikan Nomor Antrian dan me-reset ulang." title="" data-placement="right" data-toggle="tooltip">
                                         <b>Closing Antrian</b> <i class="fa fa-hand-stop-o"></i>
                                     </button>
                                 </div>
@@ -399,53 +416,88 @@
         <!-- End Of Closing Antrian Modal -->
 
         <!-- Modal -->
-        <div id="popup_pasien_baru">
-            <div class="window_pasien_baru">
-                <div class="row" id="view_data">
-                    <div class="col-md-12">
-                        <div class="card-box">
-                            <form class="form-horizontal" role="form">
-                                <div class="form-group">
-                                    <h4 class="header-title m-t-0">Daftar Pasien Baru</h4>
-                                </div>
-                                <div class="form-group">
-                                    <div class="table-responsive">
-                                        <table id="tabel_pasien_home" class="table table-hover table-bordered">
-                                            <thead>
-                                                <tr class="kuning_popup">
-                                                    <th style="text-align:center; vertical-align: middle;">
-                                                        <!-- <div class="checkbox checkbox-primary">
-                                                            <input id="checkboxAll" type="checkbox" name="centang_semua">
-                                                            <label for="checkboxAll">
-                                                                &nbsp;
-                                                            </label>
-                                                        </div> -->
-                                                    </th>
-                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">No</th>
-                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">No. RM</th>
-                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Tgl / Waktu</th>
-                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Nama Pasien</th>
-                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">JK</th>
-                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Antrian</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <center>
-                                        <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal" id="tutup_pas">Tutup</button>
-                                    </center>
-                                </div>
-                            </form>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#myModal1_ps_baru" id="popup_pasien_baru" style="display:none;">Standard Modal</button>
+        <div id="myModal1_ps_baru" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog" style="width:50%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title" id="myModalLabel">Pasien Baru</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <div class="scroll-y">
+                                <table id="tabel_pasien_home" class="table table-hover table-bordered">
+                                    <thead>
+                                        <tr class="kuning_popup">
+                                            <th style="text-align:center; vertical-align: middle;">
+                                                <!-- <div class="checkbox checkbox-primary">
+                                                    <input id="checkboxAll" type="checkbox" name="centang_semua">
+                                                    <label for="checkboxAll">
+                                                        &nbsp;
+                                                    </label>
+                                                </div> -->
+                                            </th>
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">No</th>
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">No. RM</th>
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">Tgl / Waktu</th>
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">Nama Pasien</th>
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">JK</th>
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">Antrian</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>  
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_pas">Tutup</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <!-- Modal -->
+        <button class="btn btn-primary" data-toggle="modal" data-target="#myModal1_ps_baru_ri" id="popup_pasien_baru_ri" style="display:none;">Standard Modal</button>
+        <div id="myModal1_ps_baru_ri" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog" style="width:50%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title" id="myModalLabel">Pasien Baru Rawat Inap</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <div class="scroll-y">
+                                <table id="tabel_pasien_home_ri" class="table table-hover table-bordered">
+                                    <thead>
+                                        <tr class="kuning_popup">
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">No</th>
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">No. RM</th>
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">Tgl MRS / Waktu</th>
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">Nama Pasien</th>
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">Jenis Kelamin</th>
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">Kamar</th>
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">No. Bed</th>
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">Tindakan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>  
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_pas_ri">Tutup</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
 
         <!-- jQuery  -->
         <script src="<?php echo base_url(); ?>assets/js/jquery.min.js"></script>
@@ -497,6 +549,7 @@
         <script src="<?php echo base_url(); ?>assets/plugins/moment/moment.js"></script>
         <script src="<?php echo base_url(); ?>assets/plugins/bootstrap-daterangepicker/daterangepicker.js"></script>
         <script src="<?php echo base_url(); ?>assets/plugins/select2/dist/js/select2.min.js" type="text/javascript"></script>
+        <script src="<?php echo base_url(); ?>assets/plugins/timepicker/bootstrap-timepicker.min.js"></script>
 
         <!-- KNOB JS -->
         <!--[if IE]>
@@ -562,11 +615,17 @@
                     timer = setInterval(function () {
                         get_notif_pasien();
                         get_antrian_offline();
-                    }, 5000);
+                    }, 7000);
                 }else if(tdk == 'pelayanan_rj'){
                     get_antrian_offline();
+                }else if(tdk == 'jadwal_dokter'){
+                    get_antrian_offline();
+                }else if(tdk == 'pelayanan_ri'){
+                    notif_pasien_baru_ri()
+                    timer = setInterval(function () {
+                        notif_pasien_baru_ri();
+                    }, 7000);
                 }else{
-                    $('#popup_pasien_baru').hide();
                     snd.pause();
                 }
             }
@@ -574,14 +633,15 @@
             // console.log(level);
 
             $('#li_notif').click(function(){
-                snd.pause();
-                $('#popup_pasien_baru').show();
-                data_pasien_baru();
-            });
-
-            $('#tutup_pas').click(function(){
-                $('#popup_pasien_baru').fadeOut();
-                snd.pause();
+                if(tdk == 'pelayanan_ri'){
+                    snd.pause();
+                    $('#popup_pasien_baru_ri').click();
+                    data_pasien_baru_ri();
+                }else{
+                    snd.pause();
+                    $('#popup_pasien_baru').click();
+                    data_pasien_baru();
+                }
             });
 
             $('#btn_closing').click(function(){
@@ -724,6 +784,7 @@
                             var aksi = '<button class="btn btn-success waves-effect waves-light btn-sm" type="button" onclick="terima_pasien('+result[i].ID+');">Proses Tindakan</button>';
 
                             result[i].WAKTU = result[i].WAKTU==null?"00:00":result[i].WAKTU;
+                            result[i].JENIS_KELAMIN = result[i].JENIS_KELAMIN=='L'?'Laki - Laki':'Perempuan';
                             var antrian = result[i].KODE_ANTRIAN+' - '+result[i].NOMOR_ANTRIAN;
 
                             $tr +=  '<tr>'+
@@ -750,7 +811,7 @@
                 type : "POST",
                 dataType : "json",
                 success : function(res){
-                    $('#popup_pasien_baru').fadeOut();
+                    $('#tutup_pas').click();
                     get_notif_pasien();
                     data_pasien_baru();
                     data_pasien();
@@ -838,6 +899,81 @@
                         //   }
                         // );
                     }
+                }
+            });
+        }
+
+        function notif_pasien_baru_ri(){
+            $.ajax({
+                url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/notif_pasien_baru',
+                type : "POST",
+                dataType : "json",
+                success : function(res){
+                    if(res['TOTAL'] == 0){
+                        $('#ketap_ketip').hide();
+                        snd.pause();
+                    }else{
+                        toastr["success"]("Ada pasien baru!");
+                        $('#ketap_ketip').show();
+                        snd.play();
+                    }
+
+                    $('#tot_pasien').html(res['TOTAL']);
+                }
+            });
+        }
+
+        function data_pasien_baru_ri(){
+            $.ajax({
+                url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/data_pasien_baru',
+                type : "POST",
+                dataType : "json",
+                success : function(result){
+                    $tr = "";
+
+                    if(result == "" || result == null){
+                        $tr = "<tr><td colspan='8' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+                    }else{
+                        var no = 0;
+
+                        for(var i=0; i<result.length; i++){
+                            no++;
+
+                            var aksi = '<button class="btn btn-primary waves-effect waves-light btn-sm" type="button" onclick="terima_pasien_ri('+result[i].ID+');">Proses</button>';
+
+                            result[i].WAKTU = result[i].WAKTU==null?"00:00":result[i].WAKTU;
+                            result[i].JENIS_KELAMIN = result[i].JENIS_KELAMIN=='L'?'Laki - Laki':'Perempuan';
+                            var kamar = result[i].KODE_KAMAR+' - '+result[i].VISITE_DOKTER;
+
+                            $tr +=  '<tr>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].KODE_PASIEN+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL_MASUK+' - '+result[i].WAKTU+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+kamar+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].NOMOR_BED+'</td>'+
+                                    '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
+                                    '</tr>';
+                        }
+                    }
+
+                    $('#tabel_pasien_home_ri tbody').html($tr);
+                }
+            });
+        }
+
+        function terima_pasien_ri(id){
+            $.ajax({
+                url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/terima_pasien',
+                data : {id:id},
+                type : "POST",
+                dataType : "json",
+                success : function(res){
+                    $('#tutup_pas_ri').click();
+                    notif_pasien_baru_ri();
+                    data_pasien_baru_ri();
+                    data_rawat_inap();
                 }
             });
         }

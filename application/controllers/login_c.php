@@ -96,7 +96,7 @@ class Login_c extends CI_Controller {
 				redirect('finance/finance_home_c');
 			}else if($data->LEVEL == 'Perawat'){
 				redirect('poli/rk_pelayanan_ri_c');
-			}else if($data->LEVEL == null){
+			}else if($data->LEVEL == 'Super Admin'){
 				redirect('portal');
 			}
 

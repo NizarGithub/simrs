@@ -358,25 +358,35 @@ function data_pasien(){
 
                     if(result[i].STATUS_SUDAH == '1'){
                         panggil = '<span class="label label-success">Selesai Ditangani</span>';
-                        aksi = "<button type='button' onclick='detail_rm("+result[i].ID_RJ+","+result[i].ID+");' class='btn btn-primary waves-effect waves-light btn-sm' data-toggle='modal' data-target='.bs-example-modal-lg'>"+
+                        aksi = "<button type='button' onclick='detail_rm("+result[i].ID_RJ+","+result[i].ID+");' class='btn btn-primary waves-effect waves-light btn-sm m-r-5' data-toggle='modal' data-target='.bs-example-modal-lg'>"+
                                     "<i class='fa fa-eye'></i> Detail"+
-                               "</button>";
+                               "</button>"+
+                               '<a href="<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/tindakan_rj/'+encodedString+'" class="btn btn-warning waves-effect waves-light btn-sm" onclick="klik_tindakan('+result[i].ID+');">'+
+                                    '<i class="fa fa-user-md"></i> Tindakan'+
+                                '</a>';
                     }else{
-                        panggil = '<button type="button" onclick="panggil_pasien('+result[i].ID_RJ+');" class="btn btn-purple waves-effect waves-light btn-sm">'+
-                                    nomor+' <i class="fa fa-bullhorn"></i>'+
-                                  '</button>';
-                        if(level == null || level == ""){
-                            aksi =  '<button type="button" onclick="detail_rm('+result[i].ID+');" class="btn btn-success waves-effect waves-light btn-sm">'+
-                                        '<i class="fa fa-book"></i>';
-                                    '</button>';
-                        }else{
-                            aksi = '<a href="<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/tindakan_rj/'+encodedString+'" class="btn btn-success waves-effect waves-light btn-sm m-r-5" onclick="klik_tindakan('+result[i].ID+');">'+
-                                        '<i class="fa fa-user-md"></i> Tindakan'+
-                                    '</a>'+
-                                   '<button type="button" onclick="detail_pasien('+result[i].ID+');" class="btn btn-primary waves-effect waves-light btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg">'+
+                        if(result[i].STATUS_PANGGIL == '0'){
+                            aksi = '<button type="button" onclick="detail_pasien('+result[i].ID+');" class="btn btn-primary waves-effect waves-light btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg">'+
                                         '<i class="fa fa-eye"></i> Detail'+
                                    '</button>';
+                        }else{
+                            panggil = '<button type="button" onclick="panggil_pasien('+result[i].ID_RJ+');" class="btn btn-purple waves-effect waves-light btn-sm">'+
+                                        nomor+' <i class="fa fa-bullhorn"></i>'+
+                                      '</button>';
+                            if(level == null || level == ""){
+                                aksi =  '<button type="button" onclick="detail_rm('+result[i].ID+');" class="btn btn-success waves-effect waves-light btn-sm">'+
+                                            '<i class="fa fa-book"></i>';
+                                        '</button>';
+                            }else{
+                                aksi = '<a href="<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/tindakan_rj/'+encodedString+'" class="btn btn-success waves-effect waves-light btn-sm m-r-5" onclick="klik_tindakan('+result[i].ID+');">'+
+                                            '<i class="fa fa-user-md"></i> Tindakan'+
+                                        '</a>'+
+                                       '<button type="button" onclick="detail_pasien('+result[i].ID+');" class="btn btn-primary waves-effect waves-light btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg">'+
+                                            '<i class="fa fa-eye"></i> Detail'+
+                                       '</button>';
+                            }
                         }
+                        
                     }
 
                     result[i].WAKTU = result[i].WAKTU==null?"00:00":result[i].WAKTU;
@@ -946,7 +956,7 @@ function get_total_all(){
                         <div class="input-group">
                             <input type="text" class="form-control" name="cari_pasien" id="cari_pasien" placeholder="Cari pasien..." value="">
                             <span class="input-group-btn">
-                                <button type="button" class="btn waves-effect waves-light btn-warning" id="tombol_cari">
+                                <button type="button" class="btn waves-effect waves-light btn-default" id="tombol_cari">
                                     <i class="fa fa-search"></i>
                                 </button>
                             </span>

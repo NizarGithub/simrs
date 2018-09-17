@@ -7,7 +7,7 @@
 <script type="text/javascript">
 var ajax = "";
 $(document).ready(function(){
-	<?php if($this->session->flashdata('sukses')){?>
+	  <?php if($this->session->flashdata('sukses')){?>
         notif_simpan();
     <?php }else if($this->session->flashdata('ubah')){?>
         notif_ubah();

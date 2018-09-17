@@ -57,25 +57,6 @@
         #ketap_ketip{
             display: none;
         }
-
-        #popup_pasien_baru {
-            width: 100%;
-            height: 100%;
-            position: fixed;
-            background: rgba(0,0,0,.7);
-            top: 0;
-            left: 0;
-            z-index: 9999;
-            display: none;
-        }
-        .window_pasien_baru {
-            width:50%;
-            height:auto;
-            position: relative;
-            padding: 10px;
-            margin: 2% auto;
-            background-color: #fff;
-        }
         </style>
         <script src="<?php echo base_url(); ?>assets/js/modernizr.min.js"></script>
     </head>
@@ -92,8 +73,7 @@
         );
     ?>
 
-    <body>
-
+    <body onload="startTime();">
         <!-- Navigation Bar-->
         <header id="topnav">
             <div class="topbar-main" style="background-color:#3be8b0; height:60px;">
@@ -179,7 +159,7 @@
                             </li>
 
                             <?PHP 
-                            $get_menu2 = $this->master_model_m->get_menu_2($id_user, 17);
+                            $get_menu2 = $this->master_model_m->get_menu_2($id_user, 11);
                             foreach ($get_menu2 as $key => $menu2) {
                             ?>
 
@@ -223,7 +203,6 @@
         <div class="wrapper">
             <div class="container">
                 <br>
-                <!--
                 <div class="row">
                     <input type="hidden" id="id_antrian_now" value="">
                     <input type="hidden" id="kode_antrian_now" value="">
@@ -231,29 +210,55 @@
                     <input type="hidden" id="id_antrian_now_on" value="">
                     <input type="hidden" id="kode_antrian_now_on" value="">
                     <input type="hidden" id="jml_antrian_now_on" value="">
-                    <input type="hidden" id="ke_tindakan" value="">
+                    <!-- <div class="col-lg-3 col-md-6">
+                        <div class="card-box widget-user">
+                            <div>
+                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/antri_online.png">
+                                <div class="wid-u-info">
+                                    <h4 class="m-t-0 m-b-5">Antrian Online</h4>
+                                    <button type="button" class="btn btn-info waves-effect waves-light m-b-5"><b id="loket_online"></b></button>
+                                    <button type="button" class="btn btn-purple waves-effect waves-light m-b-5" onclick="panggil_antrian('online');"><i class="fa fa-bullhorn m-r-5"></i><b id="nomor_online">-</b></button>
+                                    <button type="button" class="btn btn-success waves-effect waves-light m-b-5" onclick="next_antri('online');"><b>Berikutnya</b> <i class="fa fa-arrow-circle-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
 
+                    <?php if($view == 'home'){ ?>
                     <div class="col-lg-4 col-md-6">
                         <div class="card-box widget-user">
                             <div>
-                                <img alt="user" class="img-responsive img-circle" src="<?php //echo base_url(); ?>picture/small-queue-management.png">
+                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/small-queue-management.png">
                                 <div class="wid-u-info">
-                                    <h4 class="m-t-0 m-b-5"> Nomor Antrian </h4>
+                                    <h4 class="m-t-0 m-b-5"> Nomor Antrian <!-- <b id="loket_offline"></b> --></h4>
+                                    <!-- <h2 class="text-success" id="nomor_offline">0</h2> -->
                                     <button type="button" class="btn btn-purple waves-effect waves-light m-t-15" data-original-title="Nomor antrian sekarang" title="" data-placement="top" data-toggle="tooltip">
                                         <b id="nomor_offline"></b>
                                     </button>
-                                    <button type="button" class="btn btn-success waves-effect waves-light m-t-15" data-target="#modalClosing" data-toggle="modal" data-original-title="Digunakan untuk menghentikan Nomor Antrian dan me-reset ulang." title="" data-placement="top" data-toggle="tooltip">
+                                    <button type="button" class="btn btn-success waves-effect waves-light m-t-15" id="btn_closing" data-original-title="Digunakan untuk menghentikan Nomor Antrian dan me-reset ulang." title="" data-placement="top" data-toggle="tooltip">
                                         <b>Closing Antrian</b> <i class="fa fa-hand-stop-o"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-
+                    <?php }else{ ?>
                     <div class="col-lg-4 col-md-6">
                         <div class="card-box widget-user">
                             <div>
-                                <img alt="user" class="img-responsive img-circle" src="<?php //echo base_url(); ?>picture/Clock-Icon-Image.png">
+                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/Recent-Documents-icon.png">
+                                <div class="wid-u-info">
+                                    <h4 class="m-t-0 m-b-5">Shift</h4>
+                                    <h2 class="text-success" id="shift_txt">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php } ?>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card-box widget-user">
+                            <div>
+                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/Clock-Icon-Image.png">
                                 <div class="wid-u-info">
                                     <h4 class="m-t-0 m-b-5">Waktu</h4>
                                     <h2 class="text-info" id="waktu_txt">0</h2>
@@ -265,16 +270,16 @@
                     <div class="col-lg-4 col-md-6">
                         <div class="card-box widget-user">
                             <div>
-                                <img alt="user" class="img-responsive img-circle" src="<?php //echo base_url(); ?>picture/kisspng-calendar-date-computer-icons-time-calendar-icon-5ac41db68edb81.1459769815228021025852.jpg">
+                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/kisspng-calendar-date-computer-icons-time-calendar-icon-5ac41db68edb81.1459769815228021025852.jpg">
                                 <div class="wid-u-info">
                                     <h4 class="m-t-0 m-b-5">Tanggal</h4>
-                                    <h2 class="text-danger"><?php //echo date('d'); ?> <?php //echo $bulan[date('n')]; ?> <?php //echo date('Y'); ?></h2>
+                                    <h2 class="text-danger"><?php echo date('d'); ?> <?php echo $bulan[date('n')]; ?> <?php echo date('Y'); ?></h2>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                -->
+
                 <?php $this->load->view($page); ?>
 
                 <br>
@@ -309,46 +314,42 @@
             </div>
             <!-- end container -->
 
-            <div id="popup_pasien_baru">
-                <div class="window_pasien_baru">
-                    <div class="row" id="view_data">
-                        <div class="col-md-12">
-                            <div class="card-box">
-                                <form class="form-horizontal" role="form">
-                                    <div class="form-group">
-                                        <h4 class="header-title m-t-0">Daftar Pasien Baru</h4>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="table-responsive">
-                                            <table id="tabel_pasien_home" class="table table-hover table-bordered">
-                                                <thead>
-                                                    <tr class="kuning_popup">
-                                                        <th style="color:#fff; text-align:center;">#</th>
-                                                        <th style="color:#fff; text-align:center;">No</th>
-                                                        <th style="color:#fff; text-align:center;">No. RM</th>
-                                                        <th style="color:#fff; text-align:center;">Tgl / Waktu</th>
-                                                        <th style="color:#fff; text-align:center;">Nama Pasien</th>
-                                                        <th style="color:#fff; text-align:center;">Jenis Kelamin</th>
-                                                        <th style="color:#fff; text-align:center;">Pasien Dari</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <center>
-                                            <button type="button" class="btn btn-danger waves-effect" data-dismiss="modal" id="tutup_pas">Tutup</button>
-                                        </center>
-                                    </div>
-                                </form>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#myModal1_ps_baru" id="popup_pasien_baru" style="display:none;">Standard Modal</button>
+            <div id="myModal1_ps_baru" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
+                <div class="modal-dialog" style="width:50%;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            <h4 class="modal-title" id="myModalLabel">Pasien Baru</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <div class="scroll-y">
+                                    <table id="tabel_pasien_home" class="table table-hover table-bordered">
+                                        <thead>
+                                            <tr class="kuning_popup">
+                                                <th style="color:#fff; text-align:center;">No</th>
+                                                <th style="color:#fff; text-align:center;">Tgl / Waktu</th>
+                                                <th style="color:#fff; text-align:center;">No. RM</th>
+                                                <th style="color:#fff; text-align:center;">Nama Pasien</th>
+                                                <th style="color:#fff; text-align:center;">Jenis Kelamin</th>
+                                                <th style="color:#fff; text-align:center;">Pasien Dari</th>
+                                                <th style="color:#fff; text-align:center;">#</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            
+                                        </tbody>
+                                    </table>  
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_pas">Tutup</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
         </div>
 
         <!-- jQuery  -->
@@ -429,6 +430,23 @@
             var table = $('#datatable-fixed-header').DataTable( { fixedHeader: true } );
             $(".select2").select2();
 
+            toastr.options = {
+              "closeButton": false,
+              "debug": false,
+              "newestOnTop": false,
+              "progressBar": true,
+              "positionClass": "toast-bottom-left",
+              "preventDuplicates": false,
+              "showDuration": "300",
+              "hideDuration": "1000",
+              "timeOut": "5000",
+              "extendedTimeOut": "1000",
+              "showEasing": "swing",
+              "hideEasing": "linear",
+              "showMethod": "fadeIn",
+              "hideMethod": "fadeOut"
+            }
+
             if(level == null || level == ""){
                 
             }else{
@@ -436,22 +454,15 @@
                     get_notif_pasien();
                     timer = setInterval(function () {
                         get_notif_pasien();
-                    }, 5000);
+                    }, 7000);
                 }else{
-                    $('#popup_pasien_baru').hide();
                     snd.pause();
                 }
             }
 
             $('#show_notif').click(function(){
-                $('#popup_pasien_baru').show();
+                $('#popup_pasien_baru').click();
                 data_pasien_baru();
-            });
-
-            $('#tutup_pas').click(function(){
-                $('#popup_pasien_baru').fadeOut();
-                snd.pause();
-                clearInterval(timer);
             });
         });
 
@@ -469,41 +480,55 @@
             }
         });
 
+        function startTime() {
+            var today = new Date();
+            var h = today.getHours();
+            var m = today.getMinutes();
+            var s = today.getSeconds();
+            m = checkTime(m);
+            s = checkTime(s);
+
+            if(h >= 7 && h < 14){
+                $('#shift_txt').html('1 (Satu)');
+            }else if(h >= 14 && h < 21){
+                $('#shift_txt').html('2 (Dua)');
+            }else{
+                $('#shift_txt').html('3 (Tiga)');
+            }
+
+            document.getElementById('waktu_txt').innerHTML = h + ":" + m + ":" + s;
+            var t = setTimeout(startTime, 500);
+        }
+
+        function checkTime(i) {
+            if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+            return i;
+        }
+
         function get_notif_pasien(){
             $.ajax({
-                url : '<?php echo base_url(); ?>lab/lab_home_c/get_notif_pasien',
+                url : '<?php echo base_url(); ?>lab/lab_home_c/notif_pasien_baru',
                 type : "GET",
                 dataType : "json",
                 success : function(res){
-                    if(res.length == 0){
+                    if(res['TOTAL'] == 0){
                         $('#ketap_ketip').hide();
+                        snd.pause();
                     }else{
-                        for(var i=0; i<res.length; i++){
-                            if(res[i].STS_TERIMA == '0'){
-                                $('#ketap_ketip').show();
-                                // snd.play();
-                                // $('#popup_pasien_baru').show();
-                                // data_pasien_baru();
-                            }else{
-                                $('#ketap_ketip').hide();
-                            }
-                        }
+                        $('#ketap_ketip').show();
+                        toastr["success"]("Ada pasien baru!");
+                        // snd.play();
                     }
 
-                    $('#tot_pasien').html(res.length);
+                    $('#tot_pasien').html(res['TOTAL']);
                 }
             });
         }
 
         function data_pasien_baru(){
-            var keyword = "";
-
             $.ajax({
-                url : '<?php echo base_url(); ?>lab/lab_home_c/data_pasien',
-                data : {
-                    keyword:keyword
-                },
-                type : "GET",
+                url : '<?php echo base_url(); ?>lab/lab_home_c/data_pasien_baru',
+                type : "POST",
                 dataType : "json",
                 success : function(result){
                     $tr = "";
@@ -516,19 +541,16 @@
                         for(var i=0; i<result.length; i++){
                             no++;
                             
-                            var aksi = '<div class="checkbox checkbox-primary">'+
-                                        '    <input id="checkbox'+result[i].ID_RJ+'" type="checkbox" name="centang[]" value="'+result[i].ID_RJ+'" onclick="terima_pasien('+result[i].ID_RJ+');">'+
-                                        '    <label for="checkbox'+result[i].ID_RJ+'">&nbsp;</label>'+
-                                        '</div>';
+                            var aksi = '<button type="button" class="btn btn-success btn-sm" onclick="terima_pasien('+result[i].ID+');">Proses Tindakan</button>';
 
                             $tr +=  '<tr>'+
-                                    '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].TANGGAL+' - '+result[i].WAKTU+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].KODE_PASIEN+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].TANGGAL+' - '+result[i].WAKTU_RJ+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TIPE+'</td>'+
+                                    '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
                                     '</tr>';
                         }
                     }
@@ -557,14 +579,9 @@
                 type : "POST",
                 dataType : "json",
                 success : function(res){
-                    $('#popup_pasien_baru').fadeOut();
-                    snd.pause();
-                    clearInterval(timer);
-                    // console.log(res);
+                    $('#tutup_pas').click();
                     data_pasien();
-                    get_notif_pasien();
                     data_pasien_baru();
-                    tot_pasien_terima();
                 }
             });
         }

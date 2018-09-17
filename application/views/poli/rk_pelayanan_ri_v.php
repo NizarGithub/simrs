@@ -215,31 +215,59 @@ function data_rawat_inap(){
 			$tr = "";
 
 			if(result == "" || result == null){
-				$tr = "<tr><td colspan='8' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+				$tr = "<tr><td colspan='12' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
 				var no = 0;
 
 				for(var i=0; i<result.length; i++){
 					no++;
 
-					var tanggal = result[i].TANGGAL_MASUK+' - '+result[i].WAKTU;
-					var kelas = result[i].KELAS+' - '+result[i].VISITE_DOKTER;
-					var encodedString = Base64.encode(result[i].ID);
-
-					var aksi =  '<a href="<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/tindakan_ri/'+encodedString+'" class="btn btn-success waves-effect waves-light btn-sm"><i class="fa fa-user-md"></i>&nbsp;Tindakan</a>';
-
+					result[i].WAKTU = result[i].WAKTU==null?"-":result[i].WAKTU;
 					result[i].JENIS_KELAMIN = result[i].JENIS_KELAMIN=="L"?"Laki - Laki":"Perempuan";
 
+					var encodedString = Base64.encode(result[i].ID);
+					var aksi = '<a href="<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/tindakan_ri/'+encodedString+'" class="btn btn-success waves-effect waves-light btn-sm"><i class="fa fa-user-md"></i>&nbsp;Tindakan</a>';
+					var kelas = result[i].KODE_KAMAR+' - '+result[i].KELAS;
+					var tgl_mrs = result[i].TANGGAL_MASUK+'<br>'+result[i].WAKTU;
+					var tgl_krs = '';
+					var sistem_bayar = '';
+
+					if(result[i].TANGGAL_KELUAR == null && result[i].WAKTU_KELUAR == null){
+						tgl_krs = '-';
+					}else{
+						tgl_krs = result[i].TANGGAL_KELUAR+'<br>'+result[i].WAKTU_KELUAR;
+					}
+
+					if(result[i].SISTEM_BAYAR == '1'){
+						sistem_bayar = 'Umum';
+					}else{
+						sistem_bayar = 'Asuransi';
+					}
+
+					$tr2 = '';
+
 					$tr += "<tr>"+
-								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td style='text-align:center;'>"+tanggal+"</td>"+
-								"<td style='text-align:center;'>"+result[i].KODE_PASIEN+"</td>"+
-								"<td>"+result[i].NAMA_PASIEN+"</td>"+
-								"<td style='text-align:center;'>"+result[i].JENIS_KELAMIN+"</td>"+
-								"<td style='text-align:center;'>"+kelas+"</td>"+
-								"<td>"+result[i].NAMA_DOKTER+"</td>"+
-								"<td align='center'>"+aksi+"</td>"+
-							"</tr>";
+								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+tgl_mrs+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+tgl_krs+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_PASIEN+"</td>"+
+								"<td style='vertical-align:middle;'>"+result[i].NAMA_PASIEN+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+result[i].JENIS_KELAMIN+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+kelas+"<br><span class='label label-primary'>"+result[i].VISITE_DOKTER+"</span></td>"+
+								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].BIAYA_KAMAR_FIX)+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+result[i].DIRAWAT_SELAMA+" Hari</td>"+
+								"<td style='vertical-align:middle;'>"+result[i].NAMA_DOKTER+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+sistem_bayar+"</td>"+
+								"<td style='vertical-align:middle;' align='center'>"+aksi+"</td>"+
+							"</tr>"+
+							"<tr id='show_tr_"+result[i].ID+"'>"+$tr2+"</tr>";
+
+					if(result[i].DIRAWAT_SELAMA != 0){
+						$('#show_tr_'+result[i].ID).show();
+						for(var j=0; j<result[i].DIRAWAT_SELAMA; j++){
+							$tr += "<td>Hari 1</td>";
+						}
+					}
 				}
 			}
 
@@ -406,7 +434,7 @@ function onEnterText2(e){
 	                <div role="tabpanel" class="tab-pane fade in active" id="pasien_belum">
 	                	<form class="form-horizontal" role="form">
 	                		<div class="form-group">
-	                			<div class="col-md-5 pull-right">
+	                			<div class="col-md-12">
 					                <div class="input-group">
 					                    <input type="text" class="form-control" id="cari_pasien_belum" placeholder="Cari..." value="" onkeypress="return onEnterText(event);">
 					                    <span class="input-group-btn">
@@ -421,17 +449,21 @@ function onEnterText2(e){
 				                </div>
 	                		</div>
 	                	</form>
-	                	<div class="table-responsive">
+	                	<div class="table-responsive scroll-x">
 				            <table id="tabel_pasien_belum" class="table table-bordered">
 				                <thead>
 				                    <tr class="merah">
 				                        <th style="color:#fff; text-align:center;">No</th>
-				                        <th style="color:#fff; text-align:center;">Tanggal MRS</th>
+				                        <th style="color:#fff; text-align:center;">Tgl MRS / Waktu</th>
+				                        <th style="color:#fff; text-align:center;">Tgl KRS / Waktu</th>
 				                        <th style="color:#fff; text-align:center;">No. RM</th>
 				                        <th style="color:#fff; text-align:center;">Nama</th>
 				                        <th style="color:#fff; text-align:center;">Jenis Kelamin</th>
-				                        <th style="color:#fff; text-align:center;">Kelas</th>
+				                        <th style="color:#fff; text-align:center;">Kamar</th>
+				                        <th style="color:#fff; text-align:center;">Biaya</th>
+				                        <th style="color:#fff; text-align:center;">Dirawat Selama</th>
 				                        <th style="color:#fff; text-align:center;">Dokter</th>
+				                        <th style="color:#fff; text-align:center;">Sistem Bayar</th>
 				                        <th style="color:#fff; text-align:center;">Aksi</th>
 				                    </tr>
 				                </thead>

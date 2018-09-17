@@ -137,12 +137,13 @@ class Poli_home_m extends CI_Model {
 				b.STATUS_SUDAH,
 				c.ID_DIVISI,
 				e.KODE_ANTRIAN,
-				e.NOMOR_ANTRIAN
+				e.NOMOR_ANTRIAN,
+				e.STATUS_PANGGIL
 			FROM admum_rawat_jalan b
 			LEFT JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
 			LEFT JOIN admum_poli c ON c.ID = b.ID_POLI
 			LEFT JOIN kepeg_divisi d ON d.ID = c.ID_DIVISI
-			JOIN rk_antrian_pasien e ON e.ID_PASIEN = PSN.ID
+			JOIN rk_antrian_pasien e ON e.ID_PELAYANAN = b.ID
 			WHERE $where
 			ORDER BY b.ID ASC
 		";
@@ -222,15 +223,15 @@ class Poli_home_m extends CI_Model {
 		$sql = "
 			SELECT
 				DET.ID,
-				NM_OBT.KODE_OBAT,
-				NM_OBT.NAMA_OBAT,
+				DET.ID_RESEP,
+				DET.ID_OBAT,
+				b.NAMA_OBAT,
 				DET.TAKARAN,
 				DET.ATURAN_MINUM,
 				DET.HARGA,
 				DET.SUBTOTAL
 			FROM rk_resep_detail_rj DET
-			LEFT JOIN apotek_gudang_obat GD ON GD.ID = DET.ID_OBAT
-			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = GD.ID_SETUP_NAMA_OBAT
+			LEFT JOIN admum_setup_nama_obat b ON b.ID = DET.ID_OBAT
 			WHERE DET.ID_RESEP = '$id_resep'
 		";
 		$query = $this->db->query($sql);
@@ -303,7 +304,7 @@ class Poli_home_m extends CI_Model {
 			FROM admum_rawat_jalan b
 			JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
 			JOIN admum_poli c ON c.ID = b.ID_POLI
-			JOIN rk_antrian_pasien e ON e.ID_PASIEN = PSN.ID
+			JOIN rk_antrian_pasien e ON e.ID_PELAYANAN = b.ID
 			WHERE $where
 			AND b.STS_TERIMA = '0'
 		";
@@ -336,7 +337,7 @@ class Poli_home_m extends CI_Model {
 			FROM admum_rawat_jalan b
 			JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
 			JOIN admum_poli c ON c.ID = b.ID_POLI
-			JOIN rk_antrian_pasien e ON e.ID_PASIEN = PSN.ID
+			JOIN rk_antrian_pasien e ON e.ID_PELAYANAN = b.ID
 			WHERE $where
 			AND b.STS_TERIMA = '0'
 		";

@@ -190,6 +190,19 @@ function get_kode_pasien(){
     });
 }
 
+function get_biaya_adm(){
+    var sistem_bayar = 'Admin Ranap';
+    $.ajax({
+        url : '<?php echo base_url(); ?>admum/admum_pasien_ri_c/get_biaya_adm',
+        data : {sistem_bayar:sistem_bayar},
+        type : "POST",
+        dataType : "json",
+        success : function(row){
+            $('#biaya_adm').val(formatNumber(row['BIAYA']));
+        }
+    });
+}
+
 function data_provinsi(){
     var id_kota_kab = $('#kota').val();
     $.ajax({
@@ -205,6 +218,7 @@ function data_provinsi(){
 }
 
 function load_data_pasien(){
+    $('.load_tabel').show();
     var keyword = $('#cari_pasien').val();
     
     if(ajax){
@@ -220,31 +234,34 @@ function load_data_pasien(){
             $tr = "";
 
             if(result == "" || result == null){
-                $tr = "<tr><td style='text-align:center;' colspan='5'><b>Data Tidak Ada</b></td></tr>";
+                $tr = "<tr class='active'><td style='text-align:center;' colspan='9'><b>Data Tidak Ada</b></td></tr>";
             }else{
                 var no = 0;
 
                 for(var i=0; i<result.length; i++){
                     no++; 
 
-                    var jk = "";
-                    if(result[i].JENIS_KELAMIN == "L"){
-                        jk = "Laki - Laki";
-                    }else{
-                        jk = "Perempuan";
-                    }
+                    result[i].TANGGAL_LAHIR = (result[i].TANGGAL_LAHIR==null || result[i].TANGGAL_LAHIR=='')?"-":result[i].TANGGAL_LAHIR;
+                    result[i].NAMA_AYAH = result[i].NAMA_AYAH==null?"-":result[i].NAMA_AYAH;
+                    result[i].NAMA_IBU = result[i].NAMA_IBU==null?"-":result[i].NAMA_IBU;
+                    result[i].ALAMAT = (result[i].ALAMAT==null || result[i].ALAMAT=='')?"-":result[i].ALAMAT;
 
                     $tr += "<tr style='cursor:pointer;' onclick='klik_pasien("+result[i].ID+");'>"+
                                 "<td style='text-align:center;'>"+no+"</td>"+
-                                "<td>"+result[i].KODE_PASIEN+"</td>"+
-                                "<td>"+result[i].NAMA+"</td>"+
-                                "<td style='text-align:center;'>"+jk+"</td>"+
-                                "<td style='text-align:center;'>"+result[i].UMUR+" Tahun</td>"+
+                                "<td style='white-space:nowrap;'>"+result[i].KODE_PASIEN+"</td>"+
+                                "<td style='white-space:nowrap;'>"+result[i].NAMA+"</td>"+
+                                "<td style='text-align:center;'>"+result[i].JENIS_KELAMIN+"</td>"+
+                                "<td style='white-space:nowrap;'>"+result[i].TANGGAL_LAHIR+"</td>"+
+                                "<td style='white-space:nowrap;'>"+result[i].UMUR+" Tahun</td>"+
+                                "<td style='white-space:nowrap;'>"+result[i].NAMA_AYAH+"</td>"+
+                                "<td style='white-space:nowrap;'>"+result[i].NAMA_IBU+"</td>"+
+                                "<td style='white-space:nowrap;'>"+result[i].ALAMAT+"</td>"+
                             "</tr>";
                 }
             }
 
             $('#tabel_pasien tbody').html($tr);
+            $('.load_tabel').hide();
         }
     });
 
@@ -315,6 +332,7 @@ function klik_pasien(id){
             $('#kelurahan').attr('readonly','readonly');
 
             $('#btn_simpan').removeAttr('disabled');
+            get_biaya_adm();
         }
     });
 }
@@ -339,11 +357,25 @@ function load_ruangan(){
                 for(var i=0; i<result.length; i++){
                     no++;
 
-                    $tr += "<tr style='cursor:pointer;' onclick='klik_ruangan("+result[i].ID+");'>"+
+                    var delapan = new Date('<?php echo date('d/m/Y'); ?> 08:00:00').toLocaleTimeString();
+                    var duabelas = new Date('<?php echo date('d/m/Y'); ?> 11:59:00').toLocaleTimeString();
+                    var now = new Date().toLocaleTimeString();
+
+                    var cash = 0;
+                    var biaya_kamar = result[i].BIAYA;
+
+                    if((parseInt(now) >+ parseInt(delapan)) && (parseInt(now) <= parseInt(duabelas))){
+                        var limabelaspersen = (15 * parseFloat(biaya_kamar)) / 100;
+                        cash = parseFloat(biaya_kamar) + parseFloat(limabelaspersen);
+                    }else{
+                        cash = biaya_kamar;
+                    }
+
+                    $tr += "<tr style='cursor:pointer;' onclick='klik_ruangan("+result[i].ID+","+cash+");'>"+
                                 "<td style='text-align:center;'>"+no+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].KODE_KAMAR+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].KELAS+"</td>"+
-                                "<td style='text-align:right;'>"+formatNumber(result[i].BIAYA)+"</td>"+
+                                "<td style='text-align:right;'>"+formatNumber(cash)+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].VISITE_DOKTER+"</td>"+
                             "</tr>";
                 }
@@ -358,7 +390,7 @@ function load_ruangan(){
     });
 }
 
-function klik_ruangan(id){
+function klik_ruangan(id,cash){
     $('#tutup_kamar').click();
 
     $.ajax({
@@ -370,7 +402,7 @@ function klik_ruangan(id){
             $('#id_ruangan').val(id);
             var txt = row['KODE_KAMAR']+' - '+row['KELAS']+' - '+row['VISITE_DOKTER'];
             $('#ruang_tujuan').val(txt);
-            $('#biaya').val(NumberToMoney(row['BIAYA']));
+            $('#biaya').val(NumberToMoney(cash));
         }
     });
 }
@@ -968,47 +1000,6 @@ function Search_tgl_RI(tgl){
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-3 control-label">Pendidikan</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="pendidikan_txt" id="pendidikan_txt" value="" readonly>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">Agama</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="agama_txt" id="agama_txt" value="" readonly>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">Alamat</label>
-                            <div class="col-md-9">
-                                <textarea rows="5" class="form-control" name="alamat" id="alamat" readonly></textarea>
-                            </div>
-                        </div>
-                        <!-- <div class="form-group">
-                            <label class="col-md-3 control-label"></label>
-                            <div class="col-md-9">
-                                <button type="button" id="btn_history" onclick="get_history_medik();" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target=".bs-example-modal-lg">
-                                   <i class="fa fa-history"></i> History Rekam Medik
-                                </button>
-                            </div>
-                        </div> -->
-            		</div>
-
-            		<div class="col-lg-6">
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">Golongan Darah</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="goldar_txt" id="goldar_txt" value="" readonly>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">Tempat Lahir</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" value="" readonly>
-                            </div>
-                        </div>
-                        <div class="form-group">
                             <label class="col-md-3 control-label">Tanggal Lahir</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control" name="tanggal_txt" id="tanggal_txt" value="" readonly>
@@ -1031,6 +1022,48 @@ function Search_tgl_RI(tgl){
                                         <button type="button" class="btn btn-warning" style="cursor:default;">Bulan</button>
                                     </span>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Pendidikan</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="pendidikan_txt" id="pendidikan_txt" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Agama</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="agama_txt" id="agama_txt" value="" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Golongan Darah</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="goldar_txt" id="goldar_txt" value="" readonly>
+                            </div>
+                        </div>
+                        <!-- <div class="form-group">
+                            <label class="col-md-3 control-label"></label>
+                            <div class="col-md-9">
+                                <button type="button" id="btn_history" onclick="get_history_medik();" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target=".bs-example-modal-lg">
+                                   <i class="fa fa-history"></i> History Rekam Medik
+                                </button>
+                            </div>
+                        </div> -->
+            		</div>
+
+            		<div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Tempat Lahir</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Alamat</label>
+                            <div class="col-md-9">
+                                <textarea rows="5" class="form-control" name="alamat" id="alamat" readonly></textarea>
                             </div>
                         </div>
                         <div class="form-group">
@@ -1168,6 +1201,12 @@ function Search_tgl_RI(tgl){
                                 <input type="text" class="form-control" name="biaya" id="biaya" value="" readonly>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Biaya Adm</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="biaya_adm" id="biaya_adm" value="" readonly>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-lg-6" id="view_asuransi">
@@ -1204,7 +1243,7 @@ function Search_tgl_RI(tgl){
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-3 control-label">Kerjsasama RS</label>
+                            <label class="col-md-3 control-label">Asuransi</label>
                             <div class="col-md-9">
                                 <div class="input-group">
                                     <input type="hidden" name="id_kerjasama" id="id_kerjasama" value="">
@@ -1216,39 +1255,21 @@ function Search_tgl_RI(tgl){
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-3 control-label">Asuransi</label>
+                            <label class="col-md-3 control-label">No. Polis</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" name="nama_asuransi" id="nama_asuransi" value="">
+                                <input type="text" class="form-control" name="nomor_polis" id="nomor_polis" value="">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-3 control-label">Nomor KPA</label>
+                            <label class="col-md-3 control-label">No. Peserta</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" name="nomor_kpa" id="nomor_kpa" value="">
+                                <input type="text" class="form-control" name="nomor_peserta" id="nomor_peserta" value="">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-md-3 control-label">Nama</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control" name="nama" id="nama" value="">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">Perusahaan</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="perusahaan" id="perusahaan" value="">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">BP / Poli</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="bp_poli" id="bp_poli" value="">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">Asal Cabang</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="asal_cabang" id="asal_cabang" value="">
                             </div>
                         </div>
                         <div class="form-group">
@@ -1272,12 +1293,6 @@ function Search_tgl_RI(tgl){
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="col-md-3 control-label">Jumlah</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" name="jumlah_klaim" id="jumlah_klaim" value="" onkeyup="FormatCurrency(this);">
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <hr>
@@ -1293,7 +1308,7 @@ function Search_tgl_RI(tgl){
 <!-- //LOAD PASIEN -->
 <button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal1" id="popup_pasien" style="display:none;">Standard Modal</button>
 <div id="myModal1" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="width: 55%;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -1314,16 +1329,23 @@ function Search_tgl_RI(tgl){
                         </div>
                     </div>
                 </form>
+                <div class="load_tabel">
+                    <img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
+                </div>
                 <div class="table-responsive">
-                    <div class="scroll-y">
+                    <div class="scroll-xy">
                         <table class="table table-hover table-bordered" id="tabel_pasien">
                             <thead>
                                 <tr class="merah_popup">
                                     <th style="text-align:center; color: #fff;" width="50">No</th>
-                                    <th style="text-align:center; color: #fff;">Kode Pasien</th>
-                                    <th style="text-align:center; color: #fff;">Nama Pasien</th>
-                                    <th style="text-align:center; color: #fff;">Jenis Kelamin</th>
-                                    <th style="text-align:center; color: #fff;">Umur</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">No. RM</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">Nama Pasien</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">Jenis Kelamin</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">Tanggal Lahir</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">Umur</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">Nama Ayah</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">Nama Ibu</th>
+                                    <th style="text-align:center; color: #fff; white-space: nowrap;">Alamat</th>
                                 </tr>
                             </thead>
                             <tbody>

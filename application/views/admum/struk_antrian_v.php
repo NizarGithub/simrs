@@ -1,8 +1,11 @@
 <?php 
 ob_start();
 date_default_timezone_set('Asia/Jakarta');
-$dt = $this->master_model_m->getJmlAntrianStruk($kode_antrian,$status,$id_user);
 $tanggal = date('d-m-Y');
+$s = "SELECT * FROM rk_antrian_pasien WHERE TANGGAL = '$tanggal' AND STATUS_CLOSING = '0' AND STATUS_PANGGIL = '0' ORDER BY ID DESC LIMIT 1";
+$q = $this->db->query($s);
+$dt = $q->result();
+
 $sql = "SELECT COUNT(*) AS TOTAL FROM rk_antrian_pasien WHERE TANGGAL = '$tanggal' AND STATUS_CLOSING = '0' AND STATUS_PANGGIL = '0'";
 $query = $this->db->query($sql);
 $total = $query->row()->TOTAL;
@@ -27,7 +30,7 @@ $total = $query->row()->TOTAL;
 	foreach ($dt as $key => $val) {
 ?>
     <tr>
-    	<td style="text-align:center; font-size: 10px;"><?php echo $val->TGL; ?>, <?php echo date('H:i:s'); ?></td>
+    	<td style="text-align:center; font-size: 10px;"><?php echo $val->TANGGAL; ?>, <?php echo date('H:i:s'); ?></td>
     </tr>
     <tr>
       	<td style="text-align:center; font-size: 10px;">Helpdesk</td>
@@ -39,13 +42,13 @@ $total = $query->row()->TOTAL;
       	<td style="">&nbsp;</td>
     </tr>
     <tr>
-      	<td style="text-align:center; font-size: 37px;"><?php echo $loket; ?>-<?php echo $val->URUT; ?></td>
+      	<td style="text-align:center; font-size: 37px;"><?php echo $val->KODE_ANTRIAN; ?>-<?php echo $val->NOMOR_ANTRIAN; ?></td>
     </tr>
     <tr>
       	<td style="">&nbsp;</td>
     </tr>
     <tr>
-      	<td style="text-align:center; font-size: 10px;">Jumlah Antrian yg belum dipanggil : <?php echo $total; ?></td>
+      	<td style="text-align:center; font-size: 10px;">Jumlah Antrian yg belum dipanggil : <?php echo $total-1; ?></td>
     </tr>
 <?php
 	}

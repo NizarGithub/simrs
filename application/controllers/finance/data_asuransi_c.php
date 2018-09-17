@@ -114,7 +114,7 @@ class Data_asuransi_c extends CI_Controller {
 			'page' => 'finance/data_asuransi_v',
 			'title' => 'Setup Asuransi',
 			'subtitle' => 'Setup Asuransi',
-			'master_menu' => 'master_data',
+			'master_menu' => 'master_setup',
 			'view' => 'data_asuransi',
 			'warning' => $warning,
 			'dt' => $dt,
@@ -132,6 +132,14 @@ class Data_asuransi_c extends CI_Controller {
 		$id = $this->input->post('id');
 		$data = $this->model->get_data_asr_by_id($id);
 		echo json_encode($data);
+	}
+
+	function hapus(){
+		$id_hapus   = $this->input->post('id_hapus');
+		$this->model->hapus_departemen($id_hapus);
+
+		$this->session->set_flashdata('hapus','1');
+		redirect('finance/data_asuransi_c');
 	}
 
 }

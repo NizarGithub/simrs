@@ -619,7 +619,7 @@ function hitung_pemeriksaan(){
                     </td>
                     <td>NAMA ORTU</td>
                     <td>:</td>
-                    <td><span style="color:#0066b2;"><?php echo $dt->NAMA_ORTU; ?></span></td>
+                    <td><span style="color:#0066b2;"><?php echo $dt->NAMA_AYAH; ?></span></td>
                 </tr>
             </tbody>
           </table>
@@ -813,33 +813,33 @@ function hitung_pemeriksaan(){
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" role="form">
-                        <div class="form-group">
-                            <div class="col-md-12">
-                                  <div class="input-group">
-                                      <input type="text" class="form-control" id="cari_laborat" placeholder="Cari..." value="">
-                                      <span class="input-group-btn">
-                                          <button type="button" class="btn waves-effect waves-light btn-custom" style="cursor:default;">
-                                                <i class="fa fa-search"></i>
-                                          </button>
-                                      </span>
-                                  </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="cari_laborat" placeholder="Cari..." value="">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn waves-effect waves-light btn-custom" style="cursor:default;">
+                                          <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
                             </div>
                         </div>
-                    </form>
+                    </div>
+                  </form>
                   <div class="table-responsive">
-                        <div class="scroll-y">
-                            <table class="table table-hover table-bordered" id="tb_laborat">
-                                <thead>
-                                    <tr class="hijau_popup">
-                                        <th style="text-align:center; color: #fff;" width="50">No</th>
-                                        <th style="text-align:center; color: #fff;">Jenis Laborat</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    
-                                </tbody>
-                            </table>
-                        </div>
+                      <div class="scroll-y">
+                          <table class="table table-hover table-bordered" id="tb_laborat">
+                              <thead>
+                                  <tr class="hijau_popup">
+                                      <th style="text-align:center; color: #fff;" width="50">No</th>
+                                      <th style="text-align:center; color: #fff;">Jenis Laborat</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  
+                              </tbody>
+                          </table>
+                      </div>
                   </div>
             </div>
             <div class="modal-footer">

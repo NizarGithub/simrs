@@ -114,20 +114,54 @@ class Data_pegawai_c extends CI_Controller {
 
 		if($this->input->post('simpan')){
 			$msg 		= 2;
+			$nip        = $this->input->post('nip');
 			$id_dep     = $this->input->post('id_dep');
 			$id_div     = $this->input->post('id_div');
-			$nip        = $this->input->post('nip');
+			$id_jabatan = $this->input->post('id_jabatan');
+			$id_pangkat = $this->input->post('id_pangkat');
+			$status     = $this->input->post('status');
 			$nama       = addslashes($this->input->post('nama'));
 			$kota_lahir = addslashes($this->input->post('kota_lahir'));
 			$tgl_lahir  = addslashes($this->input->post('tgl_lahir'));
 			$alamat     = addslashes($this->input->post('alamat'));
 			$telpon     = addslashes($this->input->post('telpon'));
-			$status     = $this->input->post('status');
-			$id_jabatan = $this->input->post('id_jabatan');
-			$id_pangkat = $this->input->post('id_pangkat');
+			$id_pendidikan     = addslashes($this->input->post('id_pendidikan'));
+			$sk_pangkat     = addslashes($this->input->post('nomor_sk_pangkat'));
+			$tgl_sk_pangkat     = addslashes($this->input->post('tgl_sk_pangkat'));
+			$tgl_awal_pangkat     = addslashes($this->input->post('tgl_awal_pangkat'));
+			$tgl_akhir_pangkat     = addslashes($this->input->post('tgl_selesai_pangkat'));
+			$sts_jabatan     = addslashes($this->input->post('sts_jabatan'));
+			$sk_jabatan     = addslashes($this->input->post('nomor_sk_jabatan'));
+			$tgl_sk_jabatan     = addslashes($this->input->post('tgl_sk_jabatan'));
+			$tgl_awal_jabatan     = addslashes($this->input->post('tgl_awal_jabatan'));
+			$tgl_akhir_jabatan     = addslashes($this->input->post('tgl_selesai_jabatan'));
+			$id_gol_pajak     = addslashes($this->input->post('id_gol_pajak'));	
 			$temp_image = $this->input->post('temp_image');
 
-			$this->model->ubah_data_pegawai($id, $id_dep, $id_div, $nip, $nama, $kota_lahir, $tgl_lahir, $alamat, $telpon, $status, $id_jabatan, $id_pangkat);
+			$this->model->ubah_data_pegawai(
+				$id,
+				$nip, 
+				$id_dep, 
+				$id_div,
+				$id_jabatan, 
+				$id_pangkat,
+				$status, 
+				$nama, 
+				$kota_lahir, 
+				$tgl_lahir, 
+				$alamat, 
+				$telpon, 
+				$id_pendidikan, 
+				$sk_pangkat, 
+				$tgl_sk_pangkat, 
+				$tgl_awal_pangkat, 
+				$tgl_akhir_pangkat, 
+				$sts_jabatan, 
+				$sk_jabatan, 
+				$tgl_sk_jabatan, 
+				$tgl_awal_jabatan, 
+				$tgl_akhir_jabatan, 
+				$id_gol_pajak);
 
 			if($temp_image == 1){
 	            $name_array = array();

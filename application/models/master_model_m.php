@@ -105,8 +105,6 @@ class Master_model_m extends CI_Model
 	}
 
 	function getJmlAntrian($id_kode_antrian,$status,$id_user){
-		$tgl = date('d-m-Y');
-
 		$sql = "
 			SELECT
 				a.*, 
@@ -309,6 +307,31 @@ class Master_model_m extends CI_Model
 			ORDER BY a.ID_LOKET ASC
 		";
 		return $this->db->query($sql)->result();
+	}
+
+	function get_biaya_reg($status){
+		$sql = "SELECT * FROM admum_biaya_reg_pasien WHERE STATUS = '$status'";
+		$qry = $this->db->query($sql);
+		return $qry->row();
+	}
+
+	function get_biaya_adm($sistem_bayar){
+		$sql = "SELECT * FROM admum_biaya_reg_pasien WHERE STATUS = '$sistem_bayar'";
+		$qry = $this->db->query($sql);
+		return $qry->row();
+	}
+
+	function nomor_antrian_adm($id_loket,$kode_antrian){
+		$sql = "
+			SELECT
+				*
+			FROM kepeg_antrian
+			WHERE ID_KODE = '$id_loket'
+			AND KODE = '$kode_antrian'
+			AND STATUS_CLOSING = '0'
+		";
+		$qry = $this->db->query($sql);
+		return $qry->row();
 	}
 
 }

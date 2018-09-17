@@ -8,61 +8,10 @@ class Admum_pasien_rj_m extends CI_Model {
 		$this->load->database();
 	}
 
-	function simpan(
-		$kode_pasien,
-		$tanggal_daftar,
-		$nama,
-		$jenis_kelamin,
-		$pendidikan,
-		$agama,
-		$alamat,
-		$golongan_darah,
-		$tempat_lahir,
-		$tanggal_lahir,
-		$umur,
-		$kelurahan,
-		$kecamatan,
-		$kota,
-		$provinsi){
-
-		$sql = "
-			INSERT INTO rk_pasien(
-				KODE_PASIEN,
-				TANGGAL_DAFTAR,
-				NAMA,
-				JENIS_KELAMIN,
-				PENDIDIKAN,
-				AGAMA,
-				ALAMAT,
-				GOLONGAN_DARAH,
-				TEMPAT_LAHIR,
-				TANGGAL_LAHIR,
-				UMUR,
-				KELURAHAN,
-				KECAMATAN,
-				KOTA,
-				PROVINSI,
-				STATUS
-			) VALUES (
-				'$kode_pasien',
-				'$tanggal_daftar',
-				'$nama',
-				'$jenis_kelamin',
-				'$pendidikan',
-				'$agama',
-				'$alamat',
-				'$golongan_darah',
-				'$tempat_lahir',
-				'$tanggal_lahir',
-				'$umur', 
-				'$kelurahan',
-				'$kecamatan',
-				'$kota',
-				'$provinsi',
-				'RJ'
-			)
-		";
-		$this->db->query($sql);
+	function default_lokasi(){
+		$sql = "SELECT * FROM admum_lokasi ORDER BY ID DESC LIMIT 1";
+		$query = $this->db->query($sql);
+		return $query->result();
 	}
 
 	function kota_kab(){
@@ -209,6 +158,82 @@ class Admum_pasien_rj_m extends CI_Model {
 		return $query->row();
 	}
 
+	function load_dokter($keyword){
+		$where = "1  = 1";
+
+		if($keyword != ""){
+			$where = $where." AND PEG.NAMA LIKE '%$keyword%'";
+		}
+
+		$sql = "
+			SELECT
+				PEG.ID,
+				PEG.NIP,
+				PEG.NAMA,
+				JAB.NAMA AS JABATAN,
+				DEP.KODE AS KODE_DEP,
+				DEP.NAMA_DEP,
+				DV.KODE_DIV,
+				DV.NAMA_DIV,
+				POLI.NAMA AS NAMA_POLI
+			FROM kepeg_pegawai PEG
+			LEFT JOIN (
+				SELECT 
+					ID,
+					KODE,
+					NAMA_DEP
+				FROM kepeg_departemen
+				WHERE STS = 0
+			) DEP ON DEP.ID = PEG.ID_DEPARTEMEN
+			LEFT JOIN (
+				SELECT
+					ID,
+					KODE_DIV,
+					NAMA_DIV
+				FROM kepeg_divisi
+				WHERE STS = 0
+			) DV ON DV.ID = PEG.ID_DIVISI
+			LEFT JOIN admum_poli POLI ON POLI.ID_PEG_DOKTER = PEG.ID
+			LEFT JOIN kepeg_kel_jabatan JAB ON JAB.ID = PEG.ID_JABATAN
+			WHERE $where
+			AND JAB.NAMA LIKE '%Dokter%'
+			ORDER BY PEG.ID DESC
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function klik_dokter($id_pegawai){
+		$sql = "
+			SELECT
+				PEG.ID,
+				PEG.NIP,
+				PEG.NAMA,
+				DEP_DIV.KODE AS KODE_DEP,
+				DEP_DIV.NAMA_DEP,
+				DEP_DIV.KODE_DIV,
+				DEP_DIV.NAMA_DIV
+			FROM kepeg_pegawai PEG
+			LEFT JOIN (
+				SELECT 
+					DP.ID,
+					DP.KODE,
+					DP.NAMA_DEP,
+					DV.ID AS ID_DIVISI,
+					DV.KODE_DIV,
+					DV.NAMA_DIV
+				FROM kepeg_departemen DP
+				LEFT JOIN kepeg_divisi DV ON DV.ID_DEPARTEMEN = DP.ID
+				WHERE DP.STS = 0
+				AND DV.STS = 0
+			) DEP_DIV ON DEP_DIV.ID = PEG.ID_DEPARTEMEN
+			LEFT JOIN admum_poli POLI ON POLI.ID_PEG_DOKTER = PEG.ID
+			WHERE PEG.ID = '$id_pegawai'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
 	function load_asuransi($keyword){
 		$where = "1 = 1";
 
@@ -227,7 +252,27 @@ class Admum_pasien_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_rj($id_pasien,$asal_rujukan,$keterangan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$sistem_bayar,$asuransi,$posisi,$barcode,$nomor_antrian,$biaya_reg,$biaya_adm,$id_loket,$kd_antrian){
+	function simpan_rj(
+		$id_pasien,
+		$asal_rujukan,
+		$keterangan,
+		$hari,
+		$tanggal,
+		$bulan,
+		$tahun,
+		$waktu,
+		$id_poli,
+		$id_dokter,
+		$sistem_bayar,
+		$asuransi,
+		$posisi,
+		$barcode,
+		$nomor_antrian,
+		$biaya_reg,
+		$biaya_adm,
+		$id_loket,
+		$kd_antrian){
+
 		$sql = "
 			INSERT INTO admum_rawat_jalan(
 				ID_PASIEN,
@@ -239,6 +284,7 @@ class Admum_pasien_rj_m extends CI_Model {
 				TAHUN,
 				WAKTU,
 				ID_POLI,
+				ID_DOKTER,
 				SISTEM_BAYAR,
 				NAMA_ASURANSI,
 				STS_POSISI,
@@ -258,6 +304,7 @@ class Admum_pasien_rj_m extends CI_Model {
 				'$tahun',
 				'$waktu',
 				'$id_poli',
+				'$id_dokter',
 				'$sistem_bayar',
 				'$asuransi',
 				'$posisi',
@@ -270,12 +317,6 @@ class Admum_pasien_rj_m extends CI_Model {
 			)
 		";
 		$this->db->query($sql);
-	}
-
-	function default_lokasi(){
-		$sql = "SELECT * FROM admum_lokasi ORDER BY ID DESC LIMIT 1";
-		$query = $this->db->query($sql);
-		return $query->result();
 	}
 
 	function simpan_antrian($tanggal,$waktu,$id_pasien,$id_rj,$barcode,$id_loket,$kode_antrian,$nomor_antrian){
@@ -314,7 +355,7 @@ class Admum_pasien_rj_m extends CI_Model {
 			$where = $where;
 		}
 
-		$sql = "SELECT * FROM admum_setup_jenis_laborat WHERE $where ORDER BY ID DESC";
+		$sql = "SELECT * FROM admum_setup_jenis_laborat WHERE $where ORDER BY ID ASC";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
@@ -325,22 +366,43 @@ class Admum_pasien_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function load_pemeriksaan($keyword){
+	function load_pemeriksaan($id_jenis_lab,$keyword){
 		$where = "1 = 1";
 
 		if($keyword != ""){
-			$where = $where." AND (NAMA_PEMERIKSAAN LIKE '%$keyword%' OR KODE LIKE '%$keyword%')";
+			$where = $where." AND (a.NAMA_PEMERIKSAAN LIKE '%$keyword%')";
 		}else{
 			$where = $where;
 		}
 
-		$sql = "SELECT * FROM admum_setup_pemeriksaan WHERE $where ORDER BY ID DESC";
+		$sql = "
+			SELECT 
+				a.ID,
+				a.NAMA_PEMERIKSAAN,
+				b.NILAI_NORMAL,
+				a.TARIF
+			FROM admum_setup_pemeriksaan a
+			JOIN admum_setup_pemeriksaan_nilai b ON b.ID_PEMERIKSAAN = a.ID
+			WHERE $where 
+			AND a.ID_JENIS_LAB = '$id_jenis_lab'
+			ORDER BY a.ID ASC
+		";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
 
-	function klik_pemeriksaan($id){
-		$sql = "SELECT * FROM admum_setup_pemeriksaan WHERE ID = '$id'";
+	function klik_pemeriksaan($id_jenis_lab){
+		$sql = "
+			SELECT 
+				a.ID,
+				a.NAMA_PEMERIKSAAN,
+				b.NILAI_NORMAL,
+				a.TARIF
+			FROM admum_setup_pemeriksaan a
+			JOIN admum_setup_pemeriksaan_nilai b ON b.ID_PEMERIKSAAN = a.ID
+			WHERE a.ID_JENIS_LAB = '$id_jenis_lab'
+			ORDER BY a.ID ASC
+		";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
@@ -351,7 +413,7 @@ class Admum_pasien_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_lab_rj($id_pasien,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$sistem_bayar,$asuransi,$posisi,$biaya_reg,$biaya_adm){
+	function simpan_lab_rj($id_pasien,$asal_rujukan,$hari,$tanggal,$bulan,$tahun,$waktu,$id_poli,$sistem_bayar,$asuransi,$posisi,$biaya_reg,$biaya_adm,$dari,$id_loket,$kd_antrian){
 		$sql = "
 			INSERT INTO admum_rawat_jalan(
 				ID_PASIEN,
@@ -366,7 +428,10 @@ class Admum_pasien_rj_m extends CI_Model {
 				NAMA_ASURANSI,
 				STS_POSISI,
 				BIAYA_REG,
-				BIAYA_ADMIN
+				BIAYA_ADMIN,
+				PASIEN_DARI,
+				ID_LOKET,
+				KD_ANTRIAN
 			) VALUES(
 				'$id_pasien',
 				'$asal_rujukan',
@@ -380,7 +445,10 @@ class Admum_pasien_rj_m extends CI_Model {
 				'$asuransi',
 				'$posisi',
 				'$biaya_reg',
-				'$biaya_adm'
+				'$biaya_adm',
+				'$dari',
+				'$id_loket',
+				'$kd_antrian'
 			)
 		";
 		$this->db->query($sql);

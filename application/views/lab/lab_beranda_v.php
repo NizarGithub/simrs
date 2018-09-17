@@ -8,7 +8,8 @@ $level = $user->LEVEL;
 <style type="text/css">
 #view_tanggal,
 #view_bulan,
-#view_data_poli_det{
+#view_data_poli_det,
+#view_rm{
     display: none;
 }
 
@@ -152,29 +153,7 @@ var level = "<?php echo $level; ?>";
 $(document).ready(function(){
     tot_pasien_terima();
     data_pasien();
-    data_pasien_dr_poli();
-
-    get_notif_pasien();
-
-    if(level == null || level == ""){
-        
-    }else{
-        get_notif_pasien();
-        timer = setInterval(function () {
-            get_notif_pasien();
-        }, 5000);
-    }
-
-    $('#show_notif').click(function(){
-        $('#popup_pasien_baru').show();
-        data_pasien_baru();
-    });
-
-    $('#tutup_pas').click(function(){
-        $('#popup_pasien_baru').fadeOut();
-        snd.pause();
-        clearInterval(timer);
-    });
+    // data_pasien_dr_poli();
 
     toastr.options = {
       "closeButton": false,
@@ -708,33 +687,38 @@ function data_pasien(){
             $tr = "";
 
             if(result == "" || result == null){
-                $tr = "<tr><td colspan='9' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+                $tr = "<tr><td colspan='11' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
             }else{
                 var no = 0;
 
                 for(var i=0; i<result.length; i++){
                     no++;
+                    var aksi = '';
+                    var id = Base64.encode(result[i].ID);
+                    var id_pasien = Base64.encode(result[i].ID_PASIEN);
 
-                    var detail = '<button type="button" id="btn_history" onclick="detail_pasien('+result[i].ID+');" class="btn btn-danger waves-effect waves-light btn-sm" data-toggle="modal" data-target=".bs-example-modal-lg">'+
-                                    '<i class="fa fa-eye"></i>';
-                                 '</button>';
-                    var aksi =  '';
+                    var detail = '<a href="<?php echo base_url(); ?>lab/lab_home_c/det_rm/'+btoa(id_pasien)+'" class="btn btn-danger waves-effect waves-light btn-sm">'+
+                                    '<i class="fa fa-eye"></i>'+
+                                 '</a>';
 
                     if(level == null || level == ""){
 
                     }else{
-                        var encodedString = Base64.encode(result[i].ID_RJ);
-                        aksi =  '<a href="<?php echo base_url(); ?>lab/lab_home_c/tindakan/'+btoa(encodedString)+'" class="btn btn-success waves-effect waves-light btn-sm"><i class="fa fa-user-md"></i></a>';
+                        aksi =  '<a href="<?php echo base_url(); ?>lab/lab_home_c/tindakan/'+btoa(id)+'" class="btn btn-success waves-effect waves-light btn-sm">'+
+                                    '<i class="fa fa-user-md"></i>'+
+                                '</a>';
                     }
 
                     $tr +=  '<tr>'+
                             '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].KODE_PASIEN+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].TANGGAL+' - '+result[i].WAKTU_RJ+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].KODE_PASIEN+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].ALAMAT+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA_ORTU+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA_AYAH+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA_IBU+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL+' - '+result[i].WAKTU+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].PASIEN_DARI+'</td>'+
                             '   <td style="vertical-align:middle;" align="center">'+detail+'</td>'+
                             '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
                             '</tr>';
@@ -833,6 +817,211 @@ function detail_pasien(id){
                   "</tr>";
 
             $('#tabel_detail2 tbody').html($tr2);
+        }
+    });
+}
+
+function get_history_medik_rj(id_pasien){
+    // $('#popup_histori_rj').click();
+    $('#view_rm').show();
+    $('#view_data').hide();
+
+    $('#id_pasien2').val(id_pasien); 
+    $('.cari_tgl').val(''); 
+    $('#ord_tmp').val(''); 
+    $('#isi_history_rj').html('');
+
+    $.ajax({
+        url : '<?php echo base_url(); ?>lab/lab_home_c/get_history_medik_rj',
+        data : {id_pasien:id_pasien},
+        type : "POST",
+        dataType : "json",
+        success : function(result){
+            var isine = "";
+            var isine_igd = "";
+            var isine_ri = "";
+            var no = 0;
+            $('#nama_pasien_rj').html(result['ps']['NAMA']);
+
+            var tdk_RJ = result['tindakan_RJ'];
+            var dg_RJ = result['diagnosa_RJ'];
+            var lab_RJ = result['laborat_RJ'];
+            var rsp_RJ = result['resep_RJ'];
+
+            // TINDAKAN RJ
+            if(tdk_RJ.length > 0){
+                var ord2 = $('#ord_tmp').val(); 
+                $.each(tdk_RJ,function(i,RJ){                    
+                    var ord  = RJ.ORD;
+                    var ord2 = $('#ord_tmp').val(); 
+
+                    if(ord != ord2){
+                        isine += '<tr class="active"><td colspan="5"> <b>'+ord+'</b> </td></tr>';
+                        no = 0;
+                    }
+
+                    no++;
+
+                    isine += '<tr>'+
+                                '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
+                                '<td>'+RJ.TANGGAL+'</td>'+
+                                '<td>'+RJ.NAMA_TINDAKAN+'</td>'+
+                                '<td>&nbsp;</td>'+
+                                '<td>&nbsp;</td>'+
+                             '</tr>';
+
+                    $('#ord_tmp').val(RJ.ORD);
+                });
+            } else {
+                isine = '<tr><td colspan="5" align="center" style="text-align:center;"> <b>Belum ada tindakan</b> </td></tr>';
+            }
+
+            //DIAGNOSA RJ
+            if(dg_RJ.length > 0){
+                var ord2 = $('#ord_tmp').val(); 
+                $.each(dg_RJ,function(i,RJ){                    
+                    var ord  = RJ.ORD;
+                    var ord2 = $('#ord_tmp').val(); 
+
+                    if(ord != ord2){
+                        isine += '<tr class="active"><td colspan="5"> <b>'+ord+'</b> </td></tr>';
+                        no = 0;
+                    }
+
+                    no++;
+
+                    isine += '<tr>'+
+                                '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
+                                '<td>'+RJ.TANGGAL+'</td>'+
+                                '<td>'+RJ.DIAGNOSA+'</td>'+
+                                '<td>&nbsp;</td>'+
+                                '<td>&nbsp;</td>'+
+                             '</tr>';
+
+                    $('#ord_tmp').val(RJ.ORD);
+                });
+            } else {
+                isine = '<tr><td colspan="5" align="center" style="text-align:center;"> <b>Belum ada diagnosa</b> </td></tr>';
+            }
+
+            //LABORAT RJ
+            if(lab_RJ.length > 0){
+                var ord2 = $('#ord_tmp').val(); 
+                $.each(lab_RJ,function(i,RJ){                    
+                    var ord  = RJ.ORD;
+                    var ord2 = $('#ord_tmp').val(); 
+
+                    if(ord != ord2){
+                        isine += '<tr class="active">'+
+                                    '<td colspan="3"> <b>'+ord+'</b> </td>'+
+                                    '<td>NILAI NORMAL</td>'+
+                                    '<td>HASIL</td>'+
+                                 '</tr>';
+                        no = 0;
+                    }
+
+                    no++;
+
+                    isine += '<tr>'+
+                                '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
+                                '<td>'+RJ.TANGGAL+'</td>'+
+                                '<td>'+RJ.JENIS_LABORAT+'</td>'+
+                                '<td>&nbsp;</td>'+
+                                '<td>&nbsp;</td>'+
+                             '</tr>';
+
+                    $('#ord_tmp').val(RJ.ORD);
+                    
+                });
+            } else {
+                isine = '<tr><td colspan="5" align="center" style="text-align:center;"> <b>Belum ada data laborat</b> </td></tr>';
+            }
+
+            // RESEP RJ
+            if(rsp_RJ.length > 0){
+                var ord2 = $('#ord_tmp').val(); 
+                $.each(rsp_RJ,function(i,RJ){                    
+                    var ord  = RJ.ORD;
+                    var ord2 = $('#ord_tmp').val(); 
+
+                    if(ord != ord2){
+                        isine += '<tr class="active"><td colspan="5"> <b>'+ord+'</b> </td></tr>';
+                        no = 0;
+                    }
+
+                    no++;
+
+                    isine += '<tr>'+
+                                '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
+                                '<td>'+RJ.TANGGAL+'</td>'+
+                                '<td>'+RJ.NAMA_OBAT+'</td>'+
+                                '<td>&nbsp;</td>'+
+                                '<td>&nbsp;</td>'+
+                             '</tr>';
+
+                    $('#ord_tmp').val(RJ.ORD);
+                });
+            } else {
+                isine = '<tr><td colspan="5" align="center" style="text-align:center;"> <b>Belum ada tindakan</b> </td></tr>';
+            }
+
+            $('#isi_history_rj').html(isine);             
+            // END OF RAWAT JALAN
+        }
+    });
+
+    $('#btn_kembali').click(function(){
+        $('#view_rm').hide();
+        $('#view_data').show();
+    });
+}
+
+function Search_tgl_RJ(tgl){
+    $('#ord_tmp').val(''); 
+    var id_pasien = $('#id_pasien2').val();
+
+    $.ajax({
+        url : '<?php echo base_url(); ?>lab/lab_home_c/get_history_medik_by_search_rj',
+        data : {
+            id_pasien:id_pasien,
+            tgl : tgl
+        },
+        type : "POST",
+        dataType : "json",
+        success : function(result){
+            var isine = "";
+            var isine_igd = "";
+            var isine_ri = "";
+            var no = 0;
+            var det_RJ = result['detail_RJ'];
+            // RAWAT JALAN
+            if(det_RJ.length > 0){
+                var ord2 = $('#ord_tmp').val(); 
+                $.each(det_RJ,function(i,RJ){                    
+                    var ord  = RJ.ORD;
+                    var ord2 = $('#ord_tmp').val(); 
+
+                    if(ord != ord2){
+                        isine += '<tr><td colspan="3"> <b>'+ord+'</b> </td></tr>';
+                        no = 0;
+                    }
+
+                    no++;
+                    isine += '<tr>'+
+                                '<th scope="row" align="center" style="text-align:center;">'+no+'</th>'+
+                                '<td>'+RJ.TANGGAL+'</td>'+
+                                '<td>'+RJ.KET+'</td>'+
+                             '</tr>';
+
+                    $('#ord_tmp').val(RJ.ORD);     
+                });
+            } else {
+                isine = '<tr><td colspan="3" align="center" style="text-align:center;"> <b>Tidak ada history / info medik pada pasien ini </b> </td></tr>';
+            } 
+            $('#isi_history_rj').html(isine);             
+            // END OF RAWAT JALAN 
+
+            
         }
     });
 }
@@ -1117,26 +1306,27 @@ function hitung_pemeriksaan(){
 
             <div class="row">
                 <div class="col-lg-12">
-
                     <ul class="nav nav-tabs">
                         <li class="active" role="presentation">
                             <a data-toggle="tab" role="tab" href="#home1">
-                                <i class="fa fa-book"></i> Dari Admission <!-- <span class="badge badge-primary" id="tot_dari_adm">0</span> -->
+                                <i class="fa fa-book"></i> Pasien Baru <!-- <span class="badge badge-primary" id="tot_dari_adm">0</span> -->
                             </a>
                         </li>
                         <li role="presentation">
                             <a data-toggle="tab" role="tab" href="#profile1" id="btn_tambah_lab"><i class="fa fa-user"></i> Datang Sendiri</a>
                         </li>
-                        <li role="presentation" id="dt_dari_poli">
+                        <!-- <li role="presentation" id="dt_dari_poli">
                             <a data-toggle="tab" role="tab" href="#profile2">
-                                <i class="fa fa-home"></i> Dari Poli <!-- <span class="badge badge-danger" id="tot_dari_poli">0</span> -->
+                                <i class="fa fa-home"></i> Dari Poli 
+                                <span class="badge badge-danger" id="tot_dari_poli">0</span>
                             </a>
-                        </li>
+                        </li> -->
                     </ul>
                     <div class="tab-content">
                         <div id="home1" class="tab-pane fade in active" role="tabpanel">
-                            <form class="form-horizontal" role="form">
+                            <form class="form-horizontal" role="form" id="view_data">
                                 <input type="hidden" name="nomor_antrian" id="nomor_antrian" value="">
+                                <input type="hidden" name="ord_tmp" id="ord_tmp" value="">
                                 <div class="form-group">
                                     <label class="col-md-1 control-label" style="width: 5%; text-align: left;">Filter :</label>
                                     <?php if(count($level) != 0){ ?>
@@ -1228,24 +1418,28 @@ function hitung_pemeriksaan(){
                                 <div class="form-group">
                                     <div class="col-md-12">
                                         <div class="table-responsive">
-                                            <table id="tabel_pasien" class="table table-hover table-bordered">
-                                                <thead>
-                                                    <tr class="biru">
-                                                        <th style="color:#fff; text-align:center;">No</th>
-                                                        <th style="color:#fff; text-align:center;">No. RM</th>
-                                                        <th style="color:#fff; text-align:center;">Tgl / Waktu</th>
-                                                        <th style="color:#fff; text-align:center;">Nama Pasien</th>
-                                                        <th style="color:#fff; text-align:center;">JK</th>
-                                                        <th style="color:#fff; text-align:center;">Alamat</th>
-                                                        <th style="color:#fff; text-align:center;">Nama Org Tua</th>
-                                                        <th style="color:#fff; text-align:center;">Detail</th>
-                                                        <th style="color:#fff; text-align:center;">Tindakan</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    
-                                                </tbody>
-                                            </table>
+                                            <div class="scroll-x">
+                                                <table id="tabel_pasien" class="table table-hover table-bordered">
+                                                    <thead>
+                                                        <tr class="biru">
+                                                            <th style="color:#fff; text-align:center; white-space: nowrap;">No</th>
+                                                            <th style="color:#fff; text-align:center; white-space: nowrap;">No. RM</th>
+                                                            <th style="color:#fff; text-align:center; white-space: nowrap;">Nama Pasien</th>
+                                                            <th style="color:#fff; text-align:center; white-space: nowrap;">JK</th>
+                                                            <th style="color:#fff; text-align:center; white-space: nowrap;">Alamat</th>
+                                                            <th style="color:#fff; text-align:center; white-space: nowrap;">Nama Ayah</th>
+                                                            <th style="color:#fff; text-align:center; white-space: nowrap;">Nama Ibu</th>
+                                                            <th style="color:#fff; text-align:center; white-space: nowrap;">Tgl / Waktu</th>
+                                                            <th style="color:#fff; text-align:center; white-space: nowrap;">Pasien Dari</th>
+                                                            <th style="color:#fff; text-align:center; white-space: nowrap;">Rekam Medik</th>
+                                                            <th style="color:#fff; text-align:center; white-space: nowrap;">Tindakan</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
