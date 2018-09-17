@@ -46,7 +46,6 @@ class Ap_entry_resep_c extends CI_Controller {
 			$this->model->simpan_keranjang($id_gudang, $harga_beli);
 		}else {
 		}
-
 		echo '1';
 	}
 

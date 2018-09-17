@@ -70,7 +70,7 @@ class Ap_obat_hv_m extends CI_Model {
 		return $sql->result_array();
 	}
 
-	function simpan_keranjang($id_gudang, $harga_beli){
+	function simpan_keranjang($id_gudang, $harga_beli, $service){
 		$tanggal = date('d-m-Y');
 		$bulan = date('m');
 		$tahun = date('Y');
@@ -79,7 +79,8 @@ class Ap_obat_hv_m extends CI_Model {
 			'TANGGAL' => $tanggal,
 			'BULAN' => $bulan,
 			'TAHUN' => $tahun,
-			'HARGA_OBAT' => $harga_beli
+			'HARGA_OBAT' => $harga_beli,
+			'SERVICE' => $service
 		);
 
 		$this->db->insert('keranjang_beli_hv', $data);
@@ -90,7 +91,7 @@ class Ap_obat_hv_m extends CI_Model {
     $this->db->delete('keranjang_beli_hv');
 	}
 
-	function simpan_proses($value, $total_keranjang_name, $jumlah_beli, $harga_obat, $id_penjualan_obat_hv){
+	function simpan_proses($value, $total_keranjang_name, $jumlah_beli, $harga_obat, $service, $id_penjualan_obat_hv){
 		$tanggal = date('d-m-Y');
 		$tahun = date('Y');
 		$bulan = date('m');
@@ -103,11 +104,12 @@ class Ap_obat_hv_m extends CI_Model {
 			'TAHUN' => $tahun,
 			'BULAN' => $bulan,
 			'TOTAL' => $total_keranjang_name,
-			'HARGA_OBAT' => $harga_obat
+			'HARGA_OBAT' => $harga_obat,
+			'SERVICE' => $service
 		);
 		$this->db->insert('ap_penjualan_obat_hv_detail', $data_detail);
 		$this->db->empty_table('keranjang_beli_hv');
 
-		$this->db->query("UPDATE apotek_gudang_obat SET STOK = STOK - $jumlah_beli WHERE ID = '$value'");
+		// $this->db->query("UPDATE apotek_gudang_obat SET STOK = STOK - $jumlah_beli WHERE ID = '$value'");
 	}
 }

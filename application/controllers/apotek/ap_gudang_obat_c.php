@@ -25,14 +25,15 @@ class Ap_gudang_obat_c extends CI_Controller {
 
 		$data = array(
 			'page' => 'apotek/ap_gudang_obat_v',
-			'title' => 'Gudang Obat',
-			'subtitle' => 'Gudang Obat',
+			'title' => 'Faktur',
+			'subtitle' => 'Faktur',
 			'master_menu' => 'obat',
 			'view' => 'obat',
 			'url_simpan' => base_url().'apotek/ap_gudang_obat_c/simpan',
 			'url_ubah' => base_url().'apotek/ap_gudang_obat_c/ubah',
 			'url_hapus' => base_url().'apotek/ap_gudang_obat_c/hapus',
 			'url_cetak' => base_url().'apotek/ap_gudang_obat_c/cetak_excel',
+			'url_simpan_obat' => base_url().'apotek/ap_gudang_obat_c/simpan_obat',
 		);
 
 		$this->load->view('apotek/ap_home_v',$data);
@@ -168,6 +169,18 @@ class Ap_gudang_obat_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function data_faktur_id(){
+		$id = $this->input->post('id');
+		$data = $this->model->data_faktur_id($id);
+		echo json_encode($data);
+	}
+
+	function data_faktur_id_row(){
+		$id = $this->input->post('id');
+		$data = $this->model->data_faktur_id_row($id);
+		echo json_encode($data);
+	}
+
 	private function set_upload_options(){
 	    //upload an image options
 	    $config = array();
@@ -220,13 +233,23 @@ class Ap_gudang_obat_c extends CI_Controller {
 		$format = $datetime->setTimezone($tz_object);
 		$waktu_masuk = $format->format('H:i:s');
 
+		$status_obat_ubah = '';
+		if ($this->input->post('status_obat_ubah') == '0') {
+			$status_obat_ubah = 'Kosong';
+		}elseif ($this->input->post('status_obat_ubah') == '1') {
+			$status_obat_ubah = 'Persen';
+		}elseif ($this->input->post('status_obat_ubah') == '2') {
+			$status_obat_ubah = 'Harga';
+		}
+
 		$data_faktur = array(
 			'ID_SUPPLIER' => $id_supplier,
 			'NO_FAKTUR' => $no_faktur,
 			'TANGGAL' => $tanggal_masuk,
 			'WAKTU' => $waktu_masuk,
 			'DISKON' => $diskon,
-			'TOTAL' => $grand_total
+			'TOTAL' => $grand_total,
+			'CEK_DISKON' => $status_obat_ubah
 		);
 
 		$this->db->insert('faktur', $data_faktur);
@@ -259,6 +282,67 @@ class Ap_gudang_obat_c extends CI_Controller {
 
 		$this->model->simpan(
 			$insert_id,
+			$value,
+			$jumlah[$key],
+			$isi[$key],
+			$total[$key],
+			$jumlah_butir[$key],
+			$harga_pertablet[$key],
+			$harga_beli[$key],
+			$harga_jual[$key],
+			$tanggal_masuk,
+			$waktu_masuk
+		);
+	}
+
+		$this->session->set_flashdata('sukses','1');
+		redirect('apotek/ap_gudang_obat_c');
+	}
+
+	function simpan_obat(){
+		$id_faktur = $this->input->post('id_faktur');
+		$id_nama_obat = $this->input->post('id_nama_obat');
+		$jumlah = str_replace(',', '', $this->input->post('jumlah'));
+		$isi = str_replace(',', '', $this->input->post('isi'));
+		$total = str_replace(',', '', $this->input->post('total'));
+		$jumlah_butir = str_replace(',', '', $this->input->post('jumlah_butir'));
+		$harga_pertablet = str_replace(',', '', $this->input->post('harga_pertablet'));
+		$harga_beli = str_replace(',', '', $this->input->post('harga_beli'));
+		$harga_jual = str_replace(',', '', $this->input->post('harga_jual'));
+		$id_supplier = $this->input->post('id_supplier');
+		$no_faktur = $this->input->post('no_faktur');
+		$diskon = $this->input->post('diskon');
+		$grand_total = str_replace(',', '', $this->input->post('grand_total'));
+
+		$tanggal_masuk = date('d-m-Y');
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu_masuk = $format->format('H:i:s');
+
+		$status_obat_ubah = '';
+		if ($this->input->post('status_obat_ubah') == '0') {
+			$status_obat_ubah = 'Kosong';
+		}elseif ($this->input->post('status_obat_ubah') == '1') {
+			$status_obat_ubah = 'Persen';
+		}elseif ($this->input->post('status_obat_ubah') == '2') {
+			$status_obat_ubah = 'Harga';
+		}
+
+		$data_faktur = array(
+			'DISKON' => $diskon,
+			'TOTAL' => $grand_total,
+			'CEK_DISKON' => $status_obat_ubah
+		);
+
+		$this->db->where('ID', $id_faktur);
+		$this->db->update('faktur', $data_faktur);
+
+
+	foreach ($id_nama_obat as $key => $value) {
+
+		$this->model->simpan_obat(
+			$id_faktur,
 			$value,
 			$jumlah[$key],
 			$isi[$key],

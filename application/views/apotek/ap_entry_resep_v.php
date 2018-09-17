@@ -78,7 +78,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                     <i class="glyphicon glyphicon-fullscreen"></i>
                 </a>
             </div>
-            <div class="navbar-center"> Entry Resep</div>
+            <div class="navbar-center"> Entry Resep </div>
             <div class="navbar-collapse collapse">
                 <!-- BEGIN TOP NAVIGATION MENU -->
                 <!-- <ul class="nav navbar-nav pull-right header-menu">
@@ -476,6 +476,8 @@ $user_detail = $this->model->get_user_detail($id_user);
 
     <button type="button" data-type="error" class="btn btn-danger notification" id="notif_closing" data-message="" style="display:none;" data-horiz-pos="left" data-verti-pos="bottom">Error</button>
 
+		<button type="button" data-type="success" class="btn btn-success notification" id="notif_berhasil" style="display:none;" data-message="<i class='fa fa-check-square-o' style='padding-right:6px'></i> Data berhasil diproses!" data-horiz-pos="left" data-verti-pos="bottom">Success</button>
+
     <button type="button" onclick="snd.play();" id="btn_suara_closing" style="display:none;" name="button">aaa</button>
 
 		<button class="btn btn-danger" data-toggle="modal" id="popup_konfirmasi" style="display:none;" data-target="#modal-basic2">Show me</button>
@@ -535,7 +537,6 @@ $user_detail = $this->model->get_user_detail($id_user);
 var ajax = "";
 var snd = new Audio("<?php echo base_url(); ?>sound/Google_Event-1.mp3"); // buffers automatically when created
 $(document).ready(function(){
-
 	data_obat();
 
 	get_invoice();
@@ -615,6 +616,7 @@ function simpan_proses(){
 			var id = row.ID;
 			// window.open('<?php echo base_url(); ?>apotek/ap_obat_hv_c/cetak/'+id, '_blank', 'location=yes,height=700,width=600,scrollbars=yes,status=yes');
 			$('#btn_tidak_proses').click();
+			$('#notif_berhasil').click();
 			data_keranjang();
 			data_obat();
 			$('#btn_klik_proses').attr('disabled','disabled');
@@ -665,7 +667,7 @@ function data_obat(){
                 }else {
                   status_obat = 'Obat Racik';
                 }
-									$tr +=  '<a href="javascript:;" class="message-item media" onclick="klik_obat('+result[i].ID+', '+result[i].HARGA_BELI+');">'+
+									$tr +=  '<a href="javascript:;" class="message-item media" onclick="klik_obat('+result[i].ID+', '+result[i].TOTAL_JUAL+');">'+
 														'<div class="media">'+
 															'<img src="<?php echo base_url(); ?>picture/pills.png" width="50" class="pull-left">'+
 																'<div class="media-body">'+
@@ -684,7 +686,7 @@ function data_obat(){
 																'</div>'+
 																'<div class="col-md-2">'+
 																			'<h5 class="c-dark"><strong>Stok</strong></h5>'+
-																			'<h4 class="c-dark">'+result[i].TOTAL+'</h4>'+
+																			'<h4 class="c-dark">'+result[i].TOTAL_STOK_OBAT+'</h4>'+
 																'</div>'+
 															'</div>'+
 														'</div>'+
@@ -730,7 +732,7 @@ function data_keranjang(){
 							for(var i=0; i<res.length; i++){
 									no++;
 									var total = $('.total_keranjang').val();
-									tot += parseFloat(res[i].HARGA_JUAL);
+									tot += parseFloat(res[i].HARGA_OBAT);
 
 									$tr += '<tr>'+
 													'<td style="text-align:center;"><input type="hidden" name="id_gudang_obat[]" value="'+res[i].ID_GUDANG_OBAT+'">'+no+'</td>'+
@@ -738,11 +740,11 @@ function data_keranjang(){
 													'<td style="text-align:center;">'+res[i].NAMA_OBAT+'</td>'+
 													'<td><input type="text" id="jumlah_beli_'+res[i].ID+'" onkeyup="hitung_jumlah_total('+res[i].ID+'); get_grand_total();" value="1" name="jumlah_beli[]" class="form-control"></td>'+
 													'<td style="text-align:right;" id="harga_beli_'+res[i].ID+'">'+
-													''+formatNumber(res[i].HARGA_JUAL)+''+
+													''+formatNumber(res[i].HARGA_OBAT)+''+
 													'</td>'+
 													'<td style="display:none;">'+
-													'<input type="text" value="'+res[i].HARGA_JUAL+'" id="hidden_harga_beli_'+res[i].ID+'" name="harga_obat[]">'+
-													'<input type="text" class="total_keranjang" name="total_keranjang_name[]" id="hidden_total_keranjang_'+res[i].ID+'" value="'+res[i].HARGA_JUAL+'">'+
+													'<input type="text" value="'+res[i].HARGA_OBAT+'" id="hidden_harga_beli_'+res[i].ID+'" name="harga_obat[]">'+
+													'<input type="text" class="total_keranjang" name="total_keranjang_name[]" id="hidden_total_keranjang_'+res[i].ID+'" value="'+res[i].HARGA_OBAT+'">'+
 													'</td>'+
 													'<td style="padding-left: 0px; text-align: center;"><button class="btn btn-danger btn-sm" onclick="hapus_keranjang('+res[i].ID+');"><i class="fa fa-trash-o"></i></button></td>'+
 												'</tr>';

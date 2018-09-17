@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Ap_entry_resep_m extends CI_Model {
+class Ap_retur_m extends CI_Model {
 
 	function __construct(){
 		parent::__construct();
@@ -90,24 +90,72 @@ class Ap_entry_resep_m extends CI_Model {
     $this->db->delete('keranjang_beli_hv');
 	}
 
-	function simpan_proses($value, $total_keranjang_name, $jumlah_beli, $harga_obat, $id_penjualan_obat_hv){
-		$tanggal = date('d-m-Y');
-		$tahun = date('Y');
-		$bulan = date('m');
-
-		$data_detail = array(
-			'ID_PENJUALAN_OBAT_HV' => $id_penjualan_obat_hv,
+	function simpan_proses($value, $total_keranjang_name, $jumlah_beli, $harga_obat, $id_resep, $id_retur, $tanggal, $bulan, $tahun){
+		$data = array(
+			'ID_RETUR' => $id_retur,
 			'ID_GUDANG_OBAT' => $value,
-			'JUMLAH_BELI' => $jumlah_beli,
 			'TANGGAL' => $tanggal,
-			'TAHUN' => $tahun,
 			'BULAN' => $bulan,
+			'TAHUN' => $tahun,
+			'JUMLAH_BELI' => $jumlah_beli,
 			'TOTAL' => $total_keranjang_name,
 			'HARGA_OBAT' => $harga_obat
 		);
-		$this->db->insert('ap_penjualan_obat_hv_detail', $data_detail);
-		$this->db->empty_table('keranjang_beli_hv');
 
-		$this->db->query("UPDATE apotek_gudang_obat SET STOK = STOK - $jumlah_beli WHERE ID = '$value'");
+		$this->db->insert('retur_pasien_detail', $data);
+		$this->db->query("UPDATE apotek_gudang_obat SET STOK = STOK + $jumlah_beli WHERE ID_SETUP_NAMA_OBAT = '$value'");
+		// $this->db->query("UPDATE rk_resep_detail_rj SET JUMLAH_BELI = JUMLAH_BELI - $jumlah_beli WHERE ID_RESEP = '$id_resep'");
 	}
+
+  function get_data_resep(){
+    $sql = $this->db->query("SELECT
+                              a.*,
+                              b.NAMA AS NAMA_PASIEN
+                             FROM
+                             rk_resep_rj a
+                             LEFT JOIN rk_pasien b ON a.ID_PASIEN = b.ID");
+    return $sql->result_array();
+  }
+
+  function klik_resep($id){
+    $sql = $this->db->query("SELECT
+                							DET.ID,
+                							NM_OBT.KODE_OBAT,
+                							NM_OBT.NAMA_OBAT,
+                              NM_OBT.BARCODE,
+															NM_OBT.ID AS ID_GUDANG_OBAT,
+                							DET.TAKARAN,
+                							DET.ATURAN_MINUM,
+                							DET.HARGA,
+                							DET.JUMLAH_BELI,
+                							DET.SUBTOTAL,
+                              DET.JUMLAH_BELI,
+                              DET.SUBTOTAL
+                						FROM rk_resep_detail_rj DET
+                						LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = DET.ID_OBAT
+                						WHERE DET.ID_RESEP = '$id'
+    ");
+    return $sql->result();
+  }
+
+  function klik_resep_row($id){
+    $sql = $this->db->query("SELECT
+                							DET.ID,
+                							NM_OBT.KODE_OBAT,
+                							NM_OBT.NAMA_OBAT,
+                              NM_OBT.BARCODE,
+                							DET.TAKARAN,
+                							DET.ATURAN_MINUM,
+                							DET.HARGA,
+                							DET.JUMLAH_BELI,
+                							DET.SUBTOTAL,
+                              DET.JUMLAH_BELI,
+                              DET.SUBTOTAL,
+															RK.KODE_RESEP
+                						FROM rk_resep_detail_rj DET
+                						LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = DET.ID_OBAT
+														LEFT JOIN rk_resep_rj RK ON RK.ID = DET.ID_RESEP
+                						WHERE DET.ID_RESEP = '$id'");
+    return $sql->row();
+  }
 }

@@ -33,7 +33,7 @@ $user_detail = $this->model->get_user_detail($id_user);
 <link rel="shortcut icon" href="<?php echo base_url(); ?>picture/apotek/pay.ico">
 
 <script src="<?=base_url();?>kasir-apotek/assets/plugins/modernizr/modernizr-2.6.2-respond-1.1.0.min.js"></script>
-<script type="text/javascript" src="<?php echo base_url(); ?>js-devan/jquery-1.11.1.min.js"></script>
+
 <style type="text/css">
 #tombol_reset{
 	display: none;
@@ -65,7 +65,7 @@ $user_detail = $this->model->get_user_detail($id_user);
     <!-- BEGIN TOP MENU -->
     <input type="hidden" id="sts_edit" value="0" />
     <input type="hidden" id="sts_lunas" value="0" />
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="background-color: #0090D9; color: white;">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#sidebar">
@@ -74,11 +74,11 @@ $user_detail = $this->model->get_user_detail($id_user);
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a id="menu-medium" class="sidebar-toggle toggle_fullscreen tooltips">
+                <a id="menu-medium" class="sidebar-toggle toggle_fullscreen tooltips" style="color: white; border-right: 1px solid #ffffff;">
                     <i class="glyphicon glyphicon-fullscreen"></i>
                 </a>
             </div>
-            <div class="navbar-center"> Entry Penjualan HV / OTC</div>
+            <div class="navbar-center" style="color: white;"> Entry Paket </div>
             <div class="navbar-collapse collapse">
                 <!-- BEGIN TOP NAVIGATION MENU -->
                 <!-- <ul class="nav navbar-nav pull-right header-menu">
@@ -106,6 +106,27 @@ $user_detail = $this->model->get_user_detail($id_user);
                     <div class="form-group">
                         <!-- <label class="form-label"><strong>Pencarian</strong> Obat</label> -->
                         <div class="controls">
+                            <div class="input-group">
+                              <input type="text" id="nama_dokter" class="glowing form-control" value="" placeholder="Cari dokter ..." readonly required>
+                              <span class="input-group-addon bg-blue" id="tombol_dokter" style="cursor:pointer;">
+                                <i class="fa fa-search"></i>
+                              </span>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                              <input type="text" id="nama_paket" class="glowing form-control" value="" placeholder="Cari paket ..." readonly required>
+                              <span class="input-group-addon bg-blue" id="tombol_paket" style="cursor:pointer;">
+                                <i class="fa fa-search"></i>
+                              </span>
+                            </div>
+                            <br>
+														<div class="input-group">
+                              <input type="text" id="nama_pasien" class="glowing form-control" value="" placeholder="Cari pasien ..." readonly required>
+                              <span class="input-group-addon bg-blue" id="tombol_pasien" style="cursor:pointer;">
+                                <i class="fa fa-search"></i>
+                              </span>
+                            </div>
+                            <br>
                             <input type="text" id="cari_nama_menu" class="glowing form-control" value="" placeholder="Ketikkan obat yang ingin dicari ...">
                         </div>
                     </div>
@@ -146,6 +167,9 @@ $user_detail = $this->model->get_user_detail($id_user);
                             </div>
                             <div class="panel-body messages">
 															<form id="form_pembayaran">
+                                <input type="hidden" name="id_paket" id="id_paket" value="">
+																<input type="hidden" name="id_pasien" id="id_pasien" value="">
+                                <input type="hidden" name="id_dokter" id="id_dokter" value="">
 																<input type="hidden" name="id_pegawai" id="id_pegawai" value="<?php echo $id_user; ?>">
 																<input type="hidden" name="shift" id="shift" value="">
 																<input type="hidden" name="invoice" id="invoice" value="">
@@ -498,6 +522,113 @@ $user_detail = $this->model->get_user_detail($id_user);
                     </div>
                 </div>
             </div>
+
+    <button class="btn btn-danger" data-toggle="modal" id="popup_dokter" style="display: none;" data-target="#modal-basic4">Show me</button>
+    <div class="modal fade" id="modal-basic4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: #0090D9;">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <center><h3 class="modal-title" id="myModalLabel" style="color: white;"><strong>Data Dokter</strong></h3></center>
+                        </div>
+                        <div class="modal-body">
+                          <div class="input-group">
+                            <input type="text" id="keyword_dokter" class="glowing form-control" value="" placeholder="Cari dokter ...">
+                            <span class="input-group-addon bg-blue">
+                              <i class="fa fa-search"></i>
+                            </span>
+                          </div>
+                          <br>
+                          <table class="table table-hover" id="tabel_dokter">
+                              <thead>
+                                  <tr class="info">
+                                      <th style="text-align: center;">No</th>
+                                      <th style="text-align: center;">NIP</th>
+                                      <th style="text-align: center;">Nama Dokter</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+
+                              </tbody>
+                          </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-warning" id="tutup_popup_dokter" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <button class="btn btn-danger" data-toggle="modal" id="popup_paket" style="display: none;" data-target="#modal-basic3">Show me</button>
+    <div class="modal fade" id="modal-basic3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: #0090D9;">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <center><h3 class="modal-title" id="myModalLabel" style="color: white;"><strong>Data Paket</strong></h3></center>
+                        </div>
+                        <div class="modal-body">
+                          <table class="table table-hover" id="tabel_paket">
+                              <thead>
+                                  <tr class="info">
+                                      <th style="text-align: center;">Kode</th>
+                                      <th style="text-align: center;">Nama Paket</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+
+                              </tbody>
+                          </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-warning" id="tutup_popup_paket" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+			<button class="btn btn-danger" data-toggle="modal" id="popup_pasien" style="display: none;" data-target="#modal-basic5">Show me</button>
+	    <div class="modal fade" id="modal-basic5" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	                <div class="modal-dialog">
+	                    <div class="modal-content">
+	                        <div class="modal-header" style="background-color: #0090D9;">
+	                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	                            <center><h3 class="modal-title" id="myModalLabel" style="color: white;"><strong>Data Pasien</strong></h3></center>
+	                        </div>
+	                        <div class="modal-body">
+														<div class="input-group">
+	                            <input type="text" id="keyword_pasien" class="glowing form-control" value="" placeholder="Cari pasien ...">
+	                            <span class="input-group-addon bg-blue">
+	                              <i class="fa fa-search"></i>
+	                            </span>
+	                          </div>
+	                          <br>
+	                          <table class="table table-hover" id="tabel_pasien">
+	                              <thead>
+	                                  <tr class="info">
+	                                      <th style="text-align: center;">No</th>
+	                                      <th style="text-align: center;">Nama Pasien</th>
+	                                  </tr>
+	                              </thead>
+	                              <tbody>
+
+	                              </tbody>
+	                          </table>
+														<div class="row">
+															<div class="col-md-12">
+																<center><div id="tablePaging"> </div></center>
+															</div>
+														</div>
+	                        </div>
+	                        <div class="modal-footer">
+	                            <button type="button" class="btn btn-warning" id="tutup_popup_pasien" data-dismiss="modal">Close</button>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+
+
+
     <div class="md-overlay"></div>
 
 <!-- BEGIN MANDATORY SCRIPTS -->
@@ -532,6 +663,7 @@ $user_detail = $this->model->get_user_detail($id_user);
 
 <script src="<?php echo base_url(); ?>js-devan/js-form.js"></script>
 <script src="http://code.responsivevoice.org/responsivevoice.js"></script>
+<!-- <script type="text/javascript" src="<?php echo base_url(); ?>js-devan/jquery-1.11.1.min.js"></script> -->
 
 <script type="text/javascript">
 var ajax = "";
@@ -550,6 +682,21 @@ $(document).ready(function(){
   //   });
 	$('#btn_klik_proses').click(function(){
 		$('#popup_konfirmasi').click();
+	});
+
+	$('#tombol_dokter').click(function(){
+		$('#popup_dokter').click();
+		get_data_dokter();
+	});
+
+	$('#tombol_paket').click(function(){
+		$('#popup_paket').click();
+		get_data_paket();
+	});
+
+	$('#tombol_pasien').click(function(){
+		$('#popup_pasien').click();
+		get_data_pasien();
 	});
 
 	$('#btn_ya_proses').click(function(){
@@ -608,17 +755,21 @@ $(document).ready(function(){
 
 function simpan_proses(){
 	$.ajax({
-		url : '<?php echo base_url(); ?>apotek/ap_obat_hv_c/simpan_proses',
+		url : '<?php echo base_url(); ?>apotek/ap_entry_paket_c/simpan_proses',
 		data : $('#form_pembayaran').serialize(),
 		type : "POST",
 		dataType : "json",
 		success : function(row){
 			var id = row.ID;
-			// window.open('<?php echo base_url(); ?>apotek/ap_obat_hv_c/cetak/'+id, '_blank', 'location=yes,height=700,width=600,scrollbars=yes,status=yes');
+			// window.open('<?php echo base_url(); ?>apotek/ap_entry_paket_c/cetak/'+id, '_blank', 'location=yes,height=700,width=600,scrollbars=yes,status=yes');
 			$('#btn_tidak_proses').click();
 			$('#notif_berhasil').click();
 			data_keranjang();
 			data_obat();
+      $('#nama_paket').val('');
+      $('#id_paket').val('');
+      $('#nama_dokter').val('');
+      $('#id_dokter').val('');
 			$('#btn_klik_proses').attr('disabled','disabled');
 		}
 	});
@@ -642,7 +793,7 @@ function simpan_closing(){
 function data_obat(){
 	var keyword = $('#cari_nama_menu').val();
 	$.ajax({
-			url : '<?php echo base_url(); ?>apotek/ap_obat_hv_c/data_obat',
+			url : '<?php echo base_url(); ?>apotek/ap_entry_paket_c/data_obat',
 			data : {keyword:keyword},
 			type : "GET",
 			dataType : "json",
@@ -703,7 +854,7 @@ function data_obat(){
 
 function klik_obat(id, harga_beli, service){
 	$.ajax({
-		url : '<?php echo base_url(); ?>apotek/ap_obat_hv_c/simpan_keranjang',
+		url : '<?php echo base_url(); ?>apotek/ap_entry_paket_c/simpan_keranjang',
 		data : {
 						id:id,
 						harga_beli:harga_beli,
@@ -720,7 +871,7 @@ function klik_obat(id, harga_beli, service){
 
 function data_keranjang(){
 	$.ajax({
-			url : '<?php echo base_url(); ?>apotek/ap_obat_hv_c/data_keranjang',
+			url : '<?php echo base_url(); ?>apotek/ap_entry_paket_c/data_keranjang',
 			type : "POST",
 			dataType : "json",
 			success : function(res){
@@ -763,7 +914,7 @@ function hapus_keranjang(id){
 			var jawab = confirm("Yakin untuk menghapus data?");
             if (jawab === true) {
 							$.ajax({
-								url : '<?php echo base_url(); ?>apotek/ap_obat_hv_c/hapus_keranjang',
+								url : '<?php echo base_url(); ?>apotek/ap_entry_paket_c/hapus_keranjang',
 								data : {id:id},
 								type : "POST",
 								dataType : "json",
@@ -901,48 +1052,6 @@ function deleteRow(btn){
   row.parentNode.removeChild(row);
 }
 
-// function hitung_jumlah(id){
-// 	var jumlah_txt = $('#jumlah_txt_'+id).val();
-// 	var jumlah = $('#qty_'+id).val();
-// 	var harga = $('#harga_txt_'+id).val();
-//
-// 	if(jumlah == ""){
-// 		jumlah = 0;
-// 	}else{
-// 		jumlah = jumlah.split(',').join('');
-// 	}
-//
-// 	var total = parseFloat(jumlah) * parseFloat(harga);
-//
-// 	if(parseFloat(jumlah) > parseFloat(jumlah_txt)){
-// 		alert('Stok Tidak Mencukupi!');
-// 		$('#simpan_krj').attr('disabled','disabled');
-// 	}else{
-// 		$('#simpan_krj').removeAttr('disabled');
-// 	}
-//
-// 	$('#total_'+id).html(NumberToMoney(total));
-// 	$('#total_txt_'+id).val(total);
-//
-// 	var qty = 0;
-// 	$("input[name='qty[]']").each(function(idz,el){
-// 		var j = el.value;
-// 		if(j == ""){
-// 			j = 0;
-// 		}
-// 		qty += parseFloat(j);
-// 	});
-// 	$('#total_qty').html(NumberToMoney(qty));
-//
-// 	var grandtotal = 0;
-// 	$("input[name='total_txt[]']").each(function(idx,elm){
-// 		var tot = elm.value;
-// 		grandtotal += parseFloat(tot);
-// 	});
-//
-// 	$('#subtotal').html(NumberToMoney(grandtotal));
-// 	$('#grandtotal').html(NumberToMoney(grandtotal));
-// }
 function startTime() {
     var today = new Date();
     var h = today.getHours();
@@ -1289,6 +1398,159 @@ function semua_filter(){
       $('#tabel_rekap_penjualan tbody').html(table);
     }
   });
+}
+
+function get_data_paket(){
+  $.ajax({
+    url : '<?php echo base_url(); ?>apotek/ap_entry_paket_c/get_data_paket',
+    type : "POST",
+    dataType : "json",
+    success : function(result){
+      var table = '';
+      if(result == null || result == ""){
+          table = "<tr><td colspan='2' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+      }else{
+          var no = 0;
+          for(var i=0; i<result.length; i++){
+              no++;
+              table += "<tr style='cursor:pointer;' onclick='klik_paket("+result[i].ID+");'>"+
+                          "<td>"+result[i].KODE_PAKET+"</td>"+
+                          "<td>"+result[i].NAMA_PAKET+"</td>"+
+                      "</tr>";
+          }
+      }
+      $('#tabel_paket tbody').html(table);
+    }
+  });
+}
+
+function klik_paket(id){
+ $('#tutup_popup_paket').click();
+ $.ajax({
+   url : '<?php echo base_url(); ?>apotek/ap_entry_paket_c/klik_paket',
+   data : {id:id},
+   type : "POST",
+   dataType : "json",
+   success : function(row){
+     $('#nama_paket').val(row['NAMA_PAKET']);
+     $('#id_paket').val(row['ID'])
+   }
+ });
+}
+
+function get_data_dokter(){
+  var keyword = $('#keyword_dokter').val();
+  $.ajax({
+        url : '<?php echo base_url(); ?>apotek/ap_entry_paket_c/get_data_dokter',
+        data : {keyword:keyword},
+        type : "GET",
+        dataType : "json",
+        success : function(result){
+          var table = '';
+          if(result == null || result == ""){
+              table = "<tr><td colspan='3' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+          }else{
+              var no = 0;
+              for(var i=0; i<result.length; i++){
+                  no++;
+                  table += "<tr style='cursor:pointer;' onclick='klik_dokter("+result[i].ID+");'>"+
+                              "<td>"+no+"</td>"+
+                              "<td>"+result[i].NIP+"</td>"+
+                              "<td>"+result[i].NAMA+"</td>"+
+                          "</tr>";
+              }
+          }
+          $('#tabel_dokter tbody').html(table);
+        }
+      });
+
+  $('#keyword_dokter').off('keyup').keyup(function(){
+      get_data_dokter();
+  });
+}
+
+function klik_dokter(id){
+ $('#tutup_popup_dokter').click();
+ $.ajax({
+   url : '<?php echo base_url(); ?>apotek/ap_entry_paket_c/klik_dokter',
+   data : {id:id},
+   type : "POST",
+   dataType : "json",
+   success : function(row){
+     $('#nama_dokter').val(row['NAMA']);
+     $('#id_dokter').val(row['ID'])
+   }
+ });
+}
+
+function get_data_pasien(){
+	var keyword = $('#keyword_pasien').val();
+  $.ajax({
+    url : '<?php echo base_url(); ?>apotek/ap_entry_paket_c/get_data_pasien',
+		data : {keyword:keyword},
+    type : "POST",
+    dataType : "json",
+    success : function(result){
+      var table = '';
+      if(result == null || result == ""){
+          table = "<tr><td colspan='2' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+      }else{
+          var no = 0;
+          for(var i=0; i<result.length; i++){
+              no++;
+              table += "<tr style='cursor:pointer;' onclick='klik_pasien("+result[i].ID+");'>"+
+                          "<td style='text-align:center;'>"+no+"</td>"+
+                          "<td style='text-align:center;'>"+result[i].NAMA+"</td>"+
+                      "</tr>";
+          }
+      }
+      $('#tabel_pasien tbody').html(table);
+			paging_pasien();
+    }
+  });
+
+	$('#keyword_pasien').off('keyup').keyup(function(){
+			get_data_pasien();
+	});
+}
+
+function klik_pasien(id){
+ $('#tutup_popup_pasien').click();
+ $.ajax({
+   url : '<?php echo base_url(); ?>apotek/ap_entry_paket_c/klik_pasien',
+   data : {id:id},
+   type : "POST",
+   dataType : "json",
+   success : function(row){
+     $('#nama_pasien').val(row['NAMA']);
+     $('#id_pasien').val(row['ID'])
+   }
+ });
+}
+
+function paging_pasien($selector){
+	var jumlah_tampil = '10';
+    if(typeof $selector == 'undefined'){
+        $selector = $("#tabel_pasien tbody tr");
+    }
+    window.tp = new Pagination('#tablePaging', {
+        itemsCount:$selector.length,
+        pageSize : parseInt(jumlah_tampil),
+        onPageSizeChange: function (ps) {
+            console.log('changed to ' + ps);
+        },
+        onPageChange: function (paging) {
+            //custom paging logic here
+            //console.log(paging);
+            var start = paging.pageSize * (paging.currentPage - 1),
+                end = start + paging.pageSize,
+                $rows = $selector;
+            $rows.hide();
+            for (var i = start; i < end; i++) {
+                $rows.eq(i).show();
+            }
+        }
+    });
 }
 </script>
 </body>

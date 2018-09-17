@@ -1,12 +1,12 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Ap_obat_hv_c extends CI_Controller {
+class Ap_retur_c extends CI_Controller {
 
 	function __construct()
 	{
 		parent::__construct();
 		$this->load->helper('url');
-		$this->load->model('apotek/ap_obat_hv_m','model');
+		$this->load->model('apotek/ap_retur_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
 		$id_user = $sess_user['id'];
 		if($id_user == "" || $id_user == null){
@@ -17,13 +17,13 @@ class Ap_obat_hv_c extends CI_Controller {
 	function index(){
 		$data = array(
 			'title' => 'Sistem Informasi Rumah Sakit',
-      'page' => 'apotek/ap_obat_hv_v',
+      'page' => 'apotek/ap_retur_v',
       'master_menu' => 'kasir_aa',
-			'view' => 'obat_hv',
+			'view' => 'retur',
       'subtitle' => ''
 		);
 
-		$this->load->view('apotek/ap_obat_hv_v',$data);
+		$this->load->view('apotek/ap_retur_v',$data);
 	}
 
 	function data_obat(){
@@ -40,11 +40,10 @@ class Ap_obat_hv_c extends CI_Controller {
 	function simpan_keranjang(){
 		$id_gudang = $this->input->post('id');
 		$harga_beli = $this->input->post('harga_beli');
-		$service = $this->input->post('service');
 
 		$sql_check = $this->db->query("SELECT COUNT(*) AS TOTAL FROM keranjang_beli_hv WHERE ID_GUDANG_OBAT = '$id_gudang'")->row();
 		if ($sql_check->TOTAL == '0') {
-			$this->model->simpan_keranjang($id_gudang, $harga_beli, $service);
+			$this->model->simpan_keranjang($id_gudang, $harga_beli);
 		}else {
 		}
 		echo '1';
@@ -61,36 +60,37 @@ class Ap_obat_hv_c extends CI_Controller {
 		$total_keranjang_name = $this->input->post('total_keranjang_name');
 		$jumlah_beli = $this->input->post('jumlah_beli');
 		$harga_obat = $this->input->post('harga_obat');
-		$service = $this->input->post('service');
 
-		$invoice = $this->input->post('invoice');
+		$sum_beli = array_sum($jumlah_beli);
+
 		$shift = $this->input->post('shift');
+		$id_resep = $this->input->post('id_resep');
 		$id_pegawai = $this->input->post('id_pegawai');
+		$kode_resep = $this->input->post('kode_resep');
 		$total = str_replace(',','',  $this->input->post('total_tagihan'));
 		$tanggal = date('d-m-Y');
-    $tahun = date('Y');
-    $bulan = date('m');
-		$waktu = date('H:i:s');
+		$bulan = date('m');
+		$tahun = date('Y');
 
 		$data = array(
-			'INVOICE' => $invoice,
 			'SHIFT' => $shift,
 			'ID_PEGAWAI' => $id_pegawai,
-			'TOTAL' => $total,
-			'STATUS' => 'Penjualan HV / OTC',
+			'ID_RESEP' => $id_resep,
+			'KODE_RESEP' => $kode_resep,
+			'TOTAL_BIAYA' => $total,
 			'TANGGAL' => $tanggal,
 			'BULAN' => $bulan,
 			'TAHUN' => $tahun,
-			'WAKTU' => $waktu
+			'TOTAL_JUMLAH_RETUR' => $sum_beli
 		);
-		$this->db->insert('ap_penjualan_obat_hv', $data);
-		$id_penjualan_obat_hv = $this->db->insert_id();
+		$this->db->insert('retur_pasien', $data);
+		$id_retur = $this->db->insert_id();
 
 		foreach ($id_gudang_obat as $key => $value) {
-			$this->model->simpan_proses($value, $total_keranjang_name[$key], $jumlah_beli[$key], $harga_obat[$key], $service[$key], $id_penjualan_obat_hv);
+			$this->model->simpan_proses($value, $total_keranjang_name[$key], $jumlah_beli[$key], $harga_obat[$key], $id_resep, $id_retur, $tanggal, $bulan, $tahun);
 		}
 
-		$sql = $this->db->query("SELECT * FROM ap_penjualan_obat WHERE ID = '$id_penjualan_obat_hv'");
+		$sql = $this->db->query("SELECT * FROM retur_pasien WHERE ID = '$id_retur'");
 		$back = $sql->row_array();
 		echo json_encode($back);
 
@@ -152,6 +152,18 @@ class Ap_obat_hv_c extends CI_Controller {
 		}
 	}
 
+	function get_data_resep(){
+		$data = $this->model->get_data_resep();
+		echo json_encode($data);
+	}
+
+	function klik_resep(){
+		$id = $this->input->post('id');
+		$data['res'] = $this->model->klik_resep($id);
+		$data['row'] = $this->model->klik_resep_row($id);
+
+		echo json_encode($data);
+	}
 }
 
 /* End of file welcome.php */

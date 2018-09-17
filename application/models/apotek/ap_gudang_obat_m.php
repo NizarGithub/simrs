@@ -120,11 +120,22 @@ class Ap_gudang_obat_m extends CI_Model {
 							OBAT.HARGA_JUAL,
 							OBAT.HARGA_PERTABLET,
 							OBAT.TANGGAL_MASUK,
-							OBAT.WAKTU_MASUK
+							OBAT.WAKTU_MASUK,
+							FAKTUR.ID AS ID_FAKTUR,
+							FAKTUR.NO_FAKTUR,
+							FAKTUR.TANGGAL AS TANGGAL_FAKTUR,
+							FAKTUR.WAKTU AS WAKTU_FAKTUR,
+							FAKTUR.TOTAL AS TOTAL_FAKTUR,
+							FAKTUR.DISKON AS DISKON_FAKTUR,
+							FAKTUR.CEK_DISKON,
+							SUPLY.NAMA_SUPPLIER
 						FROM faktur_detail OBAT
 						LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
 						LEFT JOIN obat_jenis JENIS ON JENIS.ID = NM_OBT.ID_JENIS_OBAT
+						LEFT JOIN faktur FAKTUR ON FAKTUR.ID = OBAT.ID_FAKTUR
+						LEFT JOIN obat_supplier SUPLY ON SUPLY.ID = FAKTUR.ID_SUPPLIER
 						WHERE $where
+						GROUP BY FAKTUR.ID
 						$order
 					";
 		$query = $this->db->query($sql);
@@ -169,41 +180,82 @@ class Ap_gudang_obat_m extends CI_Model {
 	}
 
 	function data_obat_id($id){
-		$sql = "
-			SELECT
-				OBAT.ID,
-				OBAT.ID_SETUP_NAMA_OBAT,
-				NM_OBT.KODE_OBAT,
-				NM_OBT.BARCODE,
-				NM_OBT.NAMA_OBAT,
-				NM_OBT.ID_JENIS_OBAT,
-				NM_OBT.EXPIRED,
-				NM_OBT.GOLONGAN_OBAT,
-				NM_OBT.KATEGORI_OBAT,
-				NM_OBT.SERVICE,
-				JENIS.NAMA_JENIS,
-				OBAT.JUMLAH,
-				OBAT.ISI,
-				OBAT.TOTAL,
-				OBAT.JUMLAH_BUTIR,
-				OBAT.HARGA_BELI,
-				OBAT.HARGA_JUAL,
-				OBAT.HARGA_PERTABLET,
-				OBAT.TANGGAL_MASUK,
-				OBAT.WAKTU_MASUK,
-				OBAT.ID_SUPPLIER,
-				SUP.NAMA_SUPPLIER
-			FROM faktur_detail OBAT
-			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
-			LEFT JOIN obat_supplier SUP ON SUP.ID = OBAT.ID_SUPPLIER
-			LEFT JOIN obat_jenis JENIS ON JENIS.ID = NM_OBT.ID_JENIS_OBAT
-			WHERE OBAT.ID = '$id'
-		";
+		$sql = "SELECT
+							OBAT.ID,
+							OBAT.ID_SETUP_NAMA_OBAT,
+							NM_OBT.KODE_OBAT,
+							NM_OBT.BARCODE,
+							NM_OBT.NAMA_OBAT,
+							NM_OBT.ID_JENIS_OBAT,
+							NM_OBT.EXPIRED,
+							NM_OBT.GOLONGAN_OBAT,
+							NM_OBT.KATEGORI_OBAT,
+							NM_OBT.SERVICE,
+							JENIS.NAMA_JENIS,
+							OBAT.JUMLAH,
+							OBAT.ISI,
+							OBAT.TOTAL,
+							OBAT.JUMLAH_BUTIR,
+							OBAT.HARGA_BELI,
+							OBAT.HARGA_JUAL,
+							OBAT.HARGA_PERTABLET,
+							OBAT.TANGGAL_MASUK,
+							OBAT.WAKTU_MASUK,
+							OBAT.ID_SUPPLIER,
+							SUP.NAMA_SUPPLIER
+						FROM faktur_detail OBAT
+						LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
+						LEFT JOIN obat_supplier SUP ON SUP.ID = OBAT.ID_SUPPLIER
+						LEFT JOIN obat_jenis JENIS ON JENIS.ID = NM_OBT.ID_JENIS_OBAT
+						WHERE OBAT.ID = '$id'
+					";
 		$query = $this->db->query($sql);
 		return $query->row();
 	}
 
+	function data_faktur_id($id){
+		$sql = "SELECT
+						a.ID AS ID_FAKTUR_UTAMA,
+						a.NO_FAKTUR,
+						a.DISKON,
+						a.TOTAL AS TOTAL_FAKTUR,
+						a.CEK_DISKON,
+						a.ID_SUPPLIER,
+						b.*,
+						c.NAMA_OBAT,
+						d.NAMA_SUPPLIER
+						FROM
+						faktur a
+						LEFT JOIN faktur_detail b ON a.ID = b.ID_FAKTUR
+						LEFT JOIN admum_setup_nama_obat c ON c.iD = b.ID_SETUP_NAMA_OBAT
+						LEFT JOIN obat_supplier d ON d.ID = a.ID_SUPPLIER
+						WHERE b.ID_FAKTUR = '$id'
+					";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
 
+	function data_faktur_id_row($id){
+		$sql = "SELECT
+						a.ID AS ID_FAKTUR_UTAMA,
+						a.NO_FAKTUR,
+						a.DISKON,
+						a.TOTAL AS TOTAL_FAKTUR,
+						a.CEK_DISKON,
+						a.ID_SUPPLIER,
+						b.*,
+						c.NAMA_OBAT,
+						d.NAMA_SUPPLIER
+						FROM
+						faktur a
+						LEFT JOIN faktur_detail b ON a.ID = b.ID_FAKTUR
+						LEFT JOIN admum_setup_nama_obat c ON c.iD = b.ID_SETUP_NAMA_OBAT
+						LEFT JOIN obat_supplier d ON d.ID = a.ID_SUPPLIER
+						WHERE b.ID_FAKTUR = '$id'
+					";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
 
 	function simpan(
 		$insert_id,
@@ -243,7 +295,66 @@ class Ap_gudang_obat_m extends CI_Model {
 
 		if ($total_data == 0) {
 			$data_gudang = array(
-				'ID_SETUP_NAMA_OBAT' => $value,				
+				'ID_SETUP_NAMA_OBAT' => $value,
+				'TANGGAL_MASUK' => $tanggal_masuk,
+				'WAKTU_MASUK' => $waktu_masuk,
+				'AKTIF' => '1',
+				'STOK' => $total
+			);
+			$this->db->insert('apotek_gudang_obat', $data_gudang);
+		}else {
+			$sql_stok = $this->db->query("SELECT * FROM apotek_gudang_obat WHERE ID_SETUP_NAMA_OBAT = '$value'")->row_array();
+			$id_gudang = $sql_stok['ID'];
+			$stok = $sql_stok['STOK'];
+
+			$jumlah_stok = $total + $stok;
+			$data_gudang = array(
+				'STOK' => $jumlah_stok
+			);
+			$this->db->where('ID', $id_gudang);
+      $this->db->update('apotek_gudang_obat', $data_gudang);
+		}
+	}
+
+	function simpan_obat(
+		$id_faktur,
+		$value,
+		$jumlah,
+		$isi,
+		$total,
+		$jumlah_butir,
+		$harga_pertablet,
+		$harga_beli,
+		$harga_jual,
+		$tanggal_masuk,
+		$waktu_masuk
+	){
+
+		// print_r($harga_beli);
+		// die();
+		$data_faktur_detail = array(
+			'ID_FAKTUR' => $id_faktur,
+			'ID_SETUP_NAMA_OBAT' => $value,
+			'JUMLAH' => $jumlah,
+			'ISI' => $isi,
+			'TOTAL' => $total,
+			'JUMLAH_BUTIR' => $jumlah_butir,
+			'HARGA_PERTABLET' => $harga_pertablet,
+			'HARGA_BELI' => $harga_beli,
+			'HARGA_JUAL' => $harga_jual,
+			'TANGGAL_MASUK' => $tanggal_masuk,
+			'WAKTU_MASUK' => $waktu_masuk
+		);
+		$this->db->insert('faktur_detail', $data_faktur_detail);
+		$id_faktur = $this->db->insert_id();
+
+		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM apotek_gudang_obat WHERE ID_SETUP_NAMA_OBAT = '$value'";
+		$qry_cek = $this->db->query($sql_cek)->row();
+		$total_data = $qry_cek->TOTAL;
+
+		if ($total_data == 0) {
+			$data_gudang = array(
+				'ID_SETUP_NAMA_OBAT' => $value,
 				'TANGGAL_MASUK' => $tanggal_masuk,
 				'WAKTU_MASUK' => $waktu_masuk,
 				'AKTIF' => '1',

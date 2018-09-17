@@ -358,7 +358,7 @@ if ($('[rel="popover"]').length && $.fn.popover) {
 /*
 $('[data-equal-height="true"]').each(function(){
   equalHeight($(this).children().children());
-}); 
+});
 
 function equalHeight(group) {
    tallest = 0;
@@ -391,7 +391,7 @@ $('.favs').on('click', function () {
 /****  Custom Checkbox  ****/
 if ($('input:checkbox').length && $.fn.iCheck) {
     $('input:checkbox').each(function () {
-        // We verify if the checkbox is not a custom switch 
+        // We verify if the checkbox is not a custom switch
         if (!$(this).hasClass('switch')) {
             var icheck_style = $(this).data('style') ? $(this).data('style') : 'flat-blue';
             $(this).iCheck({
