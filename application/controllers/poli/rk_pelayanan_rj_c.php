@@ -483,7 +483,7 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		foreach ($id_obat as $key => $value) {
 			$subtotal = $harga[$key] * $jumlah[$key];
 			$this->model->simpan_resep_det($id_resep,$value,$harga[$key],$service[$key],$jumlah[$key],$subtotal,$takaran[$key],$aturan_umum[$key],$tanggal,$tahun,$bulan);
-			$this->model->ubah_stok_obat($value,$jumlah[$key]);
+			// $this->model->ubah_stok_obat($value,$jumlah[$key]);
 		}
 
 		$this->insert_kode_resep();

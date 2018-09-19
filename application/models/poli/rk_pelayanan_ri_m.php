@@ -56,7 +56,6 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				RI.TANGGAL_MASUK,
 				RI.WAKTU,
 				RI.TANGGAL_KELUAR,
-				RI.WAKTU_KELUAR,
 				PASIEN.KODE_PASIEN,
 				PASIEN.NAMA AS NAMA_PASIEN,
 				PASIEN.JENIS_KELAMIN,
@@ -67,21 +66,27 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				KRI.KODE_KAMAR,
 				KRI.KELAS,
 				KRI.VISITE_DOKTER,
-				RI.BIAYA_KAMAR_FIX,
 				PEG.NAMA AS NAMA_DOKTER,
 				RI.ID_BED,
 				BED.NOMOR_BED,
-				IFNULL(KA.DIRAWAT_SELAMA,0) AS DIRAWAT_SELAMA
+				IFNULL(KA.DIRAWAT_SELAMA,0) AS DIRAWAT_SELAMA,
+				RI.BIAYA_KAMAR_FIX,
+				a.TOTAL AS TOTAL_TINDAKAN,
+				b.BIAYA_VISITE,
+				IFNULL(c.TOTAL_TARIF,0) AS TOTAL_LAB,
+				d.TOTAL AS TOTAL_RESEP
 			FROM admum_rawat_inap RI
 			LEFT JOIN rk_pasien PASIEN ON PASIEN.ID = RI.ID_PASIEN
 			LEFT JOIN admum_kamar_rawat_inap KRI ON KRI.ID = RI.ID_KAMAR
 			LEFT JOIN admum_bed_rawat_inap BED ON BED.ID = RI.ID_BED
 			LEFT JOIN kepeg_pegawai PEG ON PEG.ID = RI.ID_DOKTER
-			LEFT JOIN rk_ri_kondisi_akhir KA ON KA.ID_PELAYANAN = RI.ID
+			LEFT JOIN rk_ri_diagnosa KA ON KA.ID_PELAYANAN = RI.ID
+			LEFT JOIN rk_ri_tindakan a ON a.ID_PELAYANAN = RI.ID
+			LEFT JOIN rk_ri_visite b ON b.ID_PELAYANAN = RI.ID
+			LEFT JOIN rk_ri_laborat c ON c.ID_PELAYANAN = RI.ID
+			LEFT JOIN rk_ri_resep d ON d.ID_PELAYANAN = RI.ID
 			WHERE $where
 			AND RI.STS_TERIMA = '1'
-			AND RI.STATUS_SUDAH = '0'
-			AND RI.TANGGAL_MASUK = '$tanggal'
 			ORDER BY RI.ID DESC
 		";
 		$query = $this->db->query($sql);
@@ -105,8 +110,10 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				RI.KELAS,
 				RI.ID_KAMAR,
 				RI.ID_DOKTER,
+				KRI.KODE_KAMAR,
 				KRI.KELAS,
 				KRI.VISITE_DOKTER,
+				KRI.BIAYA_VISITE,
 				PEG.NAMA AS NAMA_DOKTER,
 				RI.ID_BED,
 				BED.NO,
@@ -166,6 +173,11 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
+	}
+
+	function simpan_hari($id_pelayanan,$tanggal,$hari_ke){
+		$sql = "INSERT INTO admum_rawat_inap_hari(ID_PELAYANAN,TANGGAL,HARI_KE) VALUES ('$id_pelayanan','$tanggal','$hari_ke')";
+		$this->db->query($sql);
 	}
 
 	// TINDAKAN
@@ -271,6 +283,19 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		return $query->row();
 	}
 
+	function data_tindakan($id_tindakan){
+		$sql = "
+			SELECT
+				a.ID,
+				a.ID_PELAYANAN,
+				a.TANGGAL
+			FROM rk_ri_tindakan a
+			WHERE a.ID_PELAYANAN = '$id_tindakan'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
 	function data_tindakan_ri($id_tindakan,$tanggal){
 		$sql = "
 			SELECT
@@ -285,7 +310,6 @@ class Rk_pelayanan_ri_m extends CI_Model {
 			LEFT JOIN rk_ri_tindakan RI ON RI.ID = DET.ID_TINDAKAN
 			LEFT JOIN admum_setup_tindakan TDK ON TDK.ID = DET.ID_SETUP_TINDAKAN
 			WHERE RI.ID_PELAYANAN = '$id_tindakan'
-			AND DET.TANGGAL = '$tanggal'
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -400,7 +424,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		$where = "1  = 1";
 
 		if($keyword != ""){
-			$where = $where." AND (PEG.NIP LIKE '%$keyword%' OR PEG.NAMA LIKE '%$keyword%')";
+			$where = $where." AND PEG.NAMA LIKE '%$keyword%'";
 		}
 
 		$sql = "
@@ -434,6 +458,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 			LEFT JOIN admum_poli POLI ON POLI.ID_PEG_DOKTER = PEG.ID
 			LEFT JOIN kepeg_kel_jabatan JAB ON JAB.ID = PEG.ID_JABATAN
 			WHERE $where
+			AND PEG.STATUS LIKE '%Dokter%'
 			ORDER BY PEG.ID DESC
 		";
 		$query = $this->db->query($sql);
@@ -478,8 +503,9 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				RIVST.TANGGAL,
 				VST.KODE,
 				VST.NAMA_VISITE,
-				VST.TARIF,
-				PEG.NAMA AS NAMA_DOKTER
+				RIVST.BIAYA_VISITE,
+				PEG.NAMA AS NAMA_DOKTER,
+				RIVST.STATUS_VISITE
 			FROM rk_ri_visite RIVST
 			LEFT JOIN admum_setup_visite VST ON VST.ID = RIVST.ID_VISITE
 			LEFT JOIN kepeg_pegawai PEG ON PEG.ID = RIVST.ID_DOKTER
@@ -499,7 +525,8 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				VST.NAMA_VISITE,
 				VST.TARIF,
 				RIVST.ID_DOKTER,
-				PEG.NAMA AS NAMA_DOKTER
+				PEG.NAMA AS NAMA_DOKTER,
+				RIVST.STATUS_VISITE
 			FROM rk_ri_visite RIVST
 			LEFT JOIN admum_setup_visite VST ON VST.ID = RIVST.ID_VISITE
 			LEFT JOIN kepeg_pegawai PEG ON PEG.ID = RIVST.ID_DOKTER
@@ -510,7 +537,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_visite($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$id_visite,$id_dokter){
+	function simpan_visite($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$id_dokter,$biaya_visite,$status_visite){
 		$sql = "
 			INSERT INTO rk_ri_visite(
 				ID_PELAYANAN,
@@ -518,26 +545,28 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				TANGGAL,
 				BULAN,
 				TAHUN,
-				ID_VISITE,
-				ID_DOKTER
+				ID_DOKTER,
+				BIAYA_VISITE,
+				STATUS_VISITE
 			) VALUES (
 				'$id_pelayanan',
 				'$id_pasien',
 				'$tanggal',
 				'$bulan',
 				'$tahun',
-				'$id_visite',
-				'$id_dokter'
+				'$id_dokter',
+				'$biaya_visite',
+				'$status_visite'
 			)
 		";
 		$this->db->query($sql);
 	}
 
-	function ubah_visite($id,$id_visite,$id_dokter){
+	function ubah_visite($id,$id_dokter,$status_visite){
 		$sql = "
 			UPDATE rk_ri_visite SET
-				ID_VISITE = '$id_visite',
-				ID_DOKTER = '$id_dokter'
+				ID_DOKTER = '$id_dokter',
+				STATUS_VISITE = '$status_visite'
 			WHERE ID = '$id'
 		";
 		$this->db->query($sql);
@@ -910,11 +939,9 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				DG.TANGGAL,
 				DG.DIAGNOSA,
 				DG.TINDAKAN,
-				KA.NAMA_KASUS,
-				SP.NAMA_SPESIALISTIK
+				DG.DIRAWAT_SELAMA,
+				DG.KONDISI_AKHIR
 			FROM rk_ri_diagnosa DG
-			LEFT JOIN admum_setup_kasus_diagnosa KA ON KA.ID = DG.ID_KASUS
-			LEFT JOIN admum_setup_spesialistik SP ON SP.ID = DG.ID_SPESIALISTIK
 			WHERE DG.ID_PELAYANAN = '$id_pelayanan'
 		";
 		$query = $this->db->query($sql);
@@ -928,13 +955,9 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				DG.TANGGAL,
 				DG.DIAGNOSA,
 				DG.TINDAKAN,
-				DG.ID_KASUS,
-				KA.NAMA_KASUS,
-				DG.ID_SPESIALISTIK,
-				SP.NAMA_SPESIALISTIK
+				DG.DIRAWAT_SELAMA,
+				DG.KONDISI_AKHIR
 			FROM rk_ri_diagnosa DG
-			LEFT JOIN admum_setup_kasus_diagnosa KA ON KA.ID = DG.ID_KASUS
-			LEFT JOIN admum_setup_spesialistik SP ON SP.ID = DG.ID_SPESIALISTIK
 			WHERE DG.ID = '$id'
 			AND DG.ID_PELAYANAN = '$id_pelayanan'
 		";
@@ -942,7 +965,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_diagnosa($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$diagnosa,$tindakan,$hari_ke){
+	function simpan_diagnosa($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$diagnosa,$tindakan,$dirawat_selama,$kondisi_akhir,$hari_ke){
 		$sql = "
 			INSERT INTO rk_ri_diagnosa(
 				ID_PELAYANAN,
@@ -952,6 +975,8 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				TAHUN,
 				DIAGNOSA,
 				TINDAKAN,
+				DIRAWAT_SELAMA,
+				KONDISI_AKHIR,
 				HARI_KE
 			) VALUES (
 				'$id_pelayanan',
@@ -961,6 +986,8 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				'$tahun',
 				'$diagnosa',
 				'$tindakan',
+				'$dirawat_selama',
+				'$kondisi_akhir',
 				'$hari_ke'
 			)
 		";
@@ -1174,22 +1201,17 @@ class Rk_pelayanan_ri_m extends CI_Model {
 
 		$sql = "
 			SELECT
-				a.*,
-				(a.HARGA_JUAL + a.SERVICE) AS HARGA
-			FROM(
-				SELECT
-					a.ID,
-					a.KODE_OBAT,
-					a.NAMA_OBAT,
-					IFNULL(b.STOK,0) AS STOK,
-					IFNULL(c.HARGA_JUAL,0) AS HARGA_JUAL,
-					IFNULL(a.SERVICE,0) AS SERVICE
-				FROM admum_setup_nama_obat a
-				LEFT JOIN apotek_gudang_obat b ON b.ID_SETUP_NAMA_OBAT = a.ID
-				LEFT JOIN faktur_detail c ON c.ID_SETUP_NAMA_OBAT = a.ID
-				WHERE $where
-				GROUP BY a.ID
-			) a
+				a.ID,
+				a.KODE_OBAT,
+				a.NAMA_OBAT,
+				IFNULL(b.STOK,0) AS STOK,
+				IFNULL(c.HARGA_JUAL,0) AS HARGA_JUAL,
+				a.SERVICE
+			FROM admum_setup_nama_obat a
+			LEFT JOIN apotek_gudang_obat b ON b.ID_SETUP_NAMA_OBAT = a.ID
+			LEFT JOIN faktur_detail c ON c.ID_SETUP_NAMA_OBAT = a.ID
+			WHERE $where
+			GROUP BY a.ID
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -1202,7 +1224,8 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				a.KODE_OBAT,
 				a.NAMA_OBAT,
 				IFNULL(b.STOK,0) AS STOK,
-				IFNULL(c.HARGA_JUAL,0) AS HARGA_JUAL
+				IFNULL(c.HARGA_JUAL,0) AS HARGA_JUAL,
+				a.SERVICE
 			FROM admum_setup_nama_obat a
 			LEFT JOIN apotek_gudang_obat b ON b.ID_SETUP_NAMA_OBAT = a.ID
 			LEFT JOIN faktur_detail c ON c.ID_SETUP_NAMA_OBAT = a.ID
@@ -1229,62 +1252,79 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		$sql = "
 			SELECT
 				DET.ID,
-				NM_OBT.KODE_OBAT,
-				NM_OBT.NAMA_OBAT,
+				b.NAMA_OBAT,
+				DET.JUMLAH_BELI,
+				DET.SUBTOTAL,
 				DET.TAKARAN,
-				DET.ATURAN_MINUM
+				DET.ATURAN_MINUM,
+				DET.HARGA
 			FROM rk_ri_resep_detail DET
-			LEFT JOIN apotek_gudang_obat GD ON GD.ID = DET.ID_OBAT
-			LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = GD.ID_SETUP_NAMA_OBAT
+			LEFT JOIN admum_setup_nama_obat b ON b.ID = DET.ID_OBAT
 			WHERE DET.ID_RESEP = '$id_resep'
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
 
-	function simpan_resep($id_pelayanan,$id_pasien,$kode_resep,$total,$diminum_selama,$tanggal,$bulan,$tahun){
+	function simpan_resep($id_pelayanan,$id_pasien,$kode_resep,$alergi,$uraian,$banyak_resep,$diminum_selama,$tanggal,$bulan,$tahun,$total,$total_dgn_service){
 		$sql = "
 			INSERT INTO rk_ri_resep(
 				ID_PELAYANAN,
 				ID_PASIEN,
 				KODE_RESEP,
-				TOTAL,
+				ALERGI_OBAT,
+				URAIAN,
+				BANYAKNYA_RESEP,
 				DIMINUM_SELAMA,
 				TANGGAL,
 				BULAN,
-				TAHUN
+				TAHUN,
+				TOTAL,
+				TOTAL_DGN_SERVICE
 			) VALUES (
 				'$id_pelayanan',
 				'$id_pasien',
 				'$kode_resep',
-				'$total',
+				'$alergi',
+				'$uraian',
+				'$banyak_resep',
 				'$diminum_selama',
 				'$tanggal',
 				'$bulan',
-				'$tahun'
+				'$tahun',
+				'$total',
+				'$total_dgn_service'
 			)
 		";
 		$this->db->query($sql);
 	}
 
-	function simpan_resep_det($id_resep,$id_obat,$harga,$jumlah_beli,$subtotal,$takaran,$aturan_umum){
+	function simpan_resep_det($id_resep,$id_obat,$harga,$service,$jumlah,$subtotal,$takaran,$aturan_umum,$tanggal,$tahun,$bulan){
 		$sql = "
 			INSERT INTO rk_ri_resep_detail(
 				ID_RESEP,
 				ID_OBAT,
 				HARGA,
+				SERVICE,
 				JUMLAH_BELI,
 				SUBTOTAL,
 				TAKARAN,
-				ATURAN_MINUM
+				ATURAN_MINUM,
+				TANGGAL,
+				TAHUN,
+				BULAN
 			) VALUES (
 				'$id_resep',
 				'$id_obat',
 				'$harga',
-				'$jumlah_beli',
+				'$service',
+				'$jumlah',
 				'$subtotal',
 				'$takaran',
-				'$aturan_umum'
+				'$aturan_umum',
+				'$tanggal',
+				'$tahun',
+				'$bulan'
 			)
 		";
 		$this->db->query($sql);

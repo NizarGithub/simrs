@@ -6,6 +6,7 @@ class Admum_pasien_rj_m extends CI_Model {
 	{
 		parent::__construct();
 		$this->load->database();
+		date_default_timezone_set('Asia/Jakarta');
 	}
 
 	function default_lokasi(){
@@ -109,6 +110,17 @@ class Admum_pasien_rj_m extends CI_Model {
 
 	function load_poli($keyword){
 		$where = "1 = 1";
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu = $format->format('H:i');
+		$and = '';
+
+		if($waktu > '21:00'){
+			$and = " AND POLI.`STATUS` != 'Normal'";
+		}else{
+			$and = " AND POLI.`STATUS` != 'Malam'";
+		}
 
 		if($keyword != ""){
 			$where = $where." AND (POLI.NAMA LIKE '%$keyword%' OR PEG.NAMA_DOKTER LIKE '%$keyword%')";
@@ -118,7 +130,8 @@ class Admum_pasien_rj_m extends CI_Model {
 			SELECT
 				POLI.ID,
 				POLI.NAMA AS NAMA_POLI,
-				POLI.INITIAL_POLI,
+				POLI.JENIS,
+				POLI.`STATUS`,
 				POLI.ID_PEG_DOKTER,
 				POLI.BIAYA,
 				PEG.NAMA_DOKTER
@@ -130,6 +143,7 @@ class Admum_pasien_rj_m extends CI_Model {
 				FROM kepeg_pegawai a
 			) PEG ON PEG.ID = POLI.ID_PEG_DOKTER
 			WHERE $where
+			$and
 			AND POLI.AKTIF = '1'
 		";
 		$query = $this->db->query($sql);
@@ -141,7 +155,6 @@ class Admum_pasien_rj_m extends CI_Model {
 			SELECT
 				POLI.ID,
 				POLI.NAMA AS NAMA_POLI,
-				POLI.INITIAL_POLI,
 				POLI.ID_PEG_DOKTER,
 				POLI.BIAYA,
 				PEG.NAMA_DOKTER

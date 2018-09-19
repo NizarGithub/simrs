@@ -1,7 +1,10 @@
 <script type="text/javascript" src="<?php echo base_url(); ?>js-devan/jquery-1.11.1.min.js"></script>
 
 <style type="text/css">
-#view_ubah, #tombol_reset, #view_jenis{
+#view_ubah, 
+#view_jenis,
+#view_jenis_ubah,
+#tombol_reset{
 	display: none;
 }
 </style>
@@ -45,6 +48,30 @@ $(document).ready(function(){
     	data_poli();
     });
 
+    $('#status').change(function(){
+    	var jenis = $('#jenis').val();
+    	var status = $('#status').val();
+
+    	if(jenis == 'Poli Umum'){
+    		if(status == 'Malam'){
+    			$('#view_ket').show();
+    			$('#keterangan').val('Di atas jam 21:00 WIB');
+    		}else if(status == 'Tarif D'){
+    			$('#view_ket').show();
+    			$('#keterangan').val('Jasa Dokter Free');
+    		}else{
+    			$('#view_ket').hide();
+    		}
+    	}else{
+    		if(status == 'Tarif D'){
+    			$('#view_ket').show();
+    			$('#keterangan').val('Jasa POLI free, hanya Biaya Admin');
+    		}else{
+    			$('#view_ket').hide();
+    		}
+    	}
+    });
+
     $('.btn_dokter').click(function(){
 		$('#popup_dokter').click();
     	data_dokter();
@@ -68,6 +95,17 @@ $(document).ready(function(){
     $('#tambah_poli').click(function(){
     	$('#ket').val('Tambah');
     });
+
+	$('#checkbox2_ubah').click(function(){
+    	var cek = $('#checkbox2_ubah').is(":checked");
+    	if(cek == true){
+    		$('#cek_jenis_ubah').val('1');
+    		$('#view_jenis_ubah').show();
+    	}else{
+    		$('#cek_jenis_ubah').val('0');
+    		$('#view_jenis_ubah').hide();
+    	}
+    });    
 });
 
 function data_dokter(){
@@ -333,6 +371,7 @@ function data_poli(){
 					no++;
 
 					result[i].NAMA_DOKTER = result[i].NAMA_DOKTER==null?"-":result[i].NAMA_DOKTER;
+					var jenis = result[i].JENIS+' - '+result[i].STATUS;
 
 					var aksi =  '<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_poli('+result[i].ID+');">'+
 									'<i class="fa fa-pencil"></i>'+
@@ -344,8 +383,8 @@ function data_poli(){
 					$tr +=  '<tr>'+
 		                    '	<td style="vertical-align:middle; text-align:center;">'+no+'</td>'+
 		                    '   <td style="vertical-align:middle;">'+result[i].NAMA+'</td>'+
-		                    '   <td style="vertical-align:middle;">'+result[i].INITIAL_POLI+'</td>'+
-		                    '   <td style="vertical-align:middle;">'+result[i].JENIS+'</td>'+
+		                    '   <td style="vertical-align:middle;">'+jenis+'</td>'+
+		                    '   <td style="vertical-align:middle;">'+result[i].KETERANGAN+'</td>'+
 		                    '   <td style="vertical-align:middle;">'+result[i].NAMA_DOKTER+'</td>'+
 		                    '   <td style="vertical-align:middle; text-align:center;">'+
 			                    	'<a href="javascript:void(0);" class="on-default edit-row" onclick="detail_perawat('+result[i].ID+');">'+
@@ -403,25 +442,30 @@ function ubah_poli(id){
 			$('#departemen_ubah').val(row['poli']['NAMA_DEP']);
 			$('#id_divisi_ubah').val(row['poli']['ID_DIVISI']);
 			$('#divisi_ubah').val(row['poli']['NAMA_DIV']);
+			$('#jenis_txt').val(row['poli']['JENIS']);
 			$('#nama_poli_ubah').val(row['poli']['NAMA']);
-			$('#inisial_poli').val(row['poli']['INITIAL_POLI']);
 
-			if(row['poli']['JENIS'] == "Poli"){
-				$('#jenis_ubah option[value="Poli"]').attr('selected','selected');
-			}else if(row['poli']['JENIS'] == "Apotek"){
-				$('#jenis_ubah option[value="Apotek"]').attr('selected','selected');
-			}else if(row['poli']['JENIS'] == "Fisioterapi"){
-				$('#jenis_ubah option[value="Fisioterapi"]').attr('selected','selected');
-			}else if(row['poli']['JENIS'] == "Penunjang Medis"){
-				$('#jenis_ubah option[value="Penunjang Medis"]').attr('selected','selected');
-			}else if(row['poli']['JENIS'] == "Penunjang Non Medis"){
-				$('#jenis_ubah option[value="Penunjang Non Medis"]').attr('selected','selected');
-			}else if(row['poli']['JENIS'] == "Gudang Logistik"){
-				$('#jenis_ubah option[value="Gudang Logistik"]').attr('selected','selected');
-			}else if(row['poli']['JENIS'] == "Nurse Station"){
-				$('#jenis_ubah option[value="Nurse Station"]').attr('selected','selected');
+			if(row['poli']['STATUS'] == "Normal"){
+				$('#status_ubah option[value="Normal"]').attr('selected','selected');
+			}else if(row['poli']['STATUS'] == "Tarif A"){
+				$('#status_ubah option[value="Tarif A"]').attr('selected','selected');
+			}else if(row['poli']['STATUS'] == "Tarif B"){
+				$('#status_ubah option[value="Tarif B"]').attr('selected','selected');
+			}else if(row['poli']['STATUS'] == "Tarif C"){
+				$('#status_ubah option[value="Tarif C"]').attr('selected','selected');
+			}else if(row['poli']['STATUS'] == "Tarif D"){
+				$('#status_ubah option[value="Tarif D"]').attr('selected','selected');
+			}else if(row['poli']['STATUS'] == "Malam"){
+				$('#status_ubah option[value="Malam"]').attr('selected','selected');
+			}else if(row['poli']['STATUS'] == "Tarif Emergency"){
+				$('#status_ubah option[value="Tarif Emergency"]').attr('selected','selected');
+			}else if(row['poli']['STATUS'] == "Cito"){
+				$('#status_ubah option[value="Cito"]').attr('selected','selected');
+			}else if(row['poli']['STATUS'] == "Konsultasi Melalui Telpon"){
+				$('#status_ubah option[value="Konsultasi Melalui Telepon"]').attr('selected','selected');
 			}
 
+			$('#keterangan_ubah').val(row['poli']['KETERANGAN']);
 			$('#biaya_ubah').val(formatNumber(row['poli']['BIAYA']));
 			$('#id_peg_dokter_ubah').val(row['poli']['ID_PEG_DOKTER']);
 			$('#nama_dokter_txt').val(row['poli']['NAMA_DOKTER']);
@@ -650,13 +694,6 @@ function hapus_perawat(btn,id){
 	                    <div class="col-md-12">
 	                    	<form class="form-horizontal" role="form" action="<?php echo $url_cetak; ?>" target="_blank" method="post">
 	                    		<div class="form-group">
-	                    			<div class="col-md-12">
-	                    				<button type="submit" class="btn btn-success waves-effect w-md waves-light m-b-5 pull-right">
-	                    					<i class="fa fa-file-text-o"></i> <b>Cetak Excel</b>
-	                    				</button>
-	                    			</div>
-	                    		</div>
-	                    		<div class="form-group">
 					            	<label class="col-md-1 control-label" style="text-align:left; width: 9%;">Urutkan</label>
 	                    			<div class="col-md-3">
 		                    			<div class="radio radio-purple radio-inline">
@@ -701,46 +738,59 @@ function hapus_perawat(btn,id){
 					            	<label class="col-md-2 control-label">&nbsp;</label>
 					            	<div class="col-md-3">
 					            		<select class="form-control" id="pilih_jenis">
-			                                <option value="Poli">Poli</option>
-			                                <option value="Apotek">Apotek</option>
-			                                <option value="Fisioterapi">Fisioterapi</option>
-			                                <option value="Penunjang Medis">Penunjang Medis</option>
-			                                <option value="Penunjang Non Medis">Penunjang Non Medis</option>
-			                                <option value="Gudang Logistik">Gudang Logistik</option>
-			                                <option value="Nurse Station">Nurse Station</option>
+					            		<?php
+					            			$jenis_poli = $this->model->data_jenis_poli();
+					            			foreach ($jenis_poli as $key => $value) {
+					            		?>
+					            			<option value="<?php echo $value->JENIS; ?>"><?php echo $value->JENIS; ?></option>
+					            		<?php
+					            			}
+					            		?>
 			                            </select>
 					            	</div>
 					            </div>
-					        </form>
-	                        <div class="table-responsive">
-					            <table id="tabel_poli" class="table table-hover table-bordered">
-					                <thead>
-					                    <tr class="biru">
-					                        <th style="color:#fff; text-align:center;">No</th>
-					                        <th style="color:#fff; text-align:center;">Nama Poli</th>
-					                        <th style="color:#fff; text-align:center;">Inisial Poli</th>
-					                        <th style="color:#fff; text-align:center;">Jenis</th>
-					                        <th style="color:#fff; text-align:center;">Nama Dokter</th>
-					                        <th style="color:#fff; text-align:center;">Perawat</th>
-					                        <th style="color:#fff; text-align:center;">Biaya</th>
-					                        <th style="color:#fff; text-align:center;">Aksi</th>
-					                    </tr>
-					                </thead>
+					            <div class="form-group">
+					            	<div class="col-md-12">
+					            		<div class="table-responsive">
+								            <table id="tabel_poli" class="table table-hover table-bordered">
+								                <thead>
+								                    <tr class="biru">
+								                        <th style="color:#fff; text-align:center;">No</th>
+								                        <th style="color:#fff; text-align:center;">Nama Poli</th>
+								                        <th style="color:#fff; text-align:center;">Jenis</th>
+								                        <th style="color:#fff; text-align:center;">Keterangan</th>
+								                        <th style="color:#fff; text-align:center;">Nama Dokter</th>
+								                        <th style="color:#fff; text-align:center;">Perawat</th>
+								                        <th style="color:#fff; text-align:center;">Biaya</th>
+								                        <th style="color:#fff; text-align:center;">Aksi</th>
+								                    </tr>
+								                </thead>
 
-					                <tbody>
-					                    
-					                </tbody>
-					            </table>
-					        </div>
-					        <form class="form-horizontal" role="form">
+								                <tbody>
+								                    
+								                </tbody>
+								            </table>
+								        </div>
+					            	</div>
+					            </div>
 					        	<div class="form-group">
-					        		<div class="col-md-10">
+					        		<div class="col-md-9">
 					        			<div id="tablePaging"> </div>
 					        		</div>
 			                    </div>
 			                    <div class="form-group">
 					        		<div class="col-md-9">
-					        			&nbsp;
+					        			<div class="radio radio-danger radio-inline">
+			                                <input type="radio" name="cetak" value="PDF">
+			                                <label for="cari_nama_poli"> PDF </label>
+			                            </div>
+		                                <div class="radio radio-success radio-inline">
+			                                <input type="radio" name="cetak" value="Excel">
+			                                <label for="cari_jenis"> Excel </label>
+			                            </div>
+			                            <button type="submit" class="btn btn-primary waves-effect waves-light m-l-10">
+	                    					<i class="fa fa-print"></i>
+	                    				</button>
 					        		</div>
 			                        <label class="col-md-2 control-label">Jumlah Tampil</label>
 			                        <div class="col-md-1 pull-right">
@@ -768,7 +818,7 @@ function hapus_perawat(btn,id){
 					                		<input type="hidden" name="id_departemen" id="id_departemen" value="">
 					                        <span class="input-group-addon"><i class="fa fa-bank"></i></span>
 					                    	<input type="text" class="form-control" id="departemen" value="" readonly>
-					                    	<span class="input-group-addon btn_dep" style="cursor:pointer;">
+					                    	<span class="input-group-addon btn-danger btn_dep" style="cursor:pointer;">
 					                    		<i class="fa fa-search"></i>
 					                    	</span>
 					                    </div>
@@ -781,12 +831,27 @@ function hapus_perawat(btn,id){
 					                		<input type="hidden" name="id_divisi" id="id_divisi" value="">
 					                        <span class="input-group-addon"><i class="fa fa-home"></i></span>
 					                    	<input type="text" class="form-control" id="divisi" value="" readonly>
-					                    	<span class="input-group-addon btn_div" style="cursor:pointer;">
+					                    	<span class="input-group-addon btn-primary btn_div" style="cursor:pointer;">
 					                    		<i class="fa fa-search"></i>
 					                    	</span>
 					                    </div>
 					                </div>
 					            </div>
+					            <div class="form-group">
+			                        <label class="col-md-2 control-label">Jenis</label>
+			                        <div class="col-md-3">
+			                            <select class="form-control" name="jenis" id="jenis">
+			                            <?php
+					            			$jenis_poli = $this->model->data_jenis_poli();
+					            			foreach ($jenis_poli as $key => $value) {
+					            		?>
+					            			<option value="<?php echo $value->JENIS; ?>"><?php echo $value->JENIS; ?></option>
+					            		<?php
+					            			}
+					            		?>
+			                            </select>
+			                        </div>
+			                    </div>
 	                        	<div class="form-group">
 			                        <label class="col-md-2 control-label">Nama Poli</label>
 			                        <div class="col-md-6">
@@ -794,26 +859,27 @@ function hapus_perawat(btn,id){
 			                        </div>
 			                    </div>
 			                    <div class="form-group">
-			                        <label class="col-md-2 control-label">Inisial Poli</label>
-			                        <div class="col-md-6">
-			                            <input type="text" class="form-control" name="inisial_poli" value="" required="required">
+			                        <label class="col-md-2 control-label">Status</label>
+			                        <div class="col-md-3">
+			                        	<select class="form-control" name="status" id="status">
+			                        		<option value="Normal">Normal</option>
+			                        		<option value="Tarif A">Tarif A</option>
+			                        		<option value="Tarif B">Tarif B</option>
+			                        		<option value="Tarif C">Tarif C</option>
+			                        		<option value="Tarif D">Tarif D</option>
+			                        		<option value="Malam">Malam</option>
+			                        		<option value="Tarif Emergency">Tarif Emergency</option>
+			                        		<option value="Cito">CITO (Darurat)</option>
+			                        		<option value="Konsultasi Melalui Telepon">Konsultasi Melalui Telepon</option>
+			                        	</select>
 			                        </div>
 			                    </div>
 			                    <div class="form-group">
-			                        <label class="col-md-2 control-label">Jenis</label>
-			                        <div class="col-md-3">
-			                            <select class="form-control" name="jenis" required="required">
-			                                <option value="Poli">Poli</option>
-			                                <option value="Apotek">Apotek</option>
-			                                <option value="Laborat">Laborat</option>
-			                                <option value="Fisioterapi">Fisioterapi</option>
-			                                <option value="Penunjang Medis">Penunjang Medis</option>
-			                                <option value="Penunjang Non Medis">Penunjang Non Medis</option>
-			                                <option value="Gudang Logistik">Gudang Logistik</option>
-			                                <option value="Nurse Station">Nurse Station</option>
-			                            </select>
+			                        <label class="col-md-2 control-label">Keterangan</label>
+			                        <div class="col-md-6">
+			                            <input type="text" class="form-control" name="keterangan" id="keterangan" value="">
 			                        </div>
-			                    </div> 
+			                    </div>
 			                    <div class="form-group">
 			                        <label class="col-md-2 control-label">Biaya</label>
 			                        <div class="col-md-6">
@@ -827,7 +893,7 @@ function hapus_perawat(btn,id){
 					                		<input type="hidden" name="id_peg_dokter" id="id_peg_dokter" value="">
 					                        <span class="input-group-addon"><i class="fa fa-user-md"></i></span>
 					                    	<input type="text" class="form-control" id="nama_dokter" value="" readonly>
-					                    	<span class="input-group-addon btn_dokter" style="cursor:pointer;">
+					                    	<span class="input-group-addon btn-success btn_dokter" style="cursor:pointer;">
 					                    		<i class="fa fa-search"></i>
 					                    	</span>
 					                    </div>
@@ -859,6 +925,7 @@ function hapus_perawat(btn,id){
 						            	</div>
 					            	</div>
 					            </div>
+					            <hr>
 			                    <div class="form-group">
 			                        <label class="col-md-2 control-label">&nbsp;</label>
 			                        <div class="col-md-3">
@@ -889,7 +956,7 @@ function hapus_perawat(btn,id){
 	                		<input type="hidden" name="id_departemen_ubah" id="id_departemen_ubah" value="">
 	                        <span class="input-group-addon"><i class="fa fa-bank"></i></span>
 	                    	<input type="text" class="form-control" id="departemen_ubah" value="" readonly>
-	                    	<span class="input-group-addon btn_dep" style="cursor:pointer;">
+	                    	<span class="input-group-addon btn-danger btn_dep" style="cursor:pointer;">
 	                    		<i class="fa fa-search"></i>
 	                    	</span>
 	                    </div>
@@ -902,12 +969,42 @@ function hapus_perawat(btn,id){
 	                		<input type="hidden" name="id_divisi_ubah" id="id_divisi_ubah" value="">
 	                        <span class="input-group-addon"><i class="fa fa-home"></i></span>
 	                    	<input type="text" class="form-control" id="divisi_ubah" value="" readonly>
-	                    	<span class="input-group-addon btn_div" style="cursor:pointer;">
+	                    	<span class="input-group-addon btn-primary btn_div" style="cursor:pointer;">
 	                    		<i class="fa fa-search"></i>
 	                    	</span>
 	                    </div>
 	                </div>
 	            </div>
+	            <div class="form-group">
+                    <label class="col-md-2 control-label">Jenis</label>
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" name="jenis_txt" id="jenis_txt" value="" readonly>
+                    </div>
+                    <div class="col-md-2">
+                    	<div class="checkbox checkbox-primary">
+                    		<input type="hidden" name="cek_jenis_ubah" id="cek_jenis_ubah" value="">
+                            <input type="checkbox" id="checkbox2_ubah">
+                            <label for="checkbox2_ubah">
+                                Ubah
+                            </label>
+                        </div>
+                    </div>
+                </div>
+	            <div class="form-group" id="view_jenis_ubah">
+                    <label class="col-md-2 control-label">&nbsp;</label>
+                    <div class="col-md-3">
+                        <select class="form-control" name="jenis_ubah" id="jenis_ubah">
+                        <?php
+	            			$jenis_poli = $this->model->data_jenis_poli();
+	            			foreach ($jenis_poli as $key => $value) {
+	            		?>
+	            			<option value="<?php echo $value->JENIS; ?>"><?php echo $value->JENIS; ?></option>
+	            		<?php
+	            			}
+	            		?>
+                        </select>
+                    </div>
+                </div>
         		<div class="form-group">
                     <label class="col-md-2 control-label">Nama Poli</label>
                     <div class="col-md-6">
@@ -915,23 +1012,25 @@ function hapus_perawat(btn,id){
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label">Inisial Poli</label>
-                    <div class="col-md-6">
-                        <input type="text" class="form-control" name="inisial_poli_ubah" id="inisial_poli" value="">
+                    <label class="col-md-2 control-label">Status</label>
+                    <div class="col-md-3">
+                    	<select class="form-control" name="status_ubah" id="status_ubah">
+                    		<option value="Normal">Normal</option>
+                    		<option value="Tarif A">Tarif A</option>
+                    		<option value="Tarif B">Tarif B</option>
+                    		<option value="Tarif C">Tarif C</option>
+                    		<option value="Tarif D">Tarif D</option>
+                    		<option value="Malam">Malam</option>
+                    		<option value="Tarif Emergency">Tarif Emergency</option>
+                    		<option value="Cito">CITO (Darurat)</option>
+                    		<option value="Konsultasi Melalui Telepon">Konsultasi Melalui Telepon</option>
+                    	</select>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label">Jenis</label>
-                    <div class="col-md-3">
-                        <select class="form-control" name="jenis_ubah" id="jenis_ubah">
-                            <option value="Poli">Poli</option>
-                            <option value="Apotek">Apotek</option>
-                            <option value="Fisioterapi">Fisioterapi</option>
-                            <option value="Penunjang Medis">Penunjang Medis</option>
-                            <option value="Penunjang Non Medis">Penunjang Non Medis</option>
-                            <option value="Gudang Logistik">Gudang Logistik</option>
-                            <option value="Nurse Station">Nurse Station</option>
-                        </select>
+                    <label class="col-md-2 control-label">Keterangan</label>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" name="keterangan_ubah" id="keterangan_ubah" value="">
                     </div>
                 </div>
                 <div class="form-group">
@@ -947,7 +1046,7 @@ function hapus_perawat(btn,id){
 	                		<input type="hidden" name="id_peg_dokter_ubah" id="id_peg_dokter_ubah" value="">
 	                        <span class="input-group-addon"><i class="fa fa-user-md"></i></span>
 	                    	<input type="text" class="form-control" id="nama_dokter_txt" value="" readonly>
-	                    	<span class="input-group-addon btn_dokter" style="cursor:pointer;">
+	                    	<span class="input-group-addon btn-success btn_dokter" style="cursor:pointer;">
 	                    		<i class="fa fa-search"></i>
 	                    	</span>
 	                    </div>
@@ -979,6 +1078,7 @@ function hapus_perawat(btn,id){
 		            	</div>
 	                </div>
 	            </div>
+	            <hr>
                 <div class="form-group">
                     <label class="col-md-2 control-label">&nbsp;</label>
                     <div class="col-md-3">
@@ -1059,7 +1159,7 @@ function hapus_perawat(btn,id){
 
 <button id="popup_dep" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal3" style="display:none;">Standard Modal</button>
 <div id="myModal3" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="width:55%;">
+    <div class="modal-dialog">
     	<div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -1101,7 +1201,7 @@ function hapus_perawat(btn,id){
 
 <button id="popup_div" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal4" style="display:none;">Standard Modal</button>
 <div id="myModal4" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="width:55%;">
+    <div class="modal-dialog">
     	<div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>

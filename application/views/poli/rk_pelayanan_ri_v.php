@@ -228,14 +228,17 @@ function data_rawat_inap(){
 					var encodedString = Base64.encode(result[i].ID);
 					var aksi = '<a href="<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/tindakan_ri/'+encodedString+'" class="btn btn-success waves-effect waves-light btn-sm"><i class="fa fa-user-md"></i>&nbsp;Tindakan</a>';
 					var kelas = result[i].KODE_KAMAR+' - '+result[i].KELAS;
-					var tgl_mrs = result[i].TANGGAL_MASUK+'<br>'+result[i].WAKTU;
+					var tgl_mrs = result[i].TANGGAL_MASUK;
 					var tgl_krs = '';
 					var sistem_bayar = '';
+
+					var biaya_kamar = parseFloat(result[i].BIAYA_KAMAR_FIX) * parseFloat(result[i].DIRAWAT_SELAMA);
+
 
 					if(result[i].TANGGAL_KELUAR == null && result[i].WAKTU_KELUAR == null){
 						tgl_krs = '-';
 					}else{
-						tgl_krs = result[i].TANGGAL_KELUAR+'<br>'+result[i].WAKTU_KELUAR;
+						tgl_krs = result[i].TANGGAL_KELUAR;
 					}
 
 					if(result[i].SISTEM_BAYAR == '1'){
@@ -243,8 +246,6 @@ function data_rawat_inap(){
 					}else{
 						sistem_bayar = 'Asuransi';
 					}
-
-					$tr2 = '';
 
 					$tr += "<tr>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
@@ -254,20 +255,12 @@ function data_rawat_inap(){
 								"<td style='vertical-align:middle;'>"+result[i].NAMA_PASIEN+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].JENIS_KELAMIN+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+kelas+"<br><span class='label label-primary'>"+result[i].VISITE_DOKTER+"</span></td>"+
-								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].BIAYA_KAMAR_FIX)+"</td>"+
+								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(biaya_kamar)+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].DIRAWAT_SELAMA+" Hari</td>"+
 								"<td style='vertical-align:middle;'>"+result[i].NAMA_DOKTER+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+sistem_bayar+"</td>"+
 								"<td style='vertical-align:middle;' align='center'>"+aksi+"</td>"+
-							"</tr>"+
-							"<tr id='show_tr_"+result[i].ID+"'>"+$tr2+"</tr>";
-
-					if(result[i].DIRAWAT_SELAMA != 0){
-						$('#show_tr_'+result[i].ID).show();
-						for(var j=0; j<result[i].DIRAWAT_SELAMA; j++){
-							$tr += "<td>Hari 1</td>";
-						}
-					}
+							"</tr>";
 				}
 			}
 
@@ -460,7 +453,7 @@ function onEnterText2(e){
 				                        <th style="color:#fff; text-align:center;">Nama</th>
 				                        <th style="color:#fff; text-align:center;">Jenis Kelamin</th>
 				                        <th style="color:#fff; text-align:center;">Kamar</th>
-				                        <th style="color:#fff; text-align:center;">Biaya</th>
+				                        <th style="color:#fff; text-align:center;">Total</th>
 				                        <th style="color:#fff; text-align:center;">Dirawat Selama</th>
 				                        <th style="color:#fff; text-align:center;">Dokter</th>
 				                        <th style="color:#fff; text-align:center;">Sistem Bayar</th>

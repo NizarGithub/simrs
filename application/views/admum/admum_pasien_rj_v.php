@@ -428,12 +428,13 @@ function load_poli(){
 
                 for(var i=0; i<result.length; i++){
                     no++;
+                    var poli = result[i].NAMA_POLI+' - '+result[i].STATUS;
 
                     result[i].NAMA_DOKTER = result[i].NAMA_DOKTER==null?"-":result[i].NAMA_DOKTER;
 
                     $tr += "<tr style='cursor:pointer;' onclick='klik_poli("+result[i].ID+");'>"+
                                 "<td style='text-align:center;'>"+no+"</td>"+
-                                "<td>"+result[i].NAMA_POLI+"</td>"+
+                                "<td>"+poli+"</td>"+
                                 "<td>"+result[i].NAMA_DOKTER+"</td>"+
                                 "<td style='text-align:right;'>"+formatNumber(result[i].BIAYA)+"</td>"+
                             "</tr>";
@@ -1132,7 +1133,7 @@ function klik_asuransi(id){
 <!-- //LOAD POLI -->
 <button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal2" id="popup_poli" style="display:none;">Standard Modal</button>
 <div id="myModal2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="width: 50%;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>

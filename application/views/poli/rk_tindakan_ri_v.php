@@ -22,7 +22,8 @@
 #view_meninggal,
 #form_surat_dokter,
 .view_lab,
-#view_laborat_tambah{
+#view_laborat_tambah,
+#view_alergi{
 	display: none;
 }
 </style>
@@ -83,7 +84,7 @@ $(document).ready(function(){
     //TINDAKAN
 
     data_tindakan();
-    // get_hari_tindakan();
+    // get_hari_ranap();
 
     $('#btn_tambah').click(function(){
 		$('#view_tindakan_tambah').show();
@@ -769,6 +770,15 @@ $(document).ready(function(){
 		data_resep();
 	});
 
+	$("input[name='alergi']").click(function(){
+		var alergi = $("input[name='alergi']:checked").val();
+		if(alergi == 'Ya'){
+			$('#view_alergi').show();
+		}else{
+			$('#view_alergi').hide();
+		}
+	});
+
 	$('#btn_tambah_resep').click(function(){
 		$('#view_resep_tambah').show();
 		$('#view_resep').hide();
@@ -1079,6 +1089,10 @@ function load_tindakan(){
 			$('.loading_tabel_tdk').hide();
 		}
 	});
+
+	$('#cari_tindakan').off('keyup').keyup(function(){
+		load_tindakan();
+	});
 }
 
 function klik_tindakan(id){
@@ -1196,10 +1210,10 @@ function hitung_total_tindakan(){
 	$('#total_tindakan').val(formatNumber(total));
 }
 
-function get_hari_tindakan(){
+function get_hari_ranap(){
 	var id_tindakan = "<?php echo $id; ?>";
 	$.ajax({
-		url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/get_hari_tindakan',
+		url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/get_hari_ranap',
 		data : {id_tindakan:id_tindakan},
 		type : "POST",
 		dataType : "json",
@@ -1220,14 +1234,20 @@ function data_tindakan(){
 		dataType : "json",
 		success : function(result){
 			$tr = "";
+			$tr0 = "";
+			var total = 0;
 
 			if(result['dt'] == "" || result['dt'] == null){
 				$tr = "<tr><td colspan='6' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
 				var no = 0;
+				$tr0 = '<tr class="info">'+
+							'<td colspan="6"><b>Tanggal : '+result['row']['TANGGAL']+'</b></td>'+
+						'</tr>';
 
 				for(var i=0; i<result['dt'].length; i++){
 					no++;
+					total += parseFloat(result['dt'][i].SUBTOTAL);
 
 					var aksi =  '<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_tindakan('+result['dt'][i].ID+');">'+
 									'<i class="fa fa-pencil"></i>'+
@@ -1247,7 +1267,8 @@ function data_tindakan(){
 				}
 			}
 
-			$('#tabel_tindakan tbody').html($tr);
+			$('#tabel_tindakan tbody').html($tr0+$tr);
+			$('#grandtotal_tindakan').html(formatNumber(total));
 			$('#popup_load').fadeOut();
 		}
 	});
@@ -1317,19 +1338,26 @@ function data_visite(){
 				for(var i=0; i<result.length; i++){
 					no++;
 
-					var aksi =  '<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_visite('+result[i].ID+');">'+
+					var status_visite = '';
+					if(result[i].STATUS_VISITE == '1'){
+						status_visite = '<span class="label label-primary">Visit</span>';
+					}else{
+						status_visite = '<span class="label label-danger">Tidak Visit</span>';
+					}
+
+					var aksi =  '<button type="button" class="btn btn-success waves-effect waves-light btn-sm" onclick="ubah_visite('+result[i].ID+');">'+
 									'<i class="fa fa-pencil"></i>'+
 								'</button>&nbsp;'+
-						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_visite('+result[i].ID+');">'+
+						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm" onclick="hapus_visite('+result[i].ID+');">'+
 						   			'<i class="fa fa-trash"></i>'+
 						   		'</button>';
 
 					$tr += "<tr>"+
-								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td style='text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
-								"<td>"+result[i].NAMA_VISITE+"</td>"+
-								"<td style='text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
-								"<td>"+result[i].NAMA_DOKTER+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
+								"<td style='vertical-align:middle;'>"+result[i].NAMA_DOKTER+"</td>"+
+								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].BIAYA_VISITE)+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+status_visite+"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
 							"</tr>";
 				}
@@ -1355,11 +1383,16 @@ function ubah_visite(id){
 		success : function(row){
 			$('#id_ubah_visite').val(id);
 			$('#tanggal_visite_ubah').val(row['TANGGAL']);
-			$('#id_visite_ubah').val(row['ID_VISITE']);
-			$('#visite_txt').val(row['NAMA_VISITE']);
-			$('#tarif_visite_ubah').val(formatNumber(row['TARIF']));
+			// $('#id_visite_ubah').val(row['ID_VISITE']);
+			// $('#visite_txt').val(row['NAMA_VISITE']);
+			// $('#tarif_visite_ubah').val(formatNumber(row['TARIF']));
 			$('#id_dokter_ubah').val(row['ID_DOKTER']);
 			$('#dokter_visite_txt').val(row['NAMA_DOKTER']);
+			if(row['STATUS_VISITE'] == '1'){
+				$('#inlineRadio1_vis_ubah').prop('checked','checked');
+			}else{
+				$('#inlineRadio2_vis_ubah').prop('checked','checked');
+			}
 		}
 	});
 
@@ -1466,7 +1499,7 @@ function load_dokter(){
 			$tr = "";
 
 			if(result == "" || result == null){
-				$tr = "<tr><td colspan='4' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+				$tr = "<tr><td colspan='2' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
 				var no = 0;
 
@@ -1475,9 +1508,7 @@ function load_dokter(){
 
 					$tr += "<tr style='cursor:pointer;' onclick='klik_dokter("+result[i].ID+");'>"+
 								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td style='text-align:center;'>"+result[i].NIP+"</td>"+
 								"<td>"+result[i].NAMA+"</td>"+
-								"<td>"+result[i].JABATAN+"</td>"+
 							"</tr>";
 				}
 			}
@@ -2240,25 +2271,28 @@ function data_diagnosa(){
 			$tr = "";
 
 			if(result == "" || result == null){
-				$tr = "<tr><td colspan='5' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+				$tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
 				var no = 0;
 
 				for(var i=0; i<result.length; i++){
 					no++;
 
-					var aksi =  '<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_diagnosa('+result[i].ID+');">'+
-									'<i class="fa fa-pencil"></i>'+
-								'</button>&nbsp;'+
-						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_diagnosa('+result[i].ID+');">'+
+					var aksi =  '<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_diagnosa('+result[i].ID+');">'+
 						   			'<i class="fa fa-trash"></i>'+
 						   		'</button>';
+								// '<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_diagnosa('+result[i].ID+');">'+
+								// 	'<i class="fa fa-pencil"></i>'+
+								// '</button>&nbsp;'+
+						   		
 
 					$tr += "<tr>"+
 								"<td style='text-align:center;'>"+no+"</td>"+
 								"<td style='text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
 								"<td>"+result[i].DIAGNOSA+"</td>"+
 								"<td>"+result[i].TINDAKAN+"</td>"+
+								"<td style='text-align:center;'>"+result[i].DIRAWAT_SELAMA+" Hari</td>"+
+								"<td style='text-align:center;'>"+result[i].KONDISI_AKHIR+"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
 							"</tr>";
 				}
@@ -2599,7 +2633,7 @@ function load_obat(){
 					$tr += "<tr style='cursor:pointer;' onclick='klik_obat("+result[i].ID+");'>"+
 								"<td style='text-align:center;'>"+no+"</td>"+
 								"<td>"+result[i].NAMA_OBAT+"</td>"+
-								"<td style='text-align:right;'>"+result[i].HARGA+"</td>"+
+								"<td style='text-align:right;'>"+formatNumber(result[i].HARGA_JUAL)+"</td>"+
 							"</tr>";
 				}
 			}
@@ -2638,6 +2672,7 @@ function klik_obat(id){
 					$tr = "<tr id='tr_resep2_"+result[i].ID+"'>"+
 							"<input type='hidden' name='id_obat_resep[]' value='"+result[i].ID+"'>"+
 							"<input type='hidden' name='harga_obat[]' id='harga_obat_"+result[i].ID+"' value='"+result[i].HARGA_JUAL+"'>"+
+							"<input type='hidden' name='service[]' id='service_"+result[i].ID+"' value='"+result[i].SERVICE+"'>"+
 							"<td>"+result[i].KODE_OBAT+"</td>"+
 							"<td>"+result[i].NAMA_OBAT+"</td>"+
 							"<td style='text-align:right;'>"+formatNumber(result[i].HARGA_JUAL)+"</td>"+
@@ -2725,10 +2760,11 @@ function detail_resep(id){
 
 					$tr += "<tr>"+
 								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td>"+result[i].KODE_OBAT+"</td>"+
 								"<td>"+result[i].NAMA_OBAT+"</td>"+
-								"<td>"+result[i].TAKARAN+"</td>"+
-								"<td>"+result[i].ATURAN_MINUM+"</td>"+
+								"<td style='text-align:center;'>"+result[i].JUMLAH_BELI+"</td>"+
+								"<td style='text-align:right;'>"+formatNumber(result[i].SUBTOTAL)+"</td>"+
+								"<td style='text-align:center;'>"+result[i].TAKARAN+"</td>"+
+								"<td style='text-align:center;'>"+result[i].ATURAN_MINUM+"</td>"+
 							"</tr>";
 				}
 			}
@@ -2759,8 +2795,19 @@ function hitung_resep(id){
 		grandtotal += parseFloat(t);
 	});
 
+	var tot_service = 0;
+	$("input[name='service[]']").each(function(id,elm){
+		var t = elm.value;
+		t = t.split(',').join('');
+		if(t == ""){
+			t = '0';
+		}
+		tot_service += parseFloat(t);
+	});
+
 	$('#grandtotal_resep').html(formatNumber(grandtotal));
 	$('#grandtotal_resep_txt').val(grandtotal);
+	$('#total_biaya_service').val(tot_service);
 }
 
 function hapus_resep(id){
@@ -3010,6 +3057,32 @@ function hapus_surat_dokter(id){
         }
     });
 }
+
+function hitung_tanggal(){
+	var someDate = new Date();
+	var numberOfDaysToAdd = $('#dirawat_selama').val();
+	if(numberOfDaysToAdd != ''){
+		someDate.setDate(someDate.getDate() + parseInt(numberOfDaysToAdd)); 
+		//Formatting to dd/mm/yyyy :
+
+		var dd = someDate.getDate();
+		var mm = someDate.getMonth() + 1;
+		var y = someDate.getFullYear();
+
+		if(dd < 10){
+			dd = '0'+dd;
+		}
+
+		if(mm < 10){
+			mm = '0'+mm;
+		}
+
+		var someFormattedDate = dd + '-'+ mm + '-'+ y;
+		$('#tanggal_keluar').val(someFormattedDate);
+	}else{
+		$('#tanggal_keluar').val("");
+	}
+}
 </script>
 
 <div id="popup_load">
@@ -3034,6 +3107,7 @@ function hapus_surat_dokter(id){
 	            				<th style="text-align: center;">TANGGAL LAHIR</th>
 	            				<th style="text-align: center;">UMUR</th>
 	            				<th style="text-align: center;">TANGGAL MRS</th>
+	            				<th style="text-align: center;">KAMAR / BED</th>
 	            			</tr>
 	            		</thead>
 	            		<tbody>
@@ -3059,6 +3133,9 @@ function hapus_surat_dokter(id){
 	            				</td>
 	            				<td style="text-align: center;">
 	            					<span style="color:#0066b2;"><?php echo $dt->TANGGAL_MASUK; ?></span>
+	            				</td>
+	            				<td style="text-align: center;">
+	            					<span style="color:#0066b2;"><?php echo $dt->KODE_KAMAR; ?> - <?php echo $dt->KELAS; ?> / <?php echo $dt->NO; ?></span>
 	            				</td>
 	            			</tr>
 	            		</tbody>
@@ -3107,19 +3184,19 @@ function hapus_surat_dokter(id){
                 <li role="presentation" id="dt_diagnosa">
                     <a href="#diagnosa1" role="tab" data-toggle="tab"><i class="fa fa-heartbeat"></i>&nbsp;Diagnosa</a>
                 </li>
-                <li role="presentation" id="dt_laborat">
-                    <a href="#laborat1" role="tab" data-toggle="tab"><i class="fa fa-building"></i>&nbsp;Laborat</a>
-                </li>
                 <li role="presentation" id="dt_visite">
                     <a href="#visite1" role="tab" data-toggle="tab"><i class="fa fa-user-md"></i>&nbsp;Visite Dokter</a>
+                </li>
+                <li role="presentation" id="dt_laborat">
+                    <a href="#laborat1" role="tab" data-toggle="tab"><i class="fa fa-building"></i>&nbsp;Laborat</a>
                 </li>
                 <li role="presentation" id="dt_resep">
                     <a href="#resep1" role="tab" data-toggle="tab"><i class="fa fa-medkit"></i></i>&nbsp;Resep</a>
                 </li>
+                <!-- 
                 <li role="presentation" id="dt_kondisi_akhir">
                     <a href="#kondisi_akhir1" role="tab" data-toggle="tab"><i class="fa fa-check-square-o"></i>&nbsp;Kondisi Akhir</a>
                 </li>
-                <!-- 
                 <li role="presentation" id="dt_gizi">
                     <a href="#gizi1" role="tab" data-toggle="tab"><i class="fa fa-cutlery"></i>&nbsp;Gizi</a>
                 </li>
@@ -3150,12 +3227,12 @@ function hapus_surat_dokter(id){
 								</button>
                     		</div>
                     	</div>
-                    	<div class="form-group">
+                    	<!-- <div class="form-group">
                     		<div class="col-md-2">
                     			<label for="example-input1-group1" class="control-label">Hari Ke</label>
                     			<input type="text" class="form-control" name="hari_ke" id="hari_ke" value="" readonly>
                     		</div>
-                    	</div>
+                    	</div> -->
                     	<div class="form-group">
                     		<div class="col-md-12">
 			                    <div class="table-responsive">
@@ -3170,12 +3247,27 @@ function hapus_surat_dokter(id){
 						                        <th style="color:#fff; text-align:center;">Aksi</th>
 						                    </tr>
 						                </thead>
-
 						                <tbody>
 						                    
 						                </tbody>
 						            </table>
 						        </div>
+                    		</div>
+                    	</div>
+                    	<div class="form-group">
+                    		<div class="col-md-8">
+                    			&nbsp;
+                    		</div>
+                    		<div class="col-md-4">
+                    			<div class="card-box widget-user" style="background-color:#cee3f8;">
+		                            <div>
+		                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/Money_44325.png">
+		                                <div class="wid-u-info">
+		                                    <small class="text-primary"><b>Grand Total</b></small>
+		                                    <h4 class="m-t-0 m-b-5 font-600 text-danger" id="grandtotal_tindakan">0</h4>
+		                                </div>
+		                            </div>
+		                        </div>
                     		</div>
                     	</div>
                     </form>
@@ -3209,7 +3301,7 @@ function hapus_surat_dokter(id){
 	                    </div>
 	                    <div class="form-group">
 	                        <label class="col-md-1 control-label">&nbsp;</label>
-	                        <div class="col-md-9">
+	                        <div class="col-md-7">
 	                            <div class="table-responsive">
 						            <table id="tabel_tambah_tindakan" class="table table-bordered">
 						                <thead>
@@ -3296,6 +3388,345 @@ function hapus_surat_dokter(id){
 					</form>
                 </div>
 
+                <div role="tabpanel" class="tab-pane fade" id="diagnosa1">
+                	<form class="form-horizontal" id="view_diagnosa">
+                    	<div class="form-group">
+                    		<div class="col-md-6">
+                    			<h4 class="m-t-0"><i class="fa fa-table"></i>&nbsp;<b>Tabel Diagnosa</b></h4>
+                    		</div>
+                    		<div class="col-md-6">
+			                    <button class="btn btn-primary m-b-5 pull-right" type="button" id="btn_tambah_dg">
+									<i class="fa fa-plus"></i>&nbsp;<b>Tambah Diagnosa</b>
+								</button>
+                    		</div>
+                    	</div>
+                    	<div class="form-group">
+                    		<div class="col-md-12">
+			                    <div class="table-responsive">
+						            <table id="tabel_diagnosa" class="table table-bordered">
+						                <thead>
+						                    <tr class="merah">
+						                        <th style="color:#fff; text-align:center;">No</th>
+						                        <th style="color:#fff; text-align:center;">Tanggal</th>
+						                        <th style="color:#fff; text-align:center;">Diagnosa</th>
+						                        <th style="color:#fff; text-align:center;">Tindakan</th>
+						                        <th style="color:#fff; text-align:center;">Dirawat Selama</th>
+						                        <th style="color:#fff; text-align:center;">Status</th>
+						                        <th style="color:#fff; text-align:center;">Aksi</th>
+						                    </tr>
+						                </thead>
+
+						                <tbody>
+						                    
+						                </tbody>
+						            </table>
+						        </div>
+                    		</div>
+                    	</div>
+                    </form>
+
+                    <form class="form-horizontal" id="view_diagnosa_tambah" action="" method="post">
+                    	<input type="hidden" name="id_ri" value="<?php echo $id; ?>">
+						<input type="hidden" name="id_pasien" value="<?php echo $dt->ID_PASIEN; ?>">
+						<div class="form-group">
+							<label class="col-md-2 control-label">Diagnosa</label>
+							<div class="col-md-8">
+								<textarea class="form-control" rows="5" id="diagnosa" name="diagnosa"></textarea>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-md-2 control-label">Anjuran</label>
+							<div class="col-md-8">
+								<textarea class="form-control" rows="5" id="tindakan_dg" name="tindakan_dg"></textarea>
+							</div>
+						</div>
+						<div class="form-group">
+                            <label class="col-sm-2 control-label">Status</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" name="kondisi_akhir" id="kondisi_akhir">
+                                    <option value="Dirawat">Dirawat</option>
+                                    <option value="Pulang">Pulang</option>
+                                    <option value="Dirujuk">Dirujuk</option>
+                                    <option value="Operasi">Operasi</option>
+                                    <option value="Meninggal">Meninggal</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="view_operasi">
+                        	<div class="form-group">
+		                        <label class="col-md-2 control-label">Ruang Operasi</label>
+		                        <div class="col-md-4">
+		                            <div class="input-group">
+		                                <input type="hidden" name="id_ruang_opr" id="id_ruang_opr" value="">
+		                                <input type="text" class="form-control" id="ruang_operasi" value="" readonly>
+		                                <span class="input-group-btn">
+		                                    <button type="button" class="btn btn-danger btn_ruang_opr"><i class="fa fa-search"></i></button>
+		                                </span>
+		                            </div>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Tarif</label>
+		                        <div class="col-md-4">
+		                            <input type="text" class="form-control" name="tarif_operasi" id="tarif_operasi" value="" onkeyup="FormatCurrency(this);">
+		                        </div>
+		                    </div>
+		                    <hr>
+                        </div>
+                        <div id="view_meninggal">
+                        	<div class="form-group">
+		                        <label class="col-md-2 control-label">Kamar Jenazah</label>
+		                        <div class="col-md-4">
+		                            <div class="input-group">
+		                                <input type="hidden" name="id_kamar_jenazah" id="id_kamar_jenazah" value="">
+		                                <input type="text" class="form-control" id="kamar_jenazah" value="" readonly>
+		                                <span class="input-group-btn">
+		                                    <button type="button" class="btn btn-danger btn_kamar_jenazah"><i class="fa fa-search"></i></button>
+		                                </span>
+		                            </div>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Tarif</label>
+		                        <div class="col-md-4">
+		                            <input type="text" class="form-control" name="tarif_kamar_jenazah" id="tarif_kamar_jenazah" value="" readonly>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Lemari Jenazah</label>
+		                        <div class="col-md-4">
+		                            <div class="input-group">
+		                                <input type="hidden" name="id_lemari_jenazah" id="id_lemari_jenazah" value="">
+		                                <input type="text" class="form-control" id="lemari_jenazah" value="" readonly>
+		                                <span class="input-group-btn">
+		                                    <button type="button" class="btn btn-primary btn_lemari_jenazah"><i class="fa fa-search"></i></button>
+		                                </span>
+		                            </div>
+		                        </div>
+		                    </div>
+		                    <hr>
+                        </div>
+                		<div class="form-group" id="view_dirawat_selama">
+                			<label class="col-sm-2 control-label">Dirawat Selama</label>
+                			<div class="col-sm-4">
+                				<div class="input-group">
+                                    <input type="text" class="form-control num_only" name="dirawat_selama" id="dirawat_selama" value="" onkeyup="hitung_tanggal();">
+                                    <span class="input-group-addon">Hari</span>
+                                </div>
+                			</div>
+                		</div>
+                		<div class="form-group">
+                			<label class="col-sm-2 control-label">Tanggal Keluar</label>
+                			<div class="col-sm-4">
+                				<input type="text" class="form-control" name="tanggal_keluar" id="tanggal_keluar" data-mask="99-99-9999" value="">
+                			</div>
+                		</div>
+						<!-- <div class="form-group">
+	                        <label class="col-md-2 control-label">Kasus</label>
+	                        <div class="col-md-5">
+	                        	<div class="input-group">
+	                        		<input type="hidden" name="id_kasus" id="id_kasus" value="">
+	                                <input type="text" class="form-control" id="kasus_dg" value="" readonly>
+	                                <span class="input-group-btn">
+	                                    <button type="button" class="btn btn-primary btn_kasus_dg" style="cursor:cursor;"><i class="fa fa-search"></i></button>
+	                                </span>
+	                            </div>
+	                        </div>
+	                    </div> -->
+	                    <!-- <div class="form-group">
+	                        <label class="col-md-2 control-label">Spesialistik</label>
+	                        <div class="col-md-5">
+	                            <div class="input-group">
+	                            	<input type="hidden" name="id_spesialistik" id="id_spesialistik" value="">
+	                                <input type="text" class="form-control" id="spesialistik_dg" name="spesialistik_dg" value="" readonly="readonly" required="required">
+	                                <span class="input-group-btn">
+	                                    <button type="button" class="btn btn-inverse btn_spesialistik_dg"><i class="fa fa-search"></i></button>
+	                                </span>
+	                            </div>
+	                        </div>
+	                    </div> -->
+	                    <hr>
+	                    <center>
+	                    	<button type="button" class="btn btn-success" id="simpanDg"><i class="fa fa-save"></i> <b>Simpan</b></button>
+	                        <button type="button" class="btn btn-danger" id="batalDg"><i class="fa fa-times"></i> <b>Batal</b></button>
+	                    </center>
+                    </form>
+
+                    <form class="form-horizontal" id="view_diagnosa_ubah" action="" method="post">
+                    	<input type="hidden" name="id_ubah_dg" id="id_ubah_dg" value="">
+                    	<input type="hidden" name="id_ri" id="id_ri" value="<?php echo $id; ?>">
+						<input type="hidden" name="id_pasien" value="<?php echo $dt->ID_PASIEN; ?>">
+						<h4><i class="fa fa-plus"></i> Ubah Diagnosa</h4>
+						<hr>
+						<div class="form-group">
+							<label class="col-md-2 control-label">Diagnosa</label>
+							<div class="col-md-8">
+								<textarea class="form-control" rows="5" id="diagnosa_ubah" name="diagnosa_ubah"></textarea>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-md-2 control-label">Anjuran</label>
+							<div class="col-md-8">
+								<textarea class="form-control" rows="5" id="tindakan_dg_ubah" name="tindakan_dg_ubah"></textarea>
+							</div>
+						</div>
+	                    <hr>
+	                    <center>
+	                    	<button type="button" class="btn btn-success" id="simpanDgUbah"><i class="fa fa-save"></i> <b>Simpan</b></button>
+	                        <button type="button" class="btn btn-danger" id="batalDgUbah"><i class="fa fa-times"></i> <b>Batal</b></button>
+	                    </center>
+                    </form>
+                </div>
+
+                <div role="tabpanel" class="tab-pane fade" id="laborat1">
+                    <form class="form-horizontal" id="view_laborat">
+                    	<div class="form-group">
+                    		<div class="col-md-6">
+                    			<div class="checkbox checkbox-primary">
+	                                <input id="checkboxLab" type="checkbox">
+	                                <label for="checkboxLab">
+	                                    Perlu cek Laborat?
+	                                </label>
+	                            </div>
+                    		</div>
+                    	</div>
+                    	<hr>
+                    	<div class="form-group view_lab">
+                    		<div class="col-md-6">
+                    			<h4 class="m-t-0"><i class="fa fa-table"></i>&nbsp;<b>Tabel Laborat</b></h4>
+                    		</div>
+                    		<div class="col-md-6">
+			                    <button class="btn btn-primary m-b-5 pull-right" type="button" id="btn_tambah_lab">
+									<i class="fa fa-plus"></i>&nbsp;<b>Tambah Laborat</b>
+								</button>
+                    		</div>
+                    	</div>
+                    	<div class="form-group view_lab">
+                    		<div class="col-md-12">
+			                    <div class="table-responsive">
+						            <table id="tabel_laborat" class="table table-bordered">
+						                <thead>
+						                    <tr class="merah">
+						                        <th style="color:#fff; text-align:center;">No</th>
+						                        <th style="color:#fff; text-align:center;">Tanggal</th>
+						                        <th style="color:#fff; text-align:center;">Jenis Laborat</th>
+						                        <th style="color:#fff; text-align:center;">Cito</th>
+						                        <th style="color:#fff; text-align:center;">Total</th>
+						                        <th style="color:#fff; text-align:center;">Cetak</th>
+						                        <th style="color:#fff; text-align:center;">Aksi</th>
+						                    </tr>
+						                </thead>
+
+						                <tbody>
+						                    
+						                </tbody>
+						            </table>
+						        </div>
+                    		</div>
+                    	</div>
+                    	<div class="form-group view_lab">
+                    		<div class="col-md-8">
+                    			&nbsp;
+                    		</div>
+                    		<div class="col-md-4">
+                    			<div class="card-box widget-user" style="background-color:#cee3f8;">
+		                            <div>
+		                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/Money_44325.png">
+		                                <div class="wid-u-info">
+		                                    <small class="text-primary"><b>Grand Total</b></small>
+		                                    <h4 class="m-t-0 m-b-5 font-600 text-danger" id="grandtotal_laborat">0</h4>
+		                                </div>
+		                            </div>
+		                        </div>
+                    		</div>
+                    	</div>
+                    </form>
+
+                    <form class="form-horizontal" id="view_laborat_tambah" action="" method="post">
+                    	<input type="hidden" name="id_ri" id="id_ri" value="<?php echo $id; ?>">
+						<input type="hidden" name="id_dokter" value="<?php echo $dt->ID_DOKTER; ?>">
+						<input type="hidden" name="id_pasien" value="<?php echo $dt->ID_PASIEN; ?>">
+						<h4><i class="fa fa-plus"></i> Tambah Laborat</h4>
+						<hr>
+						<div class="form-group">
+							<label class="col-md-2 control-label">Kode</label>
+							<div class="col-md-5">
+								<input type="text" class="form-control" name="kode_lab" id="kode_lab" value="" readonly>
+							</div>
+						</div>
+						<div class="form-group">
+	                        <label class="col-md-2 control-label">Jenis Laborat</label>
+	                        <div class="col-md-5">
+	                        	<div class="input-group">
+	                        		<input type="hidden" name="id_laborat" id="id_laborat" value="">
+	                                <input type="text" class="form-control" id="jenis_laborat" value="" readonly>
+	                                <span class="input-group-btn">
+	                                    <button type="button" class="btn btn-primary btn_jenis_laborat" style="cursor:cursor;"><i class="fa fa-search"></i></button>
+	                                </span>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    <!-- <div class="form-group">
+	                        <label class="col-md-2 control-label">Pemeriksaan</label>
+	                        <div class="col-md-5">
+	                            <div class="input-group">
+	                                <input type="text" class="form-control" value="" readonly="readonly" required="required">
+	                                <span class="input-group-btn">
+	                                    <button type="button" class="btn btn-inverse btn_pemeriksaan"><i class="fa fa-search"></i></button>
+	                                </span>
+	                            </div>
+	                        </div>
+	                    </div> -->
+	                    <div class="form-group">
+	                        <label class="col-md-2 control-label">&nbsp;</label>
+	                        <div class="col-md-8">
+	                            <div class="table-responsive">
+						            <table id="tabel_tambah_pemeriksaan" class="table table-bordered">
+						                <thead>
+						                    <tr class="kuning_tr">
+						                        <th style="color:#fff; text-align:center;">Pemeriksaan</th>
+						                        <!-- <th style="color:#fff; text-align:center;">Hasil</th>
+						                        <th style="color:#fff; text-align:center;">Nilai Rujukan</th> -->
+						                        <th style="color:#fff; text-align:center;">Tarif</th>
+						                        <th style="color:#fff; text-align:center;">Sub Total</th>
+						                        <th style="color:#fff; text-align:center;">#</th>
+						                    </tr>
+						                </thead>
+
+						                <tbody>
+						                    
+						                </tbody>
+						            </table>
+						        </div>
+	                        </div>
+	                    </div>
+	                    <div class="form-group">
+	                        <label class="col-md-2 control-label">Total Tarif</label>
+	                        <div class="col-md-5">
+	                            <input type="text" class="form-control" name="total_tarif_pemeriksaan" id="total_tarif_pemeriksaan" value="" readonly="readonly">
+	                        </div>
+	                    </div>
+	                    <div class="form-group">
+	                    	<label class="col-md-2 control-label">Cito</label>
+	                    	<div class="col-md-5">
+	                    		<div class="radio radio-primary radio-inline">
+	                                <input type="radio" id="inlineRadio1" value="1" name="cito">
+	                                <label for="inlineRadio1"> Aktif </label>
+	                            </div>
+	                            <div class="radio radio-primary radio-inline">
+	                                <input type="radio" id="inlineRadio2" value="0" name="cito">
+	                                <label for="inlineRadio2"> Tidak Aktif </label>
+	                            </div>
+	                    	</div>
+	                    </div>
+	                    <hr>
+	                    <center>
+	                    	<button type="button" class="btn btn-success" id="simpanLab"><i class="fa fa-save"></i> <b>Simpan</b></button>
+	                        <button type="button" class="btn btn-danger" id="batalLab"><i class="fa fa-times"></i> <b>Batal</b></button>
+	                    </center>
+                    </form>
+                </div>
+
                 <div role="tabpanel" class="tab-pane fade" id="visite1">
                 	<form class="form-horizontal" id="view_visite">
                     	<div class="form-group">
@@ -3316,13 +3747,12 @@ function hapus_surat_dokter(id){
 						                    <tr class="merah">
 						                        <th style="color:#fff; text-align:center;">No</th>
 						                        <th style="color:#fff; text-align:center;">Tanggal</th>
-						                        <th style="color:#fff; text-align:center;">Visite</th>
-						                        <th style="color:#fff; text-align:center;">Tarif</th>
 						                        <th style="color:#fff; text-align:center;">Dokter</th>
+						                        <th style="color:#fff; text-align:center;">Biaya Visite</th>
+						                        <th style="color:#fff; text-align:center;">Status Visit</th>
 						                        <th style="color:#fff; text-align:center;">Aksi</th>
 						                    </tr>
 						                </thead>
-
 						                <tbody>
 						                    
 						                </tbody>
@@ -3338,10 +3768,11 @@ function hapus_surat_dokter(id){
 	                    <div class="form-group">
 	                        <label class="col-md-2 control-label">Tanggal</label>
 	                        <div class="col-md-4">
-	                            <input type="text" class="form-control" name="tanggal_visite" id="tanggal_visite" value="<?php echo date('d-m-Y'); ?>" data-mask="99-99-9999">
+	                            <input type="text" class="form-control" name="tanggal_visite" id="tanggal_visite" value="<?php echo date('d-m-Y'); ?>" data-mask="99-99-9999" readonly>
 	                        	<span class="help-block"><small>(dd-mm-yyyy)</small></span>
 	                        </div>
 	                    </div>
+	                    <!-- 
 	                    <div class="form-group">
 	                        <label class="col-md-2 control-label">Visite</label>
 	                        <div class="col-md-4">
@@ -3354,10 +3785,11 @@ function hapus_surat_dokter(id){
 	                            </div>
 	                        </div>
 	                    </div>
+	                    -->
 	                    <div class="form-group">
-	                        <label class="col-md-2 control-label">Tarif</label>
+	                        <label class="col-md-2 control-label">Biaya Visite</label>
 	                        <div class="col-md-4">
-	                            <input type="text" class="form-control" name="tarif_visite" id="tarif_visite" value="" readonly>
+	                            <input type="text" class="form-control" name="tarif_visite" id="tarif_visite" value="<?php echo number_format($dt->BIAYA_VISITE);?>" readonly>
 	                        </div>
 	                    </div>
 	                    <div class="form-group">
@@ -3372,6 +3804,19 @@ function hapus_surat_dokter(id){
 	                            </div>
 	                        </div>
 	                    </div>
+	                    <div class="form-group">
+							<label class="col-md-2 control-label">&nbsp;</label>
+							<div class="col-md-5">
+								<div class="radio radio-inline radio-success">
+	                                <input type="radio" id="inlineRadio1_vis" value="1" name="status_visite">
+	                                <label for="inlineRadio1_vis"> Visit </label>
+	                            </div>
+	                            <div class="radio radio-inline radio-success">
+	                                <input type="radio" id="inlineRadio2_vis" value="0" name="status_visite">
+	                                <label for="inlineRadio2_vis"> Tidak Visite</label>
+	                            </div>
+							</div>
+						</div>
 	                    <hr>
 	                    <center>
 	                    	<button type="button" class="btn btn-success" id="simpanVisite"><i class="fa fa-save"></i> <b>Simpan</b></button>
@@ -3390,7 +3835,7 @@ function hapus_surat_dokter(id){
 	                        	<span class="help-block"><small>(dd-mm-yyyy)</small></span>
 	                        </div>
 	                    </div>
-	                    <div class="form-group">
+	                    <!-- <div class="form-group">
 	                        <label class="col-md-2 control-label">Visite</label>
 	                        <div class="col-md-4">
 	                            <div class="input-group">
@@ -3407,7 +3852,7 @@ function hapus_surat_dokter(id){
 	                        <div class="col-md-4">
 	                            <input type="text" class="form-control" name="tarif_visite_ubah" id="tarif_visite_ubah" value="" readonly>
 	                        </div>
-	                    </div>
+	                    </div> -->
 	                    <div class="form-group">
 	                        <label class="col-md-2 control-label">Dokter</label>
 	                        <div class="col-md-4">
@@ -3420,12 +3865,162 @@ function hapus_surat_dokter(id){
 	                            </div>
 	                        </div>
 	                    </div>
+	                    <div class="form-group">
+							<label class="col-md-2 control-label">&nbsp;</label>
+							<div class="col-md-5">
+								<div class="radio radio-inline radio-success">
+	                                <input type="radio" id="inlineRadio1_vis_ubah" value="1" name="status_visite_ubah">
+	                                <label for="inlineRadio1_vis_ubah"> Visit </label>
+	                            </div>
+	                            <div class="radio radio-inline radio-success">
+	                                <input type="radio" id="inlineRadio2_vis_ubah" value="0" name="status_visite_ubah">
+	                                <label for="inlineRadio2_vis_ubah"> Tidak Visite</label>
+	                            </div>
+							</div>
+						</div>
 	                    <hr>
 	                    <center>
 	                    	<button type="button" class="btn btn-success" id="simpanVisiteUbah"><i class="fa fa-save"></i> <b>Simpan</b></button>
 	                        <button type="button" class="btn btn-danger" id="batalVisiteUbah"><i class="fa fa-times"></i> <b>Batal</b></button>
 	                    </center>
                 	</form>
+                </div>
+
+                 <div role="tabpanel" class="tab-pane fade" id="resep1">
+                	<form class="form-horizontal" id="view_resep">
+                    	<div class="form-group">
+                    		<div class="col-md-6">
+                    			<h4 class="m-t-0"><i class="fa fa-table"></i>&nbsp;<b>Tabel Resep</b></h4>
+                    		</div>
+                    		<div class="col-md-6">
+			                    <button class="btn btn-primary m-b-5 pull-right" type="button" id="btn_tambah_resep">
+									<i class="fa fa-plus"></i>&nbsp;<b>Tambah Resep</b>
+								</button>
+                    		</div>
+                    	</div>
+                    	<div class="form-group">
+                    		<div class="col-md-12">
+			                    <div class="table-responsive">
+						            <table id="tabel_resep" class="table table-bordered">
+						                <thead>
+						                    <tr class="merah">
+						                        <th style="color:#fff; text-align:center;">No</th>
+						                        <th style="color:#fff; text-align:center;">Tanggal</th>
+						                        <th style="color:#fff; text-align:center;">Kode Resep</th>
+						                        <th style="color:#fff; text-align:center;">Total</th>
+						                        <th style="color:#fff; text-align:center;">Diminum Selama</th>
+						                        <th style="color:#fff; text-align:center;">Aksi</th>
+						                    </tr>
+						                </thead>
+
+						                <tbody>
+						                    
+						                </tbody>
+						            </table>
+						        </div>
+                    		</div>
+                    	</div>
+                    </form>
+
+                    <form class="form-horizontal" id="view_resep_tambah" action="" method="post">
+                    	<input type="hidden" name="id_rj" id="id_rj" value="<?php echo $id; ?>">
+						<input type="hidden" name="id_pasien" value="<?php echo $dt->ID_PASIEN; ?>">
+						<input type="hidden" name="grandtotal_resep_txt" id="grandtotal_resep_txt" value="">
+						<input type="hidden" name="total_biaya_service" id="total_biaya_service" value="">
+						<h4><i class="fa fa-plus"></i> Tambah Resep</h4>
+						<hr>
+						<div class="form-group">
+							<label class="col-md-2 control-label">Kode Resep</label>
+							<div class="col-md-5">
+								<input type="text" class="form-control" name="kode_resep" id="kode_resep" value="" readonly>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-md-2 control-label">Alergi / Obat</label>
+							<div class="col-md-5">
+								<div class="radio radio-inline radio-success">
+	                                <input type="radio" id="inlineRadio1" value="Ya" name="alergi">
+	                                <label for="inlineRadio1"> Ya </label>
+	                            </div>
+	                            <div class="radio radio-inline radio-success">
+	                                <input type="radio" id="inlineRadio2" value="Tidak" name="alergi">
+	                                <label for="inlineRadio2"> Tidak </label>
+	                            </div>
+							</div>
+						</div>
+						<div class="form-group" id="view_alergi">
+							<label class="col-md-2 control-label">&nbsp;</label>
+							<div class="col-md-5">
+								<textarea class="form-control" name="alergi_obat" id="alergi_obat" placeholder="Ketikkan disini..."></textarea>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-md-2 control-label">Banyaknya Resep</label>
+							<div class="col-md-5">
+								<div class="input-group">
+                                    <input type="text" class="form-control num_only" name="banyak_resep" id="banyak_resep" value="">
+                                    <span class="input-group-addon">Bungkus</span>
+                                </div>
+							</div>
+						</div>
+						<div class="form-group">
+	                        <label class="col-md-2 control-label">Obat</label>
+	                        <div class="col-md-5">
+	                        	<div class="input-group">
+	                        		<input type="hidden" name="id_obat" id="id_obat" value="">
+	                                <input type="text" class="form-control" id="obat_resep" value="" readonly>
+	                                <span class="input-group-btn">
+	                                    <button type="button" class="btn btn-primary btn_obat_resep" style="cursor:cursor;"><i class="fa fa-search"></i></button>
+	                                </span>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    <div class="form-group">
+	                    	<label class="col-md-2 control-label">&nbsp;</label>
+	                    	<div class="col-md-10">
+	                    		<div class="table-responsive">
+						            <table id="tabel_tambah_resep" class="table table-bordered">
+						                <thead>
+						                    <tr class="kuning_tr">
+						                        <th style="color:#fff; text-align:center;">Kode Obat</th>
+						                        <th style="color:#fff; text-align:center;">Nama Obat</th>
+						                        <th style="color:#fff; text-align:center;">Harga</th>
+						                        <th style="color:#fff; text-align:center;">Jumlah</th>
+						                        <th style="color:#fff; text-align:center;">Total</th>
+						                        <th style="color:#fff; text-align:center;">Takaran</th>
+						                        <th style="color:#fff; text-align:center;">Aturan Minum</th>
+						                        <th style="color:#fff; text-align:center;">#</th>
+						                    </tr>
+						                </thead>
+
+						                <tbody>
+						                    
+						                </tbody>
+						                <tfoot>
+						                	<tr class="active">
+						                		<td style="text-align: center; font-weight: bold;" colspan="6">GRANDTOTAL</td>
+						                		<td style="text-align: right;" colspan="2"><b id="grandtotal_resep">0</b></td>
+						                	</tr>
+						                </tfoot>
+						            </table>
+						        </div>
+	                    	</div>
+	                    </div>
+	                    <div class="form-group">
+	                    	<label class="col-md-2 control-label">Diminum Selama</label>
+	                    	<div class="col-sm-5">
+                				<div class="input-group">
+                                    <input type="text" class="form-control num_only" name="diminum_selama" id="diminum_selama" value="">
+                                    <span class="input-group-addon">Hari</span>
+                                </div>
+                			</div>
+	                    </div>
+	                    <hr>
+	                    <center>
+	                    	<button type="button" class="btn btn-success" id="simpanResep"><i class="fa fa-save"></i> <b>Simpan</b></button>
+	                        <button type="button" class="btn btn-danger" id="batalResep"><i class="fa fa-times"></i> <b>Batal</b></button>
+	                    </center>
+                    </form>
                 </div>
 
                 <div role="tabpanel" class="tab-pane fade" id="gizi1">
@@ -3892,370 +4487,6 @@ function hapus_surat_dokter(id){
                 	</form>
                 </div>
 
-                <div role="tabpanel" class="tab-pane fade" id="diagnosa1">
-                	<form class="form-horizontal" id="view_diagnosa">
-                    	<div class="form-group">
-                    		<div class="col-md-6">
-                    			<h4 class="m-t-0"><i class="fa fa-table"></i>&nbsp;<b>Tabel Diagnosa</b></h4>
-                    		</div>
-                    		<div class="col-md-6">
-			                    <button class="btn btn-primary m-b-5 pull-right" type="button" id="btn_tambah_dg">
-									<i class="fa fa-plus"></i>&nbsp;<b>Tambah Diagnosa</b>
-								</button>
-                    		</div>
-                    	</div>
-                    	<div class="form-group">
-                    		<div class="col-md-12">
-			                    <div class="table-responsive">
-						            <table id="tabel_diagnosa" class="table table-bordered">
-						                <thead>
-						                    <tr class="merah">
-						                        <th style="color:#fff; text-align:center;">No</th>
-						                        <th style="color:#fff; text-align:center;">Tanggal</th>
-						                        <th style="color:#fff; text-align:center;">Diagnosa</th>
-						                        <th style="color:#fff; text-align:center;">Tindakan</th>
-						                        <th style="color:#fff; text-align:center;">Aksi</th>
-						                    </tr>
-						                </thead>
-
-						                <tbody>
-						                    
-						                </tbody>
-						            </table>
-						        </div>
-                    		</div>
-                    	</div>
-                    </form>
-
-                    <form class="form-horizontal" id="view_diagnosa_tambah" action="" method="post">
-                    	<input type="hidden" name="id_ri" value="<?php echo $id; ?>">
-						<input type="hidden" name="id_pasien" value="<?php echo $dt->ID_PASIEN; ?>">
-						<div class="form-group">
-							<label class="col-md-2 control-label">Diagnosa</label>
-							<div class="col-md-8">
-								<textarea class="form-control" rows="5" id="diagnosa" name="diagnosa"></textarea>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label">Anjuran</label>
-							<div class="col-md-8">
-								<textarea class="form-control" rows="5" id="tindakan_dg" name="tindakan_dg"></textarea>
-							</div>
-						</div>
-						<!-- <div class="form-group">
-	                        <label class="col-md-2 control-label">Kasus</label>
-	                        <div class="col-md-5">
-	                        	<div class="input-group">
-	                        		<input type="hidden" name="id_kasus" id="id_kasus" value="">
-	                                <input type="text" class="form-control" id="kasus_dg" value="" readonly>
-	                                <span class="input-group-btn">
-	                                    <button type="button" class="btn btn-primary btn_kasus_dg" style="cursor:cursor;"><i class="fa fa-search"></i></button>
-	                                </span>
-	                            </div>
-	                        </div>
-	                    </div> -->
-	                    <!-- <div class="form-group">
-	                        <label class="col-md-2 control-label">Spesialistik</label>
-	                        <div class="col-md-5">
-	                            <div class="input-group">
-	                            	<input type="hidden" name="id_spesialistik" id="id_spesialistik" value="">
-	                                <input type="text" class="form-control" id="spesialistik_dg" name="spesialistik_dg" value="" readonly="readonly" required="required">
-	                                <span class="input-group-btn">
-	                                    <button type="button" class="btn btn-inverse btn_spesialistik_dg"><i class="fa fa-search"></i></button>
-	                                </span>
-	                            </div>
-	                        </div>
-	                    </div> -->
-	                    <hr>
-	                    <center>
-	                    	<button type="button" class="btn btn-success" id="simpanDg"><i class="fa fa-save"></i> <b>Simpan</b></button>
-	                        <button type="button" class="btn btn-danger" id="batalDg"><i class="fa fa-times"></i> <b>Batal</b></button>
-	                    </center>
-                    </form>
-
-                    <form class="form-horizontal" id="view_diagnosa_ubah" action="" method="post">
-                    	<input type="hidden" name="id_ubah_dg" id="id_ubah_dg" value="">
-                    	<input type="hidden" name="id_ri" id="id_ri" value="<?php echo $id; ?>">
-						<input type="hidden" name="id_pasien" value="<?php echo $dt->ID_PASIEN; ?>">
-						<h4><i class="fa fa-plus"></i> Ubah Diagnosa</h4>
-						<hr>
-						<div class="form-group">
-							<label class="col-md-2 control-label">Diagnosa</label>
-							<div class="col-md-8">
-								<textarea class="form-control" rows="5" id="diagnosa_ubah" name="diagnosa_ubah"></textarea>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label">Tindakan</label>
-							<div class="col-md-8">
-								<textarea class="form-control" rows="5" id="tindakan_dg_ubah" name="tindakan_dg_ubah"></textarea>
-							</div>
-						</div>
-	                    <hr>
-	                    <center>
-	                    	<button type="button" class="btn btn-success" id="simpanDgUbah"><i class="fa fa-save"></i> <b>Simpan</b></button>
-	                        <button type="button" class="btn btn-danger" id="batalDgUbah"><i class="fa fa-times"></i> <b>Batal</b></button>
-	                    </center>
-                    </form>
-                </div>
-
-                <div role="tabpanel" class="tab-pane fade" id="laborat1">
-                    <form class="form-horizontal" id="view_laborat">
-                    	<div class="form-group">
-                    		<div class="col-md-6">
-                    			<div class="checkbox checkbox-primary">
-	                                <input id="checkboxLab" type="checkbox">
-	                                <label for="checkboxLab">
-	                                    Perlu cek Laborat?
-	                                </label>
-	                            </div>
-                    		</div>
-                    	</div>
-                    	<hr>
-                    	<div class="form-group view_lab">
-                    		<div class="col-md-6">
-                    			<h4 class="m-t-0"><i class="fa fa-table"></i>&nbsp;<b>Tabel Laborat</b></h4>
-                    		</div>
-                    		<div class="col-md-6">
-			                    <button class="btn btn-primary m-b-5 pull-right" type="button" id="btn_tambah_lab">
-									<i class="fa fa-plus"></i>&nbsp;<b>Tambah Laborat</b>
-								</button>
-                    		</div>
-                    	</div>
-                    	<div class="form-group view_lab">
-                    		<div class="col-md-12">
-			                    <div class="table-responsive">
-						            <table id="tabel_laborat" class="table table-bordered">
-						                <thead>
-						                    <tr class="merah">
-						                        <th style="color:#fff; text-align:center;">No</th>
-						                        <th style="color:#fff; text-align:center;">Tanggal</th>
-						                        <th style="color:#fff; text-align:center;">Jenis Laborat</th>
-						                        <th style="color:#fff; text-align:center;">Cito</th>
-						                        <th style="color:#fff; text-align:center;">Total</th>
-						                        <th style="color:#fff; text-align:center;">Cetak</th>
-						                        <th style="color:#fff; text-align:center;">Aksi</th>
-						                    </tr>
-						                </thead>
-
-						                <tbody>
-						                    
-						                </tbody>
-						            </table>
-						        </div>
-                    		</div>
-                    	</div>
-                    	<div class="form-group view_lab">
-                    		<div class="col-md-8">
-                    			&nbsp;
-                    		</div>
-                    		<div class="col-md-4">
-                    			<div class="card-box widget-user" style="background-color:#cee3f8;">
-		                            <div>
-		                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/Money_44325.png">
-		                                <div class="wid-u-info">
-		                                    <small class="text-primary"><b>Grand Total</b></small>
-		                                    <h4 class="m-t-0 m-b-5 font-600 text-danger" id="grandtotal_laborat">0</h4>
-		                                </div>
-		                            </div>
-		                        </div>
-                    		</div>
-                    	</div>
-                    </form>
-
-                    <form class="form-horizontal" id="view_laborat_tambah" action="" method="post">
-                    	<input type="hidden" name="id_ri" id="id_ri" value="<?php echo $id; ?>">
-						<input type="hidden" name="id_dokter" value="<?php echo $dt->ID_DOKTER; ?>">
-						<input type="hidden" name="id_pasien" value="<?php echo $dt->ID_PASIEN; ?>">
-						<h4><i class="fa fa-plus"></i> Tambah Laborat</h4>
-						<hr>
-						<div class="form-group">
-							<label class="col-md-2 control-label">Kode</label>
-							<div class="col-md-5">
-								<input type="text" class="form-control" name="kode_lab" id="kode_lab" value="" readonly>
-							</div>
-						</div>
-						<div class="form-group">
-	                        <label class="col-md-2 control-label">Jenis Laborat</label>
-	                        <div class="col-md-5">
-	                        	<div class="input-group">
-	                        		<input type="hidden" name="id_laborat" id="id_laborat" value="">
-	                                <input type="text" class="form-control" id="jenis_laborat" value="" readonly>
-	                                <span class="input-group-btn">
-	                                    <button type="button" class="btn btn-primary btn_jenis_laborat" style="cursor:cursor;"><i class="fa fa-search"></i></button>
-	                                </span>
-	                            </div>
-	                        </div>
-	                    </div>
-	                    <!-- <div class="form-group">
-	                        <label class="col-md-2 control-label">Pemeriksaan</label>
-	                        <div class="col-md-5">
-	                            <div class="input-group">
-	                                <input type="text" class="form-control" value="" readonly="readonly" required="required">
-	                                <span class="input-group-btn">
-	                                    <button type="button" class="btn btn-inverse btn_pemeriksaan"><i class="fa fa-search"></i></button>
-	                                </span>
-	                            </div>
-	                        </div>
-	                    </div> -->
-	                    <div class="form-group">
-	                        <label class="col-md-2 control-label">&nbsp;</label>
-	                        <div class="col-md-8">
-	                            <div class="table-responsive">
-						            <table id="tabel_tambah_pemeriksaan" class="table table-bordered">
-						                <thead>
-						                    <tr class="kuning_tr">
-						                        <th style="color:#fff; text-align:center;">Pemeriksaan</th>
-						                        <!-- <th style="color:#fff; text-align:center;">Hasil</th>
-						                        <th style="color:#fff; text-align:center;">Nilai Rujukan</th> -->
-						                        <th style="color:#fff; text-align:center;">Tarif</th>
-						                        <th style="color:#fff; text-align:center;">Sub Total</th>
-						                        <th style="color:#fff; text-align:center;">#</th>
-						                    </tr>
-						                </thead>
-
-						                <tbody>
-						                    
-						                </tbody>
-						            </table>
-						        </div>
-	                        </div>
-	                    </div>
-	                    <div class="form-group">
-	                        <label class="col-md-2 control-label">Total Tarif</label>
-	                        <div class="col-md-5">
-	                            <input type="text" class="form-control" name="total_tarif_pemeriksaan" id="total_tarif_pemeriksaan" value="" readonly="readonly">
-	                        </div>
-	                    </div>
-	                    <div class="form-group">
-	                    	<label class="col-md-2 control-label">Cito</label>
-	                    	<div class="col-md-5">
-	                    		<div class="radio radio-primary radio-inline">
-	                                <input type="radio" id="inlineRadio1" value="1" name="cito">
-	                                <label for="inlineRadio1"> Aktif </label>
-	                            </div>
-	                            <div class="radio radio-primary radio-inline">
-	                                <input type="radio" id="inlineRadio2" value="0" name="cito">
-	                                <label for="inlineRadio2"> Tidak Aktif </label>
-	                            </div>
-	                    	</div>
-	                    </div>
-	                    <hr>
-	                    <center>
-	                    	<button type="button" class="btn btn-success" id="simpanLab"><i class="fa fa-save"></i> <b>Simpan</b></button>
-	                        <button type="button" class="btn btn-danger" id="batalLab"><i class="fa fa-times"></i> <b>Batal</b></button>
-	                    </center>
-                    </form>
-                </div>
-
-                <div role="tabpanel" class="tab-pane fade" id="resep1">
-                	<form class="form-horizontal" id="view_resep">
-                    	<div class="form-group">
-                    		<div class="col-md-6">
-                    			<h4 class="m-t-0"><i class="fa fa-table"></i>&nbsp;<b>Tabel Resep</b></h4>
-                    		</div>
-                    		<div class="col-md-6">
-			                    <button class="btn btn-primary m-b-5 pull-right" type="button" id="btn_tambah_resep">
-									<i class="fa fa-plus"></i>&nbsp;<b>Tambah Resep</b>
-								</button>
-                    		</div>
-                    	</div>
-                    	<div class="form-group">
-                    		<div class="col-md-12">
-			                    <div class="table-responsive">
-						            <table id="tabel_resep" class="table table-bordered">
-						                <thead>
-						                    <tr class="merah">
-						                        <th style="color:#fff; text-align:center;">No</th>
-						                        <th style="color:#fff; text-align:center;">Tanggal</th>
-						                        <th style="color:#fff; text-align:center;">Kode Resep</th>
-						                        <th style="color:#fff; text-align:center;">Total</th>
-						                        <th style="color:#fff; text-align:center;">Diminum Selama</th>
-						                        <th style="color:#fff; text-align:center;">Aksi</th>
-						                    </tr>
-						                </thead>
-
-						                <tbody>
-						                    
-						                </tbody>
-						            </table>
-						        </div>
-                    		</div>
-                    	</div>
-                    </form>
-
-                    <form class="form-horizontal" id="view_resep_tambah" action="" method="post">
-                    	<input type="hidden" name="id_rj" id="id_rj" value="<?php echo $id; ?>">
-						<input type="hidden" name="id_pasien" value="<?php echo $dt->ID_PASIEN; ?>">
-						<input type="hidden" name="grandtotal_resep_txt" id="grandtotal_resep_txt" value="">
-						<h4><i class="fa fa-plus"></i> Tambah Resep</h4>
-						<hr>
-						<div class="form-group">
-							<label class="col-md-2 control-label">Kode Resep</label>
-							<div class="col-md-5">
-								<input type="text" class="form-control" name="kode_resep" id="kode_resep" value="" readonly>
-							</div>
-						</div>
-						<div class="form-group">
-	                        <label class="col-md-2 control-label">Obat</label>
-	                        <div class="col-md-5">
-	                        	<div class="input-group">
-	                        		<input type="hidden" name="id_obat" id="id_obat" value="">
-	                                <input type="text" class="form-control" id="obat_resep" value="" readonly>
-	                                <span class="input-group-btn">
-	                                    <button type="button" class="btn btn-primary btn_obat_resep" style="cursor:cursor;"><i class="fa fa-search"></i></button>
-	                                </span>
-	                            </div>
-	                        </div>
-	                    </div>
-	                    <div class="form-group">
-	                    	<label class="col-md-2 control-label">&nbsp;</label>
-	                    	<div class="col-md-10">
-	                    		<div class="table-responsive">
-						            <table id="tabel_tambah_resep" class="table table-bordered">
-						                <thead>
-						                    <tr class="kuning_tr">
-						                        <th style="color:#fff; text-align:center;">Kode Obat</th>
-						                        <th style="color:#fff; text-align:center;">Nama Obat</th>
-						                        <th style="color:#fff; text-align:center;">Harga</th>
-						                        <th style="color:#fff; text-align:center;">Jumlah</th>
-						                        <th style="color:#fff; text-align:center;">Total</th>
-						                        <th style="color:#fff; text-align:center;">Takaran</th>
-						                        <th style="color:#fff; text-align:center;">Aturan Minum</th>
-						                        <th style="color:#fff; text-align:center;">#</th>
-						                    </tr>
-						                </thead>
-
-						                <tbody>
-						                    
-						                </tbody>
-						                <tfoot>
-						                	<tr class="active">
-						                		<td style="text-align: center; font-weight: bold;" colspan="6">GRANDTOTAL</td>
-						                		<td style="text-align: right;" colspan="2"><b id="grandtotal_resep">0</b></td>
-						                	</tr>
-						                </tfoot>
-						            </table>
-						        </div>
-	                    	</div>
-	                    </div>
-	                    <div class="form-group">
-	                    	<label class="col-md-2 control-label">Diminum Selama</label>
-	                    	<div class="col-sm-5">
-                				<div class="input-group">
-                                    <input type="text" class="form-control num_only" name="diminum_selama" id="diminum_selama" value="">
-                                    <span class="input-group-addon">Hari</span>
-                                </div>
-                			</div>
-	                    </div>
-	                    <hr>
-	                    <center>
-	                    	<button type="button" class="btn btn-success" id="simpanResep"><i class="fa fa-save"></i> <b>Simpan</b></button>
-	                        <button type="button" class="btn btn-danger" id="batalResep"><i class="fa fa-times"></i> <b>Batal</b></button>
-	                    </center>
-                    </form>
-                </div>
-
                 <div role="tabpanel" class="tab-pane fade" id="kondisi_akhir1">
                 	<div class="row">
                 		<div class="col-md-12">
@@ -4270,34 +4501,6 @@ function hapus_surat_dokter(id){
                 		<input type="hidden" name="id_rj" id="id_rj" value="<?php echo $id; ?>">
 						<input type="hidden" name="id_pasien" value="<?php echo $dt->ID_PASIEN; ?>">
 						<input type="hidden" name="asal_rujukan" value="<?php echo $dt->ASAL_RUJUKAN; ?>">
-                		<div class="form-group">
-                            <label class="col-sm-2 control-label">Status</label>
-                            <div class="col-sm-4">
-                                <select class="form-control" name="kondisi_akhir" id="kondisi_akhir">
-                                    <option value="Dirawat">Dirawat</option>
-                                    <option value="Pulang">Pulang</option>
-                                    <option value="Dirujuk">Dirujuk</option>
-                                    <option value="Operasi">Operasi</option>
-                                    <option value="Meninggal">Meninggal</option>
-                                </select>
-                            </div>
-                        </div>
-                		<div class="form-group" id="view_dirawat_selama">
-                			<label class="col-sm-2 control-label">Dirawat Selama</label>
-                			<div class="col-sm-4">
-                				<div class="input-group">
-                                    <input type="text" class="form-control num_only" name="dirawat_selama" id="dirawat_selama" value="">
-                                    <span class="input-group-addon">Hari</span>
-                                </div>
-                			</div>
-                		</div>
-                		<div class="form-group">
-                			<label class="col-sm-2 control-label">Tanggal Keluar</label>
-                			<div class="col-sm-4">
-                				<input type="text" class="form-control" name="tanggal_keluar" data-mask="99-99-9999" value="">
-                			</div>
-                		</div>
-
                         <!-- <div id="view_icu">
                         	<div class="form-group">
 		                        <label class="col-md-2 control-label">Ruang ICU</label>
@@ -4331,63 +4534,6 @@ function hapus_surat_dokter(id){
 		                    </div>
 		                    <hr>
                         </div> -->
-
-                        <div id="view_operasi">
-                        	<div class="form-group">
-		                        <label class="col-md-2 control-label">Ruang Operasi</label>
-		                        <div class="col-md-4">
-		                            <div class="input-group">
-		                                <input type="hidden" name="id_ruang_opr" id="id_ruang_opr" value="">
-		                                <input type="text" class="form-control" id="ruang_operasi" value="" readonly>
-		                                <span class="input-group-btn">
-		                                    <button type="button" class="btn btn-danger btn_ruang_opr"><i class="fa fa-search"></i></button>
-		                                </span>
-		                            </div>
-		                        </div>
-		                    </div>
-		                    <div class="form-group">
-		                        <label class="col-md-2 control-label">Tarif</label>
-		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" name="tarif_operasi" id="tarif_operasi" value="" onkeyup="FormatCurrency(this);">
-		                        </div>
-		                    </div>
-		                    <hr>
-                        </div>
-
-                        <div id="view_meninggal">
-                        	<div class="form-group">
-		                        <label class="col-md-2 control-label">Kamar Jenazah</label>
-		                        <div class="col-md-4">
-		                            <div class="input-group">
-		                                <input type="hidden" name="id_kamar_jenazah" id="id_kamar_jenazah" value="">
-		                                <input type="text" class="form-control" id="kamar_jenazah" value="" readonly>
-		                                <span class="input-group-btn">
-		                                    <button type="button" class="btn btn-danger btn_kamar_jenazah"><i class="fa fa-search"></i></button>
-		                                </span>
-		                            </div>
-		                        </div>
-		                    </div>
-		                    <div class="form-group">
-		                        <label class="col-md-2 control-label">Tarif</label>
-		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" name="tarif_kamar_jenazah" id="tarif_kamar_jenazah" value="" readonly>
-		                        </div>
-		                    </div>
-		                    <div class="form-group">
-		                        <label class="col-md-2 control-label">Lemari Jenazah</label>
-		                        <div class="col-md-4">
-		                            <div class="input-group">
-		                                <input type="hidden" name="id_lemari_jenazah" id="id_lemari_jenazah" value="">
-		                                <input type="text" class="form-control" id="lemari_jenazah" value="" readonly>
-		                                <span class="input-group-btn">
-		                                    <button type="button" class="btn btn-primary btn_lemari_jenazah"><i class="fa fa-search"></i></button>
-		                                </span>
-		                            </div>
-		                        </div>
-		                    </div>
-		                    <hr>
-                        </div>
-                        
                         <center>
 	                    	<button type="button" class="btn btn-success" id="simpanKA"><i class="fa fa-save"></i> <b>Simpan</b></button>
 	                        <button type="button" class="btn btn-danger" id="batalKA"><i class="fa fa-times"></i> <b>Batal</b></button>
@@ -4691,7 +4837,7 @@ function hapus_surat_dokter(id){
 
 <button class="btn btn-primary" data-toggle="modal" data-target="#myModal4" id="popup_dokter" style="display:none;">Standard Modal</button>
 <div id="myModal4" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog" style="width:50%;">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -4718,9 +4864,7 @@ function hapus_surat_dokter(id){
 		                    <thead>
 		                        <tr class="hijau_popup">
 		                            <th style="text-align:center; color: #fff;">No</th>
-		                            <th style="text-align:center; color: #fff;">Kode</th>
 		                            <th style="text-align:center; color: #fff;">Nama Dokter</th>
-		                            <th style="text-align:center; color: #fff;">Jabatan</th>
 		                        </tr>
 		                    </thead>
 		                    <tbody>
@@ -5174,8 +5318,9 @@ function hapus_surat_dokter(id){
 		                    <thead>
 		                        <tr class="hijau_popup">
 		                            <th style="text-align:center; color: #fff;" width="50">No</th>
-		                            <th style="text-align:center; color: #fff;">Kode Obat</th>
 		                            <th style="text-align:center; color: #fff;">Nama Obat</th>
+		                            <th style="text-align:center; color: #fff;">Jumlah</th>
+		                            <th style="text-align:center; color: #fff;">Total</th>
 		                            <th style="text-align:center; color: #fff;">Takaran</th>
 		                            <th style="text-align:center; color: #fff;">Aturan Minum</th>
 		                        </tr>
@@ -5313,7 +5458,7 @@ function hapus_surat_dokter(id){
 
 <button id="popup_hapus_dg" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#custom-width-modalDg" style="display:none;">Custom width Modal</button>
 <div id="custom-width-modalDg" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog" style="width:55%;">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="custom-width-modalLabel">Konfirmasi Hapus</h4>

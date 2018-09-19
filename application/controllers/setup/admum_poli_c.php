@@ -5,6 +5,9 @@ class Admum_poli_c extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();
+		date_default_timezone_set('Asia/Jakarta');
+		$this->load->helper('url');
+		$this->load->library('fpdf/HTML2PDF');
 		$this->load->model('setup/admum_poli_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
 		$id_user = $sess_user['id'];
@@ -25,7 +28,7 @@ class Admum_poli_c extends CI_Controller {
 			'url_simpan' => base_url().'setup/admum_poli_c/simpan',
 			'url_ubah' => base_url().'setup/admum_poli_c/ubah',
 			'url_hapus' => base_url().'setup/admum_poli_c/hapus',
-			'url_cetak' => base_url().'setup/admum_poli_c/cetak_excel',
+			'url_cetak' => base_url().'setup/admum_poli_c/cetak',
 		);
 
 		$this->load->view('setup/setup_home_v',$data);
@@ -105,15 +108,15 @@ class Admum_poli_c extends CI_Controller {
 	function simpan(){
 		$id_dep = $this->input->post('id_departemen');
 		$id_div = $this->input->post('id_divisi');
-		$nama = $this->input->post('nama_poli');
-		$initial_poli = $this->input->post('inisial_poli');
 		$jenis = $this->input->post('jenis');
+		$nama = $this->input->post('nama_poli');
+		$status = $this->input->post('status');
+		$keterangan = $this->input->post('keterangan');
 		$biaya = str_replace(',', '', $this->input->post('biaya'));
-		$text_layar = strtoupper($nama);
 		$id_peg_dokter = $this->input->post('id_peg_dokter');
 		$id_peg_perawat = $this->input->post('id_perawat');
 
-		$this->model->simpan($id_dep,$id_div,$nama,$initial_poli,$jenis,$biaya,$text_layar,$id_peg_dokter);
+		$this->model->simpan($id_dep,$id_div,$jenis,$nama,$status,$keterangan,$biaya,$id_peg_dokter);
 		$id_poli = $this->db->insert_id();
 
 		foreach ($id_peg_perawat as $key => $value) {
@@ -128,15 +131,22 @@ class Admum_poli_c extends CI_Controller {
 		$id = $this->input->post('id_ubah');
 		$id_dep = $this->input->post('id_departemen_ubah');
 		$id_div = $this->input->post('id_divisi_ubah');
+		$jenis_ubah = $this->input->post('cek_jenis_ubah');
+		$jenis = '';
 		$nama = $this->input->post('nama_poli_ubah');
-		$initial_poli = $this->input->post('inisial_poli_ubah');
-		$jenis = $this->input->post('jenis_ubah');
+		$status = $this->input->post('status_ubah');
+		$keterangan = $this->input->post('keterangan_ubah');
 		$biaya = str_replace(',', '', $this->input->post('biaya_ubah'));
-		$text_layar = strtoupper($nama);
 		$id_peg_dokter = $this->input->post('id_peg_dokter_ubah');
 		$id_peg_perawat = $this->input->post('id_perawat_ubah');
 
-		$this->model->ubah($id,$id_dep,$id_div,$nama,$initial_poli,$jenis,$biaya,$text_layar,$id_peg_dokter);
+		if($jenis_ubah == '1'){
+			$jenis = $this->input->post('jenis_ubah');
+		}else{
+			$jenis = $this->input->post('jenis_txt');
+		}
+
+		$this->model->ubah($id,$id_dep,$id_div,$jenis,$nama,$status,$keterangan,$biaya,$id_peg_dokter);
 
 		foreach ($id_peg_perawat as $key => $value) {
 			$this->model->simpan_perawat($id,$value);
@@ -160,12 +170,32 @@ class Admum_poli_c extends CI_Controller {
 		echo '1';
 	}
 
+	function cetak(){
+		$cetak = $this->input->post('cetak');
+		if($cetak == 'Excel'){
+			$this->cetak_excel();
+		}else{
+			$this->cetak_pdf();
+		}
+	}
+
 	function cetak_excel(){
 		$data = array(
-			'dt' => $this->model->data_poli('','','',''),
+			'dt' => $this->model->data_nama_poli(),
+			'filename' => date('dmY').'_data_poli'
 		);
 
 		$this->load->view('setup/excel/excel_data_poli_xls',$data);
+	}
+
+	function cetak_pdf(){
+		$data = array(
+			'dt' => $this->model->data_nama_poli(),
+			'settitle' => 'Laporan Data Poli',
+			'filename' => date('dmY').'_data_poli'
+		);
+
+		$this->load->view('setup/pdf/pdf_data_poli',$data);
 	}
 
 }

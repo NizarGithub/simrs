@@ -8,6 +8,47 @@ class Admum_poli_m extends CI_Model {
 		$this->load->database();
 	}
 
+	function data_jenis_poli(){
+		$sql = "SELECT * FROM admum_poli_jenis ORDER BY ID ASC";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function data_nama_poli(){
+		$sql = "SELECT a.NAMA FROM admum_poli a GROUP BY a.NAMA ORDER BY a.ID ASC";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function data_cetak_poli($nama){
+		$sql = "
+			SELECT 
+				POLI.ID,
+				POLI.NAMA,
+				POLI.JENIS,
+				POLI.STATUS,
+				POLI.KETERANGAN,
+				POLI.BIAYA,
+				PEG.NAMA_DOKTER,
+				POLI.AKTIF,
+				COUNT(PRWT.ID) AS JUMLAH_PERAWAT
+			FROM admum_poli POLI
+			LEFT JOIN (
+				SELECT
+					PEG.ID,
+					PEG.NIP,
+					PEG.NAMA AS NAMA_DOKTER
+				FROM kepeg_pegawai PEG
+			) PEG ON PEG.ID = POLI.ID_PEG_DOKTER
+			LEFT JOIN admum_poli_perawat PRWT ON PRWT.ID_POLI = POLI.ID
+			WHERE POLI.NAMA = '$nama'
+			GROUP BY POLI.ID
+			ORDER BY POLI.ID ASC
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
 	function data_poli($keyword,$urutkan,$pilih_jenis,$cari){
 		$where = "1 = 1";
 		$order = "";
@@ -19,7 +60,7 @@ class Admum_poli_m extends CI_Model {
 		}
 
 		if($urutkan == 'Default'){
-			$order = "ORDER BY POLI.ID DESC";
+			$order = "ORDER BY POLI.ID ASC";
 		}else if($urutkan == 'Nama Poli'){
 			$order = "ORDER BY POLI.NAMA ASC";
 		}
@@ -34,8 +75,9 @@ class Admum_poli_m extends CI_Model {
 			SELECT 
 				POLI.ID,
 				POLI.NAMA,
-				POLI.INITIAL_POLI,
 				POLI.JENIS,
+				POLI.STATUS,
+				POLI.KETERANGAN,
 				POLI.BIAYA,
 				PEG.NAMA_DOKTER,
 				POLI.AKTIF,
@@ -128,7 +170,7 @@ class Admum_poli_m extends CI_Model {
 				PEG.ID,
 				PEG.NIP,
 				PEG.NAMA,
-				JAB.NAMA AS JABATAN,
+				PEG.`STATUS` AS JABATAN,
 				DEP.KODE AS KODE_DEP,
 				DEP.NAMA_DEP,
 				DV.KODE_DIV,
@@ -304,26 +346,26 @@ class Admum_poli_m extends CI_Model {
 		return $query->result();
 	}
 
-	function simpan($id_dep,$id_div,$nama,$initial_poli,$jenis,$biaya,$text_layar,$id_peg_dokter){
+	function simpan($id_dep,$id_div,$jenis,$nama,$status,$keterangan,$biaya,$id_peg_dokter){
 		$sql = "
 			INSERT INTO admum_poli(
 				ID_DEPARTEMEN,
 				ID_DIVISI,
-				NAMA,
-				INITIAL_POLI,
 				JENIS,
+				NAMA,
+				STATUS,
+				KETERANGAN,
 				BIAYA,
-				TEXT_LAYAR,
 				ID_PEG_DOKTER,
 				AKTIF
 			) VALUES (
 				'$id_dep',
 				'$id_div',
-				'$nama',
-				'$initial_poli',
 				'$jenis',
+				'$nama',
+				'$status',
+				'$keterangan',
 				'$biaya',
-				'$text_layar',
 				'$id_peg_dokter',
 				'1'
 			)
@@ -331,16 +373,16 @@ class Admum_poli_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
-	function ubah($id,$id_dep,$id_div,$nama,$initial_poli,$jenis,$biaya,$text_layar,$id_peg_dokter){
+	function ubah($id,$id_dep,$id_div,$jenis,$nama,$status,$keterangan,$biaya,$id_peg_dokter){
 		$sql = "
 			UPDATE admum_poli SET
 				ID_DEPARTEMEN = '$id_dep',
 				ID_DIVISI = '$id_div',
-				NAMA = '$nama',
-				INITIAL_POLI = '$initial_poli',
 				JENIS = '$jenis',
+				NAMA = '$nama',
+				STATUS = '$status',
+				KETERANGAN = '$keterangan',
 				BIAYA = '$biaya',
-				TEXT_LAYAR = '$text_layar',
 				ID_PEG_DOKTER = '$id_peg_dokter'
 			WHERE ID = '$id'
 		";
