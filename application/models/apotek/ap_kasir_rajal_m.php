@@ -38,7 +38,8 @@ class Ap_kasir_rajal_m extends CI_Model {
 							'1' AS TIPE,
 							a.STS_CLOSING AS STATUS_CLOSING,
 							'' AS ID_HV,
-							'' AS ID_PAKET
+							'' AS ID_PAKET,
+							c.INVOICE
 						FROM admum_rawat_jalan a
 						LEFT JOIN rk_pasien b ON b.ID = a.ID_PASIEN
 						LEFT JOIN rk_pembayaran_kasir c ON c.ID_PELAYANAN = a.ID
@@ -66,7 +67,8 @@ class Ap_kasir_rajal_m extends CI_Model {
 							'2' AS TIPE,
 							a.STATUS_CLOSING,
 							a.ID AS ID_HV,
-							'' AS ID_PAKET
+							'' AS ID_PAKET,
+							a.INVOICE
 						FROM ap_penjualan_obat_hv a
 
 						UNION ALL
@@ -88,11 +90,12 @@ class Ap_kasir_rajal_m extends CI_Model {
 							'3' AS TIPE,
 							a.STATUS_CLOSING,
 							'' AS ID_HV,
-							a.ID AS ID_PAKET
+							a.ID AS ID_PAKET,
+							a.INVOICE
 						FROM ap_penjualan_obat_paket a
 						) a
 						WHERE $where
-						AND a.TANGGAL = '14-09-2018'
+						AND a.TANGGAL = '$tanggal'
 						AND a.STATUS_CLOSING = '0'
 						ORDER BY a.ID DESC
 					";
@@ -571,7 +574,7 @@ class Ap_kasir_rajal_m extends CI_Model {
 		return $this->db->query($sql)->result();
 	}
 
-	function simpan_closing_rajal($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup){
+	function simpan_closing_rajal($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup, $invoice){
 		$data = array(
 			'ID_TUTUP' => $id_tutup,
 			'ID_KASIR_RAJAL' => $id_semua,
@@ -579,32 +582,34 @@ class Ap_kasir_rajal_m extends CI_Model {
 			'WAKTU' => $pukul,
 			'ID_PEGAWAI' => $id_pegawai,
 			'SHIFT' => $shift,
-			'TOTAL' => $total
+			'TOTAL' => $total,
+			'INVOICE' => $invoice,
+			'STATUS' => 'Kasir Rajal'
 		);
 
 	  $this->db->insert('ap_tutup_kasir_rajal_detail', $data);
 
-		// $data_update = array(
-		// 	'STATUS_CLOSING' => 1
-		// );
-		// $this->db->where('ID', $id_semua);
-    // $this->db->update('rk_pembayaran_kasir', $data_update);
-		//
-		// $this->db->select('*');
-		// $this->db->from('rk_pembayaran_kasir');
-		// $this->db->where('ID', $id_semua);
-		// $row_rajal = $this->db->get()->row_array();
-		//
-		// $id_pelayanan = $row_rajal['ID_PELAYANAN'];
-		//
-		// $data_update_rajal = array(
-		// 	'STS_CLOSING' => 1
-		// );
-		// $this->db->where('ID', $id_pelayanan);
-    // $this->db->update('admum_rawat_jalan', $data_update_rajal);
+		$data_update = array(
+			'STATUS_CLOSING' => 1
+		);
+		$this->db->where('ID', $id_semua);
+    $this->db->update('rk_pembayaran_kasir', $data_update);
+
+		$this->db->select('*');
+		$this->db->from('rk_pembayaran_kasir');
+		$this->db->where('ID', $id_semua);
+		$row_rajal = $this->db->get()->row_array();
+
+		$id_pelayanan = $row_rajal['ID_PELAYANAN'];
+
+		$data_update_rajal = array(
+			'STS_CLOSING' => 1
+		);
+		$this->db->where('ID', $id_pelayanan);
+    $this->db->update('admum_rawat_jalan', $data_update_rajal);
 	}
 
-	function simpan_closing_hv($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup){
+	function simpan_closing_hv($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup, $invoice){
 		$data = array(
 			'ID_TUTUP' => $id_tutup,
 			'ID_HV' => $id_semua,
@@ -612,19 +617,21 @@ class Ap_kasir_rajal_m extends CI_Model {
 			'WAKTU' => $pukul,
 			'ID_PEGAWAI' => $id_pegawai,
 			'SHIFT' => $shift,
-			'TOTAL' => $total
+			'TOTAL' => $total,
+			'INVOICE' => $invoice,
+			'STATUS' => 'Penjualan HV / OTC'
 		);
 
 	  $this->db->insert('ap_tutup_kasir_rajal_detail', $data);
 
-		// $data_update = array(
-		// 	'STATUS_CLOSING' => 1
-		// );
-		// $this->db->where('ID', $id_semua);
-    // $this->db->update('ap_penjualan_obat_hv', $data_update);
+		$data_update = array(
+			'STATUS_CLOSING' => 1
+		);
+		$this->db->where('ID', $id_semua);
+    $this->db->update('ap_penjualan_obat_hv', $data_update);
 	}
 
-	function simpan_closing_paket($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup){
+	function simpan_closing_paket($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup, $invoice){
 		$data = array(
 			'ID_TUTUP' => $id_tutup,
 			'ID_PAKET' => $id_semua,
@@ -632,35 +639,27 @@ class Ap_kasir_rajal_m extends CI_Model {
 			'WAKTU' => $pukul,
 			'ID_PEGAWAI' => $id_pegawai,
 			'SHIFT' => $shift,
-			'TOTAL' => $total
+			'TOTAL' => $total,
+			'INVOICE' => $invoice,
+			'STATUS' => 'Penjualan Paket'
 		);
 
 	  $this->db->insert('ap_tutup_kasir_rajal_detail', $data);
 
-		// $data_update = array(
-		// 	'STATUS_CLOSING' => 1
-		// );
-		// $this->db->where('ID', $id_semua);
-    // $this->db->update('ap_penjualan_obat_paket', $data_update);
+		$data_update = array(
+			'STATUS_CLOSING' => 1
+		);
+		$this->db->where('ID', $id_semua);
+    $this->db->update('ap_penjualan_obat_paket', $data_update);
 	}
 
 	function data_pembayaran(){
 		$query = $this->db->query("SELECT
-																TUTUP.ID AS ID_CLOSING,
-																TUTUP.TANGGAL AS TANGGAL_CLOSING,
-																TUTUP.SHIFT,
-																BAYAR.INVOICE,
-																RAJAL.ID AS ID_RAJAL,
-																BAYAR.TOTAL,
-																PEGAWAI.NAMA AS NAMA_PEGAWAI,
-																RESEP.KODE_RESEP
-																FROM
-																ap_tutup_kasir_rajal AS TUTUP
-																LEFT JOIN rk_pembayaran_kasir AS BAYAR ON TUTUP.ID_KASIR_RAJAL=BAYAR.ID
-																LEFT JOIN rk_pasien AS PASIEN ON BAYAR.ID_PASIEN=PASIEN.ID
-																LEFT JOIN admum_rawat_jalan AS RAJAL ON BAYAR.ID_PELAYANAN=RAJAL.ID
-																LEFT JOIN rk_resep_rj RESEP ON RESEP.ID_PELAYANAN = RAJAL.ID
-																LEFT JOIN kepeg_pegawai AS PEGAWAI ON TUTUP.ID_PEGAWAI=PEGAWAI.ID
+															 a.*,
+															 b.NAMA AS NAMA_PEGAWAI
+															 FROM
+															 ap_tutup_kasir_rajal_detail a
+															 LEFT JOIN kepeg_pegawai AS b ON a.ID_PEGAWAI=b.ID
 		");
 		return $query->result_array();
 	}

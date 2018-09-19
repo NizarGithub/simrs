@@ -78,9 +78,10 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		$id_pasien = $this->input->post('id_pasien');
 		$tanggal = date('d-m-Y');
 		$sql = "SELECT
-								TD.*
-							FROM rk_tindakan_rj TD
-							WHERE TD.ID_PASIEN = '$id_pasien'
+						TD.*
+						FROM rk_tindakan_rj TD
+						WHERE TD.ID_PASIEN = '$id_pasien'
+						AND TD.TANGGAL = '$tanggal'
 						";
 		$query = $this->db->query($sql);
 		$id_tindakan = '';
@@ -98,7 +99,12 @@ class Ap_kasir_rajal_c extends CI_Controller {
 	function get_resep2(){
 		$id_pasien = $this->input->post('id_pasien');
 		$tanggal = date('d-m-Y');
-		$sql = "SELECT * FROM rk_resep_rj WHERE ID_PASIEN = '$id_pasien'";
+		$sql = "SELECT
+						*
+						FROM
+						rk_resep_rj
+						WHERE ID_PASIEN = '$id_pasien'
+						AND TANGGAL = '$tanggal'";
 		$query = $this->db->query($sql);
 		$id_resep = '';
 		$data = '';
@@ -470,7 +476,7 @@ class Ap_kasir_rajal_c extends CI_Controller {
 
 		$this->db->insert('ap_tutup_kasir_rajal', $data_tutup);
 		$data['id_tutup'] = $this->db->insert_id();
-		
+
 		echo json_encode($data);
 	}
 
@@ -482,6 +488,7 @@ class Ap_kasir_rajal_c extends CI_Controller {
 			$tanggal = date('d-m-Y');
 			$bulan = date('m');
 			$tahun = date('Y');
+			$invoice = $this->input->post('invoice');
 
 			$tz_object = new DateTimeZone('Asia/Jakarta');
 			$datetime = new DateTime();
@@ -489,7 +496,7 @@ class Ap_kasir_rajal_c extends CI_Controller {
 			$pukul = $format->format('H:i:s');
 
 			$id_tutup = $this->input->post('id_tutup');
-			$this->model->simpan_closing_rajal($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup);
+			$this->model->simpan_closing_rajal($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup, $invoice);
 			echo "1";
 	}
 
@@ -501,6 +508,7 @@ class Ap_kasir_rajal_c extends CI_Controller {
 			$tanggal = date('d-m-Y');
 			$bulan = date('m');
 			$tahun = date('Y');
+			$invoice = $this->input->post('invoice');
 
 			$tz_object = new DateTimeZone('Asia/Jakarta');
 			$datetime = new DateTime();
@@ -508,7 +516,7 @@ class Ap_kasir_rajal_c extends CI_Controller {
 			$pukul = $format->format('H:i:s');
 
 			$id_tutup = $this->input->post('id_tutup');
-			$this->model->simpan_closing_hv($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup);
+			$this->model->simpan_closing_hv($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup, $invoice);
 			echo "1";
 	}
 
@@ -520,6 +528,7 @@ class Ap_kasir_rajal_c extends CI_Controller {
 			$tanggal = date('d-m-Y');
 			$bulan = date('m');
 			$tahun = date('Y');
+			$invoice = $this->input->post('invoice');
 
 			$tz_object = new DateTimeZone('Asia/Jakarta');
 			$datetime = new DateTime();
@@ -527,7 +536,7 @@ class Ap_kasir_rajal_c extends CI_Controller {
 			$pukul = $format->format('H:i:s');
 
 			$id_tutup = $this->input->post('id_tutup');
-			$this->model->simpan_closing_paket($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup);
+			$this->model->simpan_closing_paket($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup, $invoice);
 			echo "1";
 	}
 
@@ -606,13 +615,15 @@ class Ap_kasir_rajal_c extends CI_Controller {
 
 	function get_pendapatan(){
 		$tanggal = date('d-m-Y');
+		$shift = $this->input->post('shift');
 		$resep = $this->db->query("SELECT
 															 COUNT(a.ID) AS TOTAL_RESEP
 															 FROM
 															 rk_resep_rj a
 															 LEFT JOIN rk_pembayaran_kasir b ON a.ID_PELAYANAN = b.ID_PELAYANAN
-															 WHERE a.TANGGAL = '14-09-2018'
-															 AND b.SHIFT = '2'
+															 WHERE a.TANGGAL = '$tanggal'
+															 AND b.SHIFT = '$shift'
+															 AND b.STATUS_CLOSING = '0'
 														  ")->row_array();
 		$obat = $this->db->query("SELECT
 															a.*,
@@ -625,23 +636,27 @@ class Ap_kasir_rajal_c extends CI_Controller {
 															a.TANGGAL,
 															(a.HARGA * a.JUMLAH_BELI) AS TOTAL,
 															a.SERVICE,
-															c.SHIFT
+															c.SHIFT,
+															c.STATUS_CLOSING
 															FROM
 															rk_resep_detail_rj a
 															LEFT JOIN rk_resep_rj b ON a.ID_RESEP = b.ID
 															LEFT JOIN rk_pembayaran_kasir c ON b.ID_PELAYANAN = c.ID_PELAYANAN
 															)
 															a
-															WHERE a.TANGGAL = '14-09-2018'
-															AND a.SHIFT = '2'
+															WHERE a.TANGGAL = '$tanggal'
+															AND a.SHIFT = '$shift'
+															AND a.STATUS_CLOSING = '0'
 														 ")->row_array();
 		$hv = $this->db->query("SELECT
-														COUNT(*) AS LEMBAR_HV,
-														SUM(TOTAL) AS NILAI_HV
+														COUNT(a.ID) AS LEMBAR_HV,
+														SUM(a.TOTAL) AS NILAI_HV
 														FROM
-														ap_pembayaran_hv
-														WHERE TANGGAL = '14-09-2018'
-														AND SHIFT = '2'
+														ap_pembayaran_hv a
+														LEFT JOIN ap_penjualan_obat_hv b ON a.ID_PENJUALAN_HV = b.ID
+														WHERE a.TANGGAL = '$tanggal'
+														AND a.SHIFT = '$shift'
+														AND b.STATUS_CLOSING = '0'
 														")->row_array();
 
 		$nilai_obat = $obat['NILAI_OBAT'];

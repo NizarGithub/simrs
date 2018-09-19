@@ -1,6 +1,7 @@
 <?PHP
 $sess_user = $this->session->userdata('masuk_rs');
 $id_user = $sess_user['id'];  //ID PEGAWAI
+$shift = $sess_user['shift'];
 
 $user_detail = $this->model->get_user_detail($id_user);
 
@@ -303,7 +304,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                       </div>
                                   </div>
                                   <div class="panel-footer bg-green">
-                                      <h4><strong>Rekap Pendapatan</strong></h4>
+                                      <h4><strong>Rekap Pendapatan</srong></h4>
                                       <p>Hari, Bulan Dan Tahun</p>
                                   </div>
                               </div>
@@ -674,11 +675,10 @@ $user_detail = $this->model->get_user_detail($id_user);
                                 <th>No</th>
                                 <th>Tanggal</th>
                                 <th>Invoice</th>
+                                <th>Status</th>
                                 <th>Total Biaya</th>
                                 <th>Pegawai</th>
                                 <th>Shift</th>
-                                <th>Copy Resep</th>
-                                <th>Nota Poli</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -1330,13 +1330,12 @@ function data_pembayaran(){
               no++;
               table += "<tr>"+
                           "<td style='text-align:center;'>"+no+"</td>"+
-                          "<td style='text-align:center;'>"+result[i].TANGGAL_CLOSING+"</td>"+
+                          "<td style='text-align:center;'>"+result[i].TANGGAL+"</td>"+
                           "<td style='text-align:center;'>"+result[i].INVOICE+"</td>"+
-                          "<td style='text-align:center;'>"+formatNumber(result[i].TOTAL)+"</td>"+
+                          "<td style='text-align:center;'>"+result[i].STATUS+"</td>"+
+                          "<td style='text-align:right;'>Rp. "+formatNumber(result[i].TOTAL)+"</td>"+
                           "<td style='text-align:center;'>"+result[i].NAMA_PEGAWAI+"</td>"+
                           "<td style='text-align:center;'>"+result[i].SHIFT+"</td>"+
-                          "<td><button class='btn btn-success btn-sm' type='button' onclick='klik_copy_resep("+result[i].ID_RAJAL+");'><i class='fa fa-print'></i> "+result[i].KODE_RESEP+"</button></td>"+
-                          "<td><button class='btn btn-info btn-sm' type='button' onclick='klik_print_poli("+result[i].ID_RAJAL+");'><i class='fa fa-print'></i> Print Poli</button></td>"+
                       "</tr>";
           }
       }
@@ -1417,6 +1416,7 @@ function simpan_closing_rajal(id_tutup){
   $("input[name='id_rajal[]']").each(function(idx, elm){
     var id_rajal = elm.value;
     var total_rajal = $('#total_semua_'+id_rajal).val();
+    var invoice = $('#id_invoice_'+id_rajal).val();
     var tipe = 1;
     $.ajax({
       url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing_rajal',
@@ -1426,7 +1426,8 @@ function simpan_closing_rajal(id_tutup){
         total_rajal:total_rajal,
         id_pegawai:id_pegawai,
         shift:shift,
-        id_tutup
+        id_tutup:id_tutup,
+        invoice:invoice
       },
       type : "POST",
       dataType : "json",
@@ -1443,6 +1444,7 @@ function simpan_closing_hv(id_tutup){
   $("input[name='id_hv[]']").each(function(idx, elm){
     var id_hv = elm.value;
     var total_hv = $('#total_semua_'+id_hv).val();
+    var invoice = $('#id_invoice_'+id_hv).val();
     var tipe = 2;
     $.ajax({
       url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing_hv',
@@ -1452,7 +1454,8 @@ function simpan_closing_hv(id_tutup){
         total_hv:total_hv,
         id_pegawai:id_pegawai,
         shift:shift,
-        id_tutup:id_tutup
+        id_tutup:id_tutup,
+        invoice:invoice
       },
       type : "POST",
       dataType : "json",
@@ -1469,6 +1472,7 @@ function simpan_closing_paket(id_tutup){
   $("input[name='id_paket[]']").each(function(idx, elm){
     var id_paket = elm.value;
     var total_paket = $('#total_semua_'+id_paket).val();
+    var invoice = $('#id_invoice_'+id_paket).val();
     var tipe = 3;
     $.ajax({
       url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing_paket',
@@ -1478,7 +1482,8 @@ function simpan_closing_paket(id_tutup){
         total_paket:total_paket,
         id_pegawai:id_pegawai,
         shift:shift,
-        id_tutup:id_tutup
+        id_tutup:id_tutup,
+        invoice:invoice
       },
       type : "POST",
       dataType : "json",
@@ -1649,15 +1654,19 @@ function get_pasien(){
 
                     var id_semua = '';
                     var total_semua = '';
+                    var invoice_semua = '';
                     if (result[i].TIPE == '1') {
                       id_semua = "<input type='hidden' value='"+result[i].ID_KASIR_RAJAL+"' name='id_rajal[]'>";
                       total_semua = "<input type='hidden' value='"+result[i].TOTAL+"' id='total_semua_"+result[i].ID_KASIR_RAJAL+"' name='total[]'>";
+                      invoice_semua = "<input type='hidden' value='"+result[i].INVOICE+"' id='id_invoice_"+result[i].ID_KASIR_RAJAL+"' name='invoice[]'>";
                     }else if (result[i].TIPE == '2') {
                       id_semua = "<input type='hidden' value='"+result[i].ID_HV+"' name='id_hv[]'>";
                       total_semua = "<input type='hidden' value='"+result[i].TOTAL+"' id='total_semua_"+result[i].ID_HV+"' name='total[]'>";
+                      invoice_semua = "<input type='hidden' value='"+result[i].INVOICE+"' id='id_invoice_"+result[i].ID_HV+"' name='invoice[]'>";
                     }else if (result[i].TIPE == '3') {
                       id_semua = "<input type='hidden' value='"+result[i].ID_PAKET+"' name='id_paket[]'>";
                       total_semua = "<input type='hidden' value='"+result[i].TOTAL+"' id='total_semua_"+result[i].ID_PAKET+"' name='total[]'>";
+                      invoice_semua = "<input type='hidden' value='"+result[i].INVOICE+"' id='id_invoice_"+result[i].ID_PAKET+"' name='invoice[]'>";
                     }
 
                     $tr += "<tr>"+
@@ -1665,6 +1674,7 @@ function get_pasien(){
                                 ""+id_semua+""+
                                 ""+total_semua+""+
                                 ""+no+""+
+                                ""+invoice_semua+""+
                                 "</td>"+
                                 "<td style='text-align:center;'>"+result[i].TANGGAL+"</td>"+
                                 "<td>"+result[i].NAMA+" "+status_bayar+"</td>"+
@@ -1877,9 +1887,11 @@ function hitung_total_resep(id){
  biaya_resep = biaya_resep.split(',').join('');
  var biaya_lab = $('#biaya_lab').val();
  biaya_lab = biaya_lab.split(',').join('');
+ var biaya_admin = 10000;
+ var biaya_reg = 20000;
 
- var tambah_setiap_biaya = parseFloat(biaya_poli) + parseFloat(biaya_tindakan) + parseFloat(biaya_resep) + parseFloat(biaya_lab);
- $('#grandtotal2').val(tambah_setiap_biaya);
+ var tambah_setiap_biaya = parseFloat(biaya_poli) + parseFloat(biaya_tindakan) + parseFloat(biaya_resep) + parseFloat(biaya_lab) + parseFloat(biaya_admin) + parseFloat(biaya_reg);
+ $('#grandtotal2').val(formatNumber(tambah_setiap_biaya));
 }
 
 function get_tindakan(id_pasien){
@@ -2218,6 +2230,7 @@ function get_pendapatan(){
   var shift = $('#shift').val();
   $.ajax({
     url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/get_pendapatan',
+    data : {shift:shift},
     type : "POST",
     dataType : "json",
     success : function(row){

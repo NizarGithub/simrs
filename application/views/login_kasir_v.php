@@ -8,7 +8,7 @@
 <head>
     <!-- BEGIN META SECTION -->
     <meta charset="utf-8">
-    <title>Pixit - Responsive Boostrap3 Admin</title>
+    <title>Login Kasir</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta content="" name="description" />
     <meta content="themes-lab" name="author" />
@@ -35,9 +35,7 @@
                         <img src="<?=base_url();?>picture/nurse.png" alt="Key icon">
                     </div>
                     <div class="login-logo">
-                        <a href="#?login-theme-3">
                             <img src="<?=base_url();?>picture/pharmacy-logo-clipart-1.jpg" style="width: 30%;">
-                        </a>
                     </div>
                     <hr>
                     <div class="login-form">
@@ -45,13 +43,14 @@
                         <div class="alert alert-danger hide">
                             <button type="button" class="close" data-dismiss="alert">×</button>
                             <h4>Error!</h4>
-                            Your Error Message goes here
+                            Password atau Username Salah
                         </div>
                         <!-- END ERROR BOX -->
-                        <form action="http://themes-lab.com/pixit/admin/index.html" method="post">
-                            <input type="text" placeholder="Username" class="input-field form-control" >
-                            <input type="password" placeholder="Password" class="input-field form-control"/>
-                            <button type="submit" class="btn btn-login" style="background-color: #ffffff; color: black;">Login</button>
+                        <form action="<?php echo base_url(); ?>login_kasir_c/login" method="post">
+                            <input type="text" placeholder="Username" name="username" class="input-field form-control">
+                            <input type="password" placeholder="Password" name="password" class="input-field form-control">
+                            <input type="number" placeholder="Shift" id="shift" name="shift" onkeyup="masuk_shift();" min="1" max="3" class="input-field form-control">
+                            <button type="submit" id="button_submit" class="btn btn-login" disabled='disabled' style="background-color: #ffffff; color: black;">Login</button>
                         </form>
                     </div>
                 </div>
@@ -69,5 +68,16 @@
     <script src="<?=base_url();?>kasir-apotek/assets/plugins/backstretch/backstretch.min.js"></script>
     <script src="<?=base_url();?>kasir-apotek/assets/js/account.js"></script>
     <!-- END PAGE LEVEL SCRIPTS -->
+    <script type="text/javascript">
+      function masuk_shift(){
+        var shift = $('#shift').val();
+        if (parseInt(shift) > 3) {
+          alert('Shift Tidak Ada');
+          $('#button_submit').attr('disabled','disabled');
+        }else {
+          $('#button_submit').removeAttr('disabled');
+        }
+      }
+    </script>
 </body>
 </html>
