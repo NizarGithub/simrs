@@ -1,6 +1,7 @@
 <?PHP
 $sess_user = $this->session->userdata('masuk_rs');
 $id_user = $sess_user['id'];  //ID PEGAWAI
+$shift = $sess_user['shift'];
 
 $user_detail = $this->model->get_user_detail($id_user);
 
@@ -65,7 +66,7 @@ $user_detail = $this->model->get_user_detail($id_user);
     <!-- BEGIN TOP MENU -->
     <input type="hidden" id="sts_edit" value="0" />
     <input type="hidden" id="sts_lunas" value="0" />
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="background-color: #F9A825; color: white;">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#sidebar">
@@ -74,11 +75,11 @@ $user_detail = $this->model->get_user_detail($id_user);
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a id="menu-medium" class="sidebar-toggle toggle_fullscreen tooltips">
+                <a id="menu-medium" class="sidebar-toggle toggle_fullscreen tooltips" style="color: white; border-right: 1px solid #ffffff;">
                     <i class="glyphicon glyphicon-fullscreen"></i>
                 </a>
             </div>
-            <div class="navbar-center"> Entry Penjualan HV / OTC</div>
+            <div class="navbar-center" style="color: white;"> Entry Penjualan HV / OTC</div>
             <div class="navbar-collapse collapse">
                 <!-- BEGIN TOP NAVIGATION MENU -->
                 <!-- <ul class="nav navbar-nav pull-right header-menu">
@@ -147,7 +148,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                             <div class="panel-body messages">
 															<form id="form_pembayaran">
 																<input type="hidden" name="id_pegawai" id="id_pegawai" value="<?php echo $id_user; ?>">
-																<input type="hidden" name="shift" id="shift" value="">
+																<input type="hidden" name="shift" id="shift" value="<?php echo $shift; ?>">
 																<input type="hidden" name="invoice" id="invoice" value="">
 																<input type="hidden" name="total_tagihan" id="total_tagihan">
                                 <div class="row">
@@ -208,7 +209,7 @@ $user_detail = $this->model->get_user_detail($id_user);
 		                                      </div>
 		                                  </div>
 		                                  <div class="panel-footer bg-blue">
-		                                      <h4><strong>Shift <b class="shift_user">0</b></strong></h4>
+		                                      <h4><strong>Shift <b class="shift_user"><?php echo $shift; ?></b></strong></h4>
 		                                      <p><?=$user_detail->NAMA;?></p>
 		                                  </div>
 		                              </div>
@@ -955,17 +956,6 @@ function startTime() {
     var t = setTimeout(startTime, 500);
     var jam = h+':'+m;
     console.log(jam);
-
-    if(h >= 7 && h < 14){
-        $('.shift_user').html('1');
-        $('#shift').val('1');
-    }else if(h >= 14 && h < 23){
-        $('.shift_user').html('2');
-        $('#shift').val('2');
-    }else{
-        $('.shift_user').html('3');
-        $('#shift').val('3');
-    }
 }
 
 function startNotifClosing() {
@@ -981,39 +971,39 @@ function startNotifClosing() {
     var jam = h+':'+m;
     console.log(jam);
 
-    if (jam == '13:45') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 15 menit lagi");
-      $('#notif_closing').click();
-      $('#btn_suara_closing').click();
-    }else if (jam == '13:50') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 10 menit lagi");
-      $('#notif_closing').click();
-      $('#btn_suara_closing').click();
-    }else if (jam == '13:55') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 5 menit lagi");
-      $('#notif_closing').click();
-      $('#btn_suara_closing').click();
-    }else if (jam == '20:45') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 15 menit lagi");
-      $('#notif_closing').click();
-      $('#btn_suara_closing').click();
-    }else if (jam == '20:50') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 10 menit lagi");
-      $('#notif_closing').click();
-      $('#btn_suara_closing').click();
-    }else if (jam == '20:55') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 5 menit lagi");
-      $('#notif_closing').click();
-      $('#btn_suara_closing').click();
-    }
-
-		if (((parseInt(h) >= 13 || parseInt(m) >= 45)) && ((parseInt(h) < 14 || parseInt(m) < 00))) {
-			$('#btn_closing_kasir_disabled').hide();
-      $('#btn_closing_kasir').show();
-    }else if (((parseInt(h) >= 20 || parseInt(m) >= 45)) && ((parseInt(h) < 21 || parseInt(m) < 00))) {
-			$('#btn_closing_kasir_disabled').hide();
-      $('#btn_closing_kasir').show();
-    }
+    // if (jam == '13:45') {
+    //   $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 15 menit lagi");
+    //   $('#notif_closing').click();
+    //   $('#btn_suara_closing').click();
+    // }else if (jam == '13:50') {
+    //   $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 10 menit lagi");
+    //   $('#notif_closing').click();
+    //   $('#btn_suara_closing').click();
+    // }else if (jam == '13:55') {
+    //   $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 5 menit lagi");
+    //   $('#notif_closing').click();
+    //   $('#btn_suara_closing').click();
+    // }else if (jam == '20:45') {
+    //   $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 15 menit lagi");
+    //   $('#notif_closing').click();
+    //   $('#btn_suara_closing').click();
+    // }else if (jam == '20:50') {
+    //   $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 10 menit lagi");
+    //   $('#notif_closing').click();
+    //   $('#btn_suara_closing').click();
+    // }else if (jam == '20:55') {
+    //   $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 5 menit lagi");
+    //   $('#notif_closing').click();
+    //   $('#btn_suara_closing').click();
+    // }
+		//
+		// if (((parseInt(h) >= 13 || parseInt(m) >= 45)) && ((parseInt(h) < 14 || parseInt(m) < 00))) {
+		// 	$('#btn_closing_kasir_disabled').hide();
+    //   $('#btn_closing_kasir').show();
+    // }else if (((parseInt(h) >= 20 || parseInt(m) >= 45)) && ((parseInt(h) < 21 || parseInt(m) < 00))) {
+		// 	$('#btn_closing_kasir_disabled').hide();
+    //   $('#btn_closing_kasir').show();
+    // }
 }
 
 function checkTime(i) {

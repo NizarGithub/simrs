@@ -140,7 +140,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                     </li> -->
 
                     <li style="margin-right: 25px;">
-                        <a href="<?=base_url();?>logout" style="color:#fff;">
+                        <a href="<?=base_url();?>logout_kasir" style="color:#fff;">
                             <i class="fa fa-power-off"></i> Logout
                         </a>
                     </li>
@@ -252,7 +252,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                       </div>
                                   </div>
                                   <div class="panel-footer bg-blue">
-                                      <h4><strong>Shift <b class="shift_user">0</b></strong></h4>
+                                      <h4><strong>Shift <b class="shift_user"><?php echo $shift; ?></b></strong></h4>
                                       <p><?=$user_detail->NAMA;?></p>
                                   </div>
                               </div>
@@ -268,7 +268,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                       </div>
                                   </div>
                                   <div class="panel-footer bg-blue">
-                                      <h4><strong>Shift <b class="shift_user">0</b></strong></h4>
+                                      <h4><strong>Shift <b class="shift_user"><?php echo $shift; ?></b></strong></h4>
                                       <p><?=$user_detail->NAMA;?></p>
                                   </div>
                               </div>
@@ -371,7 +371,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                     <input type="hidden" name="id_pasien" id="id_pasien" value="">
                     <input type="hidden" name="id_poli" id="id_poli" value="">
                     <input type="hidden" name="id_pegawai" id="id_pegawai" value="<?php echo $id_user; ?>">
-                    <input type="hidden" name="shift" id="shift" value="">
+                    <input type="hidden" name="shift" id="shift" value="<?php echo $shift; ?>">
                     <input type="hidden" name="tanggal" id="tanggal" value="<?php echo date('d-m-Y'); ?>">
                     <input type="hidden" name="waktu" id="waktu" value="">
                     <input type="hidden" name="jenis_pembayaran" id="jenis_pembayaran" value="">
@@ -790,7 +790,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                       <input type="hidden" name="invoice_penjualan" id="invoice_pj" value="">
                       <input type="hidden" name="jenis_bayar" id="jenis_bayar" value="">
                       <input type="hidden" name="id_pegawai" id="id_pegawai_pj" value="<?php echo $id_user; ?>">
-                      <input type="hidden" name="shift" id="shift_pj" value="">
+                      <input type="hidden" name="shift" id="shift_pj" value="<?php echo $shift; ?>">
                       <input type="hidden" name="tanggal" id="tanggal_pj" value="<?php echo date('d-m-Y'); ?>">
                       <input type="hidden" name="waktu" id="waktu_pj" value="">
                       <input type="hidden" name="tipe" id="tipe_pj" value="">
@@ -1506,20 +1506,6 @@ function startTime() {
     var t = setTimeout(startTime, 500);
     var jam = h+':'+m;
     // console.log(jam);
-
-    if(h >= 7 && h < 14){
-        $('.shift_user').html('1');
-        $('#shift').val('1');
-        $('#shift_pj').val('1');
-    }else if(h >= 14 && h < 23){
-        $('.shift_user').html('2');
-        $('#shift').val('2');
-        $('#shift_pj').val('2');
-    }else{
-        $('.shift_user').html('Tutup');
-        $('#shift').val('0');
-        $('#shift_pj').val('0');
-    }
 }
 
 function startNotifClosing() {
@@ -1537,27 +1523,27 @@ function startNotifClosing() {
     // console.log(jam);
 
     if (jam == '15:42') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 15 menit lagi");
+      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing kurang 15 menit lagi");
       $('#notif_closing').click();
       $('#btn_suara_closing').click();
     }else if (jam == '13:50') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 10 menit lagi");
+      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing kurang 10 menit lagi");
       $('#notif_closing').click();
       $('#btn_suara_closing').click();
     }else if (jam == '13:55') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 5 menit lagi");
+      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing kurang 5 menit lagi");
       $('#notif_closing').click();
       $('#btn_suara_closing').click();
     }else if (jam == '20:45') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 15 menit lagi");
+      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing kurang 15 menit lagi");
       $('#notif_closing').click();
       $('#btn_suara_closing').click();
     }else if (jam == '20:50') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 10 menit lagi");
+      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing kurang 10 menit lagi");
       $('#notif_closing').click();
       $('#btn_suara_closing').click();
     }else if (jam == '20:55') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 5 menit lagi");
+      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing kurang 5 menit lagi");
       $('#notif_closing').click();
       $('#btn_suara_closing').click();
     }
