@@ -77,7 +77,7 @@ class Login_kasir_c extends CI_Controller {
 
 		}else{
 			$this->session->set_flashdata('gagal','1');
-			redirect('login_c');
+			redirect('login_kasir_c');
 		}
 	}
 }

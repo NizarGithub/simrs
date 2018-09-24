@@ -123,7 +123,7 @@ class Ap_kasir_rajal_c extends CI_Controller {
 	function get_laborat(){
 		$id_pasien = $this->input->post('id_pasien');
 		$tanggal = date('d-m-Y');
-		$sql = "SELECT * FROM rk_laborat_rj WHERE ID_PASIEN = '$id_pasien'";
+		$sql = "SELECT * FROM rk_laborat_rj WHERE ID_PASIEN = '$id_pasien' AND TANGGAL = '$tanggal'";
 		$query = $this->db->query($sql);
 		$id_laborat = '';
 		$data = '';
@@ -349,8 +349,10 @@ class Ap_kasir_rajal_c extends CI_Controller {
 
 		if ($tipe == '2') {
 			$this->db->query("UPDATE ap_penjualan_obat_hv SET STS_BAYAR = '1' WHERE ID = '$id_penjualan'");
-		}else {
+		}elseif ($tipe == '3') {
 			$this->db->query("UPDATE ap_penjualan_obat_paket SET STS_BAYAR = '1' WHERE ID = '$id_penjualan'");
+		}elseif ($tipe == '4') {
+			$this->db->query("UPDATE rk_ri_resep SET STS_BAYAR = '1' WHERE ID = '$id_penjualan'");
 		}
 
 		$this->insert_kode();
@@ -370,6 +372,20 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		);
 
 		$this->load->view('apotek/pdf/ap_struk_resep_v',$data);
+	}
+
+	function struk_resep_ranap($id_rj){
+		// $id_rj = base64_decode($id);
+		$model = $this->model->struk_resep_ranap($id_rj);
+
+		$data = array(
+			'settitle' => 'Struk Resep',
+      		'filename' => date('dmY').'_struk_resep',
+			'title' => 'Struk Resep',
+			'row' => $model
+		);
+
+		$this->load->view('apotek/pdf/ap_struk_resep_ranap_v',$data);
 	}
 
 	function nota_poli($id_rj){
@@ -398,6 +414,20 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		);
 
 		$this->load->view('apotek/pdf/ap_struk_pembayaran_pdf_v',$data);
+	}
+
+	function struk_pembayaran_ranap($id_rj){
+		// $id_rj = base64_decode($id);
+		$model = $this->model->struk_pembayaran_ranap($id_rj);
+
+		$data = array(
+			'settitle' => 'Struk Pembayaran',
+      'filename' => date('dmY').'struk_pembayaran',
+			'title' => 'Struk Pembayaran',
+			'row' => $model
+		);
+
+		$this->load->view('apotek/pdf/ap_struk_pembayaran_ranap_pdf_v',$data);
 	}
 
 	function struk($invoice){
@@ -540,6 +570,26 @@ class Ap_kasir_rajal_c extends CI_Controller {
 			echo "1";
 	}
 
+	function simpan_closing_ranap(){
+			$id_semua = $this->input->post('id_ranap');
+			$total = $this->input->post('total_ranap');
+			$id_pegawai = $this->input->post('id_pegawai');
+			$shift = $this->input->post('shift');
+			$tanggal = date('d-m-Y');
+			$bulan = date('m');
+			$tahun = date('Y');
+			$invoice = $this->input->post('invoice');
+
+			$tz_object = new DateTimeZone('Asia/Jakarta');
+			$datetime = new DateTime();
+			$format = $datetime->setTimezone($tz_object);
+			$pukul = $format->format('H:i:s');
+
+			$id_tutup = $this->input->post('id_tutup');
+			$this->model->simpan_closing_ranap($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup, $invoice);
+			echo "1";
+	}
+
 	function data_pembayaran(){
 		$data = $this->model->data_pembayaran();
 		echo json_encode($data);
@@ -613,6 +663,12 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function get_ranap_by_id(){
+		$id = $this->input->post('id');
+		$data = $this->model->get_ranap_by_id($id);
+		echo json_encode($data);
+	}
+
 	function get_pendapatan(){
 		$tanggal = date('d-m-Y');
 		$shift = $this->input->post('shift');
@@ -625,6 +681,14 @@ class Ap_kasir_rajal_c extends CI_Controller {
 															 AND b.SHIFT = '$shift'
 															 AND b.STATUS_CLOSING = '0'
 														  ")->row_array();
+		$resep_ranap = $this->db->query("SELECT
+																		COUNT(a.ID) AS TOTAL_RESEP
+																		FROM rk_pembayaran_resep_ranap a
+																		LEFT JOIN rk_ri_resep b ON a.ID_RESEP_RANAP = b.ID
+																		WHERE b.TANGGAL = '$tanggal'
+																		AND a.SHIFT = '$shift'
+																		AND b.STATUS_CLOSING = '0'
+																		")->row_array();
 		$obat = $this->db->query("SELECT
 															a.*,
 															SUM(a.TOTAL) AS NILAI_OBAT,
@@ -648,6 +712,29 @@ class Ap_kasir_rajal_c extends CI_Controller {
 															AND a.SHIFT = '$shift'
 															AND a.STATUS_CLOSING = '0'
 														 ")->row_array();
+		$obat_ranap = $this->db->query("SELECT
+																		a.*,
+																		SUM(a.TOTAL) AS NILAI_OBAT,
+																		SUM(a.SERVICE) AS TOTAL_SERVICE
+																		FROM
+																		(SELECT
+																		a.HARGA,
+																		a.JUMLAH_BELI,
+																		a.TANGGAL,
+																		(a.HARGA * a.JUMLAH_BELI) AS TOTAL,
+																		a.SERVICE,
+																		c.SHIFT,
+																		b.STATUS_CLOSING
+																		FROM
+																		rk_ri_resep_detail a
+																		LEFT JOIN rk_ri_resep b ON a.ID_RESEP = b.ID
+																		LEFT JOIN rk_pembayaran_resep_ranap c ON b.ID = c.ID_RESEP_RANAP
+																		)
+																		a
+																		WHERE a.TANGGAL = '$tanggal'
+																		AND a.SHIFT = '$shift'
+																		AND a.STATUS_CLOSING = '0'
+																		")->row_array();
 		$hv = $this->db->query("SELECT
 														COUNT(a.ID) AS LEMBAR_HV,
 														SUM(a.TOTAL) AS NILAI_HV
@@ -658,16 +745,24 @@ class Ap_kasir_rajal_c extends CI_Controller {
 														AND a.SHIFT = '$shift'
 														AND b.STATUS_CLOSING = '0'
 														")->row_array();
+		$nilai_obat_rajal = $obat['NILAI_OBAT'];
+		$nilai_service_rajal = $obat['TOTAL_SERVICE'];
+		$nilai_obat_ranap = $obat_ranap['NILAI_OBAT'];
+		$nilai_service_ranap = $obat_ranap['TOTAL_SERVICE'];
 
-		$nilai_obat = $obat['NILAI_OBAT'];
-		$nilai_service = $obat['TOTAL_SERVICE'];
+		$nilai_obat = $nilai_obat_rajal + $nilai_obat_ranap;
+		$nilai_service = $nilai_service_rajal + $nilai_service_ranap;
 		$nilai_resep = $nilai_obat + $nilai_service;
 		$nilai_hv = $hv['NILAI_HV'];
 		$total = $nilai_resep + $nilai_hv;
 
-		$data['total_resep'] = $resep['TOTAL_RESEP'];
-		$data['nilai_obat'] = $obat['NILAI_OBAT'];
-		$data['total_service'] = $obat['TOTAL_SERVICE'];
+		$resep_rajal = $resep['TOTAL_RESEP'];
+		$resep_ranap = $resep['TOTAL_RESEP'];
+		$total_resep = $resep_rajal + $resep_ranap;
+
+		$data['total_resep'] = $total_resep;
+		$data['nilai_obat'] = $nilai_obat;
+		$data['total_service'] = $nilai_service;
 		$data['nilai_resep'] = $nilai_resep;
 		$data['lembar_hv'] = $hv['LEMBAR_HV'];
 		$data['nilai_hv'] = $hv['NILAI_HV'];

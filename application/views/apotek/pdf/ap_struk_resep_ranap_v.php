@@ -87,7 +87,7 @@ table{
 		<tr>
 			<td>Alergi / Obat :</td>
 			<td style="width: 175px;">&nbsp;</td>
-			<td><div class="square">&nbsp;&nbsp;&nbsp;&nbsp;</div>&nbsp; RANAP</td>
+			<td><div class="square">&nbsp;v&nbsp;&nbsp;</div>&nbsp; RANAP</td>
 		</tr>
 		<tr>
 			<td>
@@ -106,7 +106,7 @@ table{
          ?>
 			</td>
 			<td>&nbsp;</td>
-			<td><div class="square">&nbsp;v&nbsp;&nbsp;</div>&nbsp; RAJAL</td>
+			<td><div class="square">&nbsp;&nbsp;&nbsp;&nbsp;</div>&nbsp; RAJAL</td>
 		</tr>
 	</table>
 	<br>
@@ -182,9 +182,9 @@ table{
   <table>
     <tr>
       <td>Nama</td>
-      <td style="width: 43%;">: <?php echo $row['NAMA']; ?></td>
+      <td style="width: 43%;">: <?php echo $row['NAMA_PASIEN']; ?></td>
       <td>Umur / BB</td>
-      <td>: <?php echo $row['UMUR']; ?> Tahun / -</td>
+      <td>: <?php echo $row['UMUR_PASIEN']; ?> Tahun / -</td>
     </tr>
     <tr>
       <td>Alamat</td>

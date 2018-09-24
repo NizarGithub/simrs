@@ -138,12 +138,22 @@ function get_data_pegawai(id){
               $('#level option[value="Poli"]').attr('selected','selected');
             }else if(res.LEVEL == 'Laborat'){
               $('#level option[value="Laborat"]').attr('selected','selected');
+            }else if(res.LEVEL == 'Farmasi'){
+              $('#level option[value="Farmasi"]').attr('selected','selected');
+            }else if(res.LEVEL == 'Finance'){
+              $('#level option[value="Finance"]').attr('selected','selected');
+            }else if(res.LEVEL == 'Perawat'){
+              $('#level option[value="Perawat"]').attr('selected','selected');
+            }else if(res.LEVEL == 'Rekam Medik'){
+              $('#level option[value="Rekam Medik"]').attr('selected','selected');
             }else if(res.LEVEL == 'Kasir AA'){
               $('#level option[value="Kasir AA"]').attr('selected','selected');
             }else if(res.LEVEL == 'Kasir Rajal'){
               $('#level option[value="Kasir Rajal"]').attr('selected','selected');
             }else if(res.LEVEL == 'Kasir Ranap'){
               $('#level option[value="Kasir Ranap"]').attr('selected','selected');
+            }else if(res.LEVEL == 'Super Admin'){
+              $('#level option[value="Super Admin"]').attr('selected','selected');
             }
         }
     });
@@ -299,6 +309,7 @@ function cek_username_submit(){
                                     <option value="Farmasi">Farmasi</option>
                                     <option value="Finance">Finance</option>
                                     <option value="Perawat">Perawat</option>
+                                    <option value="Rekam Medik">Rekam Medik</option>
                                     <option value="Kasir AA">Kasir AA</option>
                                     <option value="Kasir Rajal">Kasir Rajal</option>
                                     <option value="Kasir Ranap">Kasir Ranap</option>

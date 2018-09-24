@@ -130,8 +130,7 @@ class Rk_home_m extends CI_Model {
 				JOIN rk_pasien PSN ON a.ID_PASIEN = PSN.ID
 			) b
 			WHERE $where
-			AND b.STS_LIHAT = '1'
-			AND b.TANGGAL = '$now'
+			ORDER BY b.ID DESC
 		";
 		$query = $this->db->query($sql);
 		return $query->result();

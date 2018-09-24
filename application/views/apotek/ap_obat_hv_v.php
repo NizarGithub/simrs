@@ -143,7 +143,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                 <span style="padding-bottom: 6px; padding-top: 6px;" class="label label-success" style="">
                                     Invoice : #<b id="invoice_txt"></b>
                                 </span>
-                                <button type="button" class="btn btn-danger btn-sm" onclick="window.location='<?=base_url();?>finance/kasir_ranap_c';">Reset</button>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="window.location='<?=base_url();?>apotek/ap_obat_hv_c';">Reset</button>
                             </div>
                             <div class="panel-body messages">
 															<form id="form_pembayaran">
@@ -215,7 +215,7 @@ $user_detail = $this->model->get_user_detail($id_user);
 		                              </div>
 		                          </div>
 
-															<div class="col-lg-2 col-md-2" id="btn_rekap_penjualan" style="cursor: pointer;">
+															<!-- <div class="col-lg-2 col-md-2" id="btn_rekap_penjualan" style="cursor: pointer;">
 																	<div class="panel panel-icon no-bd bg-green hover-effect">
 																			<div class="panel-body bg-green">
 																					<div class="row">
@@ -228,6 +228,23 @@ $user_detail = $this->model->get_user_detail($id_user);
 																			<div class="panel-footer bg-green">
 																					<h4><strong>Rekap Penjualan</strong></h4>
 																					<p>Hari, Bulan Dan Tahun</p>
+																			</div>
+																	</div>
+															</div> -->
+
+															<div class="col-lg-2 col-md-2">
+																	<div class="panel panel-icon no-bd bg-green hover-effect">
+																			<div class="panel-body bg-green">
+																					<div class="row">
+																							<div class="col-md-12">
+																									<div class="icon"><i class="fa fa-file-text"></i>
+																									</div>
+																							</div>
+																					</div>
+																			</div>
+																			<div class="panel-footer bg-green">
+																					<h4><strong>Penjualan</strong></h4>
+																					<p>Penjualan HV / OTC</p>
 																			</div>
 																	</div>
 															</div>
@@ -329,10 +346,10 @@ $user_detail = $this->model->get_user_detail($id_user);
                 <p>Cara penggunaan shortcut keys :</p>
                 <ul>
                     <li><strong>F1:</strong> Tampilkan Bantuan </li>
-                    <li><strong>F2:</strong> Pencarian obat berdasarkan Nama Obat</li>
+                    <!-- <li><strong>F2:</strong> Pencarian obat berdasarkan Nama Obat</li> -->
                     <!-- <li><strong>F3:</strong> Menampilkan data resi yang tersimpan </li>
                     <li><strong>F4:</strong> Simpan Resi </li> -->
-                    <li><strong>F5:</strong> Proses Pembayaran </li>
+                    <!-- <li><strong>F5:</strong> Proses Pembayaran </li> -->
                 </ul>
                 <button onclick="$('#modal-12').removeClass('md-show');" class="btn btn-default"> Tutup </button>
             </div>
@@ -749,7 +766,7 @@ function data_keranjang(){
 													'<input type="text" class="total_keranjang" name="total_keranjang_name[]" id="hidden_total_keranjang_'+res[i].ID+'" value="'+res[i].HARGA_OBAT+'">'+
 													'<input type="text" value="'+res[i].SERVICE+'" name="service[]">'+
 													'</td>'+
-													'<td style="padding-left: 0px; text-align: center;"><button class="btn btn-danger btn-sm" onclick="hapus_keranjang('+res[i].ID+');"><i class="fa fa-trash-o"></i></button></td>'+
+													'<td style="padding-left: 0px; text-align: center;"><button class="btn btn-danger btn-sm" type="button" onclick="hapus_keranjang('+res[i].ID+');"><i class="fa fa-trash-o"></i></button></td>'+
 												'</tr>';
 							}
 					}

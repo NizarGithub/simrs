@@ -1211,8 +1211,8 @@ function hitung_total_harga_beli(){
                 </div> -->
             </div>
             <div class="form-group">
-                <label class="col-md-1 control-label" style="text-align:left;">Urutkan</label>
-                <div class="col-md-6">
+                <!-- <label class="col-md-1 control-label" style="text-align:left;">Urutkan</label> -->
+                <!-- <div class="col-md-6">
                     <div class="radio radio-purple radio-inline">
                         <input type="radio" name="urutkan" value="Default" id="default" checked="checked">
                         <label for="default"> Default </label>
@@ -1229,7 +1229,7 @@ function hitung_total_harga_beli(){
                         <input type="radio" name="urutkan" value="Expired" id="urut_expired">
                         <label for="jenis"> Expired </label>
                     </div>
-                </div>
+                </div> -->
                 <div class="col-md-4 pull-right">
 	                <div class="input-group">
 	                    <input type="text" class="form-control" id="cari_obat" placeholder="Cari..." value="" onkeypress="return onEnterText(event);">

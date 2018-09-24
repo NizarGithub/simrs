@@ -10,9 +10,9 @@
 $(document).ready(function(){
     get_data_rm();
 
-    setInterval(function () {
-        get_data_rm();
-    }, 5000);
+    // setInterval(function () {
+    //     get_data_rm();
+    // }, 5000);
 
     toastr.options = {
       "closeButton": false,

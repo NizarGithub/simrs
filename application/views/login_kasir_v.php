@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<?PHP
+$base_url2 =  ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") ?  "https" : "http");
+$base_url2 .=  "://".$_SERVER['HTTP_HOST'];
+$base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT_NAME']);
+?>
 <!--[if lt IE 7]>      <html class="no-js sidebar-large lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js sidebar-large lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js sidebar-large lt-ie9"> <![endif]-->
@@ -23,13 +28,14 @@
     <link href="<?=base_url();?>kasir-apotek/assets/css/animate-custom.css" rel="stylesheet">
     <!-- END PAGE LEVEL STYLE -->
     <script src="<?=base_url();?>kasir-apotek/assets/plugins/modernizr/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+    <link rel="shortcut icon" href="<?php echo base_url(); ?>picture/11.ico">
 </head>
 
 <body class="login fade-in" data-page="login" style="background-image: url(<?php echo base_url();?>/picture/blur-hospital_1203-7957.jpg); background-size: cover;">
     <!-- BEGIN LOGIN BOX -->
     <div class="container">
         <div class="row">
-            <div class="col-sm-6 col-md-4 col-sm-offset-3 col-md-offset-4" style="opacity: 0.8;">
+            <div class="col-sm-6 col-md-4 col-sm-offset-3 col-md-offset-4" >
                 <div class="login-box clearfix animated flipInY" style="background-color: #02B25F;">
                     <div class="page-icon animated bounceInDown" style="background-color: #ffffff;">
                         <img src="<?=base_url();?>picture/nurse.png" alt="Key icon">
@@ -40,20 +46,25 @@
                     <hr>
                     <div class="login-form">
                         <!-- BEGIN ERROR BOX -->
-                        <div class="alert alert-danger hide">
-                            <button type="button" class="close" data-dismiss="alert">×</button>
-                            <h4>Error!</h4>
-                            Password atau Username Salah
-                        </div>
+                        <?PHP if($this->session->flashdata('gagal')){ ?>
+                          <div class="alert alert-danger">
+                              <button type="button" class="close" data-dismiss="alert">×</button>
+                              <h4>Error!</h4>
+                              Password atau Username Salah
+                          </div>
+                        <?PHP } ?>
                         <!-- END ERROR BOX -->
                         <form action="<?php echo base_url(); ?>login_kasir_c/login" method="post">
                             <input type="text" placeholder="Username" name="username" class="input-field form-control">
                             <input type="password" placeholder="Password" name="password" class="input-field form-control">
-                            <input type="number" placeholder="Shift" id="shift" name="shift" onkeyup="masuk_shift();" min="1" max="3" class="input-field form-control">
+                            <input type="text" placeholder="Shift" id="shift" name="shift" onkeyup="masuk_shift();" class="input-field form-control">
                             <button type="submit" id="button_submit" class="btn btn-login" disabled='disabled' style="background-color: #ffffff; color: black;">Login</button>
                         </form>
                     </div>
                 </div>
+                    <div style="width: 100%; margin-top: 4%;" class="animated flipInY">
+                        <span class="btn btn-facebook btn-block" style="cursor: default; background-color: #02B25F; color: white; font-size: 14px;">© 2018 Aplikasi Rumah Sakit</span>
+                    </div>
             </div>
         </div>
     </div>
@@ -74,7 +85,9 @@
         if (parseInt(shift) > 3) {
           alert('Shift Tidak Ada');
           $('#button_submit').attr('disabled','disabled');
-        }else {
+        }else if (shift == '' || shift == null) {
+          $('#button_submit').attr('disabled','disabled');
+        }else{
           $('#button_submit').removeAttr('disabled');
         }
       }

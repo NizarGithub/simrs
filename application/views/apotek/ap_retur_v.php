@@ -232,7 +232,7 @@ $user_detail = $this->model->get_user_detail($id_user);
 		                              </div>
 		                          </div>
 
-															<div class="col-lg-2 col-md-2" id="btn_rekap_penjualan" style="cursor: pointer;">
+															<!-- <div class="col-lg-2 col-md-2" id="btn_rekap_penjualan" style="cursor: pointer;">
 																	<div class="panel panel-icon no-bd bg-green hover-effect">
 																			<div class="panel-body bg-green">
 																					<div class="row">
@@ -245,6 +245,23 @@ $user_detail = $this->model->get_user_detail($id_user);
 																			<div class="panel-footer bg-green">
 																					<h4><strong>Rekap Penjualan</strong></h4>
 																					<p>Hari, Bulan Dan Tahun</p>
+																			</div>
+																	</div>
+															</div> -->
+
+															<div class="col-lg-2 col-md-2">
+																	<div class="panel panel-icon no-bd bg-green hover-effect">
+																			<div class="panel-body bg-green">
+																					<div class="row">
+																							<div class="col-md-12">
+																									<div class="icon"><i class="fa fa-file-text"></i>
+																									</div>
+																							</div>
+																					</div>
+																			</div>
+																			<div class="panel-footer bg-green">
+																					<h4><strong>Penjualan</strong></h4>
+																					<p>Entry Retur</p>
 																			</div>
 																	</div>
 															</div>
@@ -346,10 +363,10 @@ $user_detail = $this->model->get_user_detail($id_user);
                 <p>Cara penggunaan shortcut keys :</p>
                 <ul>
                     <li><strong>F1:</strong> Tampilkan Bantuan </li>
-                    <li><strong>F2:</strong> Pencarian obat berdasarkan Nama Obat</li>
+                    <!-- <li><strong>F2:</strong> Pencarian obat berdasarkan Nama Obat</li> -->
                     <!-- <li><strong>F3:</strong> Menampilkan data resi yang tersimpan </li>
                     <li><strong>F4:</strong> Simpan Resi </li> -->
-                    <li><strong>F5:</strong> Proses Pembayaran </li>
+                    <!-- <li><strong>F5:</strong> Proses Pembayaran </li> -->
                 </ul>
                 <button onclick="$('#modal-12').removeClass('md-show');" class="btn btn-default"> Tutup </button>
             </div>
@@ -640,7 +657,6 @@ $(document).ready(function(){
 	// $('#jumlah_tampil').change(function(){
   //       data_obat();
   //   });
-
 	$('#btn_klik_proses').click(function(){
 		$('#popup_konfirmasi').click();
 	});
@@ -1435,12 +1451,12 @@ function klik_resep(id){
                      '<td class="class_harbel" style="text-align:right;" id="harga_beli_'+res['res'][i].ID+'">'+
                      ''+formatNumber(res['res'][i].HARGA)+''+
                      '</td>'+
-                     '<td style="display:block;">'+
+                     '<td style="display:none;">'+
                      '<input type="text" value="'+res['res'][i].HARGA+'" id="hidden_harga_beli_'+res['res'][i].ID+'" name="harga_obat[]">'+
                      '<input type="text" class="total_keranjang" name="total_keranjang_name[]" id="hidden_total_keranjang_'+res['res'][i].ID+'" value="'+res['res'][i].HARGA+'">'+
 										 '<input type="text" class="harbel_def" name="total_normal[]" value="'+res['res'][i].HARGA+'" id="harga_beli_def_'+res['res'][i].ID+'" field="'+res['res'][i].ID+'">'+
                      '</td>'+
-                     '<td style="padding-left: 0px; text-align: center;"><button class="btn btn-danger btn-sm btn_hapus_row" onclick="hapus_row_keranjang(this);"><i class="fa fa-trash-o"></i></button></td>'+
+                     '<td style="padding-left: 0px; text-align: center;"><button class="btn btn-danger btn-sm btn_hapus_row" onclick="hapus_row_keranjang(this, '+res['res'][i].ID+');"><i class="fa fa-trash-o"></i></button></td>'+
                    '</tr>';
          }
      }
@@ -1456,9 +1472,22 @@ function klik_resep(id){
  $('#tutup_popup_resep').click();
 }
 
-function hapus_row_keranjang(btn){
+function hapus_row_keranjang(btn, id){
+		var total = $('#total_tagihan').val();
+		total = total.split(',').join('');
+
+		var harga_dipilih = $('#hidden_total_keranjang_'+id).val();
+		var jumlah = parseFloat(total) - parseFloat(harga_dipilih);
+
+		$('#tot_biaya_keranjang').html(formatNumber(jumlah));
+		$('#total_tagihan').val(formatNumber(jumlah));
+
 		var row = btn.parentNode.parentNode;
 	  row.parentNode.removeChild(row);
+
+		if (jumlah == '0') {
+			$('#btn_klik_proses').attr('disabled','disabled');
+		}
 }
 
 function satu_shift(){
@@ -1471,7 +1500,7 @@ function satu_shift(){
 	$("input[name='total_normal[]']").each(function(idx, elm){
 			var id = $(this).attr('field');
 			$('#hidden_total_keranjang_'+id).val(elm.value);
-			$('#harga_beli_'+id).html(elm.value);
+			$('#harga_beli_'+id).html(formatNumber(elm.value));
 			var tot = $('#hidden_total_keranjang_'+id).val(elm.value);
 			var t = tot.val();
 			// console.log(tot);

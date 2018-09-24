@@ -102,7 +102,7 @@ class Ap_gudang_obat_m extends CI_Model {
 		}
 
 		if($keyword != ""){
-			$where = $where." AND (NM_OBT.NAMA_OBAT LIKE '%$keyword' OR NM_OBT.BARCODE LIKE '%$keyword%' OR NM_OBT.KODE_OBAT LIKE '%$keyword%')";
+			$where = $where." AND (SUPLY.NAMA_SUPPLIER LIKE '%$keyword' OR FAKTUR.NO_FAKTUR LIKE '%$keyword%')";
 		}
 
 		$sql = "SELECT

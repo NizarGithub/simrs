@@ -39,6 +39,7 @@ class Ap_kasir_rajal_m extends CI_Model {
 							a.STS_CLOSING AS STATUS_CLOSING,
 							'' AS ID_HV,
 							'' AS ID_PAKET,
+							'' AS ID_RESEP_RANAP,
 							c.INVOICE
 						FROM admum_rawat_jalan a
 						LEFT JOIN rk_pasien b ON b.ID = a.ID_PASIEN
@@ -68,6 +69,7 @@ class Ap_kasir_rajal_m extends CI_Model {
 							a.STATUS_CLOSING,
 							a.ID AS ID_HV,
 							'' AS ID_PAKET,
+							'' AS ID_RESEP_RANAP,
 							a.INVOICE
 						FROM ap_penjualan_obat_hv a
 
@@ -91,10 +93,36 @@ class Ap_kasir_rajal_m extends CI_Model {
 							a.STATUS_CLOSING,
 							'' AS ID_HV,
 							a.ID AS ID_PAKET,
+							'' AS ID_RESEP_RANAP,
 							a.INVOICE
 						FROM ap_penjualan_obat_paket a
+
+						UNION ALL
+
+						SELECT
+							a.ID,
+							a.TANGGAL,
+							a.ID_PASIEN,
+							b.NAMA,
+							a.STS_BAYAR,
+							'' AS ID_KASIR_RAJAL,
+							'0' AS TOT_POLI,
+							'0' AS TOT_TDK,
+							'0' AS TOT_RESEP,
+							a.TOTAL AS TOT_TARIF,
+							'0' AS BIAYA_REG,
+							'0' AS BIAYA_ADMIN,
+							'Rawat Inap' AS STATUS,
+							'4' AS TIPE,
+							a.STATUS_CLOSING,
+							'' AS ID_HV,
+							'' AS ID_PAKET,
+							a.ID AS ID_RESEP_RANAP,
+							a.KODE_RESEP AS INVOICE
+						FROM rk_ri_resep a
+						LEFT JOIN rk_pasien b ON a.ID_PASIEN = b.ID
 						) a
-						WHERE $where
+						WHERE 1=1
 						AND a.TANGGAL = '$tanggal'
 						AND a.STATUS_CLOSING = '0'
 						ORDER BY a.ID DESC
@@ -490,7 +518,7 @@ class Ap_kasir_rajal_m extends CI_Model {
 
 				$this->db->query("UPDATE apotek_gudang_obat SET STOK = STOK - $jumlah_beli WHERE ID = '$id_gudang'");
 			}
-    }else {
+    }elseif ($tipe == '3') {
 			$data= array(
 				'ID_PENJUALAN_PAKET' => $id_penjualan,
 				'ID_PEGAWAI' => $id_pegawai,
@@ -515,6 +543,31 @@ class Ap_kasir_rajal_m extends CI_Model {
 
 				$this->db->query("UPDATE apotek_gudang_obat SET STOK = STOK - $jumlah_beli WHERE ID = '$id_gudang'");
 			}
+    }elseif ($tipe == '4') {
+			// $data= array(
+			// 	'ID_RESEP_RANAP' => $id_penjualan,
+			// 	'ID_PEGAWAI' => $id_pegawai,
+			// 	'SHIFT' => $shift,
+			// 	'TANGGAL' => $tanggal,
+			// 	'WAKTU' => $waktu,
+			// 	'TOTAL' => $total,
+			// 	'JENIS_PEMBAYARAN' => $jenis_pembayaran,
+			// 	'BAYAR' => $bayar,
+			// 	'KARTU_PROVIDER' => $kartu_provider,
+			// 	'NO_KARTU' => $no_kartu,
+			// 	'TAMBAHAN' => $tambahan,
+			// 	'KEMBALI' => $kembali
+			// );
+			//
+			// $this->db->insert('rk_pembayaran_resep_ranap', $data);
+			//
+			// $query = $this->db->query("SELECT * FROM rk_ri_resep_detail WHERE ID_RESEP = '$id_penjualan'")->result_array();
+			// foreach ($query as $q) {
+			// 	$id_gudang = $q['ID_OBAT'];
+			// 	$jumlah_beli = $q['JUMLAH_BELI'];
+			//
+			// 	$this->db->query("UPDATE apotek_gudang_obat SET STOK = STOK - $jumlah_beli WHERE ID = '$id_gudang'");
+			// }
     }
 	}
 
@@ -556,6 +609,26 @@ class Ap_kasir_rajal_m extends CI_Model {
 		return $sql->row_array();
 	}
 
+	function struk_resep_ranap($id_rj){
+		$sql = $this->db->query("SELECT
+														*,
+														a.ID AS ID_RESEP,
+														b.NAMA AS NAMA_PASIEN,
+														b.TELEPON AS TELEPON_PASIEN,
+														b.ALAMAT AS ALAMAT_PASIEN,
+														b.UMUR AS UMUR_PASIEN,
+														d.NAMA AS NAMA_PEGAWAI
+														FROM
+														rk_ri_resep a
+														LEFT JOIN rk_pasien b ON a.ID_PASIEN = b.ID
+														LEFT JOIN admum_rawat_inap c ON a.ID_PELAYANAN = c.ID
+														LEFT JOIN kepeg_pegawai d ON c.ID_DOKTER = d.ID
+														WHERE a.ID = '$id_rj'
+		");
+
+		return $sql->row_array();
+	}
+
 	function detail_resep($id_resep){
 		$sql = "SELECT
 							DET.ID,
@@ -566,7 +639,7 @@ class Ap_kasir_rajal_m extends CI_Model {
 							DET.HARGA,
 							DET.JUMLAH_BELI,
 							DET.SUBTOTAL
-						FROM rk_resep_detail_rj DET
+						FROM rk_ri_resep_detail DET
 						-- LEFT JOIN apotek_gudang_obat GD ON GD.ID = DET.ID_OBAT
 						LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = DET.ID_OBAT
 						WHERE DET.ID_RESEP = '$id_resep'
@@ -651,6 +724,28 @@ class Ap_kasir_rajal_m extends CI_Model {
 		);
 		$this->db->where('ID', $id_semua);
     $this->db->update('ap_penjualan_obat_paket', $data_update);
+	}
+
+	function simpan_closing_ranap($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup, $invoice){
+		$data = array(
+			'ID_TUTUP' => $id_tutup,
+			'ID_RANAP' => $id_semua,
+			'TANGGAL' => $tanggal,
+			'WAKTU' => $pukul,
+			'ID_PEGAWAI' => $id_pegawai,
+			'SHIFT' => $shift,
+			'TOTAL' => $total,
+			'INVOICE' => $invoice,
+			'STATUS' => 'Kasir Ranap'
+		);
+
+	  $this->db->insert('ap_tutup_kasir_rajal_detail', $data);
+
+		$data_update = array(
+			'STATUS_CLOSING' => 1
+		);
+		$this->db->where('ID', $id_semua);
+    $this->db->update('rk_ri_resep', $data_update);
 	}
 
 	function data_pembayaran(){
@@ -796,6 +891,31 @@ class Ap_kasir_rajal_m extends CI_Model {
 		return $sql->row_array();
 	}
 
+	function struk_pembayaran_ranap($id_rj){
+		$sql = $this->db->query("SELECT
+														a.TOTAL,
+														a.SHIFT,
+														a.TANGGAL,
+														a.ID_RESEP_RANAP AS ID_RESEP,
+														a.JENIS_PEMBAYARAN,
+														b.KODE_RESEP,
+														c.NAMA AS NAMA_PEGAWAI,
+														d.NAMA AS NAMA_PASIEN,
+														d.ALAMAT AS ALAMAT_PASIEN,
+														f.NAMA AS NAMA_DOKTER
+														FROM
+														rk_pembayaran_resep_ranap a
+														LEFT JOIN rk_ri_resep b ON a.ID_RESEP_RANAP = b.ID
+														LEFT JOIN kepeg_pegawai c ON a.ID_PEGAWAI = c.ID
+														LEFT JOIN rk_pasien d ON b.ID_PASIEN = d.ID
+														LEFT JOIN admum_rawat_inap e ON b.ID_PELAYANAN = e.ID
+														LEFT JOIN kepeg_pegawai f ON e.ID_DOKTER = f.ID
+														WHERE a.ID = '$id_rj'
+		");
+
+		return $sql->row_array();
+	}
+
 	function data_poli(){
 		$sql = $this->db->query("SELECT a.ID AS id_poli, a.NAMA AS nama_poli FROM admum_poli a");
 		return $sql->result_array();
@@ -876,6 +996,11 @@ class Ap_kasir_rajal_m extends CI_Model {
 
 	function get_paket_by_id($id){
 		$query = $this->db->query("SELECT * FROM ap_penjualan_obat_paket WHERE ID = '$id'");
+		return $query->row_array();
+	}
+
+	function get_ranap_by_id($id){
+		$query = $this->db->query("SELECT * FROM rk_ri_resep a LEFT JOIN rk_pasien b ON a.ID_PASIEN = b.ID WHERE a.ID = '$id'");
 		return $query->row_array();
 	}
 }
