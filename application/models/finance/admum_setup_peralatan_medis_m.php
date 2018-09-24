@@ -8,6 +8,12 @@ class Admum_setup_peralatan_medis_m extends CI_Model {
 		$this->load->database(); 
 	}
 
+	function data_kategori(){
+		$sql = "SELECT * FROM log_kategori";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
 	function data_merk($keyword){
 		$where = "1 = 1";
 
@@ -32,22 +38,19 @@ class Admum_setup_peralatan_medis_m extends CI_Model {
 		$where = "1 = 1";
 
 		if($keyword != ""){
-			$where = $where." AND (ALAT.NAMA_ALAT LIKE '%$keyword' OR ALAT.BARCODE LIKE '%$keyword%' OR ALAT.KODE_ALAT LIKE '%$keyword%')";
+			$where = $where." AND (a.NAMA_ALAT LIKE '%$keyword' OR a.KODE_ALAT LIKE '%$keyword%')";
 		}
 
 		$sql = "
 			SELECT 
-				ALAT.ID,
-				ALAT.KODE_ALAT,
-				ALAT.BARCODE,
-				ALAT.NAMA_ALAT,
-				ALAT.ID_MERK,
-				SUP.MERK,
-				ALAT.JENIS_ALAT
-			FROM admum_setup_peralatan_medis ALAT
-			LEFT JOIN admum_supplier_barang SUP ON SUP.ID = ALAT.ID_MERK
+				a.ID,
+				a.KODE_ALAT,
+				a.NAMA_ALAT,
+				b.NAMA_KATEGORI
+			FROM admum_setup_peralatan_medis a
+			LEFT JOIN log_kategori b ON b.ID = a.ID_KATEGORI
 			WHERE $where 
-			ORDER BY ALAT.ID DESC
+			ORDER BY a.ID DESC
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -71,20 +74,16 @@ class Admum_setup_peralatan_medis_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan($kode_alat,$barcode,$nama_alat,$merk,$jenis_alat){
+	function simpan($kode_alat,$nama_alat,$id_kategori){
 		$sql = "
 			INSERT INTO admum_setup_peralatan_medis(
 				KODE_ALAT,
-				BARCODE,
 				NAMA_ALAT,
-				ID_MERK,
-				JENIS_ALAT
+				ID_KATEGORI
 			) VALUES (
 				'$kode_alat',
-				'$barcode',
 				'$nama_alat',
-				'$merk',
-				'$jenis_alat'
+				'$id_kategori'
 			)
 		";
 		$this->db->query($sql);

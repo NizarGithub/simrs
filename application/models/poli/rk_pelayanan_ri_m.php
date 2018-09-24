@@ -69,22 +69,13 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				PEG.NAMA AS NAMA_DOKTER,
 				RI.ID_BED,
 				BED.NOMOR_BED,
-				IFNULL(KA.DIRAWAT_SELAMA,0) AS DIRAWAT_SELAMA,
-				RI.BIAYA_KAMAR_FIX,
-				a.TOTAL AS TOTAL_TINDAKAN,
-				b.BIAYA_VISITE,
-				IFNULL(c.TOTAL_TARIF,0) AS TOTAL_LAB,
-				d.TOTAL AS TOTAL_RESEP
+				IFNULL(KA.DIRAWAT_SELAMA,0) AS DIRAWAT_SELAMA
 			FROM admum_rawat_inap RI
 			LEFT JOIN rk_pasien PASIEN ON PASIEN.ID = RI.ID_PASIEN
 			LEFT JOIN admum_kamar_rawat_inap KRI ON KRI.ID = RI.ID_KAMAR
 			LEFT JOIN admum_bed_rawat_inap BED ON BED.ID = RI.ID_BED
 			LEFT JOIN kepeg_pegawai PEG ON PEG.ID = RI.ID_DOKTER
 			LEFT JOIN rk_ri_diagnosa KA ON KA.ID_PELAYANAN = RI.ID
-			LEFT JOIN rk_ri_tindakan a ON a.ID_PELAYANAN = RI.ID
-			LEFT JOIN rk_ri_visite b ON b.ID_PELAYANAN = RI.ID
-			LEFT JOIN rk_ri_laborat c ON c.ID_PELAYANAN = RI.ID
-			LEFT JOIN rk_ri_resep d ON d.ID_PELAYANAN = RI.ID
 			WHERE $where
 			AND RI.STS_TERIMA = '1'
 			ORDER BY RI.ID DESC
@@ -283,33 +274,46 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		return $query->row();
 	}
 
-	function data_tindakan($id_tindakan){
+	function data_tindakan($id_pelayanan){
 		$sql = "
 			SELECT
 				a.ID,
 				a.ID_PELAYANAN,
 				a.TANGGAL
 			FROM rk_ri_tindakan a
-			WHERE a.ID_PELAYANAN = '$id_tindakan'
+			WHERE a.ID_PELAYANAN = '$id_pelayanan'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function data_tindakan_id($id){
+		$sql = "
+			SELECT
+				a.ID,
+				a.ID_PELAYANAN,
+				a.TANGGAL
+			FROM rk_ri_tindakan a
+			WHERE a.ID = '$id'
 		";
 		$query = $this->db->query($sql);
 		return $query->row();
 	}
 
-	function data_tindakan_ri($id_tindakan,$tanggal){
+	function data_tindakan_ri($id_tindakan){
 		$sql = "
 			SELECT
 				DET.ID,
 				DET.TANGGAL,
 				DET.ID_TINDAKAN,
+				DET.ID_SETUP_TINDAKAN,
 				TDK.NAMA_TINDAKAN,
 				TDK.TARIF,
 				DET.JUMLAH,
 				DET.SUBTOTAL
 			FROM rk_ri_tindakan_detail DET
-			LEFT JOIN rk_ri_tindakan RI ON RI.ID = DET.ID_TINDAKAN
 			LEFT JOIN admum_setup_tindakan TDK ON TDK.ID = DET.ID_SETUP_TINDAKAN
-			WHERE RI.ID_PELAYANAN = '$id_tindakan'
+			WHERE DET.ID_TINDAKAN = '$id_tindakan'
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -965,7 +969,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_diagnosa($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$diagnosa,$tindakan,$dirawat_selama,$kondisi_akhir,$hari_ke){
+	function simpan_diagnosa($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$diagnosa,$tindakan){
 		$sql = "
 			INSERT INTO rk_ri_diagnosa(
 				ID_PELAYANAN,
@@ -974,10 +978,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				BULAN,
 				TAHUN,
 				DIAGNOSA,
-				TINDAKAN,
-				DIRAWAT_SELAMA,
-				KONDISI_AKHIR,
-				HARI_KE
+				TINDAKAN
 			) VALUES (
 				'$id_pelayanan',
 				'$id_pasien',
@@ -985,10 +986,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				'$bulan',
 				'$tahun',
 				'$diagnosa',
-				'$tindakan',
-				'$dirawat_selama',
-				'$kondisi_akhir',
-				'$hari_ke'
+				'$tindakan'
 			)
 		";
 		$this->db->query($sql);
@@ -1339,6 +1337,19 @@ class Rk_pelayanan_ri_m extends CI_Model {
 	}
 
 	//KONDISI AKHIR
+
+	function data_kondisi_akhir_id($id_pelayanan){
+		$sql = "
+			SELECT 
+				a.*,
+				b.TANGGAL_KELUAR
+			FROM rk_ri_kondisi_akhir a
+			JOIN admum_rawat_inap b ON b.ID = a.ID_PELAYANAN
+			WHERE a.ID_PELAYANAN = '$id_pelayanan'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
 
 	function simpan_ka($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$dirawat,$kondisi_akhir){
 		$sql = "

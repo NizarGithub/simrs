@@ -118,6 +118,30 @@
     display: none;
 }
 
+.loading_tabel_kmr{
+    z-index: 9999;
+    position: absolute;
+    left: 45%;
+    top: 40%;
+    display: none;
+}
+
+.loading_tabel_bed{
+    z-index: 9999;
+    position: absolute;
+    left: 45%;
+    top: 40%;
+    display: none;
+}
+
+.loading_tabel_dok{
+    z-index: 9999;
+    position: absolute;
+    left: 45%;
+    top: 40%;
+    display: none;
+}
+
 #popup_hapus_bed {
     width: 100%;
     height: 100%;

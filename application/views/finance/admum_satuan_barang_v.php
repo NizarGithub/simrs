@@ -204,11 +204,7 @@ function hapus_satuan(id){
             <div id="cardpills-1" class="tab-pane fade in active">
             	<form class="form-horizontal" role="form" action="<?php echo $url_cetak; ?>" target="_blank" method="post">
 		            <div class="form-group">
-		            	<div class="col-md-7">
-                			&nbsp;
-            			</div>
-		                <div class="col-md-4 pull-right">
-                            <button style="float: left; margin-right: 10px; margin-top: 12px;" type="submit" class="btn btn-success waves-effect w-md waves-light m-b-5"><i class="fa fa-file-text-o"></i> <b>Cetak Excel</b></button>
+		                <div class="col-md-12">
 			                <div class="input-group m-t-10">
 			                    <input type="text" class="form-control" id="cari_satuan" placeholder="Cari..." value="" onkeypress="return onEnterText(event);">
 			                    <span class="input-group-btn">
@@ -234,7 +230,6 @@ function hapus_satuan(id){
 		                        <th style="color:#fff; text-align:center;">Aksi</th>
 		                    </tr>
 		                </thead>
-
 		                <tbody>
 		                    
 		                </tbody>
@@ -248,7 +243,9 @@ function hapus_satuan(id){
                     </div>
                     <div class="form-group">
 		        		<div class="col-md-9">
-		        			&nbsp;
+		        			<!-- <button type="submit" class="btn btn-success waves-effect w-md waves-light">
+                                <i class="fa fa-file-text-o"></i> <b>Cetak Excel</b>
+                            </button> -->
 		        		</div>
                         <label class="col-md-2 control-label">Jumlah Tampil</label>
                         <div class="col-md-1 pull-right">

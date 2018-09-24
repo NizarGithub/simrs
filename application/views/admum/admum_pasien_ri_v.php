@@ -338,6 +338,7 @@ function klik_pasien(id){
 }
 
 function load_ruangan(){
+    $('.loading_tabel_kmr').show();
     var kelas = $('#kelas_kamar').val();
     var keyword = $('#cari_kamar').val();
 
@@ -364,24 +365,24 @@ function load_ruangan(){
                     var cash = 0;
                     var biaya_kamar = result[i].BIAYA;
 
-                    if((parseInt(now) >+ parseInt(delapan)) && (parseInt(now) <= parseInt(duabelas))){
-                        var limabelaspersen = (15 * parseFloat(biaya_kamar)) / 100;
-                        cash = parseFloat(biaya_kamar) + parseFloat(limabelaspersen);
+                    if((parseInt(now) >= parseInt(delapan)) && (parseInt(now) <= parseInt(duabelas))){
+                        cash = (15 * parseFloat(biaya_kamar)) / 100;
                     }else{
-                        cash = biaya_kamar;
+                        cash = cash;
                     }
 
                     $tr += "<tr style='cursor:pointer;' onclick='klik_ruangan("+result[i].ID+","+cash+");'>"+
                                 "<td style='text-align:center;'>"+no+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].KODE_KAMAR+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].KELAS+"</td>"+
-                                "<td style='text-align:right;'>"+formatNumber(cash)+"</td>"+
+                                "<td style='text-align:right;'>"+formatNumber(biaya_kamar)+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].VISITE_DOKTER+"</td>"+
                             "</tr>";
                 }
             }
 
             $('#tabel_kamar tbody').html($tr);
+            $('.loading_tabel_kmr').hide();
         }
     });
 
@@ -402,12 +403,14 @@ function klik_ruangan(id,cash){
             $('#id_ruangan').val(id);
             var txt = row['KODE_KAMAR']+' - '+row['KELAS']+' - '+row['VISITE_DOKTER'];
             $('#ruang_tujuan').val(txt);
-            $('#biaya').val(NumberToMoney(cash));
+            $('#biaya').val(formatNumber(row['BIAYA']));
+            $('#biaya_charge_kamar').val(formatNumber(cash));
         }
     });
 }
 
 function load_bed(){
+    $('.loading_tabel_bed').show();
     var id_kamar = $('#id_ruangan').val();
     var keyword = $('#cari_bed').val();
 
@@ -449,6 +452,7 @@ function load_bed(){
             }
 
             $('#tabel_bed tbody').html($tr);
+            $('.loading_tabel_bed').hide();
         }
     });
 
@@ -473,6 +477,7 @@ function klik_bed(id){
 }
 
 function load_dokter(){
+    $('.loading_tabel_dok').show();
     var keyword = $('#cari_dokter').val();
 
     $.ajax({
@@ -499,6 +504,7 @@ function load_dokter(){
             }
 
             $('#tabel_dokter tbody').html($tr);
+            $('.loading_tabel_dok').hide();
         }
     });
 
@@ -1178,6 +1184,7 @@ function Search_tgl_RI(tgl){
                             <div class="col-md-4">
                                 <div class="input-group">
                                     <input type="hidden" name="id_ruangan" id="id_ruangan" value="">
+                                    <input type="hidden" name="biaya_charge_kamar" id="biaya_charge_kamar" value="">
                                     <input type="text" class="form-control" id="ruang_tujuan" value="" required="required" readonly>
                                     <span class="input-group-btn">
                                         <button type="button" class="btn btn-danger btn_ruangan"><i class="fa fa-search"></i></button>
@@ -1387,6 +1394,9 @@ function Search_tgl_RI(tgl){
                         </div>
                     </div>
                 </form>
+                <div class="loading_tabel_kmr">
+                    <img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
+                </div>
                 <div class="table-responsive">
                     <div class="scroll-y">
                         <table class="table table-hover table-bordered" id="tabel_kamar">
@@ -1438,6 +1448,9 @@ function Search_tgl_RI(tgl){
                         </div>
                     </div>
                 </form>
+                <div class="loading_tabel_bed">
+                    <img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
+                </div>
                 <div class="table-responsive">
                     <div class="scroll-y">
                         <table class="table table-hover table-bordered" id="tabel_bed">
@@ -1598,6 +1611,9 @@ function Search_tgl_RI(tgl){
                         </div>
                     </div>
                 </form>
+                <div class="loading_tabel_dok">
+                    <img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
+                </div>
                 <div class="table-responsive">
                     <div class="scroll-y">
                         <table class="table table-hover table-bordered" id="tabel_dokter">

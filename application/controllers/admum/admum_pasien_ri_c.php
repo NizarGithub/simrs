@@ -181,10 +181,29 @@ class Admum_pasien_ri_c extends CI_Controller {
 		$id_kamar = $this->input->post('id_ruangan');
 		$id_bed = $this->input->post('id_bed');
 		$biaya_kamar = str_replace(',', '', $this->input->post('biaya'));
+		$biaya_charge = str_replace(',', '', $this->input->post('biaya_charge_kamar'));
 		$biaya_adm = str_replace(',', '', $this->input->post('biaya_adm'));
 
-		$this->model->simpan_ri($id_pasien,$tanggal_masuk,$waktu,$bulan,$tahun,$nama_pjawab,$telepon,$sistem_bayar,$asal_rujukan,$id_dokter,$id_asuransi,$kelas,$id_kamar,$id_bed,$biaya_kamar,$biaya_adm);
-		$this->model->update_stt_pakai($id_bed);
+		$this->model->simpan_ri(
+			$id_pasien,
+			$tanggal_masuk,
+			$waktu,
+			$bulan,
+			$tahun,
+			$nama_pjawab,
+			$telepon,
+			$sistem_bayar,
+			$asal_rujukan,
+			$id_dokter,
+			$id_asuransi,
+			$kelas,
+			$id_kamar,
+			$id_bed,
+			$biaya_kamar,
+			$biaya_charge,
+			$biaya_adm);
+
+		$this->model->update_stt_pakai($id_bed); //bed kamar
 		$id_ri = $this->db->insert_id();
 		$id_asuransi = $this->input->post('id_kerjasama');
 		$no_polis = $this->input->post('nomor_polis');

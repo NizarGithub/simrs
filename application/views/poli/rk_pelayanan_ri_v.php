@@ -224,6 +224,7 @@ function data_rawat_inap(){
 
 					result[i].WAKTU = result[i].WAKTU==null?"-":result[i].WAKTU;
 					result[i].JENIS_KELAMIN = result[i].JENIS_KELAMIN=="L"?"Laki - Laki":"Perempuan";
+					result[i].NAMA_DOKTER = result[i].NAMA_DOKTER==null?"-":result[i].NAMA_DOKTER;
 
 					var encodedString = Base64.encode(result[i].ID);
 					var aksi = '<a href="<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/tindakan_ri/'+encodedString+'" class="btn btn-success waves-effect waves-light btn-sm"><i class="fa fa-user-md"></i>&nbsp;Tindakan</a>';
@@ -231,9 +232,6 @@ function data_rawat_inap(){
 					var tgl_mrs = result[i].TANGGAL_MASUK;
 					var tgl_krs = '';
 					var sistem_bayar = '';
-
-					var biaya_kamar = parseFloat(result[i].BIAYA_KAMAR_FIX) * parseFloat(result[i].DIRAWAT_SELAMA);
-
 
 					if(result[i].TANGGAL_KELUAR == null && result[i].WAKTU_KELUAR == null){
 						tgl_krs = '-';
@@ -254,8 +252,8 @@ function data_rawat_inap(){
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_PASIEN+"</td>"+
 								"<td style='vertical-align:middle;'>"+result[i].NAMA_PASIEN+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].JENIS_KELAMIN+"</td>"+
-								"<td style='vertical-align:middle; text-align:center;'>"+kelas+"<br><span class='label label-primary'>"+result[i].VISITE_DOKTER+"</span></td>"+
-								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(biaya_kamar)+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+kelas+"</span></td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+result[i].VISITE_DOKTER+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].DIRAWAT_SELAMA+" Hari</td>"+
 								"<td style='vertical-align:middle;'>"+result[i].NAMA_DOKTER+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+sistem_bayar+"</td>"+
@@ -453,7 +451,7 @@ function onEnterText2(e){
 				                        <th style="color:#fff; text-align:center;">Nama</th>
 				                        <th style="color:#fff; text-align:center;">Jenis Kelamin</th>
 				                        <th style="color:#fff; text-align:center;">Kamar</th>
-				                        <th style="color:#fff; text-align:center;">Total</th>
+				                        <th style="color:#fff; text-align:center;">Status</th>
 				                        <th style="color:#fff; text-align:center;">Dirawat Selama</th>
 				                        <th style="color:#fff; text-align:center;">Dokter</th>
 				                        <th style="color:#fff; text-align:center;">Sistem Bayar</th>

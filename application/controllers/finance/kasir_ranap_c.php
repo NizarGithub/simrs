@@ -107,6 +107,18 @@ class Kasir_ranap_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function get_tindakan_detail(){
+		$id_tindakan = $this->input->post('id_tindakan');
+		$data = $this->model->get_tindakan_det($id_tindakan);
+		echo json_encode($data);
+	}
+
+	function get_visite(){
+		$id_ri = $this->input->post('id_ri');
+		$data = $this->model->get_visite($id_ri);
+		echo json_encode($data);
+	}
+
 	function get_resep(){
 		$id_ri = $this->input->post('id_ri');
 		$data = $this->model->get_resep($id_ri);
@@ -115,7 +127,10 @@ class Kasir_ranap_c extends CI_Controller {
 
 	function get_kamar(){
 		$id_ri = $this->input->post('id_ri');
-		$data = $this->model->get_kamar($id_ri);
+		$data['charge'] = $this->model->get_biaya_charge_kamar($id_ri);
+		$data['jasa'] = $this->model->get_biaya_jasa_sarana($id_ri);
+		$data['adm'] = $this->model->get_biaya_admin($id_ri);
+		$data['dt'] = $this->model->get_kamar($id_ri);
 		echo json_encode($data);
 	}
 
@@ -167,10 +182,18 @@ class Kasir_ranap_c extends CI_Controller {
 
 	function cetak($id){
 		$data0 = $this->model->data_rawat_inap_id($id);
-		$data1 = $this->model->data_cetak_ri($id);
-		$data2 = $this->model->get_tindakan($id);
-		$data3 = $this->model->get_lab($id);
-		$data4 = $this->model->get_resep($id);
+		$data1 = $this->model->get_biaya_charge_kamar($id);
+		$data2 = $this->model->data_cetak_biaya_kamar($id);
+		$data3 = $this->model->get_visite($id);
+		$data4 = $this->model->get_biaya_jasa_sarana($id);
+		$data5 = $this->model->data_cetak_tindakan($id);
+		$data6 = $this->model->data_cetak_resep($id);
+		$data7 = $this->model->data_cetak_lab($id);
+		$data8 = $this->model->data_cetak_invoice($id);
+
+		$sess_user = $this->session->userdata('masuk_rs');
+		$id_user = $sess_user['id'];
+		$data9 = $this->model->get_user_detail($id_user);
 
 		$data = array(
 			'settitle' => 'Pelayanan Rawat Inap',
@@ -180,7 +203,12 @@ class Kasir_ranap_c extends CI_Controller {
 			'data1' => $data1,
 			'data2' => $data2,
 			'data3' => $data3,
-			'data4' => $data4
+			'data4' => $data4,
+			'data5' => $data5,
+			'data6' => $data6,
+			'data7' => $data7,
+			'data8' => $data8,
+			'data9' => $data9
 		);
 
 		$this->load->view('finance/cetak_rawat_inap_pdf_v',$data);

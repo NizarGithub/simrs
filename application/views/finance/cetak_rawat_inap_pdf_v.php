@@ -31,6 +31,11 @@ ob_start();
     font-size: 10px;
     border: 1px solid black;
 }
+.footer{
+    position:absolute;
+    left:0;
+    bottom:0;
+}
 </style>
 
 <?php
@@ -104,32 +109,48 @@ function romanic_number($integer, $upcase = true) {
 
     return $return; 
 }
+
+function terbilang($a) {
+    $ambil = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
+    if ($a < 12)
+        return " " . $ambil[$a];
+    elseif ($a < 20)
+        return Terbilang($a - 10) . "Belas";
+    elseif ($a < 100)
+        return Terbilang($a / 10) . " Puluh" . Terbilang($a % 10);
+    elseif ($a < 200)
+        return " Seratus" . Terbilang($a - 100);
+    elseif ($a < 1000)
+        return Terbilang($a / 100) . " Ratus" . Terbilang($a % 100);
+    elseif ($a < 2000)
+        return " Seribu" . Terbilang($a - 1000);
+    elseif ($a < 1000000)
+        return Terbilang($a / 1000) . " Ribu" . Terbilang($a % 1000);
+    elseif ($a < 1000000000)
+        return Terbilang($a / 1000000) . " Juta" . Terbilang($a % 1000000);
+}
+
+$sql = "SELECT * FROM admum_setup_logo WHERE ID = '1'";
+$qry = $this->db->query($sql);
+$row = $qry->row();
+$logo = $row->LOGO;
 ?>
 
 <table align="left">
-	<tr>
-		<td rowspan="7">
-			<img src="<?php echo base_url(); ?>picture/Indonesian_Red_Cross_Society_logo.png" style="width:75px; height:75px; margin-top: 80px; margin-right: 15px;">
-		</td>
-	</tr>
     <tr>
-      <td style="text-align:center; font-weight: bold; width: 100%;">Nama RS</td>
-    </tr>
-    <tr>
-      <td style="text-align:center; font-size: 13px; width: 100%;">Alamat</td>
-    </tr>
-    <tr>
-      <td style="text-align:center; width: 100%;">S I D O A R J O</td>
-    </tr>
-    <tr>
-      <td style="text-align:center; font-size: 12px; width: 100%;">Telepon</td>
-    </tr>
-    <tr>
-      <td style="text-align:center; font-size: 12px; width: 100%;">No Ijin</td>
+        <td style="padding-top: 0px;">
+            <img src="<?php echo base_url(); ?>picture/logo/<?php echo $logo; ?>" style="width: 70px; height: 70px;">
+        </td>
+        <td style="vertical-align: bottom;">
+            <b><?php echo $row->NAMA; ?></b><br>
+            <p style="font-size: 11px;">
+            <?php echo $row->ALAMAT; ?><br>
+            Telp. (031) <?php echo $row->TELEPON; ?>, Fax (031) <?php echo $row->FAX; ?>
+            </p>
+        </td>
     </tr>
 </table>
 
-<br/>
 <hr>
 <br/>
 
@@ -174,7 +195,7 @@ function romanic_number($integer, $upcase = true) {
 <br/>
 
 <table align="left" class="tabel">
-    <tbody>
+    <thead>
         <tr>
             <th>KETERANGAN</th>
             <th>KELAS</th>
@@ -182,109 +203,199 @@ function romanic_number($integer, $upcase = true) {
             <th>BIAYA</th>
             <th>JUMLAH</th>
         </tr>
-    <?php
-        $jumlah = 0;
-        $jasa = 0;
-        $visite = 0;
-        $tarif_tdk = 0;
-        $tarif_lab = 0;
-        $tarif_resep = 0;
-        $biaya_reg = 0;
-
-        foreach ($data1 as $key => $val1) {
-           $nomor = substr($val1->KELAS, 0,1);
-           $huruf = substr($val1->KELAS, -1);
-           $kelas = romanic_number($nomor)." ".$huruf;
-           $jumlah = $val1->DIRAWAT_SELAMA * $val1->BIAYA;
-           $jasa = $val1->JASA_SARANA;
-           $visite = $val1->BIAYA_VISITE;
-           $biaya_reg = $val1->BIAYA_REG;
-    ?>
+    </thead>
+    <tbody>
+        <?php
+            $biaya_charge = $data1->BIAYA_CHARGE_KAMAR;
+            $biaya_visite = 0;
+            $jasa_sarana = $data4->JASA_SARANA;
+            $biaya_tindakan = 0;
+            $biaya_resep = $data6->TOTAL;
+            $biaya_lab = 0;
+            $biaya_admin = $data0->BIAYA_REG;
+        ?>
+        <?php if($data1->BIAYA_CHARGE_KAMAR > 0){ ?>
+        <tr>
+            <td style="width: 300px;">Kamar Rawat Inap Charge 15% (08:00 - 11:59)</td>
+            <td style="width:80px;">&nbsp;</td>
+            <td style="width:80px;">&nbsp;</td>
+            <td style="width:90px; text-align: right"><?php echo number_format($data1->BIAYA_KAMAR_FIX,0,',','.'); ?></td>
+            <td style="width:90px; text-align: right;"><?php echo number_format($data1->BIAYA_CHARGE_KAMAR,0,',','.'); ?></td>
+        </tr>
+        <?php } ?>
         <tr>
             <td style="width: 300px;">Kamar Rawat Inap</td>
-            <td style="width:80px; text-align: center;"><?php echo $kelas; ?></td>
-            <td style="width:80px; text-align: center;"><?php echo $val1->DIRAWAT_SELAMA; ?></td>
-            <td style="width:90px; text-align: right;"><?php echo number_format($val1->BIAYA,0,',','.'); ?></td>
-            <td style="width:90px; text-align: right;"><?php echo number_format($jumlah,0,',','.'); ?></td>
+            <td style="width:80px; text-align: center;"><?php echo $data2->KELAS; ?></td>
+            <td style="width:80px; text-align: center;"><?php echo $data2->DIRAWAT_SELAMA; ?></td>
+            <td style="width:90px; text-align: right"><?php echo number_format($data2->BIAYA_KAMAR_FIX,0,',','.'); ?></td>
+            <td style="width:90px; text-align: right;">
+                <?php 
+                    $biaya_kamar = $data2->BIAYA_KAMAR_FIX;
+                    $dirawat = $data2->DIRAWAT_SELAMA;
+                    $total_biaya_kamar = $biaya_kamar * $dirawat;
+                    echo number_format($total_biaya_kamar,0,',','.'); 
+                ?>
+            </td>
         </tr>
+        <?php
+            foreach ($data3 as $val3) {
+                $biaya_visite += $val3->BIAYA_VISITE;
+        ?>
+        <tr>
+            <td style="width: 300px;">Visite Dokter Tgl <?php echo formatTanggal($val3->TANGGAL); ?></td>
+            <td style="width:80px;">&nbsp;</td>
+            <td style="width:80px;">&nbsp;</td>
+            <td style="width:90px; text-align: right"><?php echo number_format($val3->BIAYA_VISITE,0,',','.'); ?></td>
+            <td style="width:90px; text-align: right;"><?php echo number_format($val3->BIAYA_VISITE,0,',','.'); ?></td>
+        </tr>
+        <?php
+            }
+        ?>
         <tr>
             <td style="width: 300px;">Jasa Sarana RS</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td style="width:90px; text-align: right;"><?php echo number_format($jasa,0,',','.'); ?></td>
-            <td style="width:90px; text-align: right;"><?php echo number_format($jasa,0,',','.'); ?></td>
+            <td style="width:80px;">&nbsp;</td>
+            <td style="width:80px;">&nbsp;</td>
+            <td style="width:90px; text-align: right"><?php echo number_format($data4->JASA_SARANA,0,',','.'); ?></td>
+            <td style="width:90px; text-align: right;"><?php echo number_format($data4->JASA_SARANA,0,',','.'); ?></td>
         </tr>
-        <tr>
-            <td style="width: 300px;">Visite Dokter</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td style="width:90px; text-align: right;"><?php echo number_format($visite,0,',','.'); ?></td>
-            <td style="width:90px; text-align: right;"><?php echo number_format($visite,0,',','.'); ?></td>
-        </tr>
-    <?php  
-        }
-    ?>
-    <?php
-        foreach ($data2 as $key => $val2) {
-            $tarif_tdk += $val2->TARIF;
-    ?>
-        <tr>
-            <td><?php echo $val2->NAMA_TINDAKAN; ?></td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td style="text-align: right;"><?php echo number_format($val2->TARIF,0,',','.'); ?></td>
-            <td style="text-align: right;"><?php echo number_format($val2->TARIF,0,',','.'); ?></td>
-        </tr>
-    <?php
-        }
-    ?>
-    <?php
-        foreach ($data3 as $key => $val3) {
-            $tarif_lab += $val3->SUBTOTAL;
-    ?>
-        <tr>
-            <td><?php echo $val3->NAMA_PEMERIKSAAN; ?></td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td style="text-align: right;"><?php echo number_format($val3->SUBTOTAL,0,',','.'); ?></td>
-            <td style="text-align: right;"><?php echo number_format($val3->SUBTOTAL,0,',','.'); ?></td>
-        </tr>
-    <?php
-        } 
-    ?>
-    <?php
-        foreach ($data4 as $key => $val4) {
-            $tarif_resep += $val4->SUBTOTAL;
-    ?>
-        <tr>
-            <td><?php echo $val4->NAMA_OBAT; ?></td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td style="text-align: right;"><?php echo number_format($val4->SUBTOTAL,0,',','.'); ?></td>
-            <td style="text-align: right;"><?php echo number_format($val4->SUBTOTAL,0,',','.'); ?></td>
-        </tr>
-    <?php
-        }
-    ?>
-        <tr>
-            <td>Administrasi</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-            <td style="text-align: right;"><?php echo number_format($biaya_reg,0,',','.'); ?></td>
-        </tr>
-    <tr>
-        <td colspan="4" style="text-align: right;">Subtotal</td>
         <?php
-        $subtotal = $jumlah + $jasa + $visite + $tarif_tdk + $tarif_lab + $tarif_resep + $biaya_reg;
+            foreach ($data5 as $val5) {
+                $biaya_tindakan += $val5->TOTAL;
         ?>
-        <td style="text-align: right;">
-            <?php echo number_format($subtotal,0,',','.'); ?>    
-        </td>
-    </tr>
+        <tr>
+            <td style="width: 300px;"><?php echo $val5->NAMA_TINDAKAN; ?></td>
+            <td style="width:80px;">&nbsp;</td>
+            <td style="width:80px; text-align: center;"><?php echo $val5->JUMLAH; ?></td>
+            <td style="width:90px; text-align: right"><?php echo number_format($val5->HARGA,0,',','.'); ?></td>
+            <td style="width:90px; text-align: right;"><?php echo number_format($val5->TOTAL,0,',','.'); ?></td>
+        </tr>
+        <?php
+            }
+        ?>
+        <tr>
+            <td style="width: 300px;">Biaya Obat - Obatan</td>
+            <td style="width:80px;">&nbsp;</td>
+            <td style="width:80px;">&nbsp;</td>
+            <td style="width:90px; text-align: right"><?php echo number_format($data6->TOTAL,0,',','.'); ?></td>
+            <td style="width:90px; text-align: right;"><?php echo number_format($data6->TOTAL,0,',','.'); ?></td>
+        </tr>
+        <tr>
+            <td colspan="5">Pemeriksaan Laborat :</td>
+        </tr>
+        <?php
+            foreach ($data7 as $val7) {
+                $biaya_lab += $val7->SUBTOTAL;
+        ?>
+        <tr>
+            <td style="width: 300px;">- <?php echo $val7->NAMA_PEMERIKSAAN; ?></td>
+            <td style="width:80px;">&nbsp;</td>
+            <td style="width:80px;">&nbsp;</td>
+            <td style="width:90px; text-align: right"><?php echo number_format($val7->SUBTOTAL,0,',','.'); ?></td>
+            <td style="width:90px; text-align: right;"><?php echo number_format($val7->SUBTOTAL,0,',','.'); ?></td>
+        </tr>
+        <?php
+            }
+        ?>
+        <tr>
+            <td style="width: 300px;">Administrasi</td>
+            <td style="width:80px;">&nbsp;</td>
+            <td style="width:80px;">&nbsp;</td>
+            <td style="width: 90px; text-align: right;"><?php echo number_format($data0->BIAYA_REG,0,',','.'); ?></td>
+            <td style="width: 90px; text-align: right;"><?php echo number_format($data0->BIAYA_REG,0,',','.'); ?></td>
+        </tr>
+        <tr>
+            <td colspan="3">Titipan Uang</td>
+            <td style="width: 90px; text-align: right;">Sub Total Rp</td>
+            <td style="width: 90px; text-align: right;">
+                <?php 
+                    $subtotal = $biaya_charge + $total_biaya_kamar + $biaya_visite + $jasa_sarana + $biaya_tindakan + $biaya_resep + $biaya_lab + $biaya_admin;
+                    echo number_format($subtotal,0,',','.');
+                ?>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 300px;">Kurang Bayar</td>
+            <td colspan="2" style="text-align: right;"><?php echo number_format($subtotal,0,',','.'); ?></td>
+            <td style="width: 90px; text-align: right;">Discount Rp</td>
+            <td style="width: 90px; text-align: right;">0</td>
+        </tr>
+        <tr>
+            <td colspan="3">&nbsp;</td>
+            <td style="width: 90px; text-align: right;">Total Rp</td>
+            <td style="width: 90px; text-align: right;"><?php echo number_format($subtotal,0,',','.'); ?></td>
+        </tr>
     </tbody>
 </table>
 
+<br>
+
+<table align="left">
+    <tr>
+        <td style="vertical-align: bottom;">
+            <b><?php echo $row->NAMA; ?></b><br>
+            <p style="font-size: 11px;">
+            <?php echo $row->ALAMAT; ?><br>
+            Telp. (031) <?php echo $row->TELEPON; ?>, Fax (031) <?php echo $row->FAX; ?>
+            </p>
+        </td>
+    </tr>
+</table>
+
+<br>
+
+<table align="center">
+    <tr>
+        <td style="text-align: center;">KWITANSI</td>
+    </tr>
+</table>
+
+<br>
+
+<table align="right">
+    <tr>
+        <td>No Kwitansi :</td>
+        <td><?php echo $data8->INVOICE; ?></td>
+    </tr>
+</table>
+
+<br>
+
+<table align="left">
+    <tr>
+        <td>Sudah Terima dari</td>
+        <td>: <?php echo $data0->NAMA_PASIEN; ?></td>
+    </tr>
+    <tr>
+        <td>Alamat</td>
+        <td>: <?php echo $data0->ALAMAT; ?></td>
+    </tr>
+    <tr>
+        <td>Sejumlah</td>
+        <td>: <?php echo terbilang($subtotal); ?> Rupiah</td>
+    </tr>
+    <tr>
+        <td>Untuk Pembayaran</td>
+        <td>: Rincian Perawatan Pasien <b>An. <?php echo $data0->NAMA_PASIEN; ?></b></td>
+    </tr>
+</table>
+
+<div class="footer">
+    <table align="right">
+        <tr>
+            <td style="text-align:center; width:200px;">
+                Sepanjang, <?php echo formatTanggal(date('d-m-Y')); ?>
+            </td>
+        </tr>
+        <tr>
+            <td style="height:50px; width:200px;">&nbsp;</td>
+        </tr>
+        <tr>
+            <td style="text-align:center; width:200px;">
+                <?php echo $data9->NAMA; ?><br>(Cashier)
+            </td>
+        </tr>
+    </table>
+</div>
 <?PHP
     //----ukuran kertas dalam inch----//
     // custom

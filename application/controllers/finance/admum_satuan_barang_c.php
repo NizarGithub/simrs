@@ -53,7 +53,6 @@ class Admum_satuan_barang_c extends CI_Controller {
 				COUNT(*) AS TOTAL 
 			FROM nomor 
 			WHERE KETERANGAN = '$keterangan'
-			AND TAHUN = '$tahun'
 		";
 		$qry = $this->db->query($sql);
 		$total = $qry->row()->TOTAL;
@@ -62,13 +61,13 @@ class Admum_satuan_barang_c extends CI_Controller {
 		//OBT-001/2016
 		if($total == 0){
 			$no = $this->add_leading_zero(1,3);
-			$kode = "BRG-".$no."/".$tahun;
+			$kode = $no;
 		}else{
-			$s = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan' AND TAHUN = '$tahun'";
+			$s = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan'";
 			$q = $this->db->query($s)->row();
 			$next = $q->NEXT+1;
 			$no = $this->add_leading_zero($next,3);
-			$kode = "BRG-".$no."/".$tahun;
+			$kode = $no;
 		}
 
 		echo json_encode($kode);
@@ -83,14 +82,13 @@ class Admum_satuan_barang_c extends CI_Controller {
 				COUNT(*) AS TOTAL 
 			FROM nomor 
 			WHERE KETERANGAN = '$keterangan'
-			AND TAHUN = '$tahun'
 		";
 		$total = $this->db->query($sql_cek)->row()->TOTAL;
 
 		if($total == 0){
 			$this->db->query("INSERT INTO nomor(NEXT,KETERANGAN,TAHUN) VALUES ('1','$keterangan','$tahun')");
 		}else{
-			$sql = "SELECT * FROM nomor WHERE TAHUN = '$tahun' AND KETERANGAN = '$keterangan'";
+			$sql = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan'";
 			$query = $this->db->query($sql)->row();
 			$next = $query->NEXT+1;
 			$id = $query->ID;

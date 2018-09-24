@@ -188,7 +188,25 @@ class Admum_pasien_ri_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_ri($id_pasien,$tanggal_masuk,$waktu,$bulan,$tahun,$nama_pjawab,$telepon,$sistem_bayar,$asal_rujukan,$id_dokter,$id_asuransi,$kelas,$id_kamar,$id_bed,$biaya_kamar,$biaya_adm){
+	function simpan_ri(
+		$id_pasien,
+		$tanggal_masuk,
+		$waktu,
+		$bulan,
+		$tahun,
+		$nama_pjawab,
+		$telepon,
+		$sistem_bayar,
+		$asal_rujukan,
+		$id_dokter,
+		$id_asuransi,
+		$kelas,
+		$id_kamar,
+		$id_bed,
+		$biaya_kamar,
+		$biaya_charge,
+		$biaya_adm){
+		
 		$sql = "
 			INSERT INTO admum_rawat_inap(
 				ID_PASIEN,
@@ -206,6 +224,7 @@ class Admum_pasien_ri_m extends CI_Model {
 				ID_KAMAR,
 				ID_BED,
 				BIAYA_KAMAR_FIX,
+				BIAYA_CHARGE_KAMAR,
 				BIAYA_REG
 			) VALUES(
 				'$id_pasien',
@@ -223,6 +242,7 @@ class Admum_pasien_ri_m extends CI_Model {
 				'$id_kamar',
 				'$id_bed',
 				'$biaya_kamar',
+				'$biaya_charge',
 				'$biaya_adm'
 			)
 		";

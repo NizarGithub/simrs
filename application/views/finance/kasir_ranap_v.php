@@ -177,12 +177,10 @@ $user_detail = $this->model->get_user_detail($id_user);
                                                 <thead>
                                                     <tr class="warning">
                                                         <th style="text-align: center;">No</th>
-                                                        <th style="text-align: center;">Kelas</th>
+                                                        <th style="text-align: center;">Kamar</th>
                                                         <th style="text-align: center;">No. Bed</th>
                                                         <th style="text-align: center;">Biaya</th>
                                                         <th style="text-align: center;">Hari</th>
-                                                        <th style="text-align: center;">Visite Dokter</th>
-                                                        <th style="text-align: center;">Jasa Sarana</th>
                                                         <th style="text-align: center;">Total</th>
                                                     </tr>
                                                 </thead>
@@ -191,7 +189,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                                 </tbody>
                                                 <tfoot>
                                                     <tr class="active">
-                                                        <td colspan="7" style="text-align: center; font-weight: bold;">Total Biaya</td>
+                                                        <td colspan="5" style="text-align: center; font-weight: bold;">Total Biaya</td>
                                                         <td style="text-align: right;"><b id="tot_biaya_kamar">0</b></td>
                                                     </tr>
                                                 </tfoot>
@@ -221,12 +219,36 @@ $user_detail = $this->model->get_user_detail($id_user);
 
                                             <hr>
 
+                                            <h3 class="panel-title"><strong>Detail</strong> Visite Dokter</h3>
+                                            <table class="table table-bordered" id="tabel_visite_byr">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="text-align: center; background-color: #f8dfc2;">No</th>
+                                                        <th style="text-align: center; background-color: #f8dfc2;">Tanggal</th>
+                                                        <th style="text-align: center; background-color: #f8dfc2;">Dokter</th>
+                                                        <th style="text-align: center; background-color: #f8dfc2;">Biaya</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr class="active">
+                                                        <td colspan="3" style="text-align: center; font-weight: bold;">Total Biaya</td>
+                                                        <td style="text-align: right;"><b id="tot_biaya_visite">0</b></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+
+                                            <hr>
+
                                             <h3 class="panel-title"><strong>Detail</strong> Laborat</h3>
                                             <table class="table table-bordered" id="tabel_laborat_byr">
                                                 <thead>
                                                     <tr class="danger">
                                                         <th style="text-align: center;">No</th>
-                                                        <th style="text-align: center;">Tindakan</th>
+                                                        <th style="text-align: center;">Tanggal</th>
+                                                        <th style="text-align: center;">Kode Lab</th>
                                                         <th style="text-align: center;">Biaya</th>
                                                     </tr>
                                                 </thead>
@@ -235,7 +257,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                                 </tbody>
                                                 <tfoot>
                                                     <tr class="active">
-                                                        <td colspan="2" style="text-align: center; font-weight: bold;">Total Biaya</td>
+                                                        <td colspan="3" style="text-align: center; font-weight: bold;">Total Biaya</td>
                                                         <td style="text-align: right;"><b id="tot_biaya_laborat">0</b></td>
                                                     </tr>
                                                 </tfoot>
@@ -248,7 +270,8 @@ $user_detail = $this->model->get_user_detail($id_user);
                                                 <thead>
                                                     <tr class="success">
                                                         <th style="text-align: center;">No</th>
-                                                        <th style="text-align: center;">Resep</th>
+                                                        <th style="text-align: center;">Tanggal</th>
+                                                        <th style="text-align: center;">Kode Resep</th>
                                                         <th style="text-align: center;">Biaya</th>
                                                     </tr>
                                                 </thead>
@@ -257,7 +280,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                                 </tbody>
                                                 <tfoot>
                                                     <tr class="active">
-                                                        <td colspan="2" style="text-align: center; font-weight: bold;">Total Biaya</td>
+                                                        <td colspan="3" style="text-align: center; font-weight: bold;">Total Biaya</td>
                                                         <td style="text-align: right;"><b id="tot_biaya_resep">0</b></td>
                                                     </tr>
                                                 </tfoot>
@@ -271,8 +294,9 @@ $user_detail = $this->model->get_user_detail($id_user);
                                                     <tr>
                                                         <th style="text-align: center;">No</th>
                                                         <th style="text-align: center;">Nama Asuransi</th>
-                                                        <th style="text-align: center;">Asuransi</th>
-                                                        <th style="text-align: center;">Biaya</th>
+                                                        <th style="text-align: center;">Nomor Kartu</th>
+                                                        <th style="text-align: center;">Nomor Peserta</th>
+                                                        <th style="text-align: center;">Nama</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -576,13 +600,6 @@ $user_detail = $this->model->get_user_detail($id_user);
                                         <label class="form-label"><strong> Total Biaya </strong></label>
                                         <div class="controls">
                                             <input type="text" name="b_total_tagihan" id="b_total_tagihan" class="form-control" style="font-size: 15px; font-weight: bold;" readonly>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label"><strong> Biaya Asuransi </strong></label>
-                                        <div class="controls">
-                                            <input type="text" name="b_asuransi" id="b_asuransi" class="form-control" style="font-size: 15px; font-weight: bold;" readonly>
                                         </div>
                                     </div>
 
@@ -1078,6 +1095,8 @@ function get_pasien(){
                         '</a>';
             }else{
                 for(var i=0; i<result.length; i++){
+                    result[i].SISTEM_BAYAR = result[i].SISTEM_BAYAR=='1'?"Umum":"Asuransi";
+
                     var img = '';
                     if(result[i].JENIS_KELAMIN == 'L'){
                         img = '<?php echo base_url(); ?>kasir-apotek/assets/img/avatars/avatar11.png';
@@ -1085,9 +1104,28 @@ function get_pasien(){
                         img = '<?php echo base_url(); ?>kasir-apotek/assets/img/avatars/avatar5.png';
                     }
 
-                    var tanggal = shortMonth(result[i].TANGGAL_MASUK)+' - '+result[i].WAKTU;
+                    var status = '';
+                    if(result[i].STATUS_BAYAR == '1'){
+                        status = '<span class="label label-success">LUNAS</span>';
+                    }else{
+                        status = '<span class="label label-danger">BELUM LUNAS</span>';
+                    }
 
-                    result[i].SISTEM_BAYAR = result[i].SISTEM_BAYAR=='1'?"Umum":"Asuransi";
+                    var tanggal = shortMonth(result[i].TANGGAL_MASUK)+' - '+result[i].WAKTU;
+                    var biaya_kamar = result[i].BIAYA_KAMAR;
+                    var dirawat_selama = result[i].DIRAWAT_SELAMA;
+                    var biaya_charge = result[i].BIAYA_CHARGE_KAMAR;
+                    var biaya_admin = result[i].BIAYA_REG;
+                    var jasa_sarana = result[i].JASA_SARANA;
+                    var biaya_visite = result[i].BIAYA_VISITE;
+                    var jumlah_visite = result[i].JUMLAH_VISITE;
+                    var total_tindakan = result[i].TOTAL_TINDAKAN;
+                    var total_lab = result[i].TOTAL_LAB;
+                    var total_resep = result[i].TOTAL_RESEP;
+                    
+                    var total_biaya_kamar = parseFloat(biaya_kamar) * parseFloat(dirawat_selama);
+                    var total_biaya_visit = parseFloat(biaya_visite) * parseFloat(jumlah_visite);
+                    var total = parseFloat(total_biaya_kamar) + parseFloat(biaya_charge) + parseFloat(biaya_admin) + parseFloat(jasa_sarana) + parseFloat(total_biaya_visit) + parseFloat(total_tindakan) + parseFloat(total_lab) + parseFloat(total_resep);
 
                     $tr +=  '<a href="javascript:;" class="message-item media" onclick="klik_pasien('+result[i].ID+');">'+
                             '  <div class="media">'+
@@ -1099,15 +1137,15 @@ function get_pasien(){
                             '      </div>'+
                             '      <div class="col-md-3">'+
                             '           <h5 class="c-dark"><strong>Total Biaya</strong></h5>'+
-                            '           <h4 class="c-dark">'+formatNumber(result[i].TOTAL)+'</h4>'+
+                            '           <h4 class="c-dark">'+formatNumber(total)+'</h4>'+
                             '      </div>'+
                             '      <div class="col-md-2">'+
                             '           <h5 class="c-dark"><strong>Jenis Bayar</strong></h5>'+
                             '           <h4 class="c-dark">'+result[i].SISTEM_BAYAR+'</h4>'+
                             '      </div>'+
                             '      <div class="col-md-2">'+
-                            '           <h5 class="c-dark"><strong>Asuransi</strong></h5>'+
-                            '           <h4 class="c-dark">'+formatNumber(result[i].TOT_ASURANSI)+'</h4>'+
+                            '           <h5 class="c-dark"><strong>Status</strong></h5>'+
+                            '           <h4 class="c-dark">'+status+'</h4>'+
                             '      </div>'+
                             '    </div>'+
                             '  </div>'+
@@ -1129,6 +1167,7 @@ function klik_pasien(id_ri){
     $('#popup_load').show();
     get_kamar(id_ri);
     get_tindakan(id_ri);
+    get_visite(id_ri);
     get_lab(id_ri);
     get_resep(id_ri);
     get_asuransi(id_ri);
@@ -1142,13 +1181,31 @@ function klik_pasien(id_ri){
             $('#id_ri').val(id_ri);
             $('#btn_klik_bayar').removeAttr('disabled');
             $('#b_atas_nama').val(row['NAMA_PASIEN']);
-            $('#b_total_tagihan').val(formatNumber(row['TOTAL']));
-            $('#b_asuransi').val(formatNumber(row['TOT_ASURANSI']));
             $('#sistem_bayar').val(row['SISTEM_BAYAR']);
 
-            var total = parseFloat(row['TOTAL']) - parseFloat(row['TOT_ASURANSI']);
+            var biaya_kamar = row['BIAYA_KAMAR'];
+            var dirawat_selama = row['DIRAWAT_SELAMA'];
+            var biaya_charge = row['BIAYA_CHARGE_KAMAR'];
+            var jasa_sarana = row['JASA_SARANA'];
+            var biaya_visite = row['BIAYA_VISITE'];
+            var jumlah_visite = row['JUMLAH_VISITE'];
+            var total_tindakan = row['TOTAL_TINDAKAN'];
+            var total_lab = row['TOTAL_LAB'];
+            var total_resep = row['TOTAL_RESEP'];
+            
+            var total_biaya_kamar = parseFloat(biaya_kamar) * parseFloat(dirawat_selama);
+            var total_biaya_visit = parseFloat(biaya_visite) * parseFloat(jumlah_visite);
+            var total = parseFloat(total_biaya_kamar) + parseFloat(biaya_charge) + parseFloat(jasa_sarana) + parseFloat(total_biaya_visit) + parseFloat(total_tindakan) + parseFloat(total_lab) + parseFloat(total_resep);
+
+            $('#b_total_tagihan').val(formatNumber(total));
             $('#b_total').val(formatNumber(total));
             $('#popup_load').hide();
+
+            if(row['STATUS_BAYAR'] == '1'){
+                $('#btn_klik_bayar').attr('disabled','disabled');
+            }else{
+                $('#btn_klik_bayar').removeAttr('disabled');
+            }
         }
     });
 }
@@ -1159,36 +1216,71 @@ function get_kamar(id_ri){
         data : {id_ri:id_ri},
         type : "POST",
         dataType : "json",
+        async : false,
         success : function(res){
             $tr = '';
+            $tr1 = '';
+            $tr2 = '';
             var tot = 0;
+            var biaya_charge = 0;
+            var jasa_sarana = 0;
+            var grandtotal = 0;
 
-            if(res == null || res == ""){
-                $tr = '<tr><td colspan="`8" style="text-align:center;">Data Tidak Ada</td></tr>';
+            if(res['dt'] == null || res['dt'] == ""){
+                $tr = '<tr><td colspan="6" style="text-align:center;">Data Tidak Ada</td></tr>';
             }else{
                 var no = 0;
 
-                for(var i=0; i<res.length; i++){
+                for(var i=0; i<res['dt'].length; i++){
                     no++;
-                    var kelas = res[i].KELAS+' - '+res[i].VISITE_DOKTER;
-                    var total = parseFloat(res[i].BIAYA_KAMAR) + parseFloat(res[i].BIAYA_VISITE) + parseFloat(res[i].JASA_SARANA);
+                    var kamar = res['dt'][i].KODE_KAMAR+' - '+res['dt'][i].KELAS;
+                    var biaya_kamar = parseFloat(res['dt'][i].BIAYA_KAMAR_FIX);
+                    var dirawat_selama = res['dt'][i].DIRAWAT_SELAMA;
+                    var total =  parseFloat(biaya_kamar) * parseFloat(dirawat_selama);
                     tot += parseFloat(total);
 
                     $tr += '<tr>'+
                             '<td style="text-align:center;">'+no+'</td>'+
-                            '<td style="text-align:center;">'+kelas+'</td>'+
-                            '<td style="text-align:center;">'+res[i].NOMOR_BED+'</td>'+
-                            '<td style="text-align:right;">'+formatNumber(res[i].BIAYA)+'</td>'+
-                            '<td style="text-align:center;">'+res[i].DIRAWAT_SELAMA+'</td>'+
-                            '<td style="text-align:right;">'+formatNumber(res[i].BIAYA_VISITE)+'</td>'+
-                            '<td style="text-align:right;">'+formatNumber(res[i].JASA_SARANA)+'</td>'+
-                            '<td style="text-align:right;"><b>'+formatNumber(total)+'</b></td>'+
+                            '<td style="text-align:center;">'+kamar+'</td>'+
+                            '<td style="text-align:center;">'+res['dt'][i].NO+'</td>'+
+                            '<td style="text-align:right;">'+formatNumber(biaya_kamar)+'</td>'+
+                            '<td style="text-align:center;">'+dirawat_selama+'</td>'+
+                            '<td style="text-align:right;">'+formatNumber(total)+'</td>'+
                           '</tr>';
                 }
+
+                if(res['charge']['BIAYA_CHARGE_KAMAR'] > 0){
+                    biaya_charge = res['charge']['BIAYA_CHARGE_KAMAR'];
+
+                    $tr1 = '<tr>'+
+                            '<td colspan="5">Charge 15% (08:00 - 11:59)</td>'+
+                            '<td style="text-align:right;">'+formatNumber(res['charge']['BIAYA_CHARGE_KAMAR'])+'</td>'+
+                          '</tr>';
+                }
+
+                if(res['jasa']['JASA_SARANA'] > 0){
+                    jasa_sarana = res['jasa']['JASA_SARANA'];
+
+                    $tr2 = '<tr>'+
+                            '<td colspan="5">Jasa Sarana</td>'+
+                            '<td style="text-align:right;">'+formatNumber(res['jasa']['JASA_SARANA'])+'</td>'+
+                          '</tr>';
+                }
+
+                if(res['adm']['BIAYA_REG'] > 0){
+                    biaya_admin = res['adm']['BIAYA_REG'];
+
+                    $tr3 = '<tr>'+
+                            '<td colspan="5">Administrasi</td>'+
+                            '<td style="text-align:right;">'+formatNumber(res['adm']['BIAYA_REG'])+'</td>'+
+                          '</tr>';
+                }
+
+                grandtotal = parseFloat(tot) + parseFloat(biaya_charge) + parseFloat(jasa_sarana) + parseFloat(biaya_admin);
             }
 
-            $('#tot_biaya_kamar').html(formatNumber(tot));
-            $('#tabel_kamar_byr tbody').html($tr);
+            $('#tot_biaya_kamar').html(formatNumber(grandtotal));
+            $('#tabel_kamar_byr tbody').html($tr+$tr1+$tr2+$tr3);
         }
     });
 }
@@ -1199,6 +1291,7 @@ function get_tindakan(id_ri){
         data : {id_ri:id_ri},
         type : "POST",
         dataType : "json",
+        async : false,
         success : function(res){
             $tr = '';
             var tot = 0;
@@ -1206,22 +1299,78 @@ function get_tindakan(id_ri){
             if(res == null || res == ""){
                 $tr = '<tr><td colspan="3" style="text-align:center;">Data Tidak Ada</td></tr>';
             }else{
+                for(var i=0; i<res.length; i++){
+
+                    $tr +=  '<tr>'+
+                                '<td colspan="3" style="font-weight:bold;">Tanggal : '+res[i].TANGGAL+'</td>'+
+                            '</tr>';
+
+                    var id_tindakan = res[i].ID;
+
+                    $.ajax({
+                        url : '<?php echo base_url(); ?>finance/kasir_ranap_c/get_tindakan_detail',
+                        data : {id_tindakan:id_tindakan},
+                        type : "POST",
+                        dataType : "json",
+                        async : false,
+                        success : function(result){
+                            if(result == null || result == ""){
+                                $tr = '<tr><td colspan="3" style="text-align:center;">Data Tidak Ada</td></tr>';
+                            }else{
+                                var no = 0;
+
+                                for(var j=0; j<result.length; j++){
+                                    no++;
+                                    tot += parseFloat(result[j].SUBTOTAL);
+
+                                    $tr +=  '<tr>'+
+                                                '<td style="text-align:center;">'+no+'</td>'+
+                                                '<td>'+result[j].NAMA_TINDAKAN+'</td>'+
+                                                '<td style="text-align:right;">'+formatNumber(result[j].SUBTOTAL)+'</td>'+
+                                            '</tr>';
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            $('#tabel_tindakan_byr tbody').html($tr);
+            $('#tot_biaya_tindakan').html(formatNumber(tot));
+        }
+    });
+}
+
+function get_visite(id_ri){
+    $.ajax({
+        url : '<?php echo base_url(); ?>finance/kasir_ranap_c/get_visite',
+        data : {id_ri:id_ri},
+        type : "POST",
+        dataType : "json",
+        success : function(res){
+            $tr = '';
+            var tot = 0;
+
+            if(res == null || res == ""){
+                $tr = '<tr><td colspan="4" style="text-align:center;">Data Tidak Ada</td></tr>';
+            }else{
                 var no = 0;
 
                 for(var i=0; i<res.length; i++){
                     no++;
-                    tot += parseFloat(res[i].TARIF);
+                    tot += parseFloat(res[i].BIAYA_VISITE);
 
                     $tr +=  '<tr>'+
                                 '<td style="text-align:center;">'+no+'</td>'+
-                                '<td>'+res[i].NAMA_TINDAKAN+'</td>'+
-                                '<td style="text-align:right;">'+formatNumber(res[i].TARIF)+'</td>'+
+                                '<td style="text-align:center;">'+res[i].TANGGAL+'</td>'+
+                                '<td>'+res[i].NAMA_DOKTER+'</td>'+
+                                '<td style="text-align:right;">'+formatNumber(res[i].BIAYA_VISITE)+'</td>'+
                             '</tr>';
                 }
             }
 
-            $('#tot_biaya_tindakan').html(formatNumber(tot));
-            $('#tabel_tindakan_byr tbody').html($tr);
+            $('#tabel_visite_byr tbody').html($tr);
+            $('#tot_biaya_visite').html(formatNumber(tot));
         }
     });
 }
@@ -1237,18 +1386,19 @@ function get_lab(id_ri){
             var tot = 0;
 
             if(res == null || res == ""){
-                $tr = '<tr><td colspan="3" style="text-align:center;">Data Tidak Ada</td></tr>';
+                $tr = '<tr><td colspan="4" style="text-align:center;">Data Tidak Ada</td></tr>';
             }else{
                 var no = 0;
 
                 for(var i=0; i<res.length; i++){
                     no++;
-                    tot += parseFloat(res[i].SUBTOTAL);
+                    tot += parseFloat(res[i].TOTAL_TARIF);
 
                     $tr +=  '<tr>'+
                                 '<td style="text-align:center;">'+no+'</td>'+
-                                '<td>'+res[i].NAMA_PEMERIKSAAN+'</td>'+
-                                '<td style="text-align:right;">'+formatNumber(res[i].SUBTOTAL)+'</td>'+
+                                '<td style="text-align:center;">'+res[i].TANGGAL+'</td>'+
+                                '<td style="text-align:center;">'+res[i].KODE_LAB+'</td>'+
+                                '<td style="text-align:right;">'+formatNumber(res[i].TOTAL_TARIF)+'</td>'+
                             '</tr>';
                 }
             }
@@ -1276,12 +1426,13 @@ function get_resep(id_ri){
 
                 for(var i=0; i<res.length; i++){
                     no++;
-                    tot += parseFloat(res[i].SUBTOTAL);
+                    tot += parseFloat(res[i].TOTAL);
 
                     $tr += '<tr>'+
                             '<td style="text-align:center;">'+no+'</td>'+
-                            '<td>'+res[i].NAMA_OBAT+'</td>'+
-                            '<td style="text-align:right;"><b>'+formatNumber(res[i].SUBTOTAL)+'</b></td>'+
+                            '<td style="text-align:center;">'+res[i].TANGGAL+'</td>'+
+                            '<td style="text-align:center;">'+res[i].KODE_RESEP+'</td>'+
+                            '<td style="text-align:right;"><b>'+formatNumber(res[i].TOTAL)+'</b></td>'+
                           '</tr>';
                 }
             }
@@ -1303,7 +1454,7 @@ function get_asuransi(id_ri){
             var tot = 0;
 
             if(res == null || res == ""){
-                $tr = '<tr><td colspan="4" style="text-align:center;">Tidak Ada Asuransi</td></tr>';
+                $tr = '<tr><td colspan="5" style="text-align:center;">Tidak Ada Asuransi</td></tr>';
             }else{
                 var no = 0;
 
@@ -1314,8 +1465,9 @@ function get_asuransi(id_ri){
                     $tr +=  '<tr>'+
                                 '<td style="text-align:center;">'+no+'</td>'+
                                 '<td>'+res[i].NAMA_ASURANSI+'</td>'+
-                                '<td>'+res[i].ASURANSI+'</td>'+
-                                '<td style="text-align:right;">'+formatNumber(res[i].JML_KLAIM)+'</td>'+
+                                '<td style="text-align:center;">'+res[i].NO_POLIS+'</td>'+
+                                '<td style="text-align:center;">'+res[i].NO_PESERTA+'</td>'+
+                                '<td>'+res[i].NAMA+'</td>'+
                             '</tr>';
                 }
             }

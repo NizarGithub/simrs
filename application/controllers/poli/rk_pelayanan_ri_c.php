@@ -137,12 +137,25 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		echo json_encode($hari_ke);
 	}
 
+	function data_tindakan_tgl(){
+		$id_pelayanan = $this->input->post('id_pelayanan');
+		$tanggal = date('d-m-Y');
+		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM rk_ri_tindakan WHERE ID_PELAYANAN = '$id_pelayanan' AND TANGGAL = '$tanggal'";
+		$data['row'] = $this->db->query($sql_cek)->row();
+		$data['res'] = $this->model->data_tindakan($id_pelayanan);
+		echo json_encode($data);
+	}
+
+	function data_tindakan_id(){
+		$id = $this->input->post('id');
+		$data['row'] = $this->model->data_tindakan_id($id);
+		$data['det'] = $this->model->data_tindakan_ri($id);
+		echo json_encode($data);
+	}
+
 	function data_tindakan_ri(){
 		$id_tindakan = $this->input->post('id_tindakan');
-		$tanggal = date('d-m-Y');
-		$data['hr'] = $this->model->get_hari_tindakan($id_tindakan);
-		$data['dt'] = $this->model->data_tindakan_ri($id_tindakan,$tanggal);
-		$data['row'] = $this->model->data_tindakan($id_tindakan);
+		$data['dt'] = $this->model->data_tindakan_ri($id_tindakan);
 		echo json_encode($data);
 	}
 
@@ -181,6 +194,27 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		$id_tindakan = $this->db->insert_id();
 		$jumlah = $this->input->post('jumlah');
 		$subtotal = $this->input->post('subtotal');
+
+		foreach ($id_setup_tindakan as $key => $value) {
+			$this->model->simpan_det_tindakan($id_tindakan,$value,$tanggal,$bulan,$tahun,$jumlah[$key],$subtotal[$key],$hari_ke);
+		}
+
+		// $this->session->set_flashdata('sukses','1');
+		// redirect('poli/rk_pelayanan_ri_c/tindakan_ri/'.$id_pelayanan);
+		echo '1';
+	}
+
+	function simpan_tindakan_hari(){
+		$id_tindakan = $this->input->post('id_tindakan_hari');
+		$id_setup_tindakan = $this->input->post('id_setup_tindakan_hari');
+		$tanggal = date('d-m-Y');
+		$bulan = date('n');
+		$tahun = date('Y');
+		$jumlah = $this->input->post('jumlah_hari');
+		$subtotal = $this->input->post('subtotal_hari');
+		$hari_ke = null;
+
+		$this->db->query("DELETE FROM rk_ri_tindakan_detail WHERE ID_TINDAKAN = '$id_tindakan'");
 
 		foreach ($id_setup_tindakan as $key => $value) {
 			$this->model->simpan_det_tindakan($id_tindakan,$value,$tanggal,$bulan,$tahun,$jumlah[$key],$subtotal[$key],$hari_ke);
@@ -654,9 +688,6 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		$tahun = date('Y');
 		$diagnosa = addslashes($this->input->post('diagnosa'));
 		$tindakan = addslashes($this->input->post('tindakan_dg'));
-		$dirawat_selama = addslashes($this->input->post('dirawat_selama'));
-		$kondisi_akhir = addslashes($this->input->post('kondisi_akhir'));
-		$tanggal_keluar = $this->input->post('tanggal_keluar');
 		$hari_ke = '';
 
 		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM rk_ri_diagnosa WHERE ID_PELAYANAN = '$id_pelayanan'";
@@ -672,37 +703,7 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		// 	$hari_ke = '1';
 		// }
 
-		//ICU
-		$id_ruang_icu = $this->input->post('id_ruang_icu');
-		$tarif_icu = str_replace(',', '', $this->input->post('tarif_icu'));
-
-		//OPERASI
-		$id_ruang_operasi = $this->input->post('id_ruang_icu');
-		$tarif = str_replace(',', '', $this->input->post('tarif_icu'));
-
-		//MENINGGAL
-		$id_kamar_jenazah = $this->input->post('id_kamar_jenazah');
-		$id_lemari_jenazah = $this->input->post('id_lemari_jenazah');
-
-		if($kondisi_akhir == 'ICU'){
-
-			$this->model->simpan_icu($id_pelayanan,$id_pasien,$id_ruang_icu,$tarif_icu,$tanggal,$bulan,$tahun);
-			$this->db->query("UPDATE admum_setup_ruang_icu SET STATUS_PAKAI = '1' WHERE ID = '$id_ruang_icu'");
-
-		}else if($kondisi_akhir == 'Operasi'){
-
-			$this->model->simpan_operasi($id_pelayanan,$id_pasien,$id_ruang_operasi,$tarif,$tanggal,$bulan,$tahun);
-			$this->db->query("UPDATE admum_setup_ruang_operasi SET STATUS_PAKAI = '1' WHERE ID = '$id_ruang_operasi'");
-
-		}else if($kondisi_akhir == 'Meninggal'){
-
-			$this->model->simpan_meninggal($id_pelayanan,$id_pasien,$id_kamar_jenazah,$id_lemari_jenazah,$tanggal,$bulan,$tahun);
-			$this->db->query("UPDATE admum_lemari_jenazah SET STATUS_PAKAI = '1' WHERE ID = '$id_lemari_jenazah'");
-			
-		}
-
-		$this->model->simpan_diagnosa($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$diagnosa,$tindakan,$dirawat_selama,$kondisi_akhir,$hari_ke);
-		$this->db->query("UPDATE admum_rawat_inap SET STATUS_SUDAH = '1', TANGGAL_KELUAR = '$tanggal_keluar' WHERE ID = '$id_pelayanan'");
+		$this->model->simpan_diagnosa($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$diagnosa,$tindakan);
 
 		echo '1';
 	}
@@ -1075,6 +1076,12 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function data_ka_id(){
+		$id_pelayanan = $this->input->post('id_pelayanan');
+		$data = $this->model->data_kondisi_akhir_id($id_pelayanan);
+		echo json_encode($data);
+	}
+
 	function simpan_ka(){
 		$id_pelayanan = $this->input->post('id_rj');
 		$id_pasien = $this->input->post('id_pasien');
@@ -1085,10 +1092,6 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		$tanggal_keluar = $this->input->post('tanggal_keluar');
 		$kondisi_akhir = $this->input->post('kondisi_akhir');
 
-		//ICU
-		$id_ruang_icu = $this->input->post('id_ruang_icu');
-		$tarif_icu = str_replace(',', '', $this->input->post('tarif_icu'));
-
 		//OPERASI
 		$id_ruang_operasi = $this->input->post('id_ruang_icu');
 		$tarif = str_replace(',', '', $this->input->post('tarif_icu'));
@@ -1097,12 +1100,7 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		$id_kamar_jenazah = $this->input->post('id_kamar_jenazah');
 		$id_lemari_jenazah = $this->input->post('id_lemari_jenazah');
 
-		if($kondisi_akhir == 'ICU'){
-
-			$this->model->simpan_icu($id_pelayanan,$id_pasien,$id_ruang_icu,$tarif_icu,$tanggal,$bulan,$tahun);
-			$this->db->query("UPDATE admum_setup_ruang_icu SET STATUS_PAKAI = '1' WHERE ID = '$id_ruang_icu'");
-
-		}else if($kondisi_akhir == 'Operasi'){
+		if($kondisi_akhir == 'Operasi'){
 
 			$this->model->simpan_operasi($id_pelayanan,$id_pasien,$id_ruang_operasi,$tarif,$tanggal,$bulan,$tahun);
 			$this->db->query("UPDATE admum_setup_ruang_operasi SET STATUS_PAKAI = '1' WHERE ID = '$id_ruang_operasi'");

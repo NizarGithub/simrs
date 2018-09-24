@@ -46,14 +46,12 @@ class Admum_setup_peralatan_medis_c extends CI_Controller {
 	function kode_peralatan(){
 		$keterangan = "PERALATAN-MEDIS";
 		$tahun = date('Y');
-		$kode_brg = "PRMD-";
 
 		$sql = "
 			SELECT 
 				COUNT(*) AS TOTAL 
 			FROM nomor 
 			WHERE KETERANGAN = '$keterangan'
-			AND TAHUN = '$tahun'
 		";
 		$qry = $this->db->query($sql);
 		$total = $qry->row()->TOTAL;
@@ -61,14 +59,14 @@ class Admum_setup_peralatan_medis_c extends CI_Controller {
 
 		//SUPBRG-001/2016
 		if($total == 0){
-			$no = $this->add_leading_zero(1,3);
-			$kode = $kode_brg.$no."/".$tahun;
+			$no = $this->add_leading_zero(1,5);
+			$kode = "PB".$no;
 		}else{
-			$s = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan' AND TAHUN = '$tahun'";
+			$s = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan'";
 			$q = $this->db->query($s)->row();
 			$next = $q->NEXT+1;
-			$no = $this->add_leading_zero($next,3);
-			$kode = $kode_brg.$no."/".$tahun;
+			$no = $this->add_leading_zero($next,5);
+			$kode = "PB".$no;
 		}
 
 		echo json_encode($kode);
@@ -83,14 +81,13 @@ class Admum_setup_peralatan_medis_c extends CI_Controller {
 				COUNT(*) AS TOTAL 
 			FROM nomor 
 			WHERE KETERANGAN = '$keterangan'
-			AND TAHUN = '$tahun'
 		";
 		$total = $this->db->query($sql_cek)->row()->TOTAL;
 
 		if($total == 0){
 			$this->db->query("INSERT INTO nomor(NEXT,KETERANGAN,TAHUN) VALUES ('1','$keterangan','$tahun')");
 		}else{
-			$sql = "SELECT * FROM nomor WHERE TAHUN = '$tahun' AND KETERANGAN = '$keterangan'";
+			$sql = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan'";
 			$query = $this->db->query($sql)->row();
 			$next = $query->NEXT+1;
 			$id = $query->ID;
@@ -124,12 +121,10 @@ class Admum_setup_peralatan_medis_c extends CI_Controller {
 
 	function simpan(){
 		$kode_alat = $this->input->post('kode_barang');
-		$barcode = $this->input->post('barcode');
 		$nama_alat = $this->input->post('nama_barang');
-		$merk = $this->input->post('id_merk');
-		$jenis_alat = $this->input->post('jenis_alat');
+		$id_kategori = $this->input->post('id_kategori');
 
-		$this->model->simpan($kode_alat,$barcode,$nama_alat,$merk,$jenis_alat);
+		$this->model->simpan($kode_alat,$nama_alat,$id_kategori);
 		$this->insert_kode();
 
 		$this->session->set_flashdata('sukses','1');

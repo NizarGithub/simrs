@@ -218,10 +218,8 @@ function data_peralatan(){
         			$tr += "<tr>"+
         						"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
         						"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_ALAT+"</td>"+
-        						"<td style='vertical-align:middle;'>"+result[i].BARCODE+"</td>"+
         						"<td style='vertical-align:middle;'>"+result[i].NAMA_ALAT+"</td>"+
-                                "<td style='vertical-align:middle;'>"+result[i].MERK+"</td>"+
-        						"<td style='vertical-align:middle;'>"+result[i].JENIS_ALAT+"</td>"+
+        						"<td style='vertical-align:middle; text-align:center;'>"+result[i].NAMA_KATEGORI+"</td>"+
         						"<td align='center'>"+aksi+"</td>"+
         					"</tr>";
         		}
@@ -335,20 +333,24 @@ function cek_barcode(){
         			<button type="button" class="btn btn-purple waves-effect w-md waves-light" id="btn_tambah">
         				<i class="fa fa-plus"></i> Tambah Peralatan
         			</button>
+                    <button type="submit" class="btn btn-success waves-effect w-md waves-light">
+                        <i class="fa fa-file-text-o"></i> <b>Cetak Excel</b>
+                    </button>
     			</div>
-                <div class="col-md-4 pull-right">
-                    <button style="float: left; margin-right: 10px; margin-top: 2px;" type="submit" class="btn btn-success waves-effect w-md waves-light m-b-5"><i class="fa fa-file-text-o"></i> <b>Cetak Excel</b></button>
-	                <div class="input-group">
-	                    <input type="text" class="form-control" id="cari_alat" placeholder="Cari..." value="" onkeypress="return onEnterText(event);">
-	                    <span class="input-group-btn">
-	                    	<button type="button" class="btn waves-effect waves-light btn-warning" id="tombol_cari">
-	                    		<i class="fa fa-search"></i>
-	                    	</button>
-	                    	<button type="button" class="btn waves-effect waves-light btn-warning" id="tombol_reset">
-	                    		<i class="fa fa-refresh"></i>
-	                    	</button>
-	                    </span>
-	                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="cari_alat" placeholder="Cari..." value="" onkeypress="return onEnterText(event);">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn waves-effect waves-light btn-warning" id="tombol_cari">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            <button type="button" class="btn waves-effect waves-light btn-warning" id="tombol_reset">
+                                <i class="fa fa-refresh"></i>
+                            </button>
+                        </span>
+                    </div>
                 </div>
             </div>
         </form>
@@ -358,14 +360,11 @@ function cek_barcode(){
                     <tr class="biru">
                         <th style="color:#fff; text-align:center;" width="50">No</th>
                         <th style="color:#fff; text-align:center;">Kode Barang</th>
-                        <th style="color:#fff; text-align:center;">Barcode</th>
                         <th style="color:#fff; text-align:center;">Nama Barang</th>
-                        <th style="color:#fff; text-align:center;">Merk</th>
-                        <th style="color:#fff; text-align:center;">Jenis Alat</th>
+                        <th style="color:#fff; text-align:center;">Kategori</th>
                         <th style="color:#fff; text-align:center;">Aksi</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     
                 </tbody>
@@ -404,21 +403,12 @@ function cek_barcode(){
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-2 control-label">Barcode</label>
-                <div class="col-md-4">
-                    <input type="text" class="form-control" name="barcode" id="barcode" value="" required="required" onchange="cek_barcode();">
-                    <span class="help-block" style="color:#ff0000;" id="msg_barcode">
-                        <small>Barcode ini sudah ada.</small>
-                    </span>
-                </div>
-            </div>
-            <div class="form-group">
                 <label class="col-md-2 control-label">Nama Barang</label>
                 <div class="col-md-4">
                     <input type="text" class="form-control" name="nama_barang" value="" required="required">
                 </div>
             </div>
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label class="col-md-2 control-label">Merk</label>
                 <div class="col-md-4">
                     <div class="input-group">
@@ -431,24 +421,28 @@ function cek_barcode(){
                         </span>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <div class="form-group">
-                <label class="col-md-2 control-label">Jenis Alat</label>
+                <label class="col-md-2 control-label">Kategori</label>
                 <div class="col-md-4">
-                    <select name="jenis_alat" class="form-control">
-                        <option value="Alat Pembalut Luka">Alat Pembalut Luka</option>
-                        <option value="Alat Pembalut Luka">Alat Perawatan Pasien</option>
-                        <option value="Alat Tindakan Medis">Alat Tindakan Medis</option>
-                        <option value="Alat Diagnosa Penyakit">Alat Diagnosa Penyakit</option>
-                        <option value="Alat Bedah">Alat Bedah</option>
+                    <select name="id_kategori" class="form-control">
+                    <?php
+                        $kat = $this->model->data_kategori();
+                        foreach ($kat as $val) {
+                    ?>
+                        <option value="<?php echo $val->ID; ?>"><?php echo $val->NAMA_KATEGORI; ?></option>
+                    <?php
+                        }
+                    ?>
                     </select>
                 </div>
             </div>
+            <hr>
             <div class="form-group">
                 <label class="col-md-2 control-label">&nbsp;</label>
                 <div class="col-md-3">
-                	<button type="submit" class="btn btn-success waves-effect waves-light m-b-5" id="btn_simpan"> <i class="fa fa-save"></i> <span>Simpan</span> </button>
-                	<button type="button" class="btn btn-danger waves-effect waves-light m-b-5" id="batal"> <i class="fa fa-times"></i> <span>Batal</span> </button>
+                	<button type="submit" class="btn btn-success waves-effect waves-light" id="btn_simpan"> <i class="fa fa-save"></i> <span>Simpan</span> </button>
+                	<button type="button" class="btn btn-danger waves-effect waves-light" id="batal"> <i class="fa fa-times"></i> <span>Batal</span> </button>
                 </div>
             </div>
         </form>

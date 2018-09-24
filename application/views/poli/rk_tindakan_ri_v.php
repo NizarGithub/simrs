@@ -3,6 +3,7 @@
 <style type="text/css">
 #view_tindakan_tambah, 
 #view_tindakan_ubah,
+#view_tindakan_tambah_hari,
 #view_tambah_visite, 
 #view_ubah_visite,
 #view_tambah_gizi, 
@@ -129,6 +130,22 @@ $(document).ready(function(){
 	$('.btn_pelaksana').click(function(){
 		$('#popup_pelaksana').click();
 		load_pelaksana();
+	});
+
+	$('#btn_simpan_hari').click(function(){
+		$.ajax({
+			url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/simpan_tindakan_hari',
+			data : $('#view_tindakan_tambah_hari').serialize(),
+			type : "POST",
+			dataType : "json",
+			success : function(res){
+				notif_simpan();
+				data_tindakan();
+				$('#view_tindakan_tambah_hari').hide();
+				$('#view_tindakan').show();
+				$('#id_tindakan_hari').val("");
+			}
+		});
 	});
 
 	// VISITE
@@ -867,6 +884,44 @@ $(document).ready(function(){
 		load_lemari_jenazah();
 	});
 
+	$('#dt_kondisi_akhir').click(function(){
+		$('#popup_load').show();
+		var id_pelayanan = $('#id_rj_ka').val();
+
+		$.ajax({
+			url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/data_ka_id',
+			data : {id_pelayanan:id_pelayanan},
+			type : "POST",
+			dataType : "json",
+			success : function(row){
+				if(row['KONDISI_AKHIR'] == "Dirawat"){
+				  $('#kondisi_akhir option[value="Dirawat"]').attr('selected','selected');
+				}else if(row['KONDISI_AKHIR'] == "Pulang"){
+				  $('#kondisi_akhir option[value="Pulang"]').attr('selected','selected');
+				}else if(row['KONDISI_AKHIR'] == "Dirujuk"){
+				  $('#kondisi_akhir option[value="Dirujuk"]').attr('selected','selected');
+				}
+
+				$('#dirawat_selama').val(row['DIRAWAT_SELAMA']);
+				$('#tanggal_keluar').val(row['TANGGAL_KELUAR']);
+
+				if(row['ID'] != null || row['ID'] != ""){
+					$('#kondisi_akhir').attr('disabled','disabled');
+					$('#dirawat_selama').attr('readonly','readonly');
+					$('#tanggal_keluar').attr('readonly','readonly');
+					$('#simpanKA').attr('disabled','disabled');
+				}else{
+					$('#kondisi_akhir').removeAttr('disabled');
+					$('#dirawat_selama').removeAttr('readonly');
+					$('#tanggal_keluar').removeAttr('readonly');
+					$('#simpanKA').removeAttr('disabled');
+				}
+
+				$('#popup_load').hide();
+			}
+		});
+	});
+
 	$('#kondisi_akhir').change(function(){
         var kondisi_akhir = $('#kondisi_akhir').val();
         if(kondisi_akhir == 'Operasi'){
@@ -1099,8 +1154,10 @@ function klik_tindakan(id){
 	$('#popup_load').show();
 	$('#tutup_tindakan').click();
 	var id_ubah = $('#id_ubah').val();
+	var id_tindakan = $('#id_tindakan_hari').val();
 
-	if(id_ubah == ""){
+	if(id_ubah == "" && id_tindakan == ""){
+		// alert('1');
 		$.ajax({
 			url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/klik_tindakan',
 			data : {id:id},
@@ -1141,7 +1198,50 @@ function klik_tindakan(id){
 				$('#popup_load').hide();
 			}
 		});
+	}else if(id_tindakan != "" && id_ubah == ""){
+		// alert('2');
+		$.ajax({
+			url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/klik_tindakan',
+			data : {id:id},
+			type : "POST",
+			dataType : "json",
+			success : function(result){
+				$tr = "";
+
+				for(var i=0; i<result.length; i++){
+					var jumlah_data = $('#tr_hari_'+result[i].ID).length;
+
+					var aksi = "<button type='button' class='btn waves-light btn-danger btn-sm' onclick='deleteRow(this);'><i class='fa fa-times'></i></button>";
+
+					if(jumlah_data > 0){
+						var jumlah = $('#jumlah_hari_'+result[i].ID).val();
+						$('#jumlah_hari_'+result[i].ID).val(parseInt(jumlah)+1);
+					}else{
+						$tr = "<tr id='tr_hari_"+result[i].ID+"'>"+
+								"<input type='hidden' name='id_setup_tindakan_hari[]' value='"+result[i].ID+"'>"+
+								"<input type='hidden' id='tarif_hari_"+result[i].ID+"' value='"+result[i].TARIF+"'>"+
+								"<input type='hidden' name='subtotal_hari[]' id='subtotal_hari_"+result[i].ID+"' value=''>"+
+								"<td style='vertical-align:middle;'>"+result[i].NAMA_TINDAKAN+"</td>"+
+								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
+								"<td>"+
+									"<div class='col-md-12'>"+
+					                    "<input type='text' class='form-control' name='jumlah_hari[]' id='jumlah_hari_"+result[i].ID+"' value='1' onkeyup='FormatCurrency(this); hitung_jumlah("+result[i].ID+");'>"+
+				                    "</div>"+
+								"</td>"+
+								"<td style='vertical-align:middle; text-align:right;'><b id='subtotal_hari_txt_"+result[i].ID+"'></b></td>"+
+								"<td align='center'>"+aksi+"</td>"+
+							  "</tr>";
+					}
+				}
+
+				$('#tabel_tambah_tindakan_hari tbody').append($tr);
+				hitung_jumlah(id);
+				hitung_total_tindakan();
+				$('#popup_load').hide();
+			}
+		});
 	}else{
+		// alert('3');
 		$.ajax({
 			url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/klik_tindakan',
 			data : {id:id},
@@ -1155,6 +1255,7 @@ function klik_tindakan(id){
 					$('#jumlah_ubah').val("");
 					$('#subtotal_ubah').val("");
 					$('#jumlah_ubah').focus();
+					$('#popup_load').hide();
 				}
 			}
 		});
@@ -1168,18 +1269,35 @@ function deleteRow(btn){
 }
 
 function hitung_jumlah(id){
-	var tarif = $('#tarif_'+id).val();
-	var jumlah = $('#jumlah_'+id).val();
-	jumlah = jumlah.split(',').join('');
+	var id_tindakan = $('#id_tindakan_hari').val();
 
-	if(jumlah == ""){
-		jumlah = 0;
+	if(id_tindakan != ""){
+		var tarif = $('#tarif_hari_'+id).val();
+		var jumlah = $('#jumlah_hari_'+id).val();
+		// jumlah = jumlah.split(',').join('');
+
+		if(jumlah == ""){
+			jumlah = 0;
+		}
+
+		var subtotal = parseFloat(tarif) * parseFloat(jumlah);
+		$('#subtotal_hari_txt_'+id).html(formatNumber(subtotal));
+		$('#subtotal_hari_'+id).val(subtotal);
+		hitung_total_tindakan();
+	}else{
+		var tarif = $('#tarif_'+id).val();
+		var jumlah = $('#jumlah_'+id).val();
+		jumlah = jumlah.split(',').join('');
+
+		if(jumlah == ""){
+			jumlah = 0;
+		}
+
+		var subtotal = parseFloat(tarif) * parseFloat(jumlah);
+		$('#subtotal_txt_'+id).html(formatNumber(subtotal));
+		$('#subtotal_'+id).val(subtotal);
+		hitung_total_tindakan();
 	}
-
-	var subtotal = parseFloat(tarif) * parseFloat(jumlah);
-	$('#subtotal_txt_'+id).html(formatNumber(subtotal));
-	$('#subtotal_'+id).val(subtotal);
-	hitung_total_tindakan();
 }
 
 function hitung_jumlah2(){
@@ -1202,12 +1320,24 @@ function hitung_jumlah2(){
 }
 
 function hitung_total_tindakan(){
-	var total = 0;
-	$("input[name='subtotal[]']").each(function(idx,elm){
-		var tarif = elm.value;
-		total += parseFloat(tarif);
-	});
-	$('#total_tindakan').val(formatNumber(total));
+	var id_tindakan = $('#id_tindakan_hari').val();
+
+	if(id_tindakan != ""){
+		var total = 0;
+		$("input[name='subtotal_hari[]']").each(function(idx,elm){
+			var tarif = elm.value;
+			total += parseFloat(tarif);
+		});
+		$('#total_tindakan_hari').val(formatNumber(total));
+	}else{
+		// console.log('2');
+		var total = 0;
+		$("input[name='subtotal[]']").each(function(idx,elm){
+			var tarif = elm.value;
+			total += parseFloat(tarif);
+		});
+		$('#total_tindakan').val(formatNumber(total));
+	}
 }
 
 function get_hari_ranap(){
@@ -1225,52 +1355,132 @@ function get_hari_ranap(){
 
 function data_tindakan(){
 	$('#popup_load').show();
-	var id_tindakan = "<?php echo $id; ?>";
+	var id_pelayanan = "<?php echo $id; ?>";
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/data_tindakan_ri',
-		data : {id_tindakan:id_tindakan},
+		url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/data_tindakan_tgl',
+		data : {id_pelayanan:id_pelayanan},
 		type : "POST",
 		dataType : "json",
-		success : function(result){
+		async : false,
+		success : function(res){
 			$tr = "";
-			$tr0 = "";
 			var total = 0;
 
-			if(result['dt'] == "" || result['dt'] == null){
+			if(res['row']['TOTAL'] != 0){
+				$('#btn_tambah').hide();
+			}else{
+				$('#btn_tambah').show();
+			}
+
+			if(res['res'] == "" || res['res'] == null){
 				$tr = "<tr><td colspan='6' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
-				var no = 0;
-				$tr0 = '<tr class="info">'+
-							'<td colspan="6"><b>Tanggal : '+result['row']['TANGGAL']+'</b></td>'+
-						'</tr>';
+				for(var i=0; i<res['res'].length; i++){
+					var now = "<?php echo date('d-m-Y'); ?>";
+					var tombol = '';
 
-				for(var i=0; i<result['dt'].length; i++){
-					no++;
-					total += parseFloat(result['dt'][i].SUBTOTAL);
+					if(res['res'][i].TANGGAL == now){
+						tombol = '<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-l-10" onclick="tambah_tindakan('+res['res'][i].ID+');">'+
+						   			'<i class="fa fa-plus"></i> Tambah Tindakan'+
+						   		 '</button>';
+					}else{
+						tombol = tombol;
+					}
 
-					var aksi =  '<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_tindakan('+result['dt'][i].ID+');">'+
-									'<i class="fa fa-pencil"></i>'+
-								'</button>&nbsp;'+
-						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_tindakan('+result['dt'][i].ID+');">'+
-						   			'<i class="fa fa-trash"></i>'+
-						   		'</button>';
+					$tr += '<tr class="warning">'+
+								'<td colspan="6"><b>Tanggal : '+res['res'][i].TANGGAL+'</b>'+tombol+'</td>'+
+							'</tr>';
 
-					$tr += "<tr>"+
-								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td>"+result['dt'][i].NAMA_TINDAKAN+"</td>"+
-								"<td style='text-align:right;'>"+formatNumber(result['dt'][i].TARIF)+"</td>"+
-								"<td style='text-align:center;'>"+result['dt'][i].JUMLAH+"</td>"+
-								"<td style='text-align:right;'>"+formatNumber(result['dt'][i].SUBTOTAL)+"</td>"+
-								"<td align='center'>"+aksi+"</td>"+
-							"</tr>";
+					var id_tindakan = res['res'][i].ID;
+
+					$.ajax({
+						url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/data_tindakan_ri',
+						data : {id_tindakan:id_tindakan},
+						type : "POST",
+						dataType : "json",
+						async : false,
+						success : function(result){
+							if(result['dt'] != null || result['dt'] != ""){
+								var no = 0;
+								
+								for(var j=0; j<result['dt'].length; j++){
+									no++;
+									var aksi =  '<button type="button" class="btn btn-success waves-effect waves-light btn-sm" onclick="ubah_tindakan('+result['dt'][j].ID+');">'+
+													'<i class="fa fa-pencil"></i>'+
+												'</button>&nbsp;'+
+										   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm" onclick="hapus_tindakan('+result['dt'][j].ID+');">'+
+										   			'<i class="fa fa-trash"></i>'+
+										   		'</button>';
+
+									total += parseFloat(result['dt'][j].SUBTOTAL);
+									var tindakan = result['dt'][j].NAMA_TINDAKAN;
+
+									$tr += "<tr>"+
+												"<td style='text-align:center;'>"+no+"</td>"+
+												"<td>"+tindakan+"</td>"+
+												"<td style='text-align:right;'>"+formatNumber(result['dt'][j].TARIF)+"</td>"+
+												"<td style='text-align:center;'>"+result['dt'][j].JUMLAH+"</td>"+
+												"<td style='text-align:right;'>"+formatNumber(result['dt'][j].SUBTOTAL)+"</td>"+
+												"<td align='center'>"+aksi+"</td>"+
+											"</tr>";
+								}
+							}
+						}
+					});
 				}
 			}
 
-			$('#tabel_tindakan tbody').html($tr0+$tr);
+			$('#tabel_tindakan tbody').html($tr);
 			$('#grandtotal_tindakan').html(formatNumber(total));
 			$('#popup_load').fadeOut();
 		}
+	});
+}
+
+function tambah_tindakan(id){
+	$('#popup_load').show();
+	$('#view_tindakan_tambah_hari').show();
+	$('#view_tindakan').hide();
+
+	$.ajax({
+		url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/data_tindakan_id',
+		data : {id:id},
+		type : "POST",
+		dataType : "json",
+		success : function(row){
+			$('#id_tindakan_hari').val(id);
+			$('#tanggal_hari').val(row['row']['TANGGAL']);
+
+			$tr = "";
+			var total = 0;
+
+			for(var i=0; i<row['det'].length; i++){
+				total += parseFloat(row['det'][i].SUBTOTAL);
+
+				$tr += "<tr id='tr_hari_"+row['det'][i].ID+"'>"+
+						"<input type='hidden' name='id_setup_tindakan_hari[]' value='"+row['det'][i].ID_SETUP_TINDAKAN+"'>"+
+						"<input type='hidden' id='tarif_hari_"+row['det'][i].ID+"' value='"+row['det'][i].TARIF+"'>"+
+						"<input type='hidden' name='subtotal_hari[]' id='subtotal_hari_"+row['det'][i].ID+"' value='"+row['det'][i].SUBTOTAL+"'>"+
+			            "<input type='hidden' name='jumlah_hari[]' id='jumlah_hari_"+row['det'][i].ID+"' value='"+row['det'][i].JUMLAH+"'>"+
+						"<td style='vertical-align:middle;'>"+row['det'][i].NAMA_TINDAKAN+"</td>"+
+						"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(row['det'][i].TARIF)+"</td>"+
+						"<td style='vertical-align:middle; text-align:center;'>"+row['det'][i].JUMLAH+"</td>"+
+						"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(row['det'][i].SUBTOTAL)+"</td>"+
+						"<td align='center'>&nbsp;</td>"+
+					  "</tr>";
+			}
+
+			$('#tabel_tambah_tindakan_hari tbody').html($tr);
+			$('#total_tindakan_hari').val(formatNumber(total));
+			$('#popup_load').hide();
+		}
+	});
+
+	$('#batal_hari').click(function(){
+		$('#id_tindakan_hari').val("");
+		$('#view_tindakan_tambah_hari').hide();
+		$('#view_tindakan').show();
 	});
 }
 
@@ -1329,6 +1539,7 @@ function data_visite(){
 		dataType : "json",
 		success : function(result){
 			$tr = "";
+			var total = 0;
 
 			if(result == "" || result == null){
 				$tr = "<tr><td colspan='6' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
@@ -1337,6 +1548,7 @@ function data_visite(){
 
 				for(var i=0; i<result.length; i++){
 					no++;
+					total += parseFloat(result[i].BIAYA_VISITE);
 
 					var status_visite = '';
 					if(result[i].STATUS_VISITE == '1'){
@@ -1364,6 +1576,7 @@ function data_visite(){
 			}
 
 			$('#tabel_visite tbody').html($tr);
+			$('#grandtotal_visite').html(formatNumber(total));
 			$('#popup_load').fadeOut();
 		}
 	});
@@ -2271,7 +2484,7 @@ function data_diagnosa(){
 			$tr = "";
 
 			if(result == "" || result == null){
-				$tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+				$tr = "<tr><td colspan='5' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
 				var no = 0;
 
@@ -2291,8 +2504,6 @@ function data_diagnosa(){
 								"<td style='text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
 								"<td>"+result[i].DIAGNOSA+"</td>"+
 								"<td>"+result[i].TINDAKAN+"</td>"+
-								"<td style='text-align:center;'>"+result[i].DIRAWAT_SELAMA+" Hari</td>"+
-								"<td style='text-align:center;'>"+result[i].KONDISI_AKHIR+"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
 							"</tr>";
 				}
@@ -2521,10 +2732,10 @@ function data_laborat(){
 					total += parseFloat(result[i].TOTAL_TARIF);
 
 					var cetak = "<a href='<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/cetak_laborat/"+result[i].ID+"/"+id_pelayanan+"' class='btn btn-inverse btn-sm' target='_blank'><i class='fa fa-print'></i></a>";
-					var aksi =  '<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-b-5" onclick="hasil_laborat('+result[i].ID+');">'+
+					var aksi =  '<button type="button" class="btn btn-primary waves-effect waves-light btn-sm" onclick="hasil_laborat('+result[i].ID+');">'+
 									'<i class="fa fa-tint"></i>'+
 								'</button>&nbsp;'+
-						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_laborat('+result[i].ID+');">'+
+						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm" onclick="hapus_laborat('+result[i].ID+');">'+
 						   			'<i class="fa fa-trash"></i>'+
 						   		'</button>';
 
@@ -2539,7 +2750,7 @@ function data_laborat(){
 
 					$tr += "<tr>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
-								"<td style='vertical-align:middle;'>"+tanggal+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+tanggal+"</td>"+
 								"<td style='vertical-align:middle;'>"+result[i].JENIS_LABORAT+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+cito+"</td>"+
 								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TOTAL_TARIF)+"</td>"+
@@ -2706,19 +2917,21 @@ function data_resep(){
 		dataType : "json",
 		success : function(result){
 			$tr = "";
+			var total = 0;
 
 			if(result == "" || result == null){
-				$tr = "<tr><td colspan='6' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+				$tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
 				var no = 0;
 
 				for(var i=0; i<result.length; i++){
 					no++;
+					total += parseFloat(result[i].TOTAL);
 
-					var aksi =  '<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-b-5" onclick="detail_resep('+result[i].ID+');">'+
+					var aksi =  '<button type="button" class="btn btn-primary waves-effect waves-light btn-sm" onclick="detail_resep('+result[i].ID+');">'+
 									'<i class="fa fa-eye"></i>'+
 								'</button>&nbsp;'+
-						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_resep('+result[i].ID+');">'+
+						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm" onclick="hapus_resep('+result[i].ID+');">'+
 						   			'<i class="fa fa-trash"></i>'+
 						   		'</button>';
 
@@ -2726,6 +2939,7 @@ function data_resep(){
 								"<td style='text-align:center;'>"+no+"</td>"+
 								"<td style='text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
 								"<td style='text-align:center;'>"+result[i].KODE_RESEP+"</td>"+
+								"<td style='text-align:center;'>"+result[i].BANYAKNYA_RESEP+" Bungkus</td>"+
 								"<td style='text-align:right;'>"+formatNumber(result[i].TOTAL)+"</td>"+
 								"<td style='text-align:center;'>"+result[i].DIMINUM_SELAMA+" Hari</td>"+
 								"<td align='center'>"+aksi+"</td>"+
@@ -2734,6 +2948,7 @@ function data_resep(){
 			}
 
 			$('#tabel_resep tbody').html($tr);
+			$('#grandtotal_resep2').html(formatNumber(total));
 			$('#popup_load').fadeOut();
 		}
 	});
@@ -3193,10 +3408,10 @@ function hitung_tanggal(){
                 <li role="presentation" id="dt_resep">
                     <a href="#resep1" role="tab" data-toggle="tab"><i class="fa fa-medkit"></i></i>&nbsp;Resep</a>
                 </li>
-                <!-- 
                 <li role="presentation" id="dt_kondisi_akhir">
                     <a href="#kondisi_akhir1" role="tab" data-toggle="tab"><i class="fa fa-check-square-o"></i>&nbsp;Kondisi Akhir</a>
                 </li>
+                <!-- 
                 <li role="presentation" id="dt_gizi">
                     <a href="#gizi1" role="tab" data-toggle="tab"><i class="fa fa-cutlery"></i>&nbsp;Gizi</a>
                 </li>
@@ -3223,7 +3438,7 @@ function hitung_tanggal(){
                     		</div>
                     		<div class="col-md-6">
 			                    <button class="btn btn-primary m-b-5 pull-right" type="button" id="btn_tambah">
-									<i class="fa fa-plus"></i>&nbsp;<b>Tambah Tindakan</b>
+									<i class="fa fa-plus"></i>&nbsp;<b>Tindakan Baru</b>
 								</button>
                     		</div>
                     	</div>
@@ -3292,7 +3507,7 @@ function hitung_tanggal(){
 	                        <label class="col-md-1 control-label">Tindakan</label>
 	                        <div class="col-md-5">
 	                            <div class="input-group">
-	                                <input type="text" class="form-control" value="" readonly="readonly" required="required">
+	                                <input type="text" class="form-control" value="" readonly="readonly">
 	                                <span class="input-group-btn">
 	                                    <button type="button" class="btn btn-inverse btn_tindakan"><i class="fa fa-search"></i></button>
 	                                </span>
@@ -3331,6 +3546,59 @@ function hitung_tanggal(){
 	                    <center>
 	                    	<button type="button" class="btn btn-success" id="btn_simpan"><i class="fa fa-save"></i> <b>Simpan</b></button>
 	                        <button type="button" class="btn btn-danger" id="batal"><i class="fa fa-times"></i> <b>Batal</b></button>
+	                    </center>
+					</form>
+
+					<form class="form-horizontal" id="view_tindakan_tambah_hari" action="" method="post">
+						<input type="hidden" name="id_tindakan_hari" id="id_tindakan_hari" value="">
+						<div class="form-group">
+	                        <label class="col-md-1 control-label">Tanggal</label>
+	                        <div class="col-md-5">
+	                            <input type="text" class="form-control" id="tanggal_hari" value="" readonly="readonly">
+	                        </div>
+	                    </div>
+						<div class="form-group">
+	                        <label class="col-md-1 control-label">Tindakan</label>
+	                        <div class="col-md-5">
+	                            <div class="input-group">
+	                                <input type="text" class="form-control" value="" readonly="readonly">
+	                                <span class="input-group-btn">
+	                                    <button type="button" class="btn btn-inverse btn_tindakan"><i class="fa fa-search"></i></button>
+	                                </span>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    <div class="form-group">
+	                        <label class="col-md-1 control-label">&nbsp;</label>
+	                        <div class="col-md-7">
+	                            <div class="table-responsive">
+						            <table id="tabel_tambah_tindakan_hari" class="table table-bordered">
+						                <thead>
+						                    <tr class="kuning_tr">
+						                        <th style="color:#fff; text-align:center;">Tindakan</th>
+						                        <th style="color:#fff; text-align:center;">Tarif</th>
+						                        <th style="color:#fff; text-align:center;">Jumlah</th>
+						                        <th style="color:#fff; text-align:center;">Sub Total</th>
+						                        <th style="color:#fff; text-align:center;">#</th>
+						                    </tr>
+						                </thead>
+						                <tbody>
+						                    
+						                </tbody>
+						            </table>
+						        </div>
+	                        </div>
+	                    </div>
+	                    <div class="form-group">
+	                        <label class="col-md-1 control-label">Total</label>
+	                        <div class="col-md-5">
+	                            <input type="text" class="form-control" name="total_tindakan_hari" id="total_tindakan_hari" value="" readonly="readonly">
+	                        </div>
+	                    </div>
+	                    <hr>
+	                    <center>
+	                    	<button type="button" class="btn btn-success" id="btn_simpan_hari"><i class="fa fa-save"></i> <b>Simpan</b></button>
+	                        <button type="button" class="btn btn-danger" id="batal_hari"><i class="fa fa-times"></i> <b>Batal</b></button>
 	                    </center>
 					</form>
 
@@ -3409,13 +3677,10 @@ function hitung_tanggal(){
 						                        <th style="color:#fff; text-align:center;">No</th>
 						                        <th style="color:#fff; text-align:center;">Tanggal</th>
 						                        <th style="color:#fff; text-align:center;">Diagnosa</th>
-						                        <th style="color:#fff; text-align:center;">Tindakan</th>
-						                        <th style="color:#fff; text-align:center;">Dirawat Selama</th>
-						                        <th style="color:#fff; text-align:center;">Status</th>
+						                        <th style="color:#fff; text-align:center;">Anjuran</th>
 						                        <th style="color:#fff; text-align:center;">Aksi</th>
 						                    </tr>
 						                </thead>
-
 						                <tbody>
 						                    
 						                </tbody>
@@ -3440,87 +3705,6 @@ function hitung_tanggal(){
 								<textarea class="form-control" rows="5" id="tindakan_dg" name="tindakan_dg"></textarea>
 							</div>
 						</div>
-						<div class="form-group">
-                            <label class="col-sm-2 control-label">Status</label>
-                            <div class="col-sm-4">
-                                <select class="form-control" name="kondisi_akhir" id="kondisi_akhir">
-                                    <option value="Dirawat">Dirawat</option>
-                                    <option value="Pulang">Pulang</option>
-                                    <option value="Dirujuk">Dirujuk</option>
-                                    <option value="Operasi">Operasi</option>
-                                    <option value="Meninggal">Meninggal</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div id="view_operasi">
-                        	<div class="form-group">
-		                        <label class="col-md-2 control-label">Ruang Operasi</label>
-		                        <div class="col-md-4">
-		                            <div class="input-group">
-		                                <input type="hidden" name="id_ruang_opr" id="id_ruang_opr" value="">
-		                                <input type="text" class="form-control" id="ruang_operasi" value="" readonly>
-		                                <span class="input-group-btn">
-		                                    <button type="button" class="btn btn-danger btn_ruang_opr"><i class="fa fa-search"></i></button>
-		                                </span>
-		                            </div>
-		                        </div>
-		                    </div>
-		                    <div class="form-group">
-		                        <label class="col-md-2 control-label">Tarif</label>
-		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" name="tarif_operasi" id="tarif_operasi" value="" onkeyup="FormatCurrency(this);">
-		                        </div>
-		                    </div>
-		                    <hr>
-                        </div>
-                        <div id="view_meninggal">
-                        	<div class="form-group">
-		                        <label class="col-md-2 control-label">Kamar Jenazah</label>
-		                        <div class="col-md-4">
-		                            <div class="input-group">
-		                                <input type="hidden" name="id_kamar_jenazah" id="id_kamar_jenazah" value="">
-		                                <input type="text" class="form-control" id="kamar_jenazah" value="" readonly>
-		                                <span class="input-group-btn">
-		                                    <button type="button" class="btn btn-danger btn_kamar_jenazah"><i class="fa fa-search"></i></button>
-		                                </span>
-		                            </div>
-		                        </div>
-		                    </div>
-		                    <div class="form-group">
-		                        <label class="col-md-2 control-label">Tarif</label>
-		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" name="tarif_kamar_jenazah" id="tarif_kamar_jenazah" value="" readonly>
-		                        </div>
-		                    </div>
-		                    <div class="form-group">
-		                        <label class="col-md-2 control-label">Lemari Jenazah</label>
-		                        <div class="col-md-4">
-		                            <div class="input-group">
-		                                <input type="hidden" name="id_lemari_jenazah" id="id_lemari_jenazah" value="">
-		                                <input type="text" class="form-control" id="lemari_jenazah" value="" readonly>
-		                                <span class="input-group-btn">
-		                                    <button type="button" class="btn btn-primary btn_lemari_jenazah"><i class="fa fa-search"></i></button>
-		                                </span>
-		                            </div>
-		                        </div>
-		                    </div>
-		                    <hr>
-                        </div>
-                		<div class="form-group" id="view_dirawat_selama">
-                			<label class="col-sm-2 control-label">Dirawat Selama</label>
-                			<div class="col-sm-4">
-                				<div class="input-group">
-                                    <input type="text" class="form-control num_only" name="dirawat_selama" id="dirawat_selama" value="" onkeyup="hitung_tanggal();">
-                                    <span class="input-group-addon">Hari</span>
-                                </div>
-                			</div>
-                		</div>
-                		<div class="form-group">
-                			<label class="col-sm-2 control-label">Tanggal Keluar</label>
-                			<div class="col-sm-4">
-                				<input type="text" class="form-control" name="tanggal_keluar" id="tanggal_keluar" data-mask="99-99-9999" value="">
-                			</div>
-                		</div>
 						<!-- <div class="form-group">
 	                        <label class="col-md-2 control-label">Kasus</label>
 	                        <div class="col-md-5">
@@ -3608,7 +3792,7 @@ function hitung_tanggal(){
 						                <thead>
 						                    <tr class="merah">
 						                        <th style="color:#fff; text-align:center;">No</th>
-						                        <th style="color:#fff; text-align:center;">Tanggal</th>
+						                        <th style="color:#fff; text-align:center;">Tanggal / Waktu</th>
 						                        <th style="color:#fff; text-align:center;">Jenis Laborat</th>
 						                        <th style="color:#fff; text-align:center;">Cito</th>
 						                        <th style="color:#fff; text-align:center;">Total</th>
@@ -3760,6 +3944,22 @@ function hitung_tanggal(){
 						        </div>
                     		</div>
                     	</div>
+                    	<div class="form-group">
+                    		<div class="col-md-8">
+                    			&nbsp;
+                    		</div>
+                    		<div class="col-md-4">
+                    			<div class="card-box widget-user" style="background-color:#cee3f8;">
+		                            <div>
+		                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/Money_44325.png">
+		                                <div class="wid-u-info">
+		                                    <small class="text-primary"><b>Grand Total</b></small>
+		                                    <h4 class="m-t-0 m-b-5 font-600 text-danger" id="grandtotal_visite">0</h4>
+		                                </div>
+		                            </div>
+		                        </div>
+                    		</div>
+                    	</div>
                     </form>
 
                 	<form class="form-horizontal" id="view_tambah_visite">
@@ -3886,7 +4086,7 @@ function hitung_tanggal(){
                 	</form>
                 </div>
 
-                 <div role="tabpanel" class="tab-pane fade" id="resep1">
+                <div role="tabpanel" class="tab-pane fade" id="resep1">
                 	<form class="form-horizontal" id="view_resep">
                     	<div class="form-group">
                     		<div class="col-md-6">
@@ -3907,17 +4107,33 @@ function hitung_tanggal(){
 						                        <th style="color:#fff; text-align:center;">No</th>
 						                        <th style="color:#fff; text-align:center;">Tanggal</th>
 						                        <th style="color:#fff; text-align:center;">Kode Resep</th>
+						                        <th style="color:#fff; text-align:center;">Banyak Bungkus</th>
 						                        <th style="color:#fff; text-align:center;">Total</th>
 						                        <th style="color:#fff; text-align:center;">Diminum Selama</th>
 						                        <th style="color:#fff; text-align:center;">Aksi</th>
 						                    </tr>
 						                </thead>
-
 						                <tbody>
 						                    
 						                </tbody>
 						            </table>
 						        </div>
+                    		</div>
+                    	</div>
+                    	<div class="form-group">
+                    		<div class="col-md-8">
+                    			&nbsp;
+                    		</div>
+                    		<div class="col-md-4">
+                    			<div class="card-box widget-user" style="background-color:#cee3f8;">
+		                            <div>
+		                                <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/Money_44325.png">
+		                                <div class="wid-u-info">
+		                                    <small class="text-primary"><b>Grand Total</b></small>
+		                                    <h4 class="m-t-0 m-b-5 font-600 text-danger" id="grandtotal_resep2">0</h4>
+		                                </div>
+		                            </div>
+		                        </div>
                     		</div>
                     	</div>
                     </form>
@@ -4019,6 +4235,109 @@ function hitung_tanggal(){
 	                    <center>
 	                    	<button type="button" class="btn btn-success" id="simpanResep"><i class="fa fa-save"></i> <b>Simpan</b></button>
 	                        <button type="button" class="btn btn-danger" id="batalResep"><i class="fa fa-times"></i> <b>Batal</b></button>
+	                    </center>
+                    </form>
+                </div>
+
+                <div role="tabpanel" class="tab-pane fade" id="kondisi_akhir1">
+                	<div class="row">
+                		<div class="col-md-12">
+                			<div class="alert alert-info">
+                                <strong>Pastikan Anda Mengisi Dengan Benar!</strong> 
+                                <p>Jika pasien dianggap selesai melakukan pelayanan maka akan hilang dari daftar pelayanan.</p>
+                            </div>
+                		</div>
+                	</div>
+                	<hr>
+                	<form class="form-horizontal" id="view_kondisi_akhir">
+                		<input type="hidden" name="id_rj" id="id_rj_ka" value="<?php echo $id; ?>">
+						<input type="hidden" name="id_pasien" value="<?php echo $dt->ID_PASIEN; ?>">
+						<input type="hidden" name="asal_rujukan" value="<?php echo $dt->ASAL_RUJUKAN; ?>">
+						<div class="form-group">
+                            <label class="col-sm-2 control-label">Status</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" name="kondisi_akhir" id="kondisi_akhir">
+                                    <option value="Dirawat">Dirawat</option>
+                                    <option value="Pulang">Pulang</option>
+                                    <option value="Dirujuk">Dirujuk</option>
+                                    <option value="Operasi">Operasi</option>
+                                    <option value="Meninggal">Meninggal</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="view_operasi">
+                        	<div class="form-group">
+		                        <label class="col-md-2 control-label">Ruang Operasi</label>
+		                        <div class="col-md-4">
+		                            <div class="input-group">
+		                                <input type="hidden" name="id_ruang_opr" id="id_ruang_opr" value="">
+		                                <input type="text" class="form-control" id="ruang_operasi" value="" readonly>
+		                                <span class="input-group-btn">
+		                                    <button type="button" class="btn btn-danger btn_ruang_opr"><i class="fa fa-search"></i></button>
+		                                </span>
+		                            </div>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Tarif</label>
+		                        <div class="col-md-4">
+		                            <input type="text" class="form-control" name="tarif_operasi" id="tarif_operasi" value="" onkeyup="FormatCurrency(this);">
+		                        </div>
+		                    </div>
+		                    <hr>
+                        </div>
+                        <div id="view_meninggal">
+                        	<div class="form-group">
+		                        <label class="col-md-2 control-label">Kamar Jenazah</label>
+		                        <div class="col-md-4">
+		                            <div class="input-group">
+		                                <input type="hidden" name="id_kamar_jenazah" id="id_kamar_jenazah" value="">
+		                                <input type="text" class="form-control" id="kamar_jenazah" value="" readonly>
+		                                <span class="input-group-btn">
+		                                    <button type="button" class="btn btn-danger btn_kamar_jenazah"><i class="fa fa-search"></i></button>
+		                                </span>
+		                            </div>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Tarif</label>
+		                        <div class="col-md-4">
+		                            <input type="text" class="form-control" name="tarif_kamar_jenazah" id="tarif_kamar_jenazah" value="" readonly>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Lemari Jenazah</label>
+		                        <div class="col-md-4">
+		                            <div class="input-group">
+		                                <input type="hidden" name="id_lemari_jenazah" id="id_lemari_jenazah" value="">
+		                                <input type="text" class="form-control" id="lemari_jenazah" value="" readonly>
+		                                <span class="input-group-btn">
+		                                    <button type="button" class="btn btn-primary btn_lemari_jenazah"><i class="fa fa-search"></i></button>
+		                                </span>
+		                            </div>
+		                        </div>
+		                    </div>
+		                    <hr>
+                        </div>
+                		<div class="form-group" id="view_dirawat_selama">
+                			<label class="col-sm-2 control-label">Dirawat Selama</label>
+                			<div class="col-sm-4">
+                				<div class="input-group">
+                                    <input type="text" class="form-control num_only" name="dirawat_selama" id="dirawat_selama" value="" onkeyup="hitung_tanggal();">
+                                    <span class="input-group-addon">Hari</span>
+                                </div>
+                			</div>
+                		</div>
+                		<div class="form-group">
+                			<label class="col-sm-2 control-label">Tanggal Keluar</label>
+                			<div class="col-sm-4">
+                				<input type="text" class="form-control" name="tanggal_keluar" id="tanggal_keluar" data-mask="99-99-9999" value="">
+                			</div>
+                		</div>
+                		<hr>
+                        <center>
+	                    	<button type="button" class="btn btn-success" id="simpanKA"><i class="fa fa-save"></i> <b>Simpan</b></button>
+	                        <button type="button" class="btn btn-danger" id="batalKA"><i class="fa fa-times"></i> <b>Batal</b></button>
 	                    </center>
                     </form>
                 </div>
@@ -4485,60 +4804,6 @@ function hitung_tanggal(){
 	                        <button type="button" class="btn btn-danger" id="batalUbahInfus"><i class="fa fa-times"></i> <b>Batal</b></button>
 	                    </center>
                 	</form>
-                </div>
-
-                <div role="tabpanel" class="tab-pane fade" id="kondisi_akhir1">
-                	<div class="row">
-                		<div class="col-md-12">
-                			<div class="alert alert-info">
-                                <strong>Pastikan Anda Mengisi Dengan Benar!</strong> 
-                                <p>Jika pasien dianggap selesai melakukan pelayanan maka akan hilang dari daftar pelayanan.</p>
-                            </div>
-                		</div>
-                	</div>
-                	<hr>
-                	<form class="form-horizontal" id="view_kondisi_akhir">
-                		<input type="hidden" name="id_rj" id="id_rj" value="<?php echo $id; ?>">
-						<input type="hidden" name="id_pasien" value="<?php echo $dt->ID_PASIEN; ?>">
-						<input type="hidden" name="asal_rujukan" value="<?php echo $dt->ASAL_RUJUKAN; ?>">
-                        <!-- <div id="view_icu">
-                        	<div class="form-group">
-		                        <label class="col-md-2 control-label">Ruang ICU</label>
-		                        <div class="col-md-4">
-		                            <div class="input-group">
-		                                <input type="hidden" name="id_ruang_icu" id="id_ruang_icu" value="">
-		                                <input type="text" class="form-control" id="ruang_icu" value="" readonly>
-		                                <span class="input-group-btn">
-		                                    <button type="button" class="btn btn-danger btn_ruang_icu"><i class="fa fa-search"></i></button>
-		                                </span>
-		                            </div>
-		                        </div>
-		                    </div>
-		                    <div class="form-group">
-		                        <label class="col-md-2 control-label">Level</label>
-		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" name="level_icu" id="level_icu" value="" readonly>
-		                        </div>
-		                    </div>
-		                    <div class="form-group">
-		                        <label class="col-md-2 control-label">Tipe</label>
-		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" name="tipe_icu" id="tipe_icu" value="" readonly>
-		                        </div>
-		                    </div>
-		                    <div class="form-group">
-		                        <label class="col-md-2 control-label">Tarif</label>
-		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" name="tarif_icu" id="tarif_icu" value="" onkeyup="FormatCurrency(this);">
-		                        </div>
-		                    </div>
-		                    <hr>
-                        </div> -->
-                        <center>
-	                    	<button type="button" class="btn btn-success" id="simpanKA"><i class="fa fa-save"></i> <b>Simpan</b></button>
-	                        <button type="button" class="btn btn-danger" id="batalKA"><i class="fa fa-times"></i> <b>Batal</b></button>
-	                    </center>
-                    </form>
                 </div>
 
                 <div role="tabpanel" class="tab-pane fade" id="surat_dokter1">
