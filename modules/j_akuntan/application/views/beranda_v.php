@@ -551,7 +551,16 @@ function laba_rugi_grafik_bulanan(){
 <?PHP 
 $sess_user = $this->session->userdata('masuk_rs');
 $id_user = $sess_user['id'];
-$user = $this->master_model_m->get_user_info($id_user);
+$sql = "
+SELECT a.*, b.NAMA AS JABATAN, c.NAMA_DEP , d.NAMA_DIV FROM kepeg_pegawai a 
+LEFT JOIN kepeg_kel_jabatan b ON a.ID_JABATAN = b.ID 
+LEFT JOIN kepeg_departemen c ON a.ID_DEPARTEMEN = c.ID 
+LEFT JOIN kepeg_divisi d ON a.ID_DIVISI = d.ID 
+WHERE a.ID = '$id_user'
+ORDER BY a.ID ASC
+";
+$query = $this->db->query($sql);
+$user = $query->row();
 ?>
 </head>
 <body>
@@ -651,7 +660,7 @@ $user = $this->master_model_m->get_user_info($id_user);
 		</div>
 	</div>
 	<div class="leftbar leftbar-close clearfix" style="margin-top: 50px; position:fixed;">
-		<div class="admin-info clearfix">
+		<!-- <div class="admin-info clearfix">
 			<div class="admin-thumb">
                 <?PHP if($user->FOTO == "" || $user->FOTO== null){ ?>
 				    <i class="icon-user"></i>
@@ -678,12 +687,12 @@ $user = $this->master_model_m->get_user_info($id_user);
 					<li class="admin-username" style="color:#1CA0DE;"> <?=$user->JABATAN;?> </li>
 
 					<li>
-                        <!-- <a href="<?=base_url();?>pengaturan_akun_c"> Edit Profil </a> -->
+                        <a href="<?=base_url();?>pengaturan_akun_c"> Edit Profil </a>
                         <a href="<?=base_url();?>beranda_c/sign_out"><i class="icon-lock"></i> Logout</a>
                     </li>
 				</ul>
 			</div>
-		</div>
+		</div> -->
 		<div class="left-nav clearfix">
 			<div class="left-primary-nav">
 				<ul id="myTab">

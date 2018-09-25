@@ -462,7 +462,6 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		$alergi = $this->input->post('alergi');
 		$uraian = $this->input->post('alergi_obat');
 		$banyaknya_resep = $this->input->post('banyak_resep');
-		$diminum_selama = $this->input->post('diminum_selama');
 		$tanggal = date('d-m-Y');
 		$bulan = date('n');
 		$tahun = date('Y');
@@ -474,15 +473,15 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		$harga = $this->input->post('harga_obat');
 		$service = $this->input->post('service');
 		$jumlah = $this->input->post('jumlah_obat');
-		$takaran = $this->input->post('takaran_resep');
-		$aturan_umum = $this->input->post('aturan_minum');
+		$aturan_minum = $this->input->post('aturan_minum');
+		$diminum_selama = $this->input->post('diminum_selama');
 
-		$this->model->simpan_resep($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$kode_resep,$alergi,$uraian,$banyaknya_resep,$diminum_selama,$tanggal,$bulan,$tahun,$total,$total_biaya_service);
+		$this->model->simpan_resep($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$kode_resep,$alergi,$uraian,$banyaknya_resep,$tanggal,$bulan,$tahun,$total,$total_biaya_service);
 		$id_resep = $this->db->insert_id();
 
 		foreach ($id_obat as $key => $value) {
 			$subtotal = $harga[$key] * $jumlah[$key];
-			$this->model->simpan_resep_det($id_resep,$value,$harga[$key],$service[$key],$jumlah[$key],$subtotal,$takaran[$key],$aturan_umum[$key],$tanggal,$tahun,$bulan);
+			$this->model->simpan_resep_det($id_resep,$value,$harga[$key],$service[$key],$jumlah[$key],$subtotal,$aturan_minum[$key],$diminum_selama[$key],$tanggal,$tahun,$bulan);
 			// $this->model->ubah_stok_obat($value,$jumlah[$key]);
 		}
 

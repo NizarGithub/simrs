@@ -75,7 +75,8 @@ class Admum_pasien_rj_m extends CI_Model {
 				KODE_PASIEN LIKE '%$keyword%' OR 
 				NAMA_AYAH LIKE '%$keyword%' OR 
 				NAMA_IBU LIKE '%$keyword%' OR 
-				ALAMAT LIKE '%$keyword%'
+				ALAMAT LIKE '%$keyword%' OR
+				TANGGAL_LAHIR LIKE '%$keyword%'
 			)
 			";
 		}else{
@@ -90,6 +91,7 @@ class Admum_pasien_rj_m extends CI_Model {
 				JENIS_KELAMIN,
 				TANGGAL_LAHIR,
 				UMUR,
+				UMUR_BULAN,
 				NAMA_AYAH,
 				NAMA_IBU,
 				ALAMAT,

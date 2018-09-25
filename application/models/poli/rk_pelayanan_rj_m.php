@@ -573,6 +573,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				a.ID,
 				a.KODE_OBAT,
 				a.NAMA_OBAT,
+				a.GOLONGAN_OBAT,
 				IFNULL(b.STOK,0) AS STOK,
 				IFNULL(c.HARGA_JUAL,0) AS HARGA_JUAL,
 				a.SERVICE
@@ -603,6 +604,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 			SELECT
 				DET.ID,
 				b.NAMA_OBAT,
+				b.GOLONGAN_OBAT,
 				DET.JUMLAH_BELI,
 				DET.SUBTOTAL,
 				DET.TAKARAN,
@@ -616,7 +618,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 		return $query->result();
 	}
 
-	function simpan_resep($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$kode_resep,$alergi,$uraian,$banyaknya_resep,$diminum_selama,$tanggal,$bulan,$tahun,$total,$total_dgn_service){
+	function simpan_resep($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$kode_resep,$alergi,$uraian,$banyaknya_resep,$tanggal,$bulan,$tahun,$total,$total_dgn_service){
 		$sql = "
 			INSERT INTO rk_resep_rj(
 				ID_PELAYANAN,
@@ -627,7 +629,6 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				ALERGI_OBAT,
 				URAIAN,
 				BANYAKNYA_RESEP,
-				DIMINUM_SELAMA,
 				TANGGAL,
 				BULAN,
 				TAHUN,
@@ -642,7 +643,6 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				'$alergi',
 				'$uraian',
 				'$banyaknya_resep',
-				'$diminum_selama',
 				'$tanggal',
 				'$bulan',
 				'$tahun',
@@ -653,7 +653,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
-	function simpan_resep_det($id_resep,$id_obat,$harga,$service,$jumlah,$subtotal,$takaran,$aturan_umum,$tanggal,$tahun,$bulan){
+	function simpan_resep_det($id_resep,$id_obat,$harga,$service,$jumlah,$subtotal,$aturan_umum,$diminum_selama,$tanggal,$tahun,$bulan){
 		$sql = "
 			INSERT INTO rk_resep_detail_rj(
 				ID_RESEP,
@@ -662,8 +662,8 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				SERVICE,
 				JUMLAH_BELI,
 				SUBTOTAL,
-				TAKARAN,
 				ATURAN_MINUM,
+				DIMINUM_SELAMA,
 				TANGGAL,
 				TAHUN,
 				BULAN
@@ -674,8 +674,8 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				'$service',
 				'$jumlah',
 				'$subtotal',
-				'$takaran',
 				'$aturan_umum',
+				'$diminum_selama',
 				'$tanggal',
 				'$tahun',
 				'$bulan'

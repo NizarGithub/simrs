@@ -170,7 +170,8 @@ class Admum_setup_obat_c extends CI_Controller {
 			$status_racik = $this->input->post('status_obat_hidden');
 		}
 		$service = "";
-		if (empty($this->input->post('service_ubah'))) {
+		$service_ubah = $this->input->post('service_ubah'); 
+		if ($service_ubah == "") {
 			$service = $this->input->post('service_hidden');
 		}else {
 			$service = $this->input->post('service_ubah');

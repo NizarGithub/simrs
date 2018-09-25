@@ -793,9 +793,9 @@ function klik_tindakan(id){
 								"<input type='hidden' name='subtotal[]' id='subtotal_"+result[i].ID+"' value=''>"+
 								"<td style='vertical-align:middle;'>"+result[i].NAMA_TINDAKAN+"</td>"+
 								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
-								"<td>"+
+								"<td align='center'>"+
 									"<div class='col-md-12'>"+
-					                    "<input type='text' class='form-control' name='jumlah[]' id='jumlah_"+result[i].ID+"' value='1' onkeyup='FormatCurrency(this); hitung_jumlah("+result[i].ID+");'>"+
+					                    "<input type='text' class='form-control' name='jumlah[]' id='jumlah_"+result[i].ID+"' value='1' onkeyup='FormatCurrency(this); hitung_jumlah("+result[i].ID+");' style='width: 125px;'>"+
 				                    "</div>"+
 								"</td>"+
 								"<td style='vertical-align:middle; text-align:right;'><b id='subtotal_txt_"+result[i].ID+"'></b></td>"+
@@ -830,6 +830,7 @@ function klik_tindakan(id){
 function deleteRow(btn){
 	var row = btn.parentNode.parentNode;
 	row.parentNode.removeChild(row);
+	hitung_tarif_tindakan();
 }
 
 function hitung_jumlah(id){
@@ -1493,19 +1494,20 @@ function ini_obatnya(id){
 				if(jumlah_data > 0){
 
 				}else{
-					$tr = "<tr id='tr_resep2_"+result[i].ID+"'>"+
+					$tr = 	"<tr id='tr_resep2_"+result[i].ID+"'>"+
 								"<input type='hidden' name='id_obat_resep[]' value='"+result[i].ID+"'>"+
 								"<input type='hidden' name='harga_obat[]' id='harga_obat_"+result[i].ID+"' value='"+result[i].HARGA_JUAL+"'>"+
 								"<input type='hidden' name='service[]' id='service_"+result[i].ID+"' value='"+result[i].SERVICE+"'>"+
-								"<td>"+result[i].KODE_OBAT+"</td>"+
-								"<td>"+result[i].NAMA_OBAT+"</td>"+
-								"<td style='text-align:right;'>"+formatNumber(result[i].HARGA_JUAL)+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_OBAT+"</td>"+
+								"<td style='vertical-align:middle;'>"+result[i].NAMA_OBAT+"</td>"+
+								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].HARGA_JUAL)+"</td>"+
 								"<td align='center'><input type='text' class='form-control' name='jumlah_obat[]' value='' id='jumlah_obat_"+result[i].ID+"' style='width:125px;' onkeyup='FormatCurrency(this); hitung_resep("+result[i].ID+")'></td>"+
 								"<td align='center'><input type='text' class='form-control' name='total_obat[]' value='' id='total_obat_"+result[i].ID+"' style='width:125px;' readonly></td>"+
-								"<td align='center'><input type='text' class='form-control' name='takaran_resep[]' value='' style='width:125px;'></td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+result[i].GOLONGAN_OBAT+"</td>"+
 								"<td align='center'><input type='text' class='form-control' name='aturan_minum[]' value='' style='width:125px;'></td>"+
+								"<td align='center'><input type='text' class='form-control' name='diminum_selama[]' value='' style='width:125px;'></td>"+
 								"<td align='center'>"+aksi+"</td>"+
-							  "</tr>";
+							"</tr>";
 				}
 
 				$('#tabel_tambah_resep tbody').append($tr);
@@ -1530,7 +1532,7 @@ function data_resep(){
 			$tr = "";
 
 			if(result == "" || result == null){
-				$tr = "<tr><td colspan='8' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+				$tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
 				var no = 0;
 
@@ -1558,7 +1560,6 @@ function data_resep(){
 								"<td style='text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
 								"<td style='text-align:center;'>"+result[i].KODE_RESEP+"</td>"+
 								"<td style='text-align:center;'>"+result[i].BANYAKNYA_RESEP+" Bungkus</td>"+
-								"<td style='text-align:center;'>"+result[i].DIMINUM_SELAMA+" Hari</td>"+
 								"<td align='center'>"+alergi+"</td>"+
 								"<td style='text-align:right;'>"+formatNumber(result[i].TOTAL)+"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
@@ -1596,8 +1597,8 @@ function detail_resep(id){
 								"<td style='text-align:center;'>"+no+"</td>"+
 								"<td>"+obat+"</td>"+
 								"<td style='text-align:right;'>"+formatNumber(result[i].SUBTOTAL)+"</td>"+
-								"<td style='text-align:center;'>"+result[i].TAKARAN+"</td>"+
-								"<td>"+result[i].ATURAN_MINUM+"</td>"+
+								"<td style='text-align:center;'>"+result[i].GOLONGAN_OBAT+"</td>"+
+								"<td style='text-align:center;'>"+result[i].ATURAN_MINUM+"</td>"+
 							"</tr>";
 				}
 			}
@@ -2337,7 +2338,7 @@ function data_surat_dokter_ada(){
 		                    </div>
 		                    <div class="form-group">
 		                        <label class="col-md-1 control-label">&nbsp;</label>
-		                        <div class="col-md-9">
+		                        <div class="col-md-6">
 		                            <div class="table-responsive">
 							            <table id="tabel_tambah_tindakan" class="table table-bordered">
 							                <thead>
@@ -2349,7 +2350,6 @@ function data_surat_dokter_ada(){
 							                        <th style="color:#fff; text-align:center;">#</th>
 							                    </tr>
 							                </thead>
-
 							                <tbody>
 							                    
 							                </tbody>
@@ -2709,8 +2709,7 @@ function data_surat_dokter_ada(){
 							                        <th style="color:#fff; text-align:center;">Tanggal</th>
 							                        <th style="color:#fff; text-align:center;">Kode Resep</th>
 							                        <th style="color:#fff; text-align:center;">Banyak Resep</th>
-							                        <th style="color:#fff; text-align:center;">Diminum Selama</th>
-							                        <th style="color:#fff; text-align:center;">Alergi</th>
+							                        <th style="color:#fff; text-align:center;">Alergi Obat</th>
 							                        <th style="color:#fff; text-align:center;">Total</th>
 							                        <th style="color:#fff; text-align:center;">Aksi</th>
 							                    </tr>
@@ -2791,8 +2790,9 @@ function data_surat_dokter_ada(){
 							                        <th style="color:#fff; text-align:center;">Harga</th>
 							                        <th style="color:#fff; text-align:center;">Jumlah</th>
 							                        <th style="color:#fff; text-align:center;">Total</th>
-							                        <th style="color:#fff; text-align:center;">Takaran</th>
+							                        <th style="color:#fff; text-align:center;">Jenis Obat</th>
 							                        <th style="color:#fff; text-align:center;">Aturan Minum</th>
+							                        <th style="color:#fff; text-align:center;">Diminum Selama</th>
 							                        <th style="color:#fff; text-align:center;">#</th>
 							                    </tr>
 							                </thead>
@@ -2801,7 +2801,7 @@ function data_surat_dokter_ada(){
 							                </tbody>
 							                <tfoot>
 							                	<tr class="info">
-							                		<td colspan="7" style="text-align: center;"><b>GRANDTOTAL</b></td>
+							                		<td colspan="8" style="text-align: center;"><b>GRANDTOTAL</b></td>
 							                		<td>
 							                			<b id="grandtotal_resep">0</b>
 							                			<input type="hidden" name="total_biaya_service" id="total_biaya_service" value="">
@@ -2812,7 +2812,7 @@ function data_surat_dokter_ada(){
 							        </div>
 		                    	</div>
 		                    </div>
-		                    <div class="form-group">
+		                    <!-- <div class="form-group">
 		                    	<label class="col-md-2 control-label">Diminum Selama</label>
 		                    	<div class="col-sm-5">
 	                				<div class="input-group">
@@ -2820,7 +2820,7 @@ function data_surat_dokter_ada(){
 	                                    <span class="input-group-addon">Hari</span>
 	                                </div>
 	                			</div>
-		                    </div>
+		                    </div> -->
 		                    <hr>
 		                    <center>
 		                    	<button type="button" class="btn btn-success" id="simpanResep"><i class="fa fa-save"></i> <b>Simpan</b></button>
@@ -3515,7 +3515,7 @@ function data_surat_dokter_ada(){
 		                            <th style="text-align:center; color: #fff;" width="50">No</th>
 		                            <th style="text-align:center; color: #fff;">Nama Obat</th>
 		                            <th style="text-align:center; color: #fff;">Harga</th>
-		                            <th style="text-align:center; color: #fff;">Takaran</th>
+		                            <th style="text-align:center; color: #fff;">Jenis Obat</th>
 		                            <th style="text-align:center; color: #fff;">Aturan Minum</th>
 		                        </tr>
 		                    </thead>
@@ -3553,7 +3553,7 @@ function data_surat_dokter_ada(){
 
 <button id="popup_hapus_resep" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#custom-width-modalResep" style="display:none;">Custom width Modal</button>
 <div id="custom-width-modalResep" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog" style="width:55%;">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="custom-width-modalLabel">Konfirmasi Hapus</h4>

@@ -201,7 +201,7 @@
                                 </a>
                             </li>
                             <?PHP 
-                            $get_menu2 = $this->master_model_m->get_menu_2($id_user, 3);
+                            $get_menu2 = $this->master_model_m->get_menu_2($id_user, 2);
                             foreach ($get_menu2 as $key => $menu2) {
                             ?>
 

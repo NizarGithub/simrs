@@ -330,18 +330,21 @@ function load_data_pasien(){
                 for(var i=0; i<result.length; i++){
                     no++; 
 
+                    result[i].JENIS_KELAMIN = result[i].JENIS_KELAMIN=='L'?"Laki - Laki":'Perempuan';
                     result[i].TANGGAL_LAHIR = (result[i].TANGGAL_LAHIR==null || result[i].TANGGAL_LAHIR=='')?"-":result[i].TANGGAL_LAHIR;
                     result[i].NAMA_AYAH = result[i].NAMA_AYAH==null?"-":result[i].NAMA_AYAH;
                     result[i].NAMA_IBU = result[i].NAMA_IBU==null?"-":result[i].NAMA_IBU;
                     result[i].ALAMAT = (result[i].ALAMAT==null || result[i].ALAMAT=='')?"-":result[i].ALAMAT;
 
+                    var umur = result[i].UMUR+' Tahun '+result[i].UMUR_BULAN+' Bulan';
+
                     $tr += "<tr style='cursor:pointer;' onclick='klik_pasien("+result[i].ID+");'>"+
-                                "<td style='text-align:center;'>"+no+"</td>"+
-                                "<td style='white-space:nowrap;'>"+result[i].KODE_PASIEN+"</td>"+
+                                "<td style='white-space:nowrap; text-align:center;'>"+no+"</td>"+
+                                "<td style='white-space:nowrap; text-align:center;'>"+result[i].KODE_PASIEN+"</td>"+
                                 "<td style='white-space:nowrap;'>"+result[i].NAMA+"</td>"+
-                                "<td style='text-align:center;'>"+result[i].JENIS_KELAMIN+"</td>"+
-                                "<td style='white-space:nowrap;'>"+result[i].TANGGAL_LAHIR+"</td>"+
-                                "<td style='white-space:nowrap;'>"+result[i].UMUR+" Tahun</td>"+
+                                "<td style='white-space:nowrap; text-align:center;'>"+result[i].JENIS_KELAMIN+"</td>"+
+                                "<td style='white-space:nowrap; text-align:center;'>"+result[i].TANGGAL_LAHIR+"</td>"+
+                                "<td style='white-space:nowrap; text-align:center;'>"+umur+"</td>"+
                                 "<td style='white-space:nowrap;'>"+result[i].NAMA_AYAH+"</td>"+
                                 "<td style='white-space:nowrap;'>"+result[i].NAMA_IBU+"</td>"+
                                 "<td style='white-space:nowrap;'>"+result[i].ALAMAT+"</td>"+
@@ -1075,7 +1078,7 @@ function klik_asuransi(id){
 <!-- //LOAD PASIEN -->
 <button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal" id="popup_pasien" style="display:none;">Standard Modal</button>
 <div id="myModal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog" style="width: 80%;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
