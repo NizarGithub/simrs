@@ -782,32 +782,24 @@ class Rk_pelayanan_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_rawat_inap($id_pasien,$tanggal_masuk,$bulan,$tahun,$asal_rujukan,$nama_penanggungjawab,$telepon,$sistem_bayar,$kelas,$id_kamar,$id_bed){
+	function simpan_rawat_inap($id_pasien,$tanggal_masuk,$waktu,$bulan,$tahun,$asal_rujukan,$id_poli){
 		$sql = "
 			INSERT INTO admum_rawat_inap(
 				ID_PASIEN,
 				TANGGAL_MASUK,
+				WAKTU,
 				BULAN,
 				TAHUN,
 				ASAL_RUJUKAN,
-				NAMA_PENANGGUNGJAWAB,
-				TELEPON,
-				SISTEM_BAYAR,
-				KELAS,
-				ID_KAMAR,
-				ID_BED
+				ID_POLI
 			) VALUES (
 				'$id_pasien',
 				'$tanggal_masuk',
+				'$waktu',
 				'$bulan',
 				'$tahun',
 				'$asal_rujukan',
-				'$nama_penanggungjawab',
-				'$telepon',
-				'$sistem_bayar',
-				'$kelas',
-				'$id_kamar',
-				'$id_bed'
+				'$id_poli'
 			)
 		";
 		$this->db->query($sql);
@@ -968,7 +960,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 
 	// SURAT DOKTER
 
-	function data_surat_dokter($id_pelayanan){
+	function data_surat_dokter($id_pelayanan,$tanggal){
 		$sql = "
 			SELECT
 				SD.ID,

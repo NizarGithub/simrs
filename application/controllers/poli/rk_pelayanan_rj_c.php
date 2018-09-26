@@ -525,16 +525,16 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		$tanggal = date('d-m-Y');
 		$bulan = date('n');
 		$tahun = date('Y');
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu = $format->format('H:i:s');
 		$kondisi_akhir = $this->input->post('kondisi_akhir');
 
 		//RAWAT INAP
 		$asal_rujukan = $this->input->post('asal_rujukan');
 		$nama_penanggungjawab = $this->input->post('nama_pjawab');
 		$telepon = $this->input->post('telepon');
-		$sistem_bayar = $this->input->post('sistem_bayar');
-		$kelas = $this->input->post('kelas_kamar');
-		$id_kamar = $this->input->post('id_ruangan');
-		$id_bed = $this->input->post('id_bed'); 
 
 		//ICU
 		$id_ruang_icu = $this->input->post('id_ruang_icu');
@@ -550,9 +550,9 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 
 		if($kondisi_akhir == 'Rawat Inap'){
 
-			$this->model->simpan_rawat_inap($id_pasien,$tanggal,$bulan,$tahun,$asal_rujukan,$nama_penanggungjawab,$telepon,$sistem_bayar,$kelas,$id_kamar,$id_bed);
+			$this->model->simpan_rawat_inap($id_pasien,$tanggal,$waktu,$bulan,$tahun,$asal_rujukan,$id_poli);
 			$this->db->query("UPDATE admum_rawat_jalan SET STATUS_PINDAH = '$kondisi_akhir' WHERE ID = '$id_pelayanan'");
-			$this->db->query("UPDATE admum_bed_rawat_inap SET STATUS_PAKAI = '1' WHERE ID = '$id_bed'");
+			// $this->db->query("UPDATE admum_bed_rawat_inap SET STATUS_PAKAI = '1' WHERE ID = '$id_bed'");
 		
 		}else if($kondisi_akhir == 'Operasi'){
 
@@ -668,7 +668,8 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 
 	function data_surat_dokter(){
 		$id_pelayanan = $this->input->post('id');
-		$data = $this->model->data_surat_dokter($id_pelayanan);
+		$tanggal = date('d-m-Y');
+		$data = $this->model->data_surat_dokter($id_pelayanan,$tanggal);
 		echo json_encode($data);
 	}
 

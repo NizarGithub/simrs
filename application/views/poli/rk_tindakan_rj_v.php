@@ -564,7 +564,7 @@ $(document).ready(function(){
 	$('#kondisi_akhir').change(function(){
         var kondisi_akhir = $('#kondisi_akhir').val();
         if(kondisi_akhir == 'Rawat Inap'){
-        	$('#pindah_rawat_inap').show();
+        	// $('#pindah_rawat_inap').show();
         	$('#view_operasi').hide();
         	$('#view_icu').hide();
         	$('#view_meninggal').hide();
@@ -665,6 +665,7 @@ $(document).ready(function(){
 	});
 
     //SURAT DOKTER
+
     $('#dt_surat_dokter').click(function(){
     	var id = $('#id_rj').val();
     	$.ajax({
@@ -673,9 +674,13 @@ $(document).ready(function(){
     		type : "POST",
     		dataType : "json",
     		success : function(row){
-    			$('#waktu_sd').val(row['WAKTU_ISTIRAHAT']);
-    			$('#mulai_tgl_sd').val(row['MULAI_TANGGAL']);
-    			$('#sampai_tgl_sd').val(row['SAMPAI_TANGGAL']);
+    			if(row['WAKTU_ISTIRAHAT'] == null && row['MULAI_TANGGAL'] == null && row['SAMPAI_TANGGAL'] == null){
+
+    			}else{
+	    			$('#waktu_sd').val(row['WAKTU_ISTIRAHAT']);
+	    			$('#mulai_tgl_sd').val(row['MULAI_TANGGAL']);
+	    			$('#sampai_tgl_sd').val(row['SAMPAI_TANGGAL']);
+    			}
     		}
     	});
     });
@@ -1505,7 +1510,12 @@ function ini_obatnya(id){
 								"<td align='center'><input type='text' class='form-control' name='total_obat[]' value='' id='total_obat_"+result[i].ID+"' style='width:125px;' readonly></td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].GOLONGAN_OBAT+"</td>"+
 								"<td align='center'><input type='text' class='form-control' name='aturan_minum[]' value='' style='width:125px;'></td>"+
-								"<td align='center'><input type='text' class='form-control' name='diminum_selama[]' value='' style='width:125px;'></td>"+
+								"<td align='center'>"+
+									"<div class='input-group' style='width:125px;'>"+
+										"<input type='text' class='form-control num_only' name='diminum_selama[]' value=''>"+
+										"<span class='input-group-addon'>Hari</span>"+
+									"</div>"+
+								"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
 							"</tr>";
 				}
@@ -1695,13 +1705,25 @@ function load_ruangan(){
                 for(var i=0; i<result.length; i++){
                     no++;
 
+                    var delapan = new Date('<?php echo date('d/m/Y'); ?> 08:00:00').toLocaleTimeString();
+                    var duabelas = new Date('<?php echo date('d/m/Y'); ?> 11:59:00').toLocaleTimeString();
+                    var now = new Date().toLocaleTimeString();
+
+                    var cash = 0;
+                    var biaya_kamar = result[i].BIAYA;
+
+                    if((parseInt(now) >= parseInt(delapan)) && (parseInt(now) <= parseInt(duabelas))){
+                        cash = (15 * parseFloat(biaya_kamar)) / 100;
+                    }else{
+                        cash = cash;
+                    }
+
                     $tr += "<tr style='cursor:pointer;' onclick='klik_ruangan("+result[i].ID+");'>"+
                                 "<td style='text-align:center;'>"+no+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].KODE_KAMAR+"</td>"+
-                                "<td>"+result[i].NAMA_KAMAR+"</td>"+
-                                "<td style='text-align:center;'>"+result[i].KATEGORI+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].KELAS+"</td>"+
-                                "<td style='text-align:right;'>"+formatNumber(result[i].BIAYA)+"</td>"+
+                                "<td style='text-align:right;'>"+formatNumber(biaya_kamar)+"</td>"+
+                                "<td style='text-align:center;'>"+result[i].VISITE_DOKTER+"</td>"+
                             "</tr>";
                 }
             }
@@ -1725,7 +1747,7 @@ function klik_ruangan(id){
         dataType : "json",
         success : function(row){
             $('#id_ruangan').val(id);
-            var txt = row['KODE_KAMAR']+' - '+row['NAMA_KAMAR'];
+            var txt = row['KODE_KAMAR']+' - '+row['VISITE_DOKTER'];
             $('#ruang_tujuan').val(txt);
             $('#biaya').val(NumberToMoney(row['BIAYA']));
         }
@@ -2035,22 +2057,29 @@ function data_surat_dokter(){
                 for(var i=0; i<result.length; i++){
                 	no++;
 
-                	result[i].JENIS_KELAMIN = result[i].JENIS_KELAMIN=="L"?"Laki - Laki":"Perempuan";
-
-                	var aksi =  '<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-b-5" onclick="surat_dokter('+result[i].ID+');">'+
-									'<i class="fa fa-print"></i>'+
-								'</button>&nbsp;'+
-						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_surat_dokter('+result[i].ID+');">'+
-						   			'<i class="fa fa-trash"></i>'+
-						   		'</button>';
-
                     $tr += "<tr>"+
                     			"<td style='text-align:center;'>"+no+"</td>"+
                                 "<td style='text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
-                                "<td>"+result[i].NAMA+"</td>"+
-                                "<td style='text-align:center;'>"+result[i].JENIS_KELAMIN+"</td>"+
-                                "<td style='text-align:center;'>"+result[i].UMUR+" Tahun</td>"+
-                                "<td align='center'>"+aksi+"</td>"+
+                                "<td style='text-align:center;'>"+
+                                	'<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-b-5" onclick="surat_dokter('+result[i].ID+');">'+
+										'<i class="fa fa-print"></i>'+
+									'</button>&nbsp;'+
+                                "</td>"+
+                                "<td style='text-align:center;'>"+
+                                	'<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-b-5" onclick="surat_dokter('+result[i].ID+');">'+
+										'<i class="fa fa-print"></i>'+
+									'</button>&nbsp;'+
+                                "</td>"+
+                                "<td style='text-align:center;'>"+
+                                	'<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-b-5" onclick="surat_dokter('+result[i].ID+');">'+
+										'<i class="fa fa-print"></i>'+
+									'</button>&nbsp;'+
+                                "</td>"+
+                                "<td style='text-align:center;'>"+
+                                	'<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-b-5" onclick="surat_dokter('+result[i].ID+');">'+
+										'<i class="fa fa-print"></i>'+
+									'</button>&nbsp;'+
+                                "</td>"+
                             "</tr>";
                 }
             }
@@ -2112,6 +2141,32 @@ function data_surat_dokter_ada(){
             $('#tabel_data_surat_dokter').html($tr);
 		}
 	});
+}
+
+function hitung_tanggal(){
+	var someDate = new Date();
+	var numberOfDaysToAdd = $('#waktu_sd').val();
+	if(numberOfDaysToAdd != ''){
+		someDate.setDate(someDate.getDate() + parseInt(numberOfDaysToAdd)); 
+		//Formatting to dd/mm/yyyy :
+
+		var dd = someDate.getDate();
+		var mm = someDate.getMonth() + 1;
+		var y = someDate.getFullYear();
+
+		if(dd < 10){
+			dd = '0'+dd;
+		}
+
+		if(mm < 10){
+			mm = '0'+mm;
+		}
+
+		var someFormattedDate = dd + '-'+ mm + '-'+ y;
+		$('#sampai_tgl_sd').val(someFormattedDate);
+	}else{
+		$('#sampai_tgl_sd').val("");
+	}
 }
 </script>
 
@@ -2226,12 +2281,25 @@ function data_surat_dokter_ada(){
 	                <li role="presentation" id="dt_kondisi_akhir">
 	                    <a href="#kondisi_akhir1" role="tab" data-toggle="tab"><i class="fa fa-check-square-o"></i>&nbsp;Kondisi Akhir</a>
 	                </li>
-	                <li role="presentation" id="dt_surat_dokter">
-	                    <a href="#surat_dokter1" role="tab" data-toggle="tab"><i class="fa fa-file-text-o"></i>&nbsp;Surat Keterangan Dokter</a>
-	                </li>
-	                <li role="presentation" id="dt_data_surat_dokter">
-	                    <a href="#data_surat_dokter1" role="tab" data-toggle="tab"><i class="fa fa-file-text-o"></i>&nbsp;Data Surat Dokter</a>
-	                </li>
+	                <li class="dropdown" role="presentation">
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="javascript:;" aria-expanded="false">
+                            Surat Keterangan <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li id="dt_surat_dokter">
+                                <a data-toggle="tab" role="tab" href="#surat_dokter1">Surat Ket. Dokter</a>
+                            </li>
+                            <li id="dt_surat_dokter_ri">
+                                <a data-toggle="tab" role="tab" href="#data_surat_dokter_ri1">Surat Ket. RI</a>
+                            </li>
+                            <li id="dt_surat_dokter_istirahat">
+                                <a data-toggle="tab" role="tab" href="#data_surat_dokter_istirahat1">Surat Ket. Istirahat</a>
+                            </li>
+                            <li>
+                                <a data-toggle="tab" role="tab" href="#dropdown21">Surat Ket. Sehat</a>
+                            </li>
+                        </ul>
+                    </li>
 	            </ul>
 	            <div class="tab-content">
 	                <div role="tabpanel" class="tab-pane fade in active" id="tindakan1">
@@ -2779,8 +2847,7 @@ function data_surat_dokter_ada(){
 		                        </div>
 		                    </div>
 		                    <div class="form-group">
-		                    	<label class="col-md-2 control-label">&nbsp;</label>
-		                    	<div class="col-md-10">
+		                    	<div class="col-md-12">
 		                    		<div class="table-responsive">
 							            <table id="tabel_tambah_resep" class="table table-bordered">
 							                <thead>
@@ -2835,14 +2902,14 @@ function data_surat_dokter_ada(){
 							<input type="hidden" name="id_poli" id="id_poli_ka" value="<?php echo $dt->ID_POLI; ?>">
 							<input type="hidden" name="id_dokter" id="id_dokter_ka" value="<?php echo $dt->ID_DOKTER; ?>">
 							<input type="hidden" name="id_pasien" id="id_pasien_ka" value="<?php echo $dt->ID; ?>">
-							<input type="hidden" name="asal_rujukan" value="<?php echo $dt->ASAL_RUJUKAN; ?>">
+							<input type="hidden" name="asal_rujukan" value="Dari Poli">
 	                		<div class="form-group">
 	                            <label class="col-sm-2 control-label">Status</label>
 	                            <div class="col-sm-4">
 	                                <select class="form-control" name="kondisi_akhir" id="kondisi_akhir">
 	                                    <option value="Pulang">Pulang</option>
-	                                    <option value="Dirujuk">Dirujuk</option>
 	                                    <option value="Rawat Inap">Rawat Inap</option>
+	                                    <option value="Dirujuk">Dirujuk</option>
 	                                    <option value="ICU">ICU</option>
 	                                    <option value="Operasi">Operasi</option>
 	                                    <option value="Meninggal">Meninggal</option>
@@ -2859,23 +2926,27 @@ function data_surat_dokter_ada(){
 	                        <hr>
 
 	                        <div id="pindah_rawat_inap">
-	                        	<h4>Pindah Rawat Inap</h4>
+	                        	<h4>Kamar Rawat Inap</h4>
 	                        	<hr>
 	                        	<div class="form-group">
 			                        <label class="col-md-2 control-label">Kelas</label>
 			                        <div class="col-md-4">
 			                            <select class="form-control select2" name="kelas_kamar" id="kelas_kamar">
-			                                <option value="Semua">Semua</option>
-			                                <option value="Kelas 1">Kelas 1</option>
-			                                <option value="Kelas 2">Kelas 2</option>
-			                                <option value="Kelas 3">Kelas 3</option>
-			                                <option value="VIP">VIP</option>
-			                                <option value="VVIP">VVIP</option>
+			                                <option value="SVIP">SVIP</option>
+					                        <option value="VIP">VIP</option>
+					                        <option value="1A">I A</option>
+					                        <option value="1B">I B</option>
+					                        <option value="2A">II A</option>
+					                        <option value="2B">II B</option>
+					                        <option value="3">III</option>
+					                        <option value="NEO">Ruang Neo</option>
+					                        <option value="Ruang Isolasi">Ruang Isolasi</option>
+					                        <option value="UGD">UGD</option>
 			                            </select>
 			                        </div>
 			                    </div>
 			                    <div class="form-group">
-			                        <label class="col-md-2 control-label">Ruang Tujuan</label>
+			                        <label class="col-md-2 control-label">Kamar</label>
 			                        <div class="col-md-4">
 			                            <div class="input-group">
 			                                <input type="hidden" name="id_ruangan" id="id_ruangan" value="">
@@ -2893,7 +2964,7 @@ function data_surat_dokter_ada(){
 			                        </div>
 			                    </div>
 			                    <div class="form-group">
-			                        <label class="col-md-2 control-label">Kamar & Bed</label>
+			                        <label class="col-md-2 control-label">No. Bed</label>
 			                        <div class="col-md-4">
 			                            <div class="input-group">
 			                                <input type="hidden" name="id_bed" id="id_bed" value="">
@@ -2916,7 +2987,7 @@ function data_surat_dokter_ada(){
 			                            <input type="text" class="form-control num_only" name="telepon" id="telepon" value="" maxlength="12" required="required">
 			                        </div>
 			                    </div>
-			                    <div class="form-group">
+			                    <!-- <div class="form-group">
 			                        <label class="col-md-2 control-label">Sistem Bayar</label>
 			                        <div class="col-md-4">
 			                            <select class="form-control select2" name="sistem_bayar">
@@ -2926,7 +2997,7 @@ function data_surat_dokter_ada(){
 			                                <option value="JAMKESDA">JAMKESDA</option>
 			                            </select>
 			                        </div>
-			                    </div>
+			                    </div> -->
 			                    <hr>
 	                        </div>
 
@@ -3069,7 +3140,7 @@ function data_surat_dokter_ada(){
 	                            <label class="col-md-2 control-label">Waktu Istirahat</label>
 	                            <div class="col-md-4">
 		                            <div class="input-group">
-		                                <input type="text" class="form-control num_only" name="waktu_sd" id="waktu_sd" value="" required="required">
+		                                <input type="text" class="form-control num_only" name="waktu_sd" id="waktu_sd" value="" required="required" onkeyup="hitung_tanggal();">
 		                                <span class="input-group-btn">
 		                                	<button class="btn btn-primary" type="button" style="cursor:default;">Hari</button>
 		                                </span>
@@ -3079,13 +3150,13 @@ function data_surat_dokter_ada(){
 	                        <div class="form-group">
 		                        <label class="col-md-2 control-label">Mulai Tanggal</label>
 		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" name="mulai_tgl_sd" id="mulai_tgl_sd" value="<?php echo date('d-m-Y'); ?>" data-mask="99-99-9999" required="required">
+		                            <input type="text" class="form-control" name="mulai_tgl_sd" id="mulai_tgl_sd" value="<?php echo date('d-m-Y'); ?>" readonly>
 		                        </div>
 		                    </div>
 		                    <div class="form-group">
 		                        <label class="col-md-2 control-label">Sampai Tanggal</label>
 		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" name="sampai_tgl_sd" id="sampai_tgl_sd" value="" data-mask="99-99-9999" required="required">
+		                            <input type="text" class="form-control" name="sampai_tgl_sd" id="sampai_tgl_sd" value="" readonly>
 		                        </div>
 		                    </div>
 		                    
@@ -3603,11 +3674,10 @@ function data_surat_dokter_ada(){
                             <thead>
                                 <tr class="merah_popup">
                                     <th style="text-align:center; color: #fff;" width="50">No</th>
-                                    <th style="text-align:center; color: #fff;">Kode Kamar</th>
-                                    <th style="text-align:center; color: #fff;">Nama Kamar</th>
-                                    <th style="text-align:center; color: #fff;">Kategori</th>
+                                    <th style="text-align:center; color: #fff;">Nomor Kamar</th>
                                     <th style="text-align:center; color: #fff;">Kelas</th>
                                     <th style="text-align:center; color: #fff;">Biaya</th>
+                                    <th style="text-align:center; color: #fff;">Visite Dokter Sp.</th>
                                 </tr>
                             </thead>
                             <tbody>

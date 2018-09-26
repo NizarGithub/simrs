@@ -241,23 +241,23 @@ function data_kamar(){
 					var aksi = "";
 
 					if(result[i].TOTAL != 0){
-						aksi =  '<button type="button" class="btn btn-info waves-effect waves-light btn-sm m-b-5" onclick="detail_kamar('+result[i].ID+');">'+
+						aksi =  '<button type="button" class="btn btn-info waves-effect waves-light btn-sm" onclick="detail_kamar('+result[i].ID+');">'+
 									'<i class="fa fa-eye"></i>'+
 								'</button>&nbsp;'+
-								'<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_kamar('+result[i].ID+');">'+
+								'<button type="button" class="btn btn-success waves-effect waves-light btn-sm" onclick="ubah_kamar('+result[i].ID+');">'+
 									'<i class="fa fa-pencil"></i>'+
 								'</button>&nbsp;'+
-						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_kamar('+result[i].ID+');">'+
+						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm" onclick="hapus_kamar('+result[i].ID+');">'+
 						   			'<i class="fa fa-trash"></i>'+
 						   		'</button>';
 					}else{
-						aksi =  '<button type="button" class="btn btn-pink waves-effect waves-light btn-sm m-b-5" onclick="tambah_bed('+result[i].ID+');">'+
+						aksi =  '<button type="button" class="btn btn-pink waves-effect waves-light btn-sm" onclick="tambah_bed('+result[i].ID+');">'+
 									'<i class="fa fa-bed"></i>'+
 								'</button>&nbsp;'+
-								'<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_kamar('+result[i].ID+');">'+
+								'<button type="button" class="btn btn-success waves-effect waves-light btn-sm" onclick="ubah_kamar('+result[i].ID+');">'+
 									'<i class="fa fa-pencil"></i>'+
 								'</button>&nbsp;'+
-						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_kamar('+result[i].ID+');">'+
+						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm" onclick="hapus_kamar('+result[i].ID+');">'+
 						   			'<i class="fa fa-trash"></i>'+
 						   		'</button>';
 					}
@@ -624,7 +624,7 @@ function hapus_bed(id,id_kamar){
                 <div class="col-md-6">
                 	<div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                    	<input type="text" class="form-control" name="kode_kamar" id="kode_kamar" value="" onkeyup="cek_nomor_kamar();">
+                    	<input type="text" class="form-control" name="kode_kamar" id="kode_kamar" value="">
                     </div>
                 </div>
             </div>

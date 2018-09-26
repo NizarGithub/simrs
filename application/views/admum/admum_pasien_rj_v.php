@@ -674,6 +674,7 @@ function hitung_pemeriksaan(){
 }
 
 function load_asuransi(){
+    $('.load_tabel_asuransi').show();
     var keyword = $('#cari_asuransi').val();
 
     $.ajax({
@@ -700,6 +701,7 @@ function load_asuransi(){
             }
 
             $('#tabel_asuransi tbody').html($tr);
+            $('.load_tabel_asuransi').hide();
         }
     });
 
@@ -972,7 +974,7 @@ function klik_asuransi(id){
                             </div>
                         </div>
                         <div class="form-group view_lab">
-                            <label class="col-md-2 control-label">Jenis Laborat</label>
+                            <label class="col-md-2 control-label">Jenis Lab</label>
                             <div class="col-md-5">
                                 <div class="input-group">
                                     <input type="hidden" name="id_laborat" id="id_laborat" value="">
@@ -1048,13 +1050,13 @@ function klik_asuransi(id){
                             </div>
                         </div>
                         <div class="form-group view_asr">
-                            <label class="col-md-2 control-label">Nama Asuransi</label>
+                            <label class="col-md-2 control-label">Asuransi</label>
                             <div class="col-md-9">
                                 <div class="input-group">
                                     <input type="hidden" name="id_asuransi" id="id_asuransi" value="">
                                     <input type="text" class="form-control" name="nama_asuransi" id="nama_asuransi" value="" readonly>
                                     <span class="input-group-btn">
-                                        <button type="button" class="btn btn-default btn_asuransi"><i class="fa fa-search"></i></button>
+                                        <button type="button" class="btn btn-danger btn_asuransi"><i class="fa fa-search"></i></button>
                                     </span>
                                 </div>
                             </div>
@@ -1356,6 +1358,9 @@ function klik_asuransi(id){
                         </div>
                     </div>
                 </form>
+                <div class="load_tabel_asuransi">
+                    <img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
+                </div>
                 <div class="table-responsive">
                     <div class="scroll-y">
                         <table class="table table-hover table-bordered" id="tabel_asuransi">

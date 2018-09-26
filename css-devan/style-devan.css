@@ -70,6 +70,14 @@
     display: none;
 }
 
+.load_tabel_asuransi{
+    z-index: 9999;
+    position: absolute;
+    left: 40%;
+    top: 40%;
+    display: none;
+}
+
 .loading_tabel_tdk{
     z-index: 9999;
     position: absolute;

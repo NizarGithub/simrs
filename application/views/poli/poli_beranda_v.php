@@ -852,9 +852,9 @@ function get_total_all(){
             </h4>
             <form class="form-horizontal" role="form">
                 <div class="form-group">
-                    <label class="col-md-1 control-label" style="width: 4%; text-align: left;">Filter :</label>
+                    <label class="col-md-1 control-label" style="width: 7%; text-align: left;">Filter :</label>
                     <?php if(count($level) != 0){ ?>
-                    <div class="col-md-2" style="width: 10%;">
+                    <div class="col-md-2" style="width: 15%;">
                         <div class="checkbox checkbox-inline checkbox-success">
                             <input type="checkbox" id="cek_tampil_semua" value="Semua">
                             <label for="cek_tampil_semua"> Tampilkan Semua </label>
@@ -956,7 +956,7 @@ function get_total_all(){
                         <div class="input-group">
                             <input type="text" class="form-control" name="cari_pasien" id="cari_pasien" placeholder="Cari pasien..." value="">
                             <span class="input-group-btn">
-                                <button type="button" class="btn waves-effect waves-light btn-default" id="tombol_cari">
+                                <button type="button" class="btn waves-effect waves-light btn-warning" id="tombol_cari">
                                     <i class="fa fa-search"></i>
                                 </button>
                             </span>

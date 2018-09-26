@@ -1041,6 +1041,7 @@ function Search_tgl_RI(tgl){
     $id_pegawai = $sess_user['id'];
 ?>
 <input type="hidden" id="ord_tmp" value="" />
+
 <div id="popup_load">
     <div class="window_load">
         <img src="<?=base_url()?>picture/progress.gif" height="100" width="125">
