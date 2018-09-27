@@ -44,9 +44,10 @@ class Ap_gudang_obat_m extends CI_Model {
 						NM_OBT.GOLONGAN_OBAT,
 						NM_OBT.KATEGORI_OBAT,
 						NM_OBT.SERVICE,
-						JENIS.NAMA_JENIS
+						NM_OBT.ID_JENIS_OBAT
+						-- JENIS.NAMA_JENIS
 					FROM admum_setup_nama_obat NM_OBT
-					LEFT JOIN obat_jenis JENIS ON JENIS.ID = NM_OBT.ID_JENIS_OBAT
+					-- LEFT JOIN obat_jenis JENIS ON JENIS.ID = NM_OBT.ID_JENIS_OBAT
 					WHERE NM_OBT.ID = '$id'
 		";
 		$query = $this->db->query($sql);

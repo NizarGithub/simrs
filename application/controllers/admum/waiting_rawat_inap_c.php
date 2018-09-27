@@ -36,10 +36,71 @@ class Waiting_rawat_inap_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	function klik_pasien(){
+	function klik_pasien_poli(){
 		$id = $this->input->post('id');
-		$data = $this->model->klik_pasien($id);
+		$data = $this->model->klik_pasien_poli($id);
 		echo json_encode($data);
+	}
+
+	function load_kamar(){
+		$keyword = $this->input->post('keyword');
+		$kelas = $this->input->post('kelas');
+		$data = $this->model->load_kamar($keyword,$kelas);
+		echo json_encode($data);
+	}
+
+	function klik_kamar(){
+		$id = $this->input->post('id');
+		$data = $this->model->klik_kamar($id);
+		echo json_encode($data);
+	}
+
+	function load_bed(){
+		$keyword = $this->input->post('keyword');
+		$id_kamar = $this->input->post('id_kamar');
+		$data = $this->model->load_bed($keyword,$id_kamar);
+		echo json_encode($data);
+	}
+
+	function klik_bed(){
+		$id = $this->input->post('id');
+		$data = $this->model->klik_bed($id);
+		echo json_encode($data);
+	}
+
+	function get_biaya_adm(){
+		$sistem_bayar = $this->input->post('sistem_bayar');
+		$data = $this->master_model_m->get_biaya_adm($sistem_bayar);
+		echo json_encode($data);
+	}
+
+	function ubah(){
+		$id = $this->input->post('id_ri');
+		$pjawab = $this->input->post('nama_pjawab');
+		$telepon = $this->input->post('telepon');
+		$sistem_bayar = $this->input->post('sistem_bayar');
+		$kelas = $this->input->post('kelas_kamar');
+		$id_kamar = $this->input->post('id_ruangan');
+		$id_bed = $this->input->post('id_bed');
+		$biaya_kamar = str_replace(',', '', $this->input->post('biaya'));
+		$biaya_charge = str_replace(',', '', $this->input->post('biaya_charge_kamar'));
+		$biaya_reg = str_replace(',', '', $this->input->post('biaya_adm'));
+
+		$this->model->update_rawat_inap($id,$pjawab,$telepon,$sistem_bayar,$kelas,$id_kamar,$id_bed,$biaya_kamar,$biaya_charge,$biaya_reg);
+		$this->model->update_stt_pakai($id_bed);
+
+		$id_asuransi = $this->input->post('id_kerjasama');
+		$no_polis = $this->input->post('nomor_polis');
+		$no_peserta = $this->input->post('nomor_peserta');
+		$nama = $this->input->post('nama');
+		$status_pasien = $this->input->post('status_pasien');
+
+		if($sistem_bayar == '2'){
+			$this->model->simpan_asuransi($id,$id_asuransi,$no_polis,$no_peserta,$nama,$status_pasien);
+		}
+
+		$this->session->set_flashdata('sukses','1');
+		redirect('admum/waiting_rawat_inap_c');
 	}
 
 }

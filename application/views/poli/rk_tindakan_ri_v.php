@@ -1,5 +1,4 @@
 <script type="text/javascript" src="<?php echo base_url(); ?>js-devan/jquery-1.11.1.min.js"></script>
-
 <style type="text/css">
 #view_tindakan_tambah, 
 #view_tindakan_ubah,
@@ -24,7 +23,8 @@
 #form_surat_dokter,
 .view_lab,
 #view_laborat_tambah,
-#view_alergi{
+#view_alergi,
+#view_pemeriksaan{
 	display: none;
 }
 </style>
@@ -35,6 +35,7 @@ $id_user = $sess_user['id'];
 ?>
 
 <script type="text/javascript">
+var ajax = "";
 $(document).ready(function(){
 	<?php if($this->session->flashdata('sukses')){?>
 		notif_simpan();
@@ -731,6 +732,14 @@ $(document).ready(function(){
 		load_pemeriksaan();
 	});
 
+	$('#btn_tambah_pemeriksaan').click(function(){
+		$('#view_pemeriksaan').show();
+	});
+
+	$('#btn_tutup_pemeriksaan').click(function(){
+		$('#view_pemeriksaan').hide();
+	});
+
 	$('#simpanLab').click(function(){
 		var id_laborat = $('#id_laborat').val();
 		var pemeriksaan = $('#tabel_tambah_pemeriksaan tbody tr').length;
@@ -824,8 +833,13 @@ $(document).ready(function(){
 	});
 
 	$('#simpanResep').click(function(){
+		var banyak_resep = $('#banyak_resep').val();
 		var tr = $("#tabel_tambah_resep tbody tr").length;
-		if(tr == 0){
+
+		if(banyak_resep == ""){
+			toastr["error"]("Masukkan jumlah resep!", "Notifikasi");
+			$('#banyak_resep').focus();
+		}else if(tr == 0){
 			toastr["error"]("Obat kosong!", "Notifikasi");
 		}else{
 			$.ajax({
@@ -894,26 +908,24 @@ $(document).ready(function(){
 			type : "POST",
 			dataType : "json",
 			success : function(row){
-				if(row['KONDISI_AKHIR'] == "Dirawat"){
-				  $('#kondisi_akhir option[value="Dirawat"]').attr('selected','selected');
+				if(row['KONDISI_AKHIR'] == "Rawat Inap"){
+				  $('#kondisi_akhir option[value="Rawat Inap"]').attr('selected','selected');
 				}else if(row['KONDISI_AKHIR'] == "Pulang"){
 				  $('#kondisi_akhir option[value="Pulang"]').attr('selected','selected');
 				}else if(row['KONDISI_AKHIR'] == "Dirujuk"){
 				  $('#kondisi_akhir option[value="Dirujuk"]').attr('selected','selected');
 				}
 
-				$('#dirawat_selama').val(row['DIRAWAT_SELAMA']);
-				$('#tanggal_keluar').val(row['TANGGAL_KELUAR']);
+				if(row['DIRAWAT_SELAMA'] != '0'){
+					$('#dirawat_selama').val(row['DIRAWAT_SELAMA']);
+					$('#tanggal_keluar').val(row['TANGGAL_KELUAR']);
 
-				if(row['ID'] != null || row['ID'] != ""){
 					$('#kondisi_akhir').attr('disabled','disabled');
-					$('#dirawat_selama').attr('readonly','readonly');
-					$('#tanggal_keluar').attr('readonly','readonly');
+					$('#dirawat_selama').attr('disabled','disabled');
 					$('#simpanKA').attr('disabled','disabled');
 				}else{
 					$('#kondisi_akhir').removeAttr('disabled');
-					$('#dirawat_selama').removeAttr('readonly');
-					$('#tanggal_keluar').removeAttr('readonly');
+					$('#dirawat_selama').removeAttr('disabled');
 					$('#simpanKA').removeAttr('disabled');
 				}
 
@@ -2656,27 +2668,35 @@ function klik_pemeriksaan(id){
 
 function load_pemeriksaan(){
 	var keyword = $('#cari_pemeriksaan').val();
+	var id_jenis_lab = $('#id_laborat').val();
 
-	$.ajax({
+	if(ajax){
+		ajax.abort();
+	}
+
+	ajax = $.ajax({
 		url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/load_pemeriksaan',
-		data : {keyword:keyword},
-		type : "POST",
+		data : {
+			keyword:keyword,
+			id_jenis_lab:id_jenis_lab
+		},
+		type : "GET",
 		dataType : "json",
 		success : function(result){
 			$tr = "";
 
 			if(result == "" || result == null){
-				$tr = "<tr><td colspan='4' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+				$tr = "<tr><td colspan='3' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
 				var no = 0;
 
 				for(var i=0; i<result.length; i++){
 					no++;
 
-					$tr += "<tr style='cursor:pointer;' onclick='klik_pemeriksaan("+result[i].ID+");'>"+
+					$tr += "<tr style='cursor:pointer;' onclick='klik_pemeriksaan_manual("+result[i].ID_NILAI+");'>"+
 								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td>"+result[i].KODE+"</td>"+
 								"<td>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
+								"<td>"+result[i].NILAI_NORMAL+"</td>"+
 								"<td style='text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
 							"</tr>";
 				}
@@ -2685,6 +2705,43 @@ function load_pemeriksaan(){
 			$('#tb_pemeriksaan tbody').html($tr);
 		}
 	});
+
+	$('#cari_pemeriksaan').off('keyup').keyup(function(){
+		load_pemeriksaan();
+	});
+}
+
+function klik_pemeriksaan_manual(id_nilai){
+	$('#tutup_pemeriksaan').click();
+
+    $.ajax({
+        url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/klik_pemeriksaan_manual',
+        data : {id_nilai:id_nilai},
+        type : "POST",
+        dataType : "json",
+        success : function(result){
+            $tr = "";
+
+            for(var i=0; i<result.length; i++){
+                var jumlah_data = $('#tr2_'+result[i].ID).length;
+
+                var aksi = "<button type='button' class='btn waves-light btn-danger btn-sm' onclick='deleteRow2(this);'><i class='fa fa-times'></i></button>";
+
+                $tr += "<tr id='tr2_"+result[i].ID+"'>"+
+                            "<input type='hidden' name='id_pemeriksaan[]' value='"+result[i].ID+"'>"+
+                            "<input type='hidden' name='tarif_pemeriksaan[]' value='"+result[i].TARIF+"'>"+
+                            "<td style='vertical-align:middle;'>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
+                            "<td style='vertical-align:middle;'>"+result[i].NILAI_NORMAL+"</td>"+
+                            "<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
+                            "<td align='center'>"+aksi+"</td>"+
+                          "</tr>";
+            }
+
+            $('#tabel_tambah_pemeriksaan tbody').append($tr);
+            hitung_pemeriksaan();
+            $('#popup_load').hide();
+        }
+    });
 }
 
 function deleteRow2(btn){
@@ -2860,6 +2917,7 @@ function load_obat(){
 }
 
 function klik_obat(id){
+	$('#popup_load').show();
 	$('#tutup_resep').click();
 
 	$.ajax({
@@ -2884,19 +2942,26 @@ function klik_obat(id){
 							"<input type='hidden' name='id_obat_resep[]' value='"+result[i].ID+"'>"+
 							"<input type='hidden' name='harga_obat[]' id='harga_obat_"+result[i].ID+"' value='"+result[i].HARGA_JUAL+"'>"+
 							"<input type='hidden' name='service[]' id='service_"+result[i].ID+"' value='"+result[i].SERVICE+"'>"+
-							"<td>"+result[i].KODE_OBAT+"</td>"+
-							"<td>"+result[i].NAMA_OBAT+"</td>"+
-							"<td style='text-align:right;'>"+formatNumber(result[i].HARGA_JUAL)+"</td>"+
+							"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_OBAT+"</td>"+
+							"<td style='vertical-align:middle;'>"+result[i].NAMA_OBAT+"</td>"+
+							"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].HARGA_JUAL)+"</td>"+
 							"<td align='center'><input type='text' class='form-control' name='jumlah_obat[]' value='' id='jumlah_obat_"+result[i].ID+"' style='width:125px;' onkeyup='FormatCurrency(this); hitung_resep("+result[i].ID+")'></td>"+
 							"<td align='center'><input type='text' class='form-control' name='total_obat[]' value='' id='total_obat_"+result[i].ID+"' style='width:125px;' readonly></td>"+
-							"<td align='center'><input type='text' class='form-control' name='takaran_resep[]' value='' style='width:125px;'></td>"+
+							"<td style='vertical-align:middle; text-align:center;'>"+result[i].ID_JENIS_OBAT+"</td>"+
 							"<td align='center'><input type='text' class='form-control' name='aturan_minum[]' value='' style='width:125px;'></td>"+
+							"<td align='center'>"+
+								"<div class='input-group' style='width:125px;'>"+
+									"<input type='text' class='form-control num_only' name='diminum_selama[]' value=''>"+
+									"<span class='input-group-addon'>Hari</span>"+
+								"</div>"+
+							"</td>"+
 							"<td align='center'>"+aksi+"</td>"+
 						  "</tr>";
 				}
 			}
 
 			$('#tabel_tambah_resep tbody').append($tr);
+			$('#popup_load').hide();
 		}
 	});
 }
@@ -2904,6 +2969,29 @@ function klik_obat(id){
 function deleteRowResep(btn){
 	var row = btn.parentNode.parentNode;
 	row.parentNode.removeChild(row);
+	var grandtotal = 0;
+	$("input[name='total_obat[]']").each(function(id,elm){
+		var t = elm.value;
+		t = t.split(',').join('');
+		if(t == ""){
+			t = '0';
+		}
+		grandtotal += parseFloat(t);
+	});
+
+	var tot_service = 0;
+	$("input[name='service[]']").each(function(id,elm){
+		var t = elm.value;
+		t = t.split(',').join('');
+		if(t == ""){
+			t = '0';
+		}
+		tot_service += parseFloat(t);
+	});
+
+	$('#grandtotal_resep').html(formatNumber(grandtotal));
+	$('#grandtotal_resep_txt').val(grandtotal);
+	$('#total_biaya_service').val(tot_service);
 }
 
 function data_resep(){
@@ -2941,7 +3029,6 @@ function data_resep(){
 								"<td style='text-align:center;'>"+result[i].KODE_RESEP+"</td>"+
 								"<td style='text-align:center;'>"+result[i].BANYAKNYA_RESEP+" Bungkus</td>"+
 								"<td style='text-align:right;'>"+formatNumber(result[i].TOTAL)+"</td>"+
-								"<td style='text-align:center;'>"+result[i].DIMINUM_SELAMA+" Hari</td>"+
 								"<td align='center'>"+aksi+"</td>"+
 							"</tr>";
 				}
@@ -2978,7 +3065,7 @@ function detail_resep(id){
 								"<td>"+result[i].NAMA_OBAT+"</td>"+
 								"<td style='text-align:center;'>"+result[i].JUMLAH_BELI+"</td>"+
 								"<td style='text-align:right;'>"+formatNumber(result[i].SUBTOTAL)+"</td>"+
-								"<td style='text-align:center;'>"+result[i].TAKARAN+"</td>"+
+								"<td style='text-align:center;'>"+result[i].ID_JENIS_OBAT+"</td>"+
 								"<td style='text-align:center;'>"+result[i].ATURAN_MINUM+"</td>"+
 							"</tr>";
 				}
@@ -3359,26 +3446,26 @@ function hitung_tanggal(){
 	        </div>
 	        <div class="col-md-4">
 	            <div class="card-box">
-	            	<h4><i class="fa fa-user-md"></i> Dokter</h4>
+	            	<h4><i class="fa fa-home"></i> Poli</h4>
 	            	<hr/>
-	            	<table class="table">
+	            	<table class="table table-striped">
 	            		<thead>
 	            			<tr class="info">
-	            				<th style="text-align: center;">DOKTER</th>
-	            				<th style="text-align: center;">PELAYANAN</th>
 	            				<th style="text-align: center;">ASAL RUJUKAN</th>
+	            				<th style="text-align: center;">NAMA POLI</th>
+	            				<th style="text-align: center;">DOKTER</th>
 	            			</tr>
 	            		</thead>
 	            		<tbody>
 		            		<tr>
 		            			<td style="text-align: center;">
-		            				<span style="color:#0066b2;"><?php echo $dt->NAMA_DOKTER; ?>
-		            			</td>
-		            			<td style="text-align: center;">
-		            				<span style="color:#0066b2;"><?php echo $dt->STATUS; ?>
-		            			</td>
-		            			<td style="text-align: center;">
 		            				<span style="color:#0066b2;"><?php echo $dt->ASAL_RUJUKAN; ?>
+		            			</td>
+		            			<td style="text-align: center;">
+		            				<span style="color:#0066b2;"><?php echo $dt->NAMA_POLI; ?>
+		            			</td>
+		            			<td style="text-align: center;">
+		            				<span style="color:#0066b2;"><?php echo $dt->NAMA_DOKTER; ?>
 		            			</td>
 		            		</tr>
 	            		</tbody>
@@ -3800,7 +3887,6 @@ function hitung_tanggal(){
 						                        <th style="color:#fff; text-align:center;">Aksi</th>
 						                    </tr>
 						                </thead>
-
 						                <tbody>
 						                    
 						                </tbody>
@@ -3849,34 +3935,37 @@ function hitung_tanggal(){
 	                                </span>
 	                            </div>
 	                        </div>
+	                        <div class="col-md-5">
+	                        	<button type="button" class="btn btn-success" id="btn_tambah_pemeriksaan"><i class="fa fa-plus"></i> Tambah Pemeriksaan Manual</button>
+	                        </div>
 	                    </div>
-	                    <!-- <div class="form-group">
+	                    <div class="form-group" id="view_pemeriksaan">
 	                        <label class="col-md-2 control-label">Pemeriksaan</label>
 	                        <div class="col-md-5">
 	                            <div class="input-group">
-	                                <input type="text" class="form-control" value="" readonly="readonly" required="required">
+	                                <input type="text" class="form-control" value="" readonly="readonly">
 	                                <span class="input-group-btn">
 	                                    <button type="button" class="btn btn-inverse btn_pemeriksaan"><i class="fa fa-search"></i></button>
 	                                </span>
 	                            </div>
 	                        </div>
-	                    </div> -->
+	                        <div class="col-md-5">
+	                        	<button type="button" class="btn btn-danger" id="btn_tutup_pemeriksaan"><i class="fa fa-times"></i> Tutup</button>
+	                        </div>
+	                    </div>
 	                    <div class="form-group">
 	                        <label class="col-md-2 control-label">&nbsp;</label>
-	                        <div class="col-md-8">
+	                        <div class="col-md-7">
 	                            <div class="table-responsive">
 						            <table id="tabel_tambah_pemeriksaan" class="table table-bordered">
 						                <thead>
 						                    <tr class="kuning_tr">
 						                        <th style="color:#fff; text-align:center;">Pemeriksaan</th>
-						                        <!-- <th style="color:#fff; text-align:center;">Hasil</th>
-						                        <th style="color:#fff; text-align:center;">Nilai Rujukan</th> -->
+						                        <th style="color:#fff; text-align:center;">Nilai Normal</th>
 						                        <th style="color:#fff; text-align:center;">Tarif</th>
-						                        <th style="color:#fff; text-align:center;">Sub Total</th>
 						                        <th style="color:#fff; text-align:center;">#</th>
 						                    </tr>
 						                </thead>
-
 						                <tbody>
 						                    
 						                </tbody>
@@ -4109,7 +4198,6 @@ function hitung_tanggal(){
 						                        <th style="color:#fff; text-align:center;">Kode Resep</th>
 						                        <th style="color:#fff; text-align:center;">Banyak Bungkus</th>
 						                        <th style="color:#fff; text-align:center;">Total</th>
-						                        <th style="color:#fff; text-align:center;">Diminum Selama</th>
 						                        <th style="color:#fff; text-align:center;">Aksi</th>
 						                    </tr>
 						                </thead>
@@ -4159,7 +4247,7 @@ function hitung_tanggal(){
 	                                <label for="inlineRadio1"> Ya </label>
 	                            </div>
 	                            <div class="radio radio-inline radio-success">
-	                                <input type="radio" id="inlineRadio2" value="Tidak" name="alergi">
+	                                <input type="radio" id="inlineRadio2" value="Tidak" name="alergi" checked>
 	                                <label for="inlineRadio2"> Tidak </label>
 	                            </div>
 							</div>
@@ -4203,33 +4291,24 @@ function hitung_tanggal(){
 						                        <th style="color:#fff; text-align:center;">Harga</th>
 						                        <th style="color:#fff; text-align:center;">Jumlah</th>
 						                        <th style="color:#fff; text-align:center;">Total</th>
-						                        <th style="color:#fff; text-align:center;">Takaran</th>
+						                        <th style="color:#fff; text-align:center;">Jenis Obat</th>
 						                        <th style="color:#fff; text-align:center;">Aturan Minum</th>
+						                        <th style="color:#fff; text-align:center;">Diminum Selama</th>
 						                        <th style="color:#fff; text-align:center;">#</th>
 						                    </tr>
 						                </thead>
-
 						                <tbody>
 						                    
 						                </tbody>
 						                <tfoot>
 						                	<tr class="active">
-						                		<td style="text-align: center; font-weight: bold;" colspan="6">GRANDTOTAL</td>
+						                		<td style="text-align: center; font-weight: bold;" colspan="7">GRANDTOTAL</td>
 						                		<td style="text-align: right;" colspan="2"><b id="grandtotal_resep">0</b></td>
 						                	</tr>
 						                </tfoot>
 						            </table>
 						        </div>
 	                    	</div>
-	                    </div>
-	                    <div class="form-group">
-	                    	<label class="col-md-2 control-label">Diminum Selama</label>
-	                    	<div class="col-sm-5">
-                				<div class="input-group">
-                                    <input type="text" class="form-control num_only" name="diminum_selama" id="diminum_selama" value="">
-                                    <span class="input-group-addon">Hari</span>
-                                </div>
-                			</div>
 	                    </div>
 	                    <hr>
 	                    <center>
@@ -4257,7 +4336,7 @@ function hitung_tanggal(){
                             <label class="col-sm-2 control-label">Status</label>
                             <div class="col-sm-4">
                                 <select class="form-control" name="kondisi_akhir" id="kondisi_akhir">
-                                    <option value="Dirawat">Dirawat</option>
+                                    <option value="Rawat Inap">Rawat Inap</option>
                                     <option value="Pulang">Pulang</option>
                                     <option value="Dirujuk">Dirujuk</option>
                                     <option value="Operasi">Operasi</option>
@@ -4331,7 +4410,7 @@ function hitung_tanggal(){
                 		<div class="form-group">
                 			<label class="col-sm-2 control-label">Tanggal Keluar</label>
                 			<div class="col-sm-4">
-                				<input type="text" class="form-control" name="tanggal_keluar" id="tanggal_keluar" data-mask="99-99-9999" value="">
+                				<input type="text" class="form-control" name="tanggal_keluar" id="tanggal_keluar" value="" readonly>
                 			</div>
                 		</div>
                 		<hr>
@@ -4367,7 +4446,6 @@ function hitung_tanggal(){
 						                        <th style="color:#fff; text-align:center;">Aksi</th>
 						                    </tr>
 						                </thead>
-
 						                <tbody>
 						                    
 						                </tbody>
@@ -5407,11 +5485,11 @@ function hitung_tanggal(){
 
 <button class="btn btn-primary" data-toggle="modal" data-target="#myModal1_pemeriksaan" id="popup_pemeriksaan" style="display:none;">Standard Modal</button>
 <div id="myModal1_pemeriksaan" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog" style="width:50%;">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title" id="myModalLabel">Data Tindakan</h4>
+                <h4 class="modal-title" id="myModalLabel">Data Pemeriksaan</h4>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" role="form">
@@ -5434,8 +5512,8 @@ function hitung_tanggal(){
 		                    <thead>
 		                        <tr class="hijau_popup">
 		                            <th style="text-align:center; color: #fff;" width="50">No</th>
-		                            <th style="text-align:center; color: #fff;">Kode</th>
 		                            <th style="text-align:center; color: #fff;">Pemeriksaan</th>
+		                            <th style="text-align:center; color: #fff;">Nilai Normal</th>
 		                            <th style="text-align:center; color: #fff;">Tarif</th>
 		                        </tr>
 		                    </thead>
@@ -5586,7 +5664,7 @@ function hitung_tanggal(){
 		                            <th style="text-align:center; color: #fff;">Nama Obat</th>
 		                            <th style="text-align:center; color: #fff;">Jumlah</th>
 		                            <th style="text-align:center; color: #fff;">Total</th>
-		                            <th style="text-align:center; color: #fff;">Takaran</th>
+		                            <th style="text-align:center; color: #fff;">Jenis Obat</th>
 		                            <th style="text-align:center; color: #fff;">Aturan Minum</th>
 		                        </tr>
 		                    </thead>

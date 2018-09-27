@@ -9,7 +9,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 	}
 
 	function notif_pasien_baru($tanggal){
-		$sql = "SELECT COUNT(*) AS TOTAL FROM admum_rawat_inap WHERE TANGGAL_MASUK = '$tanggal' AND STS_TERIMA = '0'";
+		$sql = "SELECT COUNT(*) AS TOTAL FROM admum_rawat_inap WHERE STS_TERIMA = '0'";
 		$query = $this->db->query($sql);
 		return $query->row();
 	}
@@ -32,8 +32,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 			LEFT JOIN rk_pasien PASIEN ON PASIEN.ID = RI.ID_PASIEN
 			LEFT JOIN admum_kamar_rawat_inap KRI ON KRI.ID = RI.ID_KAMAR
 			LEFT JOIN admum_bed_rawat_inap BED ON BED.ID = RI.ID_BED
-			WHERE RI.TANGGAL_MASUK = '$tanggal'
-			AND RI.STS_TERIMA = '0'
+			WHERE RI.STS_TERIMA = '0'
 			ORDER BY RI.ID DESC
 		";
 		$query = $this->db->query($sql);
@@ -75,7 +74,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 			LEFT JOIN admum_kamar_rawat_inap KRI ON KRI.ID = RI.ID_KAMAR
 			LEFT JOIN admum_bed_rawat_inap BED ON BED.ID = RI.ID_BED
 			LEFT JOIN kepeg_pegawai PEG ON PEG.ID = RI.ID_DOKTER
-			LEFT JOIN rk_ri_diagnosa KA ON KA.ID_PELAYANAN = RI.ID
+			LEFT JOIN rk_ri_kondisi_akhir KA ON KA.ID_PELAYANAN = RI.ID
 			WHERE $where
 			AND RI.STS_TERIMA = '1'
 			ORDER BY RI.ID DESC
@@ -114,12 +113,14 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				PASIEN.KECAMATAN,
 				PASIEN.KELURAHAN,
 				PASIEN.KOTA,
-				PASIEN.PEKERJAAN
+				PASIEN.PEKERJAAN,
+				PL.NAMA AS NAMA_POLI
 			FROM admum_rawat_inap RI
 			LEFT JOIN rk_pasien PASIEN ON PASIEN.ID = RI.ID_PASIEN
 			LEFT JOIN admum_kamar_rawat_inap KRI ON KRI.ID = RI.ID_KAMAR
 			LEFT JOIN admum_bed_rawat_inap BED ON BED.ID = RI.ID_BED
 			LEFT JOIN kepeg_pegawai PEG ON PEG.ID = RI.ID_DOKTER
+			JOIN admum_poli PL ON PL.ID = RI.ID_POLI
 			WHERE RI.ID = '$id'
 		";
 		$query = $this->db->query($sql);
@@ -1029,16 +1030,44 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		return $query->row();
 	}
 
-	function load_pemeriksaan($keyword){
+	function load_pemeriksaan($keyword,$id_jenis_lab){
 		$where = "1 = 1";
 
 		if($keyword != ""){
-			$where = $where." AND (NAMA_PEMERIKSAAN LIKE '%$keyword%' OR KODE LIKE '%$keyword%')";
+			$where = $where." AND a.NAMA_PEMERIKSAAN LIKE '%$keyword%'";
 		}else{
 			$where = $where;
 		}
 
-		$sql = "SELECT * FROM admum_setup_pemeriksaan WHERE $where ORDER BY ID ASC";
+		$sql = "
+			SELECT 
+				a.ID,
+				b.ID AS ID_NILAI,
+				a.NAMA_PEMERIKSAAN,
+				b.NILAI_NORMAL,
+				a.TARIF
+			FROM admum_setup_pemeriksaan a
+			JOIN admum_setup_pemeriksaan_nilai b ON b.ID_PEMERIKSAAN = a.ID
+			WHERE $where 
+			AND a.ID_JENIS_LAB = '$id_jenis_lab'
+			ORDER BY a.ID ASC
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function klik_pemeriksaan_manual($id_nilai){
+		$sql = "
+			SELECT 
+				b.ID AS ID_NILAI,
+				a.ID,
+				a.NAMA_PEMERIKSAAN,
+				b.NILAI_NORMAL,
+				a.TARIF
+			FROM admum_setup_pemeriksaan a
+			JOIN admum_setup_pemeriksaan_nilai b ON b.ID_PEMERIKSAAN = a.ID
+			WHERE b.ID = '$id_nilai'
+		";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
@@ -1221,6 +1250,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				a.ID,
 				a.KODE_OBAT,
 				a.NAMA_OBAT,
+				a.ID_JENIS_OBAT,
 				IFNULL(b.STOK,0) AS STOK,
 				IFNULL(c.HARGA_JUAL,0) AS HARGA_JUAL,
 				a.SERVICE
@@ -1251,6 +1281,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 			SELECT
 				DET.ID,
 				b.NAMA_OBAT,
+				b.ID_JENIS_OBAT,
 				DET.JUMLAH_BELI,
 				DET.SUBTOTAL,
 				DET.TAKARAN,
@@ -1264,7 +1295,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		return $query->result();
 	}
 
-	function simpan_resep($id_pelayanan,$id_pasien,$kode_resep,$alergi,$uraian,$banyak_resep,$diminum_selama,$tanggal,$bulan,$tahun,$total,$total_dgn_service){
+	function simpan_resep($id_pelayanan,$id_pasien,$kode_resep,$alergi,$uraian,$banyak_resep,$tanggal,$bulan,$tahun,$total,$total_dgn_service){
 		$sql = "
 			INSERT INTO rk_ri_resep(
 				ID_PELAYANAN,
@@ -1273,7 +1304,6 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				ALERGI_OBAT,
 				URAIAN,
 				BANYAKNYA_RESEP,
-				DIMINUM_SELAMA,
 				TANGGAL,
 				BULAN,
 				TAHUN,
@@ -1286,7 +1316,6 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				'$alergi',
 				'$uraian',
 				'$banyak_resep',
-				'$diminum_selama',
 				'$tanggal',
 				'$bulan',
 				'$tahun',
@@ -1297,7 +1326,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
-	function simpan_resep_det($id_resep,$id_obat,$harga,$service,$jumlah,$subtotal,$takaran,$aturan_umum,$tanggal,$tahun,$bulan){
+	function simpan_resep_det($id_resep,$id_obat,$harga,$service,$jumlah,$subtotal,$aturan_umum,$diminum_selama,$tanggal,$tahun,$bulan){
 		$sql = "
 			INSERT INTO rk_ri_resep_detail(
 				ID_RESEP,
@@ -1306,8 +1335,8 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				SERVICE,
 				JUMLAH_BELI,
 				SUBTOTAL,
-				TAKARAN,
 				ATURAN_MINUM,
+				DIMINUM_SELAMA,
 				TANGGAL,
 				TAHUN,
 				BULAN
@@ -1318,8 +1347,8 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				'$service',
 				'$jumlah',
 				'$subtotal',
-				'$takaran',
 				'$aturan_umum',
+				'$diminum_selama',
 				'$tanggal',
 				'$tahun',
 				'$bulan'

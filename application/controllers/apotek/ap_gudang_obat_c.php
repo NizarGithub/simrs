@@ -222,6 +222,7 @@ class Ap_gudang_obat_c extends CI_Controller {
 		$harga_pertablet = str_replace(',', '', $this->input->post('harga_pertablet'));
 		$harga_beli = str_replace(',', '', $this->input->post('harga_beli'));
 		$harga_jual = str_replace(',', '', $this->input->post('harga_jual'));
+		$harga_bulat = str_replace(',', '', $this->input->post('harga_bulat'));
 		$id_supplier = $this->input->post('id_supplier');
 		$no_faktur = $this->input->post('no_faktur');
 		$diskon = $this->input->post('diskon');

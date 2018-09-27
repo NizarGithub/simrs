@@ -591,7 +591,8 @@ class Ap_kasir_rajal_c extends CI_Controller {
 	}
 
 	function data_pembayaran(){
-		$data = $this->model->data_pembayaran();
+		$keyword = $this->input->get('keyword');
+		$data = $this->model->data_pembayaran($keyword);
 		echo json_encode($data);
 	}
 
@@ -606,7 +607,7 @@ class Ap_kasir_rajal_c extends CI_Controller {
 	}
 
 	function tanggal_filter(){
-    $tanggal_sekarang = $this->input->post('tanggal_sekarang');
+    $tanggal_sekarang = $this->input->post('tanggal_sekarang');		
     $tanggal_sampai = $this->input->post('tanggal_sampai');
     $data = $this->model->tanggal_filter($tanggal_sekarang, $tanggal_sampai);
     echo json_encode($data);

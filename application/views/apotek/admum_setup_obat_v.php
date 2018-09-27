@@ -74,7 +74,7 @@ $(document).ready(function(){
 	// });
 	$('.btn_jenis').click(function(){
 		$('#popup_jenis').click();
-		get_jenis_obat();
+		// get_jenis_obat();
 	});
 
 	$('.btn_golongan').click(function(){
@@ -223,65 +223,86 @@ function get_kode_obat(){
 //
 // //-------------
 
-function get_jenis_obat(){
-	var keyword = $('#cari_jenis').val();
+// function get_jenis_obat(){
+// 	var keyword = $('#cari_jenis').val();
+//
+// 	if(ajax){
+// 		ajax.abort();
+// 	}
+//
+// 	ajax = $.ajax({
+//         url : '<?php echo base_url(); ?>apotek/admum_setup_obat_c/data_jenis_obat',
+//         data : {keyword:keyword},
+//         type : "GET",
+//         dataType : "json",
+//         success : function(result){
+//             $tr = "";
+//
+//             if(result == "" || result == null){
+//             	$tr = "<tr><td colspan='2' style='text-align:center;'><b>Data tidak ditemukan</b></td></tr>";
+//             }else{
+// 	            var no = 0;
+// 	            for(var i=0; i<result.length; i++){
+// 	            	no++;
+//
+// 	            	$tr += '<tr style="cursor:pointer;" onclick="klik_jenis('+result[i].ID+');">'+
+// 	            				'<td style="text-align:center;">'+no+'</td>'+
+// 	            				'<td>'+result[i].NAMA_JENIS+'</td>'+
+// 	            			'</tr>';
+// 	            }
+//             }
+//
+//             $('#tabel_jenis tbody').html($tr);
+//         }
+//     });
+//
+//     $('#cari_jenis').off('keyup').keyup(function(){
+//     	get_jenis_obat();
+//     });
+// }
+//
+// function klik_jenis(id_jenis){
+// 	$('#tutup_jenis').click();
+//     $('#cari_jenis').val("");
+//
+// 	$.ajax({
+// 		url : '<?php echo base_url(); ?>apotek/admum_setup_obat_c/klik_jenis',
+// 		data : {id_jenis:id_jenis},
+// 		type : "POST",
+// 		dataType : "json",
+// 		success : function(row){
+//             var ket = $('#ket').val();
+//
+//             if(ket == 'Tambah'){
+//     			$('#id_jenis').val(id_jenis);
+//     			$('#jenis_obat').val(row['NAMA_JENIS']);
+//             }else{
+//                 $('#id_jenis_ubah').val(id_jenis);
+//                 $('#jenis_obat_ubah').val(row['NAMA_JENIS']);
+//             }
+// 		}
+// 	});
+// }
 
-	if(ajax){
-		ajax.abort();
-	}
-
-	ajax = $.ajax({
-        url : '<?php echo base_url(); ?>apotek/admum_setup_obat_c/data_jenis_obat',
-        data : {keyword:keyword},
-        type : "GET",
-        dataType : "json",
-        success : function(result){
-            $tr = "";
-
-            if(result == "" || result == null){
-            	$tr = "<tr><td colspan='2' style='text-align:center;'><b>Data tidak ditemukan</b></td></tr>";
-            }else{
-	            var no = 0;
-	            for(var i=0; i<result.length; i++){
-	            	no++;
-
-	            	$tr += '<tr style="cursor:pointer;" onclick="klik_jenis('+result[i].ID+');">'+
-	            				'<td style="text-align:center;">'+no+'</td>'+
-	            				'<td>'+result[i].NAMA_JENIS+'</td>'+
-	            			'</tr>';
-	            }
-            }
-
-            $('#tabel_jenis tbody').html($tr);
-        }
-    });
-
-    $('#cari_jenis').off('keyup').keyup(function(){
-    	get_jenis_obat();
-    });
-}
-
-function klik_jenis(id_jenis){
+function klik_jenis(no_jenis){
 	$('#tutup_jenis').click();
-    $('#cari_jenis').val("");
+	var ket = $('#ket').val();
 
-	$.ajax({
-		url : '<?php echo base_url(); ?>apotek/admum_setup_obat_c/klik_jenis',
-		data : {id_jenis:id_jenis},
-		type : "POST",
-		dataType : "json",
-		success : function(row){
-            var ket = $('#ket').val();
-
-            if(ket == 'Tambah'){
-    			$('#id_jenis').val(id_jenis);
-    			$('#jenis_obat').val(row['NAMA_JENIS']);
-            }else{
-                $('#id_jenis_ubah').val(id_jenis);
-                $('#jenis_obat_ubah').val(row['NAMA_JENIS']);
-            }
-		}
-	});
+	var jenis = {
+										1 : 'Tablet',
+										2 : 'Sirup / Drop',
+										3 : 'Injeksi',
+										4 : 'Suprositoria',
+										5 : 'Salep / Krim',
+										6 : 'Spray',
+			           }
+	 if(ket == 'Tambah'){
+		 	$('#id_jenis').val(jenis[no_jenis]);
+ 			$('#jenis_obat').val(jenis[no_jenis]);
+ 	}else{
+			$('#id_jenis_ubah').val(jenis[no_jenis]);
+ 			$('#jenis_obat_ubah').val(jenis[no_jenis]);
+ 	}
 }
 
 function klik_golongan(no_golongan){
@@ -289,18 +310,10 @@ function klik_golongan(no_golongan){
 	var ket = $('#ket').val();
 
 	var golongan = {
-										1 : 'Alkes',
-										2 : 'OKT (Obat Keras Tertentu)',
-										3 : 'Injeksi',
-										4 : 'Supro (Suprositoria)',
-										5 : 'Vaksin',
-										6 : 'Cream',
-										7 : 'Drop',
-										8 : 'HV / OTC',
-										9 : 'Susu',
-									 	10 : 'Sirup',
-										11 : 'Tablet',
-										12 : 'Generik'
+										1 : 'Obat Bebas (HV)',
+										2 : 'Obat Keras (Ok)',
+										3 : 'Obat Psikotropika (OKT)',
+										4 : 'Obat Narkotik'
 			           }
 	 if(ket == 'Tambah'){
 		 	$('#id_golongan').val(golongan[no_golongan]);
@@ -317,11 +330,8 @@ function klik_kategori(no_kategori){
 
 	var kategori = {
 										1 : 'Obat Bebas',
-										2 : 'Obat Bebas Terbatas',
+										2 : 'Obat Resep',
 										3 : 'Obat Keras',
-										4 : 'Jamu',
-										5 : 'Obat Herbal Terstandar',
-										6 : 'Fitofarmaka'
 			           }
 	 if(ket == 'Tambah'){
 		 	$('#id_kategori').val(kategori[no_kategori]);
@@ -448,7 +458,7 @@ function ubah_obat(id){
 			$('#barcode_ubah').val(row['BARCODE']);
 			$('#nama_obat_ubah').val(row['NAMA_OBAT']);
 			$('#id_jenis_ubah').val(row['ID_JENIS_OBAT']);
-			$('#jenis_obat_ubah').val(row['NAMA_JENIS']);
+			$('#jenis_obat_ubah').val(row['ID_JENIS_OBAT']);
 			var status_obat = "";
 			if(row['STATUS_OBAT'] == 0){
 					status_obat = "Obat Jadi";
@@ -993,7 +1003,25 @@ function cek_barcode(){
 												</tr>
 										</thead>
 										<tbody>
+											<?php
+											$array = array(
+												0 => 'Tablet',
+												1 => 'Sirup / Drop',
+												2 => 'Injeksi',
+												3 => 'Suprositoria',
+												4 => 'Salep / Krim',
+												5 => 'Spray'
+											);
+											$no = 0;
 
+											for ($i=0; $i < count($array); $i++) {
+											$no++;
+											 ?>
+											<tr style="cursor:pointer;" onclick="klik_jenis(<?php echo $no; ?>);">
+												<td><?php echo $no; ?></td>
+												<td><?php echo $array[$i]; ?></td>
+											</tr>
+											<?php } ?>
 										</tbody>
 								</table>
 						</div>
@@ -1027,18 +1055,10 @@ function cek_barcode(){
 		                    <tbody>
 													<?php
 													$array = array(
-														0 => 'Alkes',
-														1 => 'OKT (Obat Keras Tertentu)',
-														2 => 'Injeksi',
-														3 => 'Supro (Suprositoria)',
-														4 => 'Vaksin',
-														5 => 'Cream',
-														6 => 'Drop',
-														7 => 'HV / OTC',
-														8 => 'Susu',
-														9 => 'Sirup',
-														10 => 'Tablet',
-														11 => 'Generik',
+														0 => 'Obat Bebas (HV)',
+														1 => 'Obat Keras (OK)',
+														2 => 'Obat Psikotropika (OKT)',
+														3 => 'Obat Narkotik'
 													);
 													$no = 0;
 
@@ -1084,11 +1104,8 @@ function cek_barcode(){
 													<?php
 													$array = array(
 														0 => 'Obat Bebas',
-														1 => 'Obat Bebas Terbatas',
-														2 => 'Obat Keras',
-														3 => 'Jamu',
-														4 => 'Obat Herbal Terstandar',
-														5 => 'Fitofarmaka',
+														1 => 'Obat Resep',
+														2 => 'Obat Keras'
 													);
 													$no = 0;
 

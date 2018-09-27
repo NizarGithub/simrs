@@ -70,29 +70,28 @@ class Admum_setup_obat_m extends CI_Model {
 	}
 
 	function data_obat_id($id){
-		$sql = "
-			SELECT
-				OBAT.ID,
-				OBAT.KODE_OBAT,
-				OBAT.BARCODE,
-				OBAT.NAMA_OBAT,
-				OBAT.ID_MERK,
-				OBAT.ID_JENIS_OBAT,
-				OBAT.EXPIRED,
-				OBAT.GOLONGAN_OBAT,
-				OBAT.KATEGORI_OBAT,
-				OBAT.STATUS_OBAT,
-				OBAT.SERVICE,
-				OBAT.NO_BATCH,
-				SUP.MERK,
-				JENIS.NAMA_JENIS
-			FROM admum_setup_nama_obat OBAT
-			LEFT JOIN obat_supplier SUP ON SUP.ID = OBAT.ID_MERK
-			LEFT JOIN obat_jenis JENIS ON JENIS.ID = OBAT.ID_JENIS_OBAT
-			WHERE OBAT.ID = '$id'
-		";
-		$query = $this->db->query($sql);
-		return $query->row();
+		$sql = "SELECT
+							OBAT.ID,
+							OBAT.KODE_OBAT,
+							OBAT.BARCODE,
+							OBAT.NAMA_OBAT,
+							OBAT.ID_MERK,
+							OBAT.ID_JENIS_OBAT,
+							OBAT.EXPIRED,
+							OBAT.GOLONGAN_OBAT,
+							OBAT.KATEGORI_OBAT,
+							OBAT.STATUS_OBAT,
+							OBAT.SERVICE,
+							OBAT.NO_BATCH,
+							SUP.MERK
+							-- JENIS.NAMA_JENIS
+						FROM admum_setup_nama_obat OBAT
+						LEFT JOIN obat_supplier SUP ON SUP.ID = OBAT.ID_MERK
+						-- LEFT JOIN obat_jenis JENIS ON JENIS.ID = OBAT.ID_JENIS_OBAT
+						WHERE OBAT.ID = '$id'
+					";
+					$query = $this->db->query($sql);
+					return $query->row();
 	}
 
 	function simpan($kode_obat,$barcode,$nama_obat,$id_jenis,$expired,$golongan,$kategori,$status_obat,$service,$no_batch){

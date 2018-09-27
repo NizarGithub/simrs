@@ -794,8 +794,15 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 	}
 
 	function load_pemeriksaan(){
-		$keyword = $this->input->post('keyword');
-		$data = $this->model->load_pemeriksaan($keyword);
+		$keyword = $this->input->get('keyword');
+		$id_jenis_lab = $this->input->get('id_jenis_lab');
+		$data = $this->model->load_pemeriksaan($keyword,$id_jenis_lab);
+		echo json_encode($data);
+	}
+
+	function klik_pemeriksaan_manual(){
+		$id_nilai = $this->input->post('id_nilai');
+		$data = $this->model->klik_pemeriksaan_manual($id_nilai);
 		echo json_encode($data);
 	}
 
@@ -990,7 +997,6 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		$alergi = $this->input->post('alergi');
 		$uraian = $this->input->post('alergi_obat');
 		$banyak_resep = $this->input->post('banyak_resep');
-		$diminum_selama = $this->input->post('diminum_selama');
 		$tanggal = date('d-m-Y');
 		$bulan = date('n');
 		$tahun = date('Y');
@@ -1002,15 +1008,15 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		$harga = $this->input->post('harga_obat');
 		$service = $this->input->post('service');
 		$jumlah_beli = $this->input->post('jumlah_obat');
-		$takaran = $this->input->post('takaran_resep');
 		$aturan_umum = $this->input->post('aturan_minum');
+		$diminum_selama = $this->input->post('diminum_selama');
 
-		$this->model->simpan_resep($id_pelayanan,$id_pasien,$kode_resep,$alergi,$uraian,$banyak_resep,$diminum_selama,$tanggal,$bulan,$tahun,$total,$total_biaya_service);
+		$this->model->simpan_resep($id_pelayanan,$id_pasien,$kode_resep,$alergi,$uraian,$banyak_resep,$tanggal,$bulan,$tahun,$total,$total_biaya_service);
 		$id_resep = $this->db->insert_id();
 
 		foreach ($id_obat as $key => $value) {
 			$subtotal = $harga[$key] * $jumlah_beli[$key];
-			$this->model->simpan_resep_det($id_resep,$value,$harga[$key],$service[$key],$jumlah_beli[$key],$subtotal,$takaran[$key],$aturan_umum[$key],$tanggal,$tahun,$bulan);
+			$this->model->simpan_resep_det($id_resep,$value,$harga[$key],$service[$key],$jumlah_beli[$key],$subtotal,$aturan_umum[$key],$diminum_selama[$key],$tanggal,$tahun,$bulan);
 		}
 
 		$this->insert_kode_resep();

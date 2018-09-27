@@ -84,7 +84,7 @@
                     <!-- LOGO -->
                     <div class="topbar-left">
                         <a href="<?php echo base_url(); ?>portal" class="logo" style="margin-top:4px;">
-                            <img src="<?php echo base_url(); ?>picture/jtech-logo.png" style="max-width:150px; max-height:40px;">
+                            <img src="<?php echo base_url(); ?>picture/logo/logo2.jpeg" style="max-width:150px; max-height:40px;">
                         </a>
                     </div>
                     <!-- End Logo container-->

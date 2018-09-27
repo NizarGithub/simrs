@@ -668,6 +668,11 @@ $user_detail = $this->model->get_user_detail($id_user);
                             <center><h3 class="modal-title" id="myModalLabel"><strong>Data Pembayaran</strong></h3></center>
                         </div>
                         <div class="modal-body">
+                          <div class="input-group">
+                            <input type="text" class="form-control" id="search_pembayaran">
+                            <span class="input-group-addon bg-blue"><span class="arrow"><i class="fa fa-search"></i></span></span>
+                          </div>
+                          <br>
                           <table class="table" id="tabel_pembayaran">
                             <thead>
                               <tr class="info">
@@ -683,6 +688,10 @@ $user_detail = $this->model->get_user_detail($id_user);
                             <tbody>
                             </tbody>
                           </table>
+                          <center>
+                            <div id="tablePaging">
+                            </div>
+                          </center>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -1261,6 +1270,7 @@ $(document).ready(function(){
     });
 
     $('#btn_show_data_pembayaran').click(function(){
+        $('#popup_data_pembayaran').click();
         data_pembayaran();
     });
 
@@ -1317,10 +1327,11 @@ function data_rekap_pendapatan(){
 }
 
 function data_pembayaran(){
-  $('#popup_data_pembayaran').click();
+  var keyword = $('#search_pembayaran').val();
   $.ajax({
     url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/data_pembayaran',
-    type : "POST",
+    data : {keyword:keyword},
+    type : "GET",
     dataType : "json",
     success : function(result){
       var table = '';
@@ -1342,8 +1353,12 @@ function data_pembayaran(){
           }
       }
       $('#tabel_pembayaran tbody').html(table);
-      // paging_pembayaran();
+      paging_pembayaran();
     }
+  });
+
+  $('#search_pembayaran').off('keyup').keyup(function(){
+      data_pembayaran();
   });
 }
 
@@ -1633,13 +1648,13 @@ function get_pasien(){
                       }
                     }else{
                       if (result[i].TIPE == '1') {
-                        aksi = "<button class='btn btn-success' type='button' onclick='klik_detail_pasien("+result[i].ID+","+result[i].TIPE+");'><i class='fa fa-check-square-o'></i>"+formatNumber(result[i].TOTAL)+"</button>";
+                        aksi = "<button class='btn btn-success' type='button' onclick='klik_detail_pasien("+result[i].ID+","+result[i].TIPE+");'><i class='fa fa-check-square-o'></i> "+formatNumber(result[i].TOTAL)+"</button>";
                       }else if (result[i].TIPE == '2') {
                         aksi = "<button class='btn btn-success' type='button'><i class='fa fa-check-square-o'></i>"+formatNumber(result[i].TOTAL)+"</button>";
                       }else if (result[i].TIPE == '3') {
                         aksi = "<button class='btn btn-success' type='button'><i class='fa fa-check-square-o'></i>"+formatNumber(result[i].TOTAL)+"</button>";
                       }else if (result[i].TIPE == '4') {
-                        aksi = "<button class='btn btn-success' type='button' onclick='klik_detail_pasien("+result[i].ID+","+result[i].TIPE+");'><i class='fa fa-check-square-o'></i>"+formatNumber(result[i].TOTAL)+"</button>";
+                        aksi = "<button class='btn btn-success' type='button' onclick='klik_detail_pasien("+result[i].ID+","+result[i].TIPE+");'><i class='fa fa-check-square-o'></i> "+formatNumber(result[i].TOTAL)+"</button>";
                       }
                     }
 

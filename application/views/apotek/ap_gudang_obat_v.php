@@ -182,7 +182,7 @@ function klik_nama_obat(id, number){
                 $('#id_nama_obat_'+number).val(id);
                 $('#kode_obat_'+number).val(row['KODE_OBAT']);
                 $('#nama_obat_'+number).val(row['NAMA_OBAT']);
-								$('#jenis_obat_'+number).val(row['NAMA_JENIS']);
+								$('#jenis_obat_'+number).val(row['ID_JENIS_OBAT']);
 								$('#expired_'+number).val(row['EXPIRED']);
 								$('#golongan_'+number).val(row['GOLONGAN_OBAT']);
 								$('#kategori_'+number).val(row['KATEGORI_OBAT']);
@@ -194,7 +194,7 @@ function klik_nama_obat(id, number){
                 $('#id_nama_obat_ubah').val(id);
                 $('#kode_obat_ubah').val(row['KODE_OBAT']);
                 $('#nama_obat_ubah').val(row['NAMA_OBAT']);
-								$('#jenis_obat_ubah').val(row['NAMA_JENIS']);
+								$('#jenis_obat_ubah').val(row['ID_JENIS_OBAT']);
 								$('#expired_ubah').val(row['EXPIRED']);
 								$('#golongan_ubah').val(row['GOLONGAN_OBAT']);
 								$('#kategori_ubah').val(row['KATEGORI_OBAT']);
@@ -204,7 +204,7 @@ function klik_nama_obat(id, number){
 							$('#faktur_id_nama_obat_'+number).val(id);
 							$('#faktur_kode_obat_'+number).val(row['KODE_OBAT']);
 							$('#faktur_nama_obat_'+number).val(row['NAMA_OBAT']);
-							$('#faktur_jenis_obat_'+number).val(row['NAMA_JENIS']);
+							$('#faktur_jenis_obat_'+number).val(row['ID_JENIS_OBAT']);
 							$('#faktur_expired_'+number).val(row['EXPIRED']);
 							$('#faktur_golongan_'+number).val(row['GOLONGAN_OBAT']);
 							$('#faktur_kategori_'+number).val(row['KATEGORI_OBAT']);
@@ -278,23 +278,33 @@ function klik_jenis(id_jenis){
 	});
 }
 
+function klik_jenis_baru(no_kategori){
+	$('#tutup_kategori').click();
+	var ket = $('#ket').val();
+
+	var kategori = {
+										1 : 'Obat Bebas',
+										2 : 'Obat Resep',
+										3 : 'Obat Keras',
+			           }
+	 if(ket == 'Tambah'){
+		 	$('#id_kategori').val(no_kategori);
+ 			$('#kategori').val(kategori[no_kategori]);
+ 	}else{
+			$('#id_kategori_ubah').val(no_kategori);
+ 			$('#kategori_ubah').val(kategori[no_kategori]);
+ 	}
+}
+
 function klik_golongan(no_golongan){
 	$('#tutup_golongan').click();
 	var ket = $('#ket').val();
 
 	var golongan = {
-										1 : 'Alkes',
-										2 : 'OKT (Obat Keras Tertentu)',
-										3 : 'Injeksi',
-										4 : 'Supro (Suprositoria)',
-										5 : 'Vaksin',
-										6 : 'Cream',
-										7 : 'Drop',
-										8 : 'HV / OTC',
-										9 : 'Susu',
-									 	10 : 'Sirup',
-										11 : 'Tablet',
-										12 : 'Generik'
+										1 : 'Obat Bebas (HV)',
+										2 : 'Obat Keras (Ok)',
+										3 : 'Obat Psikotropika (OKT)',
+										4 : 'Obat Narkotik'
 			           }
 	 if(ket == 'Tambah'){
 		 	$('#id_golongan').val(no_golongan);
@@ -311,11 +321,8 @@ function klik_kategori(no_kategori){
 
 	var kategori = {
 										1 : 'Obat Bebas',
-										2 : 'Obat Bebas Terbatas',
+										2 : 'Obat Resep',
 										3 : 'Obat Keras',
-										4 : 'Jamu',
-										5 : 'Obat Herbal Terstandar',
-										6 : 'Fitofarmaka'
 			           }
 	 if(ket == 'Tambah'){
 		 	$('#id_kategori').val(no_kategori);
@@ -848,6 +855,7 @@ function tambah_obat(){
 																					'<div class="input-group">'+
 																							'<span class="input-group-addon">Rp</span>'+
 																							'<input type="text" class="form-control" name="harga_jual[]" id="harga_jual_'+i+'" value="" required="required" onkeyup="FormatCurrency(this);" readonly>'+
+																							'<input type="hidden" class="form-control" name="harga_bulat[]" id="harga_bulat_'+i+'" value="" required="required" onkeyup="FormatCurrency(this);" readonly>'+
 																					'</div>'+
 																			'</div>'+
 																	'</div>'+
@@ -997,6 +1005,7 @@ function faktur_tambah_obat(){
 																					'<div class="input-group">'+
 																							'<span class="input-group-addon">Rp</span>'+
 																							'<input type="text" class="form-control" name="harga_jual[]" id="faktur_harga_jual_'+i+'" value="" required="required" onkeyup="FormatCurrency(this);" readonly>'+
+																							'<input type="hidden" class="form-control" name="harga_bulat[]" id="faktur_harga_bulat_'+i+'" value="" required="required" onkeyup="FormatCurrency(this);" readonly>'+
 																					'</div>'+
 																			'</div>'+
 																	'</div>'+
@@ -1083,7 +1092,7 @@ function klik_nama_supplier(id){
 	});
 }
 
-function hitung_harga_jual(number){
+function hitung_harga_jual_lawas(number){
 	var ket = $('#ket').val();
 
 	if (ket == 'Tambah') {
@@ -1129,6 +1138,287 @@ function hitung_harga_jual(number){
 		var bulatan = Math.round(total_harga_jual);
 		$('#faktur_harga_jual_'+number).val(NumberToMoney(bulatan));
 	}
+}
+
+function hitung_harga_jual(number){
+	var ket = $('#ket').val();
+
+	if (ket == 'Tambah') {
+		var kategori = $('#kategori_'+number).val();
+		if (kategori == 'Obat Bebas') {
+
+			var harga_beli = $('#harga_beli_'+number).val();
+			harga_beli = harga_beli.split(',').join('');
+			if(harga_beli == ""){
+					harga_beli = 0;
+			}
+
+			var total_jumlah = $('#total_'+number).val();
+			total_jumlah = total_jumlah.split(',').join('');
+			if(total_jumlah == ""){
+					total_jumlah = 0;
+			}
+
+			var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
+			var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
+			var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
+
+			var hitung_kategori = '';
+			if (parseFloat(hitung_akhir) <= 100) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 100 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			} else if (parseFloat(hitung_akhir) <= 500) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 40 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) <= 1000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 20 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) >= 1000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 10 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}
+
+		var bulatan = custom_pembulatan(hitung_kategori, 100);
+
+		$('#harga_jual_'+number).val(NumberToMoney(hitung_kategori));
+		$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
+
+		}else if (kategori == 'Obat Resep') {
+
+			var harga_beli = $('#harga_beli_'+number).val();
+			harga_beli = harga_beli.split(',').join('');
+			if(harga_beli == ""){
+					harga_beli = 0;
+			}
+
+			var total_jumlah = $('#total_'+number).val();
+			total_jumlah = total_jumlah.split(',').join('');
+			if(total_jumlah == ""){
+					total_jumlah = 0;
+			}
+
+			var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
+			var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
+			var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
+
+			var hitung_kategori = '';
+			if (parseFloat(hitung_akhir) <= 100) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 200 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			} else if (parseFloat(hitung_akhir) <= 500) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 50 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) <= 1000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 35 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) >= 1000 && parseFloat(hitung_akhir) <= 10000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 25 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) >= 10000  && parseFloat(hitung_akhir) <= 100000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 20 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) >= 100000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 15 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}
+
+			var bulatan = custom_pembulatan(hitung_kategori, 100);
+
+			$('#harga_jual_'+number).val(NumberToMoney(hitung_kategori));
+			$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
+
+		}else if (kategori == 'Obat Keras') {
+
+			var harga_beli = $('#harga_beli_'+number).val();
+			harga_beli = harga_beli.split(',').join('');
+			if(harga_beli == ""){
+					harga_beli = 0;
+			}
+
+			var total_jumlah = $('#total_'+number).val();
+			total_jumlah = total_jumlah.split(',').join('');
+			if(total_jumlah == ""){
+					total_jumlah = 0;
+			}
+
+			var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
+			var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
+			var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
+
+			var hitung_kategori = '';
+			if (parseFloat(hitung_akhir) <= 100) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 150 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			} else if (parseFloat(hitung_akhir) <= 500) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 45 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) <= 1000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 25 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) >= 1000 && parseFloat(hitung_akhir) <= 10000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 20 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) >= 10000  && parseFloat(hitung_akhir) <= 100000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 15 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) >= 100000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 10 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}
+
+			var bulatan = custom_pembulatan(hitung_kategori, 100);
+
+			$('#harga_jual_'+number).val(NumberToMoney(hitung_kategori));
+			$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
+
+		}
+	}else if (ket == 'Ubah') {
+		// var harga_beli = $('#harga_beli_ubah').val();
+		// harga_beli = harga_beli.split(',').join('');
+		// if(harga_beli == ""){
+		// 		harga_beli = 0;
+		// }
+		//
+		// var hitung_ppn = parseFloat(harga_beli) * 0.1;
+		// var hitung_persen = parseFloat(harga_beli) * 0.05;
+		//
+		// var total_harga_jual = parseFloat(hitung_ppn) + parseFloat(hitung_persen) + parseFloat(harga_beli);
+		// var bulatan = Math.ceil(total_harga_jual);
+		// $('#harga_jual_ubah').val(NumberToMoney(bulatan));
+	}else if (ket == 'Tambah_faktur') {
+		var kategori = $('#faktur_kategori_'+number).val();
+		if (kategori == 'Obat Bebas') {
+
+			var harga_beli = $('#faktur_harga_beli_'+number).val();
+			harga_beli = harga_beli.split(',').join('');
+			if(harga_beli == ""){
+					harga_beli = 0;
+			}
+
+			var total_jumlah = $('#faktur_total_'+number).val();
+			total_jumlah = total_jumlah.split(',').join('');
+			if(total_jumlah == ""){
+					total_jumlah = 0;
+			}
+
+			var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
+			var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
+			var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
+
+			var hitung_kategori = '';
+			if (parseFloat(hitung_akhir) <= 100) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 100 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			} else if (parseFloat(hitung_akhir) <= 500) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 40 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) <= 1000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 20 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) >= 1000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 10 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}
+
+		var bulatan = custom_pembulatan(hitung_kategori, 100);
+
+		$('#faktur_harga_jual_'+number).val(NumberToMoney(hitung_kategori));
+		$('#faktur_harga_bulat_'+number).val(NumberToMoney(bulatan));
+
+		}else if (kategori == 'Obat Resep') {
+
+			var harga_beli = $('#faktur_harga_beli_'+number).val();
+			harga_beli = harga_beli.split(',').join('');
+			if(harga_beli == ""){
+					harga_beli = 0;
+			}
+
+			var total_jumlah = $('#faktur_total_'+number).val();
+			total_jumlah = total_jumlah.split(',').join('');
+			if(total_jumlah == ""){
+					total_jumlah = 0;
+			}
+
+			var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
+			var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
+			var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
+
+			var hitung_kategori = '';
+			if (parseFloat(hitung_akhir) <= 100) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 200 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			} else if (parseFloat(hitung_akhir) <= 500) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 50 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) <= 1000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 35 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) >= 1000 && parseFloat(hitung_akhir) <= 10000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 25 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) >= 10000  && parseFloat(hitung_akhir) <= 100000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 20 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) >= 100000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 15 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}
+
+			var bulatan = custom_pembulatan(hitung_kategori, 100);
+
+			$('#faktur_harga_jual_'+number).val(NumberToMoney(hitung_kategori));
+			$('#faktur_harga_bulat_'+number).val(NumberToMoney(bulatan));
+
+		}else if (kategori == 'Obat Keras') {
+
+			var harga_beli = $('#faktur_harga_beli_'+number).val();
+			harga_beli = harga_beli.split(',').join('');
+			if(harga_beli == ""){
+					harga_beli = 0;
+			}
+
+			var total_jumlah = $('#faktur_total_'+number).val();
+			total_jumlah = total_jumlah.split(',').join('');
+			if(total_jumlah == ""){
+					total_jumlah = 0;
+			}
+
+			var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
+			var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
+			var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
+
+			var hitung_kategori = '';
+			if (parseFloat(hitung_akhir) <= 100) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 150 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			} else if (parseFloat(hitung_akhir) <= 500) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 45 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) <= 1000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 25 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) >= 1000 && parseFloat(hitung_akhir) <= 10000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 20 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) >= 10000  && parseFloat(hitung_akhir) <= 100000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 15 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}else if (parseFloat(hitung_akhir) >= 100000) {
+				hitung_ppn_awal = parseFloat(hitung_akhir) * 10 / 100;
+				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+			}
+
+			var bulatan = custom_pembulatan(hitung_kategori, 100);
+
+			$('#faktur_harga_jual_'+number).val(NumberToMoney(hitung_kategori));
+			$('#faktur_harga_bulat_'+number).val(NumberToMoney(bulatan));
+		}
+	}
+}
+
+function custom_pembulatan(nilai, pembulat){
+		 var hasil = (Math.ceil(parseInt(nilai))%parseInt(pembulat) == 0) ? Math.ceil(parseInt(nilai)) : Math.round((parseInt(nilai)+parseInt(pembulat)/2)/parseInt(pembulat))*parseInt(pembulat);
+		 return hasil;
 }
 
 function hitung_diskon(){
@@ -1460,6 +1750,7 @@ function hitung_total_harga_beli(){
 																										<div class="input-group">
 																												<span class="input-group-addon">Rp</span>
 																												<input type="text" class="form-control" name="harga_jual[]" id="harga_jual_1" value="" required="required" onkeyup="FormatCurrency(this);" readonly>
+																												<input type="hidden" class="form-control" name="harga_bulat[]" id="harga_bulat_1" value="" required="required" onkeyup="FormatCurrency(this);" readonly>
 																										</div>
 																								</div>
 																						</div>
@@ -1665,6 +1956,7 @@ function hitung_total_harga_beli(){
 																										<div class="input-group">
 																												<span class="input-group-addon">Rp</span>
 																												<input type="text" class="form-control" name="harga_jual[]" id="faktur_harga_jual_1" value="" required="required" onkeyup="FormatCurrency(this);" readonly>
+																												<input type="hidden" class="form-control" name="harga_bulat[]" id="faktur_harga_bulat_1" value="" required="required" onkeyup="FormatCurrency(this);" readonly>
 																										</div>
 																								</div>
 																						</div>
@@ -1857,6 +2149,7 @@ function hitung_total_harga_beli(){
                             <div class="input-group">
                                 <span class="input-group-addon">Rp</span>
                                 <input type="text" class="form-control" name="harga_jual_ubah" id="harga_jual_ubah" value="" required="required" onkeyup="FormatCurrency(this);" readonly>
+																<input type="text" class="form-control" name="harga_bulat_ubah" id="harga_bulat_ubah" value="" required="required" onkeyup="FormatCurrency(this);" readonly>
                             </div>
                         </div>
                     </div>

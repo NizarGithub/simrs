@@ -896,7 +896,7 @@ function klik_asuransi(id){
                             <label class="col-md-3 control-label">Asal Rujukan</label>
                             <div class="col-md-9">
                                 <select class="form-control select2" name="asal_rujukan" id="asal_rujukan">
-                                    <option value="Sendiri">Datang Sendiri</option>
+                                    <option value="Sendiri">APS</option>
                                     <option value="Bidan">Bidan</option>
                                     <option value="Puskesmas">Puskesmas</option>
                                     <option value="RS Swasta">RS Swasta</option>
@@ -1098,6 +1098,7 @@ function klik_asuransi(id){
                                     </button>
                                 </span>
                             </div>
+                            <span class="help-block"><small><b><i>*pencarian berdasarkan Nama Pasien, Nama Orang Tua, Alamat dan Tanggal Lahir</i></b></small></span>
                         </div>
                     </div>
                 </form>

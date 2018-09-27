@@ -167,10 +167,10 @@ table{
         foreach ($dt as $key => $val) {
       ?>
         <tr>
-          <td style="width: 35%; font-size: 14px;"><?php echo $val->NAMA_OBAT; ?></td>
-          <td style="width: 10%; font-size: 14px;">x <?php echo $val->JUMLAH_BELI; ?></td>
-          <td style="width: 20%; font-size: 14px;"><?php echo $val->TAKARAN; ?></td>
-          <td style="width: 20%; font-size: 14px;"><?php echo $val->ATURAN_MINUM; ?></td>
+          <td style="font-size: 14px;"><?php echo $val->NAMA_OBAT; ?></td>
+          <td style="font-size: 14px;">x <?php echo $val->JUMLAH_BELI; ?></td>
+          <td style="font-size: 14px;">, <?php echo $val->TAKARAN; ?></td>
+          <td style="font-size: 14px;">, <?php echo $val->ATURAN_MINUM; ?></td>
         </tr>
       <?php
         }

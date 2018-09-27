@@ -782,7 +782,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_rawat_inap($id_pasien,$tanggal_masuk,$waktu,$bulan,$tahun,$asal_rujukan,$id_poli){
+	function simpan_rawat_inap($id_pasien,$tanggal_masuk,$waktu,$bulan,$tahun,$asal_rujukan,$id_poli,$id_dokter){
 		$sql = "
 			INSERT INTO admum_rawat_inap(
 				ID_PASIEN,
@@ -791,7 +791,8 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				BULAN,
 				TAHUN,
 				ASAL_RUJUKAN,
-				ID_POLI
+				ID_POLI,
+				ID_DOKTER
 			) VALUES (
 				'$id_pasien',
 				'$tanggal_masuk',
@@ -799,7 +800,8 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				'$bulan',
 				'$tahun',
 				'$asal_rujukan',
-				'$id_poli'
+				'$id_poli',
+				'$id_dokter'
 			)
 		";
 		$this->db->query($sql);

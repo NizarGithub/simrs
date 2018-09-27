@@ -123,7 +123,7 @@ class Ap_kasir_rajal_m extends CI_Model {
 						LEFT JOIN rk_pasien b ON a.ID_PASIEN = b.ID
 						) a
 						WHERE 1=1
-						AND a.TANGGAL = '$tanggal'
+						AND a.TANGGAL = '25-09-2018'
 						AND a.STATUS_CLOSING = '0'
 						ORDER BY a.ID DESC
 					";
@@ -639,6 +639,24 @@ class Ap_kasir_rajal_m extends CI_Model {
 							DET.HARGA,
 							DET.JUMLAH_BELI,
 							DET.SUBTOTAL
+						FROM rk_resep_detail_rj DET
+						-- LEFT JOIN apotek_gudang_obat GD ON GD.ID = DET.ID_OBAT
+						LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = DET.ID_OBAT
+						WHERE DET.ID_RESEP = '$id_resep'
+					";
+		return $this->db->query($sql)->result();
+	}
+
+	function detail_resep_ranap($id_resep){
+		$sql = "SELECT
+							DET.ID,
+							NM_OBT.KODE_OBAT,
+							NM_OBT.NAMA_OBAT,
+							DET.TAKARAN,
+							DET.ATURAN_MINUM,
+							DET.HARGA,
+							DET.JUMLAH_BELI,
+							DET.SUBTOTAL
 						FROM rk_ri_resep_detail DET
 						-- LEFT JOIN apotek_gudang_obat GD ON GD.ID = DET.ID_OBAT
 						LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = DET.ID_OBAT
@@ -748,13 +766,22 @@ class Ap_kasir_rajal_m extends CI_Model {
     $this->db->update('rk_ri_resep', $data_update);
 	}
 
-	function data_pembayaran(){
+	function data_pembayaran($keyword){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND (b.NAMA LIKE '%$keyword%' OR a.TANGGAL LIKE '%$keyword%' OR a.STATUS LIKE '%$keyword%' OR a.INVOICE LIKE '%$keyword%')";
+		}else{
+			$where = $where;
+		}
+
 		$query = $this->db->query("SELECT
 															 a.*,
 															 b.NAMA AS NAMA_PEGAWAI
 															 FROM
 															 ap_tutup_kasir_rajal_detail a
 															 LEFT JOIN kepeg_pegawai AS b ON a.ID_PEGAWAI=b.ID
+															 WHERE $where
 		");
 		return $query->result_array();
 	}

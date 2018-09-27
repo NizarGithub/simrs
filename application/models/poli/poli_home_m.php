@@ -145,7 +145,7 @@ class Poli_home_m extends CI_Model {
 			LEFT JOIN kepeg_divisi d ON d.ID = c.ID_DIVISI
 			JOIN rk_antrian_pasien e ON e.ID_PELAYANAN = b.ID
 			WHERE $where
-			ORDER BY b.ID ASC
+			ORDER BY b.ID DESC
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -226,10 +226,12 @@ class Poli_home_m extends CI_Model {
 				DET.ID_RESEP,
 				DET.ID_OBAT,
 				b.NAMA_OBAT,
-				DET.TAKARAN,
-				DET.ATURAN_MINUM,
+				b.ID_JENIS_OBAT,
 				DET.HARGA,
-				DET.SUBTOTAL
+				DET.JUMLAH_BELI,
+				DET.SUBTOTAL,
+				DET.ATURAN_MINUM,
+				DET.DIMINUM_SELAMA
 			FROM rk_resep_detail_rj DET
 			LEFT JOIN admum_setup_nama_obat b ON b.ID = DET.ID_OBAT
 			WHERE DET.ID_RESEP = '$id_resep'

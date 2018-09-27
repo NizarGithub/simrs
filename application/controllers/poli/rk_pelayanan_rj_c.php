@@ -550,7 +550,7 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 
 		if($kondisi_akhir == 'Rawat Inap'){
 
-			$this->model->simpan_rawat_inap($id_pasien,$tanggal,$waktu,$bulan,$tahun,$asal_rujukan,$id_poli);
+			$this->model->simpan_rawat_inap($id_pasien,$tanggal,$waktu,$bulan,$tahun,$asal_rujukan,$id_poli,$id_peg_dokter);
 			$this->db->query("UPDATE admum_rawat_jalan SET STATUS_PINDAH = '$kondisi_akhir' WHERE ID = '$id_pelayanan'");
 			// $this->db->query("UPDATE admum_bed_rawat_inap SET STATUS_PAKAI = '1' WHERE ID = '$id_bed'");
 		

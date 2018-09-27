@@ -395,8 +395,8 @@ function data_pasien(){
 
                     $tr +=  '<tr>'+
                             '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
-                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].KODE_PASIEN+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL+' - '+result[i].WAKTU+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].KODE_PASIEN+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].ALAMAT+'</td>'+
@@ -722,8 +722,12 @@ function get_resep(){
                                     $tr2 += '<tr>'+
                                                 '<td style="text-align:center;">'+no2+'</td>'+
                                                 '<td>'+result[i].NAMA_OBAT+'</td>'+
-                                                '<td>'+result[i].ATURAN_MINUM+'</td>'+
+                                                '<td style="text-align:center;">'+result[i].ID_JENIS_OBAT+'</td>'+
+                                                '<td style="text-align:right;">'+formatNumber(result[i].HARGA)+'</td>'+
+                                                '<td style="text-align:center;">'+formatNumber(result[i].JUMLAH_BELI)+'</td>'+
                                                 '<td style="text-align:right;">'+formatNumber(result[i].SUBTOTAL)+'</td>'+
+                                                '<td style="text-align:center;">'+result[i].ATURAN_MINUM+'</td>'+
+                                                '<td style="text-align:center;">'+result[i].DIMINUM_SELAMA+' Hari</td>'+
                                             '</tr>';
                                 }
 
@@ -861,6 +865,9 @@ function get_total_all(){
                         </div>
                     </div>
                     <?php } ?>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label" style="width: 7%; text-align: left;">&nbsp;</label>
                     <div class="col-md-4">
                         <?php if(count($level) == 0){ ?>
                         <div class="radio radio-info radio-inline">
@@ -961,6 +968,7 @@ function get_total_all(){
                                 </button>
                             </span>
                         </div>
+                        <span class="help-block"><small><i>*pencarian berdasarkan No. RM, Nama Pasien</i></small></span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -970,10 +978,10 @@ function get_total_all(){
                                 <thead>
                                     <tr class="merah">
                                         <th style="color:#fff; text-align:center;">No</th>
-                                        <th style="color:#fff; text-align:center;">No. RM</th>
                                         <th style="color:#fff; text-align:center;">Tgl / Waktu</th>
+                                        <th style="color:#fff; text-align:center;">No. RM</th>
                                         <th style="color:#fff; text-align:center;">Nama Pasien</th>
-                                        <th style="color:#fff; text-align:center;">JK</th>
+                                        <th style="color:#fff; text-align:center;">Jenis Kelamin</th>
                                         <th style="color:#fff; text-align:center;">Alamat</th>
                                         <th style="color:#fff; text-align:center;">Panggil</th>
                                         <th style="color:#fff; text-align:center;">
@@ -1193,8 +1201,12 @@ function get_total_all(){
                                         <tr class="danger">
                                             <th style="text-align: center;">NO</th>
                                             <th style="text-align: center;">NAMA OBAT</th>
-                                            <th style="text-align: center;">ATURAN MINUM</th>
+                                            <th style="text-align: center;">JENIS OBAT</th>
+                                            <th style="text-align: center;">HARGA</th>
+                                            <th style="text-align: center;">JUMLAH</th>
                                             <th style="text-align: center;">TOTAL</th>
+                                            <th style="text-align: center;">ATURAN MINUM</th>
+                                            <th style="text-align: center;">DIMINUM SELAMA</th>
                                         </tr>
                                     </thead>
                                     <tbody>
