@@ -128,7 +128,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                         <div class="controls">
                           <div class="input-group">
                             <input type="text" id="nama_resep" class="glowing form-control" value="" placeholder="Cari No Resep ..." readonly required>
-                            <span class="input-group-addon bg-green" style="cursor:pointer;" onclick="get_data_resep();">
+                            <span class="input-group-addon bg-green" style="cursor:pointer;" id="btn_resep">
                               <i class="fa fa-search"></i>
                             </span>
                           </div>
@@ -601,6 +601,9 @@ $user_detail = $this->model->get_user_detail($id_user);
 
                                 </tbody>
                             </table>
+														<center>
+															<div id="tablePagingresep"></div>
+														</center>
                           </div>
                           <div class="modal-footer">
                               <button type="button" class="btn btn-warning" id="tutup_popup_resep" data-dismiss="modal">Close</button>
@@ -668,6 +671,11 @@ $(document).ready(function(){
 	$('#btn_dokter').click(function(){
 		$('#popup_dokter').show();
 		get_data_dokter();
+	});
+
+	$('#btn_resep').click(function(){
+		$('#popup_resep').click();
+		get_data_resep();
 	});
 
 	$('.non_tunai_grp').hide();
@@ -1384,7 +1392,6 @@ function klik_dokter(id){
 }
 
 function get_data_resep(){
-  $('#popup_resep').click();
   var keyword = $('#keyword_resep').val();
 
 
@@ -1409,12 +1416,42 @@ function get_data_resep(){
               }
           }
           $('#tabel_resep tbody').html(table);
+					paging_resep();
         }
       });
 
   $('#keyword_resep').off('keyup').keyup(function(){
       get_data_resep();
   });
+}
+
+function paging_resep($selector){
+	var jumlah_tampil = 10;
+
+    if(typeof $selector == 'undefined'){
+        $selector = $("#tabel_resep tbody tr");
+    }
+
+    window.tp = new Pagination('#tablePagingresep', {
+        itemsCount:$selector.length,
+        pageSize : parseInt(jumlah_tampil),
+        onPageSizeChange: function (ps) {
+            console.log('changed to ' + ps);
+        },
+        onPageChange: function (paging) {
+            //custom paging logic here
+            //console.log(paging);
+            var start = paging.pageSize * (paging.currentPage - 1),
+                end = start + paging.pageSize,
+                $rows = $selector;
+
+            $rows.hide();
+
+            for (var i = start; i < end; i++) {
+                $rows.eq(i).show();
+            }
+        }
+    });
 }
 
 function klik_resep(id){

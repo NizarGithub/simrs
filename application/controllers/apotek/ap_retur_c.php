@@ -153,7 +153,8 @@ class Ap_retur_c extends CI_Controller {
 	}
 
 	function get_data_resep(){
-		$data = $this->model->get_data_resep();
+		$keyword = $this->input->get('keyword');
+		$data = $this->model->get_data_resep($keyword);
 		echo json_encode($data);
 	}
 

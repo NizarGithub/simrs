@@ -93,8 +93,8 @@ function formatTanggal($tgl){
 	<thead>
 		<tr>
 			<th width="50" style="text-align:center;">No</th>
-			<th width="200" style="text-align:center;">Nama Obat</th>
-			<th width="190" style="text-align:center;">Jenis Obat</th>
+			<th width="290" style="text-align:center;">Nama Obat</th>
+			<th width="100" style="text-align:center;">Jenis Obat</th>
 			<th width="100" style="text-align:center;">Sisa Stok</th>
 			<th width="200" style="text-align:center;">Expired</th>
 		</tr>
@@ -105,24 +105,16 @@ function formatTanggal($tgl){
 
 		foreach ($dt as $key => $value) {
 			$no++;
-
-			$satuan = "";
-
-            if($value->JUMLAH_BUTIR != 0){
-                $satuan = $value->SATUAN_ISI;
-            }else{
-                $satuan = $value->NAMA_SATUAN;
-            }
 	?>
 		<tr>
 			<td style="text-align:center;"><?php echo $no; ?></td>
 			<td>
 				<?php echo $value->NAMA_OBAT; ?>
 				<br>
-				<small><b><?php echo $value->KODE_OBAT; ?></b></small>
+				<small><?php echo $value->KODE_OBAT; ?></small>
 			</td>
-			<td style="text-align:center;"><?php echo $value->NAMA_JENIS; ?></td>
-			<td><?php echo $value->TOTAL." ".$satuan; ?></td>
+			<td style="text-align:center;"><?php echo $value->ID_JENIS_OBAT; ?></td>
+			<td style="text-align:center;"><?php echo $value->TOTAL; ?></td>
 			<td style="text-align:center;"><?php echo formatTanggal($value->KADALUARSA); ?></td>
 		</tr>
 	<?php

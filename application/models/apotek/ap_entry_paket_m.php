@@ -78,36 +78,30 @@ class Ap_entry_paket_m extends CI_Model {
     $where = "1 = 1";
 
     if($keyword != ""){
-      $where = $where." AND (NM_OBT.NAMA_OBAT LIKE '%$keyword%' OR NM_OBT.BARCODE LIKE '%$keyword%' OR NM_OBT.KODE_OBAT LIKE '%$keyword%')";
+      $where = $where." AND (b.NAMA_OBAT LIKE '%$keyword%' OR b.BARCODE LIKE '%$keyword%' OR b.KODE_OBAT LIKE '%$keyword%')";
     }
 
     $sql = "SELECT
-            GUDANG.ID,
-            NM_OBT.KODE_OBAT,
-            NM_OBT.BARCODE,
-            NM_OBT.NAMA_OBAT,
-            NM_OBT.EXPIRED,
-            NM_OBT.STATUS_OBAT,
-            NM_OBT.SERVICE,
-            JENIS.NAMA_JENIS,
-            OBAT.JUMLAH,
-            OBAT.ISI,
-            OBAT.TOTAL,
-            OBAT.JUMLAH_BUTIR,
-            OBAT.HARGA_BELI,
-            OBAT.HARGA_JUAL AS TOTAL_JUAL,
-            OBAT.TANGGAL_MASUK,
-            OBAT.WAKTU_MASUK,
-            GUDANG.STOK AS TOTAL_STOK_OBAT
-            FROM
-            faktur_detail OBAT
-            LEFT JOIN faktur FAKTUR ON FAKTUR.ID = OBAT.ID_FAKTUR
-            LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
-            LEFT JOIN obat_supplier SUP ON SUP.ID = FAKTUR.ID_SUPPLIER
-            LEFT JOIN obat_jenis JENIS ON JENIS.ID = NM_OBT.ID_JENIS_OBAT
-            LEFT JOIN apotek_gudang_obat GUDANG ON NM_OBT.ID = GUDANG.ID_SETUP_NAMA_OBAT
-            WHERE $where
-            GROUP BY OBAT.ID_SETUP_NAMA_OBAT
+						a.ID,
+						b.KODE_OBAT,
+						b.BARCODE,
+						b.NAMA_OBAT,
+						b.EXPIRED,
+						b.STATUS_OBAT,
+						b.SERVICE,
+						b.ID_JENIS_OBAT,
+						a.HARGA_BELI,
+						a.HARGA_JUAL,
+						a.HARGA_BULAT,
+						a.TANGGAL_MASUK,
+						a.WAKTU_MASUK,
+						( a.HARGA_BULAT + b.SERVICE ) AS TOTAL_JUAL,
+						a.STOK AS TOTAL_STOK_OBAT
+						FROM
+						apotek_gudang_obat a
+						LEFT JOIN admum_setup_nama_obat b ON a.ID_SETUP_NAMA_OBAT = b.ID
+						WHERE $where
+            -- GROUP BY OBAT.ID_SETUP_NAMA_OBAT
           ";
     $query = $this->db->query($sql);
     return $query->result();

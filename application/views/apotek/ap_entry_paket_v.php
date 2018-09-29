@@ -836,11 +836,40 @@ function data_obat(){
                 }else {
                   status_obat = 'Obat Racik';
                 }
+
+								var kadaluarsa = result[i].EXPIRED;
+								var balik_hari_kadaluarsa = kadaluarsa.substr(1,1);
+								var balik_bulan_kadaluarsa = kadaluarsa.substr(4,1);
+								var balik_tahun_kadaluarsa = kadaluarsa.substr(6,4);
+								var satuan_tanggal_kadaluarsa = balik_tahun_kadaluarsa+'-'+balik_bulan_kadaluarsa+'-'+balik_hari_kadaluarsa;
+
+								var tanggal = new Date();
+								var tahun = tanggal.getFullYear();
+								var bulan = tanggal.getMonth() + 1;
+								var hari = tanggal.getDate();
+
+								var satuan_tanggal_sekarang = tahun+'-'+bulan+'-'+hari;
+
+								var kadal = '';
+								if (new Date(satuan_tanggal_sekarang) >= new Date(satuan_tanggal_kadaluarsa)) {
+									kadal = '<small class="pull-right" style="color: red;">Exp : '+result[i].EXPIRED+'</small>';
+								}else {
+									kadal = '<small class="pull-right" style="color: black;">Exp : '+result[i].EXPIRED+'</small>';
+								}
+
+								var stok_habis = '';
+								var stok = result[i].TOTAL_STOK_OBAT;
+								if (stok < 10 || stok == 10) {
+									stok_habis = '<h4 class="c-red">'+result[i].TOTAL_STOK_OBAT+'</h4>';
+								}else {
+									stok_habis = '<h4 class="c-dark">'+result[i].TOTAL_STOK_OBAT+'</h4>';
+								}
+
 									$tr +=  '<a href="javascript:;" class="message-item media" onclick="klik_obat('+result[i].ID+', '+result[i].TOTAL_JUAL+', '+result[i].SERVICE+');">'+
 														'<div class="media">'+
 															'<img src="<?php echo base_url(); ?>picture/pills.png" width="50" class="pull-left">'+
 																'<div class="media-body">'+
-                                '<small class="pull-right" style="color: black;">Exp : '+result[i].EXPIRED+'</small>'+
+                                ''+kadal+''+
 																'<div class="col-md-3">'+
 																	'<h5 class="c-dark"><strong>'+result[i].BARCODE+'</strong></h5>'+
 																	'<h4 class="c-dark">'+result[i].NAMA_OBAT+'</h4>'+
@@ -855,7 +884,7 @@ function data_obat(){
 																'</div>'+
 																'<div class="col-md-2">'+
 																			'<h5 class="c-dark"><strong>Stok</strong></h5>'+
-																			'<h4 class="c-dark">'+result[i].TOTAL_STOK_OBAT+'</h4>'+
+																			''+stok_habis+''+
 																'</div>'+
 															'</div>'+
 														'</div>'+
@@ -1421,8 +1450,8 @@ function get_data_paket(){
           for(var i=0; i<result.length; i++){
               no++;
               table += "<tr style='cursor:pointer;' onclick='klik_paket("+result[i].ID+");'>"+
-                          "<td>"+result[i].KODE_PAKET+"</td>"+
-                          "<td>"+result[i].NAMA_PAKET+"</td>"+
+                          "<td style='text-align:center;'>"+result[i].KODE_PAKET+"</td>"+
+                          "<td style='text-align:center;'>"+result[i].NAMA_PAKET+"</td>"+
                       "</tr>";
           }
       }
@@ -1461,8 +1490,8 @@ function get_data_dokter(){
               for(var i=0; i<result.length; i++){
                   no++;
                   table += "<tr style='cursor:pointer;' onclick='klik_dokter("+result[i].ID+");'>"+
-                              "<td>"+no+"</td>"+
-                              "<td>"+result[i].NIP+"</td>"+
+                              "<td style='text-align:center;'>"+no+"</td>"+
+                              "<td style='text-align:center;'>"+result[i].NIP+"</td>"+
                               "<td>"+result[i].NAMA+"</td>"+
                           "</tr>";
               }

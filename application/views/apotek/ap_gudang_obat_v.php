@@ -403,7 +403,7 @@ function data_obat(){
 																// '<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_obat('+result[i].ID+');">'+
                                 //     '<i class="fa fa-pencil"></i>'+
                                 // '</button>&nbsp;'+
-                                '<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_obat('+result[i].ID+');">'+
+                                '<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_obat('+result[i].ID_FAKTUR+');">'+
                                     '<i class="fa fa-trash"></i>'+
                                 '</button>';
 
@@ -646,14 +646,14 @@ function hapus_obat(id){
     $('#popup_hps').click();
 
     $.ajax({
-        url : '<?php echo base_url(); ?>apotek/ap_gudang_obat_c/data_obat_id',
+        url : '<?php echo base_url(); ?>apotek/ap_gudang_obat_c/data_faktur_id_row',
         data : {id:id},
         type : "POST",
         dataType : "json",
         success : function(row){
             $('#id_hapus').val(id);
-            var txt = row['KODE_OBAT']+' - '+row['NAMA_OBAT'];
-            $('#msg').html('Apakah data obat <b>'+txt+'</b> ingin dihapus?');
+            var txt = row['NO_FAKTUR']+' - '+row['NAMA_SUPPLIER'];
+            $('#msg').html('Apakah data faktur <b>'+txt+'</b> ingin dihapus?');
         }
     });
 }
@@ -675,7 +675,7 @@ function detail_obat(id){
 
 						for(var i=0; i<result.length; i++){
 						no++;
-						var aksi =  '<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_obat('+result[i].ID+');">'+
+						var aksi =  '<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5">'+
 														'<i class="fa fa-trash"></i>'+
 												'</button>';
 						var pertablet = '';
@@ -699,8 +699,35 @@ function detail_obat(id){
 					}
 
 					$('#tabel_detail_faktur tbody').html($tr);
-					paging();
+					paging_detail();
 					$('#popup_load').fadeOut();
+        }
+    });
+}
+
+function paging_detail($selector){
+	var jumlah_tampil = 10;
+
+    if(typeof $selector == 'undefined'){
+        $selector = $("#tabel_detail_faktur tbody tr");
+    }
+
+    window.tp = new Pagination('#tablePagingdetail', {
+        itemsCount:$selector.length,
+        pageSize : parseInt(jumlah_tampil),
+        onPageSizeChange: function (ps) {
+            console.log('changed to ' + ps);
+        },
+        onPageChange: function (paging) {
+            //custom paging logic here
+            //console.log(paging);
+            var start = paging.pageSize * (paging.currentPage - 1),
+                end = start + paging.pageSize,
+                $rows = $selector;
+            $rows.hide();
+            for (var i = start; i < end; i++) {
+                $rows.eq(i).show();
+            }
         }
     });
 }
@@ -1160,7 +1187,7 @@ function hitung_harga_jual(number){
 			}
 
 			var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
-			var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
+			var hitung_ppn = (parseFloat(hitung_awal) * 10) / 100;
 			var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
 
 			var hitung_kategori = '';
@@ -1171,7 +1198,7 @@ function hitung_harga_jual(number){
 				hitung_ppn_awal = parseFloat(hitung_akhir) * 40 / 100;
 				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
 			}else if (parseFloat(hitung_akhir) <= 1000) {
-				hitung_ppn_awal = parseFloat(hitung_akhir) * 20 / 100;
+				hitung_ppn_awal = (parseFloat(hitung_akhir) * 20) / 100;
 				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
 			}else if (parseFloat(hitung_akhir) >= 1000) {
 				hitung_ppn_awal = parseFloat(hitung_akhir) * 10 / 100;
@@ -1179,8 +1206,9 @@ function hitung_harga_jual(number){
 			}
 
 		var bulatan = custom_pembulatan(hitung_kategori, 100);
+		var kategori_bulat = Math.round(hitung_kategori);
 
-		$('#harga_jual_'+number).val(NumberToMoney(hitung_kategori));
+		$('#harga_jual_'+number).val(NumberToMoney(kategori_bulat));
 		$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
 
 		}else if (kategori == 'Obat Resep') {
@@ -1223,8 +1251,9 @@ function hitung_harga_jual(number){
 			}
 
 			var bulatan = custom_pembulatan(hitung_kategori, 100);
+			var kategori_bulat = Math.round(hitung_kategori);
 
-			$('#harga_jual_'+number).val(NumberToMoney(hitung_kategori));
+			$('#harga_jual_'+number).val(NumberToMoney(kategori_bulat));
 			$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
 
 		}else if (kategori == 'Obat Keras') {
@@ -1267,8 +1296,9 @@ function hitung_harga_jual(number){
 			}
 
 			var bulatan = custom_pembulatan(hitung_kategori, 100);
+			var kategori_bulat = Math.round(hitung_kategori);
 
-			$('#harga_jual_'+number).val(NumberToMoney(hitung_kategori));
+			$('#harga_jual_'+number).val(NumberToMoney(kategori_bulat));
 			$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
 
 		}
@@ -1321,8 +1351,9 @@ function hitung_harga_jual(number){
 			}
 
 		var bulatan = custom_pembulatan(hitung_kategori, 100);
+		var kategori_bulat = Math.round(hitung_kategori);
 
-		$('#faktur_harga_jual_'+number).val(NumberToMoney(hitung_kategori));
+		$('#faktur_harga_jual_'+number).val(NumberToMoney(kategori_bulat));
 		$('#faktur_harga_bulat_'+number).val(NumberToMoney(bulatan));
 
 		}else if (kategori == 'Obat Resep') {
@@ -1365,8 +1396,9 @@ function hitung_harga_jual(number){
 			}
 
 			var bulatan = custom_pembulatan(hitung_kategori, 100);
+			var kategori_bulat = Math.round(hitung_kategori);
 
-			$('#faktur_harga_jual_'+number).val(NumberToMoney(hitung_kategori));
+			$('#faktur_harga_jual_'+number).val(NumberToMoney(kategori_bulat));
 			$('#faktur_harga_bulat_'+number).val(NumberToMoney(bulatan));
 
 		}else if (kategori == 'Obat Keras') {
@@ -1409,8 +1441,9 @@ function hitung_harga_jual(number){
 			}
 
 			var bulatan = custom_pembulatan(hitung_kategori, 100);
+			var kategori_bulat = Math.round(hitung_kategori);
 
-			$('#faktur_harga_jual_'+number).val(NumberToMoney(hitung_kategori));
+			$('#faktur_harga_jual_'+number).val(NumberToMoney(kategori_bulat));
 			$('#faktur_harga_bulat_'+number).val(NumberToMoney(bulatan));
 		}
 	}
@@ -2462,6 +2495,9 @@ function hitung_total_harga_beli(){
 
 									</tbody>
 							</table>
+						<div class="form-group">						
+								<div id="tablePagingdetail"> </div>
+						</div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_kategori">Tutup</button>

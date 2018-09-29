@@ -268,6 +268,7 @@ class Ap_gudang_obat_m extends CI_Model {
 		$harga_pertablet,
 		$harga_beli,
 		$harga_jual,
+		$harga_bulat,
 		$tanggal_masuk,
 		$waktu_masuk
 	){
@@ -284,6 +285,7 @@ class Ap_gudang_obat_m extends CI_Model {
 			'HARGA_PERTABLET' => $harga_pertablet,
 			'HARGA_BELI' => $harga_beli,
 			'HARGA_JUAL' => $harga_jual,
+			'HARGA_BULAT' => $harga_bulat,
 			'TANGGAL_MASUK' => $tanggal_masuk,
 			'WAKTU_MASUK' => $waktu_masuk
 		);
@@ -300,7 +302,10 @@ class Ap_gudang_obat_m extends CI_Model {
 				'TANGGAL_MASUK' => $tanggal_masuk,
 				'WAKTU_MASUK' => $waktu_masuk,
 				'AKTIF' => '1',
-				'STOK' => $total
+				'STOK' => $total,
+				'HARGA_JUAL' => $harga_jual,
+				'HARGA_BELI' => $harga_beli,
+				'HARGA_BULAT' => $harga_bulat
 			);
 			$this->db->insert('apotek_gudang_obat', $data_gudang);
 		}else {
@@ -310,7 +315,10 @@ class Ap_gudang_obat_m extends CI_Model {
 
 			$jumlah_stok = $total + $stok;
 			$data_gudang = array(
-				'STOK' => $jumlah_stok
+				'STOK' => $jumlah_stok,
+				'HARGA_JUAL' => $harga_jual,
+				'HARGA_BELI' => $harga_beli,
+				'HARGA_BULAT' => $harga_bulat
 			);
 			$this->db->where('ID', $id_gudang);
       $this->db->update('apotek_gudang_obat', $data_gudang);
@@ -327,6 +335,7 @@ class Ap_gudang_obat_m extends CI_Model {
 		$harga_pertablet,
 		$harga_beli,
 		$harga_jual,
+		$harga_bulat,
 		$tanggal_masuk,
 		$waktu_masuk
 	){
@@ -343,6 +352,7 @@ class Ap_gudang_obat_m extends CI_Model {
 			'HARGA_PERTABLET' => $harga_pertablet,
 			'HARGA_BELI' => $harga_beli,
 			'HARGA_JUAL' => $harga_jual,
+			'HARGA_BULAT' => $harga_bulat,
 			'TANGGAL_MASUK' => $tanggal_masuk,
 			'WAKTU_MASUK' => $waktu_masuk
 		);
@@ -359,7 +369,10 @@ class Ap_gudang_obat_m extends CI_Model {
 				'TANGGAL_MASUK' => $tanggal_masuk,
 				'WAKTU_MASUK' => $waktu_masuk,
 				'AKTIF' => '1',
-				'STOK' => $total
+				'STOK' => $total,
+				'HARGA_BELI' => $harga_beli,
+				'HARGA_JUAL' => $harga_jual,
+				'HARGA_BULAT' => $harga_bulat
 			);
 			$this->db->insert('apotek_gudang_obat', $data_gudang);
 		}else {
@@ -369,7 +382,10 @@ class Ap_gudang_obat_m extends CI_Model {
 
 			$jumlah_stok = $total + $stok;
 			$data_gudang = array(
-				'STOK' => $jumlah_stok
+				'STOK' => $jumlah_stok,
+				'HARGA_BELI' => $harga_beli,
+				'HARGA_JUAL' => $harga_jual,
+				'HARGA_BULAT' => $harga_bulat
 			);
 			$this->db->where('ID', $id_gudang);
       $this->db->update('apotek_gudang_obat', $data_gudang);

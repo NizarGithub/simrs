@@ -196,14 +196,6 @@ function data_obat(){
         		for(var i=0; i<result.length; i++){
         			no++;
 
-                    var satuan = "";
-
-                    if(result[i].JUMLAH_BUTIR != 0){
-                        satuan = result[i].SATUAN_ISI;
-                    }else{
-                        satuan = result[i].NAMA_SATUAN;
-                    }
-
                     // Here are the two dates to compare
 					var date1 = "<?php echo date('Y-m-d'); ?>";
 					var date2 = result[i].KADALUARSA_BALIK;
@@ -255,9 +247,9 @@ function data_obat(){
         							"<b>"+result[i].NAMA_OBAT+"</b><br/>"+
                                     "<small>"+result[i].KODE_OBAT+"</small>"+
         						"</td>"+
-                                "<td style='text-align:center;'>"+result[i].NAMA_JENIS+"</td>"+
-        						"<td>"+NumberToMoney(result[i].TOTAL)+"&nbsp;"+satuan+"</td>"+
-        						"<td style='text-align:center;'>"+formatTanggal(result[i].KADALUARSA)+"</td>"+
+                                "<td style='text-align:center;'>"+result[i].ID_JENIS_OBAT+"</td>"+
+        						"<td><center>"+NumberToMoney(result[i].TOTAL)+"</center></td>"+
+        						"<td style='text-align:center;'>"+formatTanggal(result[i].EXPIRED)+"</td>"+
         						"<td style='text-align:center;'>"+keterangan+"</td>"+
         					"</tr>";
         		}
@@ -316,9 +308,9 @@ function data_gudang_obat(){
                         "<small>"+result[i].KODE_OBAT+"</small>"+
         							"</td>"+
                       "<td style='text-align:center;'>"+result[i].NAMA_JENIS+"</td>"+
-											"<td>"+result[i].HARGA_BELI+"</td>"+
-											"<td>"+result[i].HARGA_JUAL+"</td>"+
-        						  "<td>"+NumberToMoney(result[i].TOTAL)+"</td>"+
+											"<td style='text-align:right;'>Rp. "+NumberToMoney(result[i].HARGA_BELI)+"</td>"+
+											"<td style='text-align:right;'>Rp. "+NumberToMoney(result[i].TOTAL_HARGA)+"</td>"+
+        						  "<td style='text-align:center;'>"+NumberToMoney(result[i].TOTAL)+"</td>"+
         						  "<td style='text-align:center;'>"+formatTanggal(result[i].KADALUARSA)+"</td>"+
         					  "</tr>";
         		}

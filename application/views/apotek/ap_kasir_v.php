@@ -768,6 +768,10 @@ $user_detail = $this->model->get_user_detail($id_user);
                                 </table>
                               </div>
                             </div>
+                            <center>
+                              <div id="tablePagingpendapatan">
+                              </div>
+                            </center>
                           </div>
                           <div class="modal-footer">
                               <button type="submit" class="btn btn-success">Print</button>
@@ -1322,8 +1326,35 @@ function data_rekap_pendapatan(){
           }
       }
       $('#tabel_rekap_pendapatan tbody').html(table);
+      paging_pendapatan();
     }
   });
+}
+
+function paging_pendapatan($selector){
+    if(typeof $selector == 'undefined'){
+        $selector = $("#tabel_rekap_pendapatan tbody tr");
+    }
+    window.tp = new Pagination('#tablePagingpendapatan', {
+        itemsCount:$selector.length,
+        pageSize : '10',
+        onPageSizeChange: function (ps) {
+            console.log('changed to ' + ps);
+        },
+        onPageChange: function (paging) {
+            //custom paging logic here
+            //console.log(paging);
+            var start = paging.pageSize * (paging.currentPage - 1),
+                end = start + paging.pageSize,
+                $rows = $selector;
+
+            $rows.hide();
+
+            for (var i = start; i < end; i++) {
+                $rows.eq(i).show();
+            }
+        }
+    });
 }
 
 function data_pembayaran(){

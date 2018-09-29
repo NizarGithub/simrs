@@ -260,6 +260,7 @@ $user_detail = $this->model->get_user_detail($id_user);
 																					</div>
 																			</div>
 																			<div class="panel-footer" style="background-color: #F57F17;">
+																				<input type="hidden" id="date_now" value="<?php echo date('d-m-Y'); ?>">
 																				<?php
 		                                        $bulan_arr = array(
 		                                            1 =>    "Januari", 2  =>"Februari", 3  =>"Maret", 4 =>"April",
@@ -659,6 +660,7 @@ function simpan_closing(){
 
 function data_obat(){
 	var keyword = $('#cari_nama_menu').val();
+	var tanggal_sekarang = $('#date_now').val();
 	$.ajax({
 			url : '<?php echo base_url(); ?>apotek/ap_obat_hv_c/data_obat',
 			data : {keyword:keyword},
@@ -685,11 +687,40 @@ function data_obat(){
                 }else {
                   status_obat = 'Obat Racik';
                 }
+
+								var kadaluarsa = result[i].EXPIRED;
+								var balik_hari_kadaluarsa = kadaluarsa.substr(1,1);
+								var balik_bulan_kadaluarsa = kadaluarsa.substr(4,1);
+								var balik_tahun_kadaluarsa = kadaluarsa.substr(6,4);
+								var satuan_tanggal_kadaluarsa = balik_tahun_kadaluarsa+'-'+balik_bulan_kadaluarsa+'-'+balik_hari_kadaluarsa;
+
+								var tanggal = new Date();
+								var tahun = tanggal.getFullYear();
+								var bulan = tanggal.getMonth() + 1;
+								var hari = tanggal.getDate();
+
+								var satuan_tanggal_sekarang = tahun+'-'+bulan+'-'+hari;
+
+								var kadal = '';
+								if (new Date(satuan_tanggal_sekarang) >= new Date(satuan_tanggal_kadaluarsa)) {
+									kadal = '<small class="pull-right" style="color: red;">Exp : '+result[i].EXPIRED+'</small>';
+								}else {
+									kadal = '<small class="pull-right" style="color: black;">Exp : '+result[i].EXPIRED+'</small>';
+								}
+
+								var stok_habis = '';
+								var stok = result[i].TOTAL_STOK_OBAT;
+								if (stok < 10 || stok == 10) {
+									stok_habis = '<h4 class="c-red">'+result[i].TOTAL_STOK_OBAT+'</h4>';
+								}else {
+									stok_habis = '<h4 class="c-dark">'+result[i].TOTAL_STOK_OBAT+'</h4>';
+								}
+
 									$tr +=  '<a href="javascript:;" class="message-item media" onclick="klik_obat('+result[i].ID+', '+result[i].TOTAL_JUAL+', '+result[i].SERVICE+');">'+
 														'<div class="media">'+
 															'<img src="<?php echo base_url(); ?>picture/pills.png" width="50" class="pull-left">'+
 																'<div class="media-body">'+
-                                '<small class="pull-right" style="color: black;">Exp : '+result[i].EXPIRED+'</small>'+
+                                ''+kadal+''+
 																'<div class="col-md-3">'+
 																	'<h5 class="c-dark"><strong>'+result[i].BARCODE+'</strong></h5>'+
 																	'<h4 class="c-dark">'+result[i].NAMA_OBAT+'</h4>'+
@@ -704,7 +735,7 @@ function data_obat(){
 																'</div>'+
 																'<div class="col-md-2">'+
 																			'<h5 class="c-dark"><strong>Stok</strong></h5>'+
-																			'<h4 class="c-dark">'+result[i].TOTAL_STOK_OBAT+'</h4>'+
+																			''+stok_habis+''+
 																'</div>'+
 															'</div>'+
 														'</div>'+

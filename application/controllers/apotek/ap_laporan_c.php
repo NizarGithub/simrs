@@ -92,7 +92,7 @@ class Ap_laporan_c extends CI_Controller {
 		$data = array(
 			'title' => 'Laporan Sisa Stok Obat',
 			'settitle' => 'Laporan Sisa Stok Obat',
-			'dt' => $this->model->data_obat($keyword,$urutkan,$urutkan_stok),
+			'dt' => $this->model->data_obat_cetak($keyword,$urutkan,$urutkan_stok),
 			'filename' => 'LapSisaStok_'.$bln.'_'.$y,
 			'bulan' => $bln,
 			'tahun' => $y,

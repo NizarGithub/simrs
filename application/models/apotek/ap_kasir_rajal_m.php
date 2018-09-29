@@ -123,7 +123,7 @@ class Ap_kasir_rajal_m extends CI_Model {
 						LEFT JOIN rk_pasien b ON a.ID_PASIEN = b.ID
 						) a
 						WHERE 1=1
-						AND a.TANGGAL = '25-09-2018'
+						AND a.TANGGAL = '$tanggal'
 						AND a.STATUS_CLOSING = '0'
 						ORDER BY a.ID DESC
 					";

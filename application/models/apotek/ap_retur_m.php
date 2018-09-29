@@ -107,13 +107,21 @@ class Ap_retur_m extends CI_Model {
 		// $this->db->query("UPDATE rk_resep_detail_rj SET JUMLAH_BELI = JUMLAH_BELI - $jumlah_beli WHERE ID_RESEP = '$id_resep'");
 	}
 
-  function get_data_resep(){
+  function get_data_resep($keyword){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND (a.KODE_RESEP LIKE '%$keyword%' OR b.NAMA LIKE '%$keyword%')";
+		}
+
     $sql = $this->db->query("SELECT
                               a.*,
                               b.NAMA AS NAMA_PASIEN
                              FROM
                              rk_resep_rj a
-                             LEFT JOIN rk_pasien b ON a.ID_PASIEN = b.ID");
+                             LEFT JOIN rk_pasien b ON a.ID_PASIEN = b.ID
+														 WHERE $where
+														 ");
     return $sql->result_array();
   }
 

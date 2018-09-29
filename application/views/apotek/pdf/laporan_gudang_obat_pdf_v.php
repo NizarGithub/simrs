@@ -121,15 +121,12 @@ function formatTanggal($tgl){
 <table class="grid">
 	<thead>
 		<tr>
-			<th style="text-align:center; width: 20px;">No</th>
+			<th style="text-align:center;">No</th>
 			<th>Nama Obat</th>
 			<th>Jenis Obat</th>
       <th>Status Obat</th>
       <th>Golongan Obat</th>
       <th>Kategori Obat</th>
-      <th>Jumlah</th>
-      <th>Isi</th>
-      <th>Jumlah Isi</th>
 			<th>Sisa Stok</th>
       <th>Harga Beli</th>
       <th>Harga Jual</th>
@@ -143,51 +140,12 @@ function formatTanggal($tgl){
 
 		foreach ($dt as $key => $value) {
 			$no++;
-			$satuan = "";
-      if($value->JUMLAH_BUTIR != 0){
-          $satuan = $value->SATUAN_ISI;
-      }else{
-          $satuan = $value->NAMA_SATUAN;
-      }
+
 			$status_obat = "";
 			if($value->STATUS_RACIK == 0){
 					$status_obat = "Obat Umum";
 			}else{
 					$status_obat = "Obat Racik";
-			}
-			$go = $value->ID_GOLONGAN;
-			if ($go == '' || $go == NULL) {
-				$golongan = 'Golongan Obat Kosong';
-			}else {
-				$gol = array(
-					1 => 'Alkes',
-					2 => 'OKT (Obat Keras Tertentu)',
-					3 => 'Injeksi',
-					4 => 'Supro (Suprositoria)',
-					5 => 'Vaksin',
-					6 => 'Cream',
-					7 => 'Drop',
-					8 => 'HV / OTC',
-					9 => 'Susu',
-					10 => 'Sirup',
-					11 => 'Tablet',
-					12 => 'Generik',
-				);
-				$golongan = $gol[intval($go)];
-			}
-			$ka = $value->ID_KATEGORI;
-			if ($ka == '' || $ka == NULL) {
-				$kategori = 'Kategori Obat Kosong';
-			}else {
-				$kat = array(
-					1 => 'Obat Bebas',
-					2 => 'Obat Bebas Terbatas',
-					3 => 'Obat Keras',
-					4 => 'Jamu',
-					5 => 'Obat Herbal Terstandar',
-					6 => 'Fitofarmaka',
-				);
-				$kategori = $kat[intval($ka)];
 			}
 	?>
 		<tr>
@@ -197,16 +155,13 @@ function formatTanggal($tgl){
 				<br>
 				<small><b><?php echo $value->KODE_OBAT; ?></b></small>
 			</td>
-			<td width="90" style="font-size: 11px;"><?php echo $value->NAMA_JENIS; ?></td>
-			<td style="font-size: 12px;"><?php echo $status_obat ?></td>
-			<td width="65" style="font-size: 12px;"><?php echo $golongan ?></td>
-			<td width="65" style="font-size: 12px;"><?php echo $kategori ?></td>
-			<td><?php echo $value->JUMLAH ?></td>
-			<td><?php echo $value->ISI ?></td>
-			<td><?php echo $value->JUMLAH_BUTIR ?></td>
-			<td><?php echo $value->TOTAL ?></td>
-			<td><?php echo $value->HARGA_BELI ?></td>
-			<td><?php echo $value->HARGA_JUAL ?></td>
+			<td width="86" style="font-size: 11px; text-align: center;"><?php echo $value->NAMA_JENIS; ?></td>
+			<td width="86" style="font-size: 12px;"><?php echo $status_obat ?></td>
+			<td width="86" style="font-size: 12px;"><?php echo $value->GOLONGAN_OBAT ?></td>
+			<td width="86" style="font-size: 12px;"><?php echo $value->KATEGORI_OBAT ?></td>
+			<td style="text-align:center;"><?php echo $value->TOTAL ?></td>
+			<td style="text-align:right">Rp. <?php echo number_format($value->HARGA_BELI); ?></td>
+			<td style="text-align:right">Rp. <?php echo number_format($value->TOTAL_HARGA); ?></td>
 			<td><?php echo formatTanggal($value->KADALUARSA); ?></td>
 			<td><?php echo $value->TANGGAL_MASUK ?></td>
 		</tr>
