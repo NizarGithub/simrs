@@ -156,17 +156,9 @@ $(document).ready(function(){
         $('#tombol_cari').show();
     });
 
-	// $('#dt_pasien_sudah').click(function(){
-	// 	data_pasien_sudah();
-	// });
-
-	// $('#jumlah_tampil').change(function(){
-	// 	data_pasien_belum();
-	// });
-
-	// $('#jumlah_tampil2').change(function(){
-	// 	data_pasien_sudah();
-	// });
+	$('#jumlah_tampil').change(function(){
+		data_rawat_inap();
+	});
 
 });
 
@@ -215,7 +207,7 @@ function data_rawat_inap(){
 			$tr = "";
 
 			if(result == "" || result == null){
-				$tr = "<tr><td colspan='12' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+				$tr = "<tr><td colspan='11' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
 				var no = 0;
 
@@ -227,33 +219,73 @@ function data_rawat_inap(){
 					result[i].NAMA_DOKTER = result[i].NAMA_DOKTER==null?"-":result[i].NAMA_DOKTER;
 
 					var encodedString = Base64.encode(result[i].ID);
-					var aksi = '<a href="<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/tindakan_ri/'+encodedString+'" class="btn btn-success waves-effect waves-light btn-sm"><i class="fa fa-user-md"></i>&nbsp;Tindakan</a>';
-					var kelas = result[i].KODE_KAMAR+' - '+result[i].KELAS;
-					var tgl_mrs = result[i].TANGGAL_MASUK;
-					var tgl_krs = '';
-					var sistem_bayar = '';
+					var aksi = '<a href="<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/tindakan_ri/'+encodedString+'" class="btn btn-primary waves-effect waves-light btn-sm"><i class="fa fa-user-md"></i>&nbsp;Tindakan</a>';
+					var tgl_mrs = result[i].TANGGAL_MRS;
 
+					var tgl_krs = '';
 					if(result[i].TANGGAL_KELUAR == null && result[i].WAKTU_KELUAR == null){
 						tgl_krs = '-';
 					}else{
 						tgl_krs = result[i].TANGGAL_KELUAR;
 					}
 
+					var sistem_bayar = '';
 					if(result[i].SISTEM_BAYAR == '1'){
 						sistem_bayar = 'Umum';
 					}else{
 						sistem_bayar = 'Asuransi';
 					}
 
-					$tr += "<tr>"+
+					var bed = '';
+					if(result[i].STATUS_SUDAH == '1'){
+						bed = 'Selesai Ditangani';
+					}else{
+						bed = result[i].KODE_KAMAR+' - '+result[i].KELAS+' / '+result[i].NOMOR_BED;
+					}
+
+					// Here are the two dates to compare
+					var date1 = "<?php echo date('Y-m-d'); ?>";
+					var date2 = result[i].TGL_KELUAR_BALIK;
+					// First we split the values to arrays date1[0] is the year, [1] the month and [2] the day
+					date1 = date1.split('-');
+					date2 = date2.split('-');
+					// Now we convert the array to a Date object, which has several helpful methods
+					date1 = new Date(date1[0], date1[1], date1[2]);
+					date2 = new Date(date2[0], date2[1], date2[2]);
+					// We use the getTime() method and get the unixtime (in milliseconds, but we want seconds, therefore we divide it through 1000)
+					date1_unixtime = parseInt(date1.getTime() / 1000);
+					date2_unixtime = parseInt(date2.getTime() / 1000);
+					// This is the calculated difference in seconds
+					var timeDifference = date2_unixtime - date1_unixtime;
+					// in Hours
+					var timeDifferenceInHours = timeDifference / 60 / 60;
+					// and finaly, in days :)
+					var timeDifferenceInDays = timeDifferenceInHours  / 24;
+					//in month
+					var timeDifferenceInMonth = (date2.getFullYear() - date1.getFullYear()) * 12 + (date2.getMonth() - date1.getMonth());
+
+					var hari = parseFloat(timeDifferenceInDays)-1;
+					var warna = '';
+					var keterangan = '';
+
+					if(parseFloat(hari) > 0 && parseFloat(hari) <= 2){
+						warna = "class='deezer_hj'";
+						keterangan = "Sisa Rawat Inap tinggal <b>"+hari+" hari</b>";
+					}else{
+						warna = warna;
+						keterangan = keterangan;
+					}
+
+					// <button data-original-title="Tooltip on top" title="" data-placement="top" data-toggle="tooltip" class="btn btn-default" type="button">Tooltip on top</button>
+
+					$tr += "<tr "+warna+" >"+
 								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+tgl_mrs+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+tgl_krs+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_PASIEN+"</td>"+
 								"<td style='vertical-align:middle;'>"+result[i].NAMA_PASIEN+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].JENIS_KELAMIN+"</td>"+
-								"<td style='vertical-align:middle; text-align:center;'>"+kelas+"</span></td>"+
-								"<td style='vertical-align:middle; text-align:center;'>"+result[i].VISITE_DOKTER+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+bed+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].DIRAWAT_SELAMA+" Hari</td>"+
 								"<td style='vertical-align:middle;'>"+result[i].NAMA_DOKTER+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+sistem_bayar+"</td>"+
@@ -274,130 +306,6 @@ function onEnterText(e){
         data_pasien_belum();
         $('#tombol_reset').show();
         $('#tombol_cari').hide();
-        return false;
-    }
-}
-
-// PASIEN SUDAH
-
-function paging2($selector){
-	var jumlah_tampil = $('#jumlah_tampil2').val();
-
-    if(typeof $selector == 'undefined')
-    {
-        $selector = $("#tabel_pasien_sudah tbody tr");
-    }
-
-    window.tp = new Pagination('#tablePaging2', {
-        itemsCount:$selector.length,
-        pageSize : parseInt(jumlah_tampil),
-        onPageSizeChange: function (ps) {
-            console.log('changed to ' + ps);
-        },
-        onPageChange: function (paging) {
-            //custom paging logic here
-            //console.log(paging);
-            var start = paging.pageSize * (paging.currentPage - 1),
-                end = start + paging.pageSize,
-                $rows = $selector;
-
-            $rows.hide();
-
-            for (var i = start; i < end; i++) {
-                $rows.eq(i).show();
-            }
-        }
-    });
-}
-
-function data_pasien_sudah(){
-	$('#popup_load').show();
-	var keyword = $('#cari_pasien_sudah').val();
-
-	$.ajax({
-		url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/data_pasien_sudah',
-		data : {keyword:keyword},
-		type : "POST",
-		dataType : "json",
-		success : function(result){
-			$tr = "";
-
-			if(result == "" || result == null){
-				$tr = "<tr><td colspan='8' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
-			}else{
-				var no = 0;
-
-				for(var i=0; i<result.length; i++){
-					no++;
-
-					var stt = "";
-					var warna = "";
-
-					if(result[i].KONDISI_AKHIR == 'Dirawat'){
-						stt = '<span class="label label-primary">'+result[i].KONDISI_AKHIR+'</span>';
-						warna = 'class="biru_stt_pindah"';
-					}else if(result[i].KONDISI_AKHIR == 'Pindah Poli'){
-						stt = '<span class="label label-warning">'+result[i].KONDISI_AKHIR+'</span>';
-						warna = 'class="warning"';
-					}else if(result[i].KONDISI_AKHIR == 'Operasi'){
-						stt = '<span class="label label-danger">'+result[i].KONDISI_AKHIR+'</span>';
-						warna = 'class="danger"';
-					}else if(result[i].KONDISI_AKHIR == 'Pulang'){
-						stt = '<span class="label label-success">'+result[i].KONDISI_AKHIR+'</span>';
-						warna = 'class="hijau_stt_pindah"';
-					}else if(result[i].KONDISI_AKHIR == null){
-						stt = '-';
-						warna = '';
-					}else{
-						stt = result[i].KONDISI_AKHIR;
-						warna = "-";
-					}
-
-					var date = new Date(result[i].TANGGAL_MASUK_BALIK);
-					date.setDate(date.getDate() + parseInt(result[i].DIRAWAT_SELAMA));
-
-					var dateMsg = date.getDate()+'-'+ (date.getMonth()+1) +'-'+date.getFullYear();
-
-					$tr += "<tr "+warna+" >"+
-								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td>"+result[i].KODE_PASIEN+"</td>"+
-								"<td>"+result[i].NAMA_PASIEN+"</td>"+
-								"<td>"+result[i].ASAL_RUJUKAN+"</td>"+
-								"<td>"+result[i].NAMA_KAMAR+"</td>"+
-								"<td style='text-align:center;'>"+result[i].SISTEM_BAYAR+"</td>"+
-								"<td style='text-align:center;'>"+result[i].TANGGAL_MASUK+"</td>"+
-								"<td style='text-align:center;'>"+result[i].DIRAWAT_SELAMA+" Hari</td>"+
-								"<td style='text-align:center;'>"+dateMsg+"</td>"+
-								"<td style='text-align:center;'>"+stt+"</td>"+
-							"</tr>";
-				}
-			}
-
-			$('#tabel_pasien_sudah tbody').html($tr);
-			paging2();
-			$('#popup_load').fadeOut();
-		}
-	});
-
-	$('#tombol_cari2').click(function(){
-        data_pasien_sudah();
-        $('#tombol_reset2').show();
-        $('#tombol_cari2').hide();
-    });
-
-    $('#tombol_reset2').click(function(){
-        $('#cari_pasien_sudah').val("");
-        data_pasien_sudah();
-        $('#tombol_reset2').hide();
-        $('#tombol_cari2').show();
-    });
-}
-
-function onEnterText2(e){
-    if (e.keyCode == 13) {
-        data_pasien_sudah();
-        $('#tombol_reset2').show();
-        $('#tombol_cari2').hide();
         return false;
     }
 }
@@ -437,6 +345,7 @@ function onEnterText2(e){
 					                    	</button>
 					                    </span>
 					                </div>
+					                <small><i><b>*pencarian berdasarkan No. RM, Nama Pasien dan Nama Dokter</b></i></small>
 				                </div>
 	                		</div>
 	                	</form>
@@ -450,8 +359,7 @@ function onEnterText2(e){
 				                        <th style="color:#fff; text-align:center;">No. RM</th>
 				                        <th style="color:#fff; text-align:center;">Nama</th>
 				                        <th style="color:#fff; text-align:center;">Jenis Kelamin</th>
-				                        <th style="color:#fff; text-align:center;">Kamar</th>
-				                        <th style="color:#fff; text-align:center;">Status</th>
+				                        <th style="color:#fff; text-align:center;">Kamar / Bed</th>
 				                        <th style="color:#fff; text-align:center;">Dirawat Selama</th>
 				                        <th style="color:#fff; text-align:center;">Dokter</th>
 				                        <th style="color:#fff; text-align:center;">Sistem Bayar</th>
@@ -484,69 +392,24 @@ function onEnterText2(e){
 		                            </select>
 				                </div>
 		                    </div>
-				        </form>
-	                </div>
-
-	                <div role="tabpanel" class="tab-pane fade" id="pasien_sudah">
-	                	<form class="form-horizontal" role="form">
-	                		<div class="form-group">
-	                			<div class="col-md-5 pull-right">
-					                <div class="input-group">
-					                    <input type="text" class="form-control" id="cari_pasien_sudah" placeholder="Cari..." value="" onkeypress="return onEnterText2(event);">
-					                    <span class="input-group-btn">
-					                    	<button type="button" class="btn waves-effect waves-light btn-warning" id="tombol_cari2">
-					                    		<i class="fa fa-search"></i>
-					                    	</button>
-					                    	<button type="button" class="btn waves-effect waves-light btn-warning" id="tombol_reset2">
-					                    		<i class="fa fa-refresh"></i>
-					                    	</button>
-					                    </span>
-					                </div>
-				                </div>
-	                		</div>
-	                	</form>
-	                	<div class="table-responsive">
-				            <table id="tabel_pasien_sudah" class="table table-bordered">
-				                <thead>
-				                    <tr class="biru">
-				                        <th style="color:#fff; text-align:center;">No</th>
-				                        <th style="color:#fff; text-align:center;">No. RM</th>
-				                        <th style="color:#fff; text-align:center;">Nama</th>
-				                        <th style="color:#fff; text-align:center;">Asal Rujukan</th>
-				                        <th style="color:#fff; text-align:center;">Nama Ruang</th>
-				                        <th style="color:#fff; text-align:center;">Sistem Bayar</th>
-				                        <th style="color:#fff; text-align:center;">Tgl Pelayanan</th>
-				                        <th style="color:#fff; text-align:center;">Dirawat Selama</th>
-				                        <th style="color:#fff; text-align:center;">Tgl Pulang</th>
-				                        <th style="color:#fff; text-align:center;">Kondisi Akhir</th>
-				                    </tr>
-				                </thead>
-
-				                <tbody>
-				                    
-				                </tbody>
-				            </table>
-				        </div>
-				        <form class="form-horizontal" role="form">
-				        	<div class="form-group">
-				        		<div class="col-md-10">
-				        			<div id="tablePaging2"> </div>
-				        		</div>
-		                    </div>
 		                    <div class="form-group">
-				        		<div class="col-md-9">
-				        			&nbsp;
-				        		</div>
-		                        <label class="col-md-2 control-label">Jumlah Tampil</label>
-		                        <div class="col-md-1 pull-right">
-					                <select class="form-control" id="jumlah_tampil2">
-		                                <option value="10">10</option>
-		                                <option value="20">20</option>
-		                                <option value="50">50</option>
-		                                <option value="100">100</option>
-		                            </select>
-				                </div>
-		                    </div>
+	                            <div class="col-md-6">
+	                                <table class="table table-bordered">
+	                                    <thead>
+	                                        <tr class="biru">
+	                                            <th style="text-align:center; color: #fff;">Warna</th>
+	                                            <th style="text-align:center; color: #fff;">Keterangan</th>
+	                                        </tr>
+	                                    </thead>
+	                                    <tbody>
+	                                        <tr>
+	                                            <td class="deezer_hj"><b>Hijau</b></td>
+	                                            <td>Pasien Rawat Inap yang waktu rawat inapnya kurang dari 3 hari dari tanggal KRS</td>
+	                                        </tr>
+	                                    </tbody>
+	                                </table>
+	                            </div>
+	                        </div>
 				        </form>
 	                </div>
 	            </div>

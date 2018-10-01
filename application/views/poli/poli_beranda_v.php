@@ -345,7 +345,7 @@ function data_pasien(){
             $tr = "";
 
             if(result == "" || result == null){
-                $tr = "<tr><td colspan='8' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+                $tr = "<tr><td colspan='10' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
             }else{
                 var no = 0;
 
@@ -392,6 +392,7 @@ function data_pasien(){
                     result[i].WAKTU = result[i].WAKTU==null?"00:00":result[i].WAKTU;
                     result[i].ALAMAT = (result[i].ALAMAT=="" || result[i].ALAMAT==null)?"-":result[i].ALAMAT;
                     result[i].JENIS_KELAMIN = result[i].JENIS_KELAMIN=="L"?"Laki - Laki":"Perempuan";
+                    var umur = result[i].UMUR+' Tahun '+result[i].UMUR_BULAN+' Bulan';
 
                     $tr +=  '<tr>'+
                             '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
@@ -399,6 +400,8 @@ function data_pasien(){
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].KODE_PASIEN+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL_LAHIR+'</td>'+
+                            '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+umur+'</td>'+
                             '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].ALAMAT+'</td>'+
                             '   <td style="vertical-align:middle;" align="center">'+panggil+'</td>'+
                             '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
@@ -856,7 +859,7 @@ function get_total_all(){
             </h4>
             <form class="form-horizontal" role="form">
                 <div class="form-group">
-                    <label class="col-md-1 control-label" style="width: 7%; text-align: left;">Filter :</label>
+                    <label class="col-md-2 control-label" style="width: 5%; text-align: left;">Filter :</label>
                     <?php if(count($level) != 0){ ?>
                     <div class="col-md-2" style="width: 15%;">
                         <div class="checkbox checkbox-inline checkbox-success">
@@ -867,7 +870,7 @@ function get_total_all(){
                     <?php } ?>
                 </div>
                 <div class="form-group">
-                    <label class="col-md-2 control-label" style="width: 7%; text-align: left;">&nbsp;</label>
+                    <label class="col-md-2 control-label" style="width: 5%;">&nbsp;</label>
                     <div class="col-md-4">
                         <?php if(count($level) == 0){ ?>
                         <div class="radio radio-info radio-inline">
@@ -982,6 +985,8 @@ function get_total_all(){
                                         <th style="color:#fff; text-align:center;">No. RM</th>
                                         <th style="color:#fff; text-align:center;">Nama Pasien</th>
                                         <th style="color:#fff; text-align:center;">Jenis Kelamin</th>
+                                        <th style="color:#fff; text-align:center;">Tanggal Lahir</th>
+                                        <th style="color:#fff; text-align:center;">Umur</th>
                                         <th style="color:#fff; text-align:center;">Alamat</th>
                                         <th style="color:#fff; text-align:center;">Panggil</th>
                                         <th style="color:#fff; text-align:center;">

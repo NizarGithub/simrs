@@ -286,6 +286,12 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function klik_pemeriksaan_manual(){
+		$id_nilai = $this->input->post('id_nilai');
+		$data = $this->model->klik_pemeriksaan_manual($id_nilai);
+		echo json_encode($data);
+	}
+
 	function klik_pemeriksaan(){
 		$id = $this->input->post('id');
 		$data = $this->model->klik_pemeriksaan($id);
@@ -550,7 +556,7 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 
 		if($kondisi_akhir == 'Rawat Inap'){
 
-			$this->model->simpan_rawat_inap($id_pasien,$tanggal,$waktu,$bulan,$tahun,$asal_rujukan,$id_poli,$id_peg_dokter);
+			$this->model->simpan_rawat_inap($id_pelayanan,$id_pasien,$tanggal,$waktu,$bulan,$tahun,$asal_rujukan,$id_poli,$id_peg_dokter);
 			$this->db->query("UPDATE admum_rawat_jalan SET STATUS_PINDAH = '$kondisi_akhir' WHERE ID = '$id_pelayanan'");
 			// $this->db->query("UPDATE admum_bed_rawat_inap SET STATUS_PAKAI = '1' WHERE ID = '$id_bed'");
 		
@@ -749,6 +755,109 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		$id = $this->input->post('id_hapus_sd');
 		$this->model->hapus_surat_dokter($id);
 		echo '1';
+	}
+
+	//SURAT PENGANTAR RI
+
+	function get_kode_pengantar_ri(){ //Rolling Per Bulan
+		$keterangan = 'SURAT-PENGANTAR-RI';
+		$bulan = date('n');
+		$tahun = date('Y');
+
+		$sql = "
+			SELECT 
+				COUNT(*) AS TOTAL 
+			FROM nomor 
+			WHERE KETERANGAN = '$keterangan'
+			AND BULAN = '$bulan'
+			AND TAHUN = '$tahun'
+		";
+		$qry = $this->db->query($sql);
+		$total = $qry->row()->TOTAL;
+		$kode = "";
+
+		//001/2016
+		if($total == 0){
+			$no = $this->add_leading_zero(1,3);
+			$kode = $tahun.$bulan.$no;
+		}else{
+			$s = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan' AND BULAN = '$bulan' AND TAHUN = '$tahun'";
+			$q = $this->db->query($s)->row();
+			$next = $q->NEXT+1;
+			$no = $this->add_leading_zero($next,3);
+			$kode = $tahun.$bulan.$no;
+		}
+
+		echo json_encode($kode);
+	}
+
+	function insert_kode_pengantar_ri(){
+	    $keterangan = 'SURAT-PENGANTAR-RI';
+		$bulan = date('n');
+		$tahun = date('Y');
+
+		$sql_cek = "
+			SELECT 
+				COUNT(*) AS TOTAL 
+			FROM nomor 
+			WHERE KETERANGAN = '$keterangan'
+			AND BULAN = '$bulan'
+			AND TAHUN = '$tahun'
+		";
+		$total = $this->db->query($sql_cek)->row()->TOTAL;
+
+		if($total == 0){
+			$this->db->query("INSERT INTO nomor(NEXT,KETERANGAN,BULAN,TAHUN) VALUES ('1','$keterangan','$bulan','$tahun')");
+		}else{
+			$sql = "SELECT * FROM nomor WHERE BULAN = '$bulan' AND TAHUN = '$tahun' AND KETERANGAN = '$keterangan'";
+			$query = $this->db->query($sql)->row();
+			$next = $query->NEXT+1;
+			$id = $query->ID;
+			$this->db->query("UPDATE nomor SET NEXT = '$next' WHERE ID = '$id' AND KETERANGAN = '$keterangan'");
+		}
+	}
+
+	function get_diagnosa_by_idrj(){
+		$id_rj = $this->input->post('id_rj');
+		$data = $this->model->get_diagnosa_by_idrj($id_rj);
+		echo json_encode($data);
+	}
+
+	function simpan_surat_pengantar_ri(){
+		$id_pelayanan = $this->input->post('id_rj_surat_pengantar_ri');
+		$id_poli = $this->input->post('id_poli');
+		$id_dokter = $this->input->post('id_dokter');
+		$id_pasien = $this->input->post('id_pasien');
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu = $format->format('H:i:s');
+		$tanggal = date('d-m-Y');
+		$bulan = date('n');
+		$tahun = date('Y');
+		$kode_surat = $this->input->post('kode_surat_pengantar');
+		$tinggi_badan = $this->input->post('tinggi_badan');
+		$berat_badan = $this->input->post('berat_badan');
+		$diagnosa = $this->input->post('diagnosa_dx');
+		$terapi = $this->input->post('terapi_dx');
+
+		$this->model->simpan_surat_pengantar_ri($id_pelayanan,$id_poli,$id_dokter,$id_pasien,$waktu,$tanggal,$bulan,$tahun,$kode_surat,$tinggi_badan,$berat_badan,$diagnosa,$terapi);
+		$this->insert_kode_pengantar_ri();
+
+		echo '1';
+	}
+
+	function cetak_surat_pengantar_ri($id){
+		$id_rj = $this->decode($id);
+		$data1 = $this->model->cetak_data_surat_pengantar_ri($id_rj);
+
+		$data = array(
+			'settitle' => 'Surat Pengantar Rawat Inap',
+			'filename' => 'surat_pengantar_ri',
+			'data1' => $data1
+		);
+
+		$this->load->view('poli/pdf/rk_surat_pengantar_ri_pdf_v',$data);
 	}
 
 }

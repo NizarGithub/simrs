@@ -13,7 +13,7 @@
 	display: none;
 }
 
-#view_laborat_tambah, #view_laborat_ubah, .view_lab{
+#view_laborat_tambah, #view_laborat_ubah, .view_lab, #view_pemeriksaan{
 	display: none;
 }
 
@@ -285,6 +285,14 @@ $(document).ready(function(){
 	$('.btn_pemeriksaan').click(function(){
 		$('#popup_pemeriksaan').click();
 		load_pemeriksaan();
+	});
+
+	$('#btn_tambah_pemeriksaan').click(function(){
+		$('#view_pemeriksaan').show();
+	});
+
+	$('#btn_tutup_pemeriksaan').click(function(){
+		$('#view_pemeriksaan').hide();
 	});
 
 	$('#simpanLab').click(function(){
@@ -685,8 +693,20 @@ $(document).ready(function(){
     	});
     });
 
-    $('#dt_data_surat_dokter').click(function(){
-    	data_surat_dokter_ada();
+    $('#dt_surat_pengantar_ri').click(function(){
+    	get_kode_pengantar_ri();
+
+    	var id_rj = $('#id_rj_surat_pengantar_ri').val();
+
+    	$.ajax({
+    		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/get_diagnosa_by_idrj',
+    		data : {id_rj:id_rj},
+    		type : "POST",
+    		dataType : "json",
+    		success : function(row){
+    			$('#diagnosa_dx').val(row['DIAGNOSA']);
+    		}
+    	});
     });
 
     $('#simpanSD').click(function(){
@@ -722,6 +742,40 @@ $(document).ready(function(){
     	$('#waktu_sd').val("");
     	$('#mulai_tgl_sd').val("");
     	$('#sampai_tgl_sd').val("");
+    });
+
+    $('#simpanPRI').click(function(){
+    	var id_rj = $('#id_rj_surat_pengantar_ri').val();
+    	var tinggi_badan = $('#tinggi_badan').val();
+    	var berat_badan = $('#berat_badan').val();
+    	var terapi_dx = $('#terapi_dx').val();
+
+    	if(tinggi_badan == ''){
+    		toastr["error"]("Tinggi badan kosong!", "Notifikasi");
+			$('#tinggi_badan').focus();
+    	}else if(berat_badan == ''){
+    		toastr["error"]("Berat badan kosong!", "Notifikasi");
+			$('#berat_badan').focus();
+    	}else if(terapi_dx == ''){
+    		toastr["error"]("Terapi kosong!", "Notifikasi");
+			$('#terapi_dx').focus();
+    	}else{
+    		$.ajax({
+    			url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/simpan_surat_pengantar_ri',
+	    		data : $('#view_surat_pengantar_ri').serialize(),
+	    		type : "POST",
+	    		dataType : "json",
+	    		success : function(result){
+	    			var encodedString = Base64.encode(id_rj);
+	    			window.open('<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/cetak_surat_pengantar_ri/'+encodedString,'_blank');
+					$('#tinggi_badan').val("");
+			    	$('#berat_badan').val("");
+			    	$('#diagnosa_dx').val("");
+			    	$('#terapi_dx').val("");
+			    	get_kode_pengantar_ri();
+	    		}
+    		});
+    	}
     });
 
 });
@@ -885,10 +939,10 @@ function data_tindakan(){
 
 					total += parseFloat(result[i].SUBTOTAL);
 
-					var aksi =  '<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_tindakan('+result[i].ID+');">'+
+					var aksi =  '<button type="button" class="btn btn-success waves-effect waves-light btn-sm" onclick="ubah_tindakan('+result[i].ID+');">'+
 									'<i class="fa fa-pencil"></i>'+
 								'</button>&nbsp;'+
-						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_tindakan('+result[i].ID+');">'+
+						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm" onclick="hapus_tindakan('+result[i].ID+');">'+
 						   			'<i class="fa fa-trash"></i>'+
 						   		'</button>'; 
 
@@ -1065,19 +1119,19 @@ function data_diagnosa(){
 				for(var i=0; i<result.length; i++){
 					no++;
 
-					var aksi =  '<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-b-5" onclick="ubah_diagnosa('+result[i].ID+');">'+
+					var aksi =  '<button type="button" class="btn btn-primary waves-effect waves-light btn-sm" onclick="ubah_diagnosa('+result[i].ID+');">'+
 									'<i class="fa fa-pencil"></i>'+
 								'</button>&nbsp;'+
-						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_diagnosa('+result[i].ID+');">'+
+						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm" onclick="hapus_diagnosa('+result[i].ID+');">'+
 						   			'<i class="fa fa-trash"></i>'+
 						   		'</button>';
 
 					$tr += "<tr>"+
-								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td style='text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
-								"<td>"+result[i].DIAGNOSA+"</td>"+
-								"<td>"+result[i].TINDAKAN+"</td>"+
-								"<td>"+result[i].URAIAN+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
+								"<td style='vertical-align:middle;'>"+result[i].DIAGNOSA+"</td>"+
+								"<td style='vertical-align:middle;'>"+result[i].TINDAKAN+"</td>"+
+								"<td style='vertical-align:middle;'>"+result[i].URAIAN+"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
 							"</tr>";
 				}
@@ -1215,7 +1269,6 @@ function klik_pemeriksaan(id){
 							"<td style='vertical-align:middle;'>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
 							"<td style='vertical-align:middle;'>"+result[i].NILAI_NORMAL+"</td>"+
 							"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
-							"<td style='vertical-align:middle; text-align:right;'><b>"+formatNumber(result[i].TARIF)+"</b></td>"+
 							"<td align='center'>"+aksi+"</td>"+
 						  "</tr>";
 			}
@@ -1269,7 +1322,7 @@ function load_pemeriksaan(){
 				for(var i=0; i<result.length; i++){
 					no++;
 
-					$tr += "<tr style='cursor:pointer;' onclick='klik_pemeriksaan("+result[i].ID+");'>"+
+					$tr += "<tr style='cursor:pointer;' onclick='klik_pemeriksaan_manual("+result[i].ID_NILAI+");'>"+
 								"<td style='text-align:center;'>"+no+"</td>"+
 								"<td>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
 								"<td>"+result[i].NILAI_NORMAL+"</td>"+
@@ -1285,6 +1338,40 @@ function load_pemeriksaan(){
 	$('#cari_pemeriksaan').off('keyup').keyup(function(){
 		load_pemeriksaan();
 	});
+}
+
+function klik_pemeriksaan_manual(id_nilai){
+	$('#tutup_pemeriksaan').click();
+
+    $.ajax({
+        url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/klik_pemeriksaan_manual',
+        data : {id_nilai:id_nilai},
+        type : "POST",
+        dataType : "json",
+        success : function(result){
+            $tr = "";
+
+            for(var i=0; i<result.length; i++){
+                var jumlah_data = $('#tr2_'+result[i].ID).length;
+
+                var aksi = "<button type='button' class='btn waves-light btn-danger btn-sm' onclick='deleteRow2(this);'><i class='fa fa-times'></i></button>";
+
+                $tr += "<tr id='tr2_"+result[i].ID+"'>"+
+                            "<input type='hidden' name='id_pemeriksaan[]' value='"+result[i].ID+"'>"+
+                            "<input type='hidden' name='nilai_normal[]' value='"+result[i].NILAI_NORMAL+"'>"+
+                            "<input type='hidden' name='tarif_pemeriksaan[]' value='"+result[i].TARIF+"'>"+
+                            "<td style='vertical-align:middle;'>"+result[i].NAMA_PEMERIKSAAN+"</td>"+
+                            "<td style='vertical-align:middle;'>"+result[i].NILAI_NORMAL+"</td>"+
+                            "<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
+                            "<td align='center'>"+aksi+"</td>"+
+                          "</tr>";
+            }
+
+            $('#tabel_tambah_pemeriksaan tbody').append($tr);
+            hitung_pemeriksaan();
+            $('#popup_load').hide();
+        }
+    });
 }
 
 function data_laborat(){
@@ -1317,10 +1404,10 @@ function data_laborat(){
 					total += parseFloat(result[i].TOTAL_TARIF);
 
 					var cetak = "<a href='<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/cetak_laborat/"+result[i].ID+"/"+id_pelayanan+"' class='btn btn-inverse btn-sm' target='_blank'><i class='fa fa-print'></i></a>";
-					var aksi =  '<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-b-5" onclick="hasil_laborat('+result[i].ID+');">'+
+					var aksi =  '<button type="button" class="btn btn-primary waves-effect waves-light btn-sm" onclick="hasil_laborat('+result[i].ID+');">'+
 									'<i class="fa fa-tint"></i>'+
 								'</button>&nbsp;'+
-						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_laborat('+result[i].ID+');">'+
+						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm" onclick="hapus_laborat('+result[i].ID+');">'+
 						   			'<i class="fa fa-trash"></i>'+
 						   		'</button>';
 
@@ -1434,11 +1521,12 @@ function load_obat(){
 
 				for(var i=0; i<result.length; i++){
 					no++;
+					var harga = parseFloat(result[i].HARGA_JUAL) + parseFloat(result[i].SERVICE);
 
 					$tr += "<tr style='cursor:pointer;' onclick='klik_obat("+result[i].ID+");'>"+
 								"<td style='text-align:center;'>"+no+"</td>"+
 								"<td>"+result[i].NAMA_OBAT+"</td>"+
-								"<td style='text-align:right;'>"+formatNumber(result[i].HARGA_JUAL)+"</td>"+
+								"<td style='text-align:right;'>"+formatNumber(harga)+"</td>"+
 							"</tr>";
 				}
 			}
@@ -1499,20 +1587,22 @@ function ini_obatnya(id){
 				if(jumlah_data > 0){
 
 				}else{
+					var harga = parseFloat(result[i].HARGA_JUAL) + parseFloat(result[i].SERVICE);
+
 					$tr = 	"<tr id='tr_resep2_"+result[i].ID+"'>"+
 								"<input type='hidden' name='id_obat_resep[]' value='"+result[i].ID+"'>"+
 								"<input type='hidden' name='harga_obat[]' id='harga_obat_"+result[i].ID+"' value='"+result[i].HARGA_JUAL+"'>"+
 								"<input type='hidden' name='service[]' id='service_"+result[i].ID+"' value='"+result[i].SERVICE+"'>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_OBAT+"</td>"+
 								"<td style='vertical-align:middle;'>"+result[i].NAMA_OBAT+"</td>"+
-								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].HARGA_JUAL)+"</td>"+
+								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(harga)+"</td>"+
 								"<td align='center'><input type='text' class='form-control' name='jumlah_obat[]' value='' id='jumlah_obat_"+result[i].ID+"' style='width:125px;' onkeyup='FormatCurrency(this); hitung_resep("+result[i].ID+")'></td>"+
 								"<td align='center'><input type='text' class='form-control' name='total_obat[]' value='' id='total_obat_"+result[i].ID+"' style='width:125px;' readonly></td>"+
-								"<td style='vertical-align:middle; text-align:center;'>"+result[i].GOLONGAN_OBAT+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+result[i].ID_JENIS_OBAT+"</td>"+
 								"<td align='center'><input type='text' class='form-control' name='aturan_minum[]' value='' style='width:125px;'></td>"+
 								"<td align='center'>"+
 									"<div class='input-group' style='width:125px;'>"+
-										"<input type='text' class='form-control num_only' name='diminum_selama[]' value=''>"+
+										"<input type='text' class='form-control' name='diminum_selama[]' value='' onkeyup='FormatCurrency(this);'>"+
 										"<span class='input-group-addon'>Hari</span>"+
 									"</div>"+
 								"</td>"+
@@ -1566,12 +1656,12 @@ function data_resep(){
 					}
 
 					$tr += "<tr>"+
-								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td style='text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
-								"<td style='text-align:center;'>"+result[i].KODE_RESEP+"</td>"+
-								"<td style='text-align:center;'>"+result[i].BANYAKNYA_RESEP+" Bungkus</td>"+
-								"<td align='center'>"+alergi+"</td>"+
-								"<td style='text-align:right;'>"+formatNumber(result[i].TOTAL)+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_RESEP+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+result[i].BANYAKNYA_RESEP+" Bungkus</td>"+
+								"<td style='vertical-align:middle;' align='center'>"+alergi+"</td>"+
+								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TOTAL)+"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
 							"</tr>";
 				}
@@ -2037,110 +2127,15 @@ function klik_lemari_jenazah(id){
 
 // SURAT DOKTER
 
-function data_surat_dokter(){
-	$('#popup_load').show();
-	var id = "<?php echo $id; ?>";
-
+function get_kode_pengantar_ri(){
 	$.ajax({
-        url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/data_surat_dokter',
-        data : {id:id},
+        url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/get_kode_pengantar_ri',
         type : "POST",
         dataType : "json",
-        success : function(result){
-            $tr = "";
-
-            if(result == "" || result == null){
-                $tr = "<tr><td colspan='6' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
-            }else{
-            	var no = 0;
-
-                for(var i=0; i<result.length; i++){
-                	no++;
-
-                    $tr += "<tr>"+
-                    			"<td style='text-align:center;'>"+no+"</td>"+
-                                "<td style='text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
-                                "<td style='text-align:center;'>"+
-                                	'<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-b-5" onclick="surat_dokter('+result[i].ID+');">'+
-										'<i class="fa fa-print"></i>'+
-									'</button>&nbsp;'+
-                                "</td>"+
-                                "<td style='text-align:center;'>"+
-                                	'<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-b-5" onclick="surat_dokter('+result[i].ID+');">'+
-										'<i class="fa fa-print"></i>'+
-									'</button>&nbsp;'+
-                                "</td>"+
-                                "<td style='text-align:center;'>"+
-                                	'<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-b-5" onclick="surat_dokter('+result[i].ID+');">'+
-										'<i class="fa fa-print"></i>'+
-									'</button>&nbsp;'+
-                                "</td>"+
-                                "<td style='text-align:center;'>"+
-                                	'<button type="button" class="btn btn-primary waves-effect waves-light btn-sm m-b-5" onclick="surat_dokter('+result[i].ID+');">'+
-										'<i class="fa fa-print"></i>'+
-									'</button>&nbsp;'+
-                                "</td>"+
-                            "</tr>";
-                }
-            }
-
-            $('#tabel_surat_dokter tbody').html($tr);
-            $('#popup_load').fadeOut();
+        success : function(kode){
+            $('#kode_surat_pengantar').val(kode);
         }
     });
-}
-
-function data_surat_dokter_ada(){
-	var id_pasien = $('#id_pasien_dt_sd').val();
-
-	$.ajax({
-		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/data_surat_dokter_id',
-		data : {id_pasien:id_pasien},
-		type : "POST",
-		dataType : "json",
-		success : function(row){
-			row['NAMA'] = row['NAMA']==null?"-":row['NAMA'];
-			row['UMUR'] = row['UMUR']==null?"-":row['UMUR'];
-			row['UMUR_BULAN'] = row['UMUR_BULAN']==null?"-":row['UMUR_BULAN'];
-			row['ALAMAT'] = row['ALAMAT']==null?"-":row['ALAMAT'];
-			row['WAKTU_ISTIRAHAT'] = row['WAKTU_ISTIRAHAT']==null?"-":row['WAKTU_ISTIRAHAT'];
-			row['MULAI_TANGGAL'] = row['MULAI_TANGGAL']==null?"-":row['MULAI_TANGGAL'];
-			row['SAMPAI_TANGGAL'] = row['SAMPAI_TANGGAL']==null?"-":row['SAMPAI_TANGGAL'];
-
-			if(row.length == 0){
-				$('#btn_cetak').attr('disabled','disabled');
-			}else{
-				$('#btn_cetak').removeAttr('disabled');
-			}
-
-			$tr = '<tr>'+
-                  '    <td>Nama</td>'+
-                  '    <td>: '+row['NAMA']+'</td>'+
-                  '</tr>'+
-                  '<tr>'+
-                  '    <td>Umur</td>'+
-                  '    <td>: '+row['UMUR']+' Tahun '+row['UMUR_BULAN']+' Bulan</td>'+
-                  '</tr>'+
-                  '<tr>'+
-                  '    <td>Alamat</td>'+
-                  '    <td>: '+row['ALAMAT']+'</td>'+
-                  '</tr>'+
-                  '<tr>'+
-                  '    <td>Waktu Istirahat</td>'+
-                  '    <td>: '+row['WAKTU_ISTIRAHAT']+' Hari</td>'+
-                  '</tr>'+
-                  '<tr>'+
-                  '    <td>Mulai Tanggal</td>'+
-                  '    <td>: '+row['MULAI_TANGGAL']+'</td>'+
-                  '</tr>'+
-                  '<tr>'+
-                  '    <td>Sampai Tanggal</td>'+
-                  '    <td>: '+row['SAMPAI_TANGGAL']+'</td>'+
-                  '</tr>';
-
-            $('#tabel_data_surat_dokter').html($tr);
-		}
-	});
 }
 
 function hitung_tanggal(){
@@ -2287,16 +2282,19 @@ function hitung_tanggal(){
                         </a>
                         <ul class="dropdown-menu">
                             <li id="dt_surat_dokter">
-                                <a data-toggle="tab" role="tab" href="#surat_dokter1">Surat Ket. Dokter</a>
+                                <a data-toggle="tab" role="tab" href="#surat_dokter1">Surat Keterangan Dokter</a>
+                            </li>
+                            <li id="dt_surat_pengantar_ri">
+                                <a data-toggle="tab" role="tab" href="#data_surat_pengantar_ri1">Surat Pengantar RI</a>
                             </li>
                             <li id="dt_surat_dokter_ri">
-                                <a data-toggle="tab" role="tab" href="#data_surat_dokter_ri1">Surat Ket. RI</a>
+                                <a data-toggle="tab" role="tab" href="#data_surat_dokter_ri1">Surat Keterangan RI</a>
                             </li>
                             <li id="dt_surat_dokter_istirahat">
-                                <a data-toggle="tab" role="tab" href="#data_surat_dokter_istirahat1">Surat Ket. Istirahat</a>
+                                <a data-toggle="tab" role="tab" href="#data_surat_dokter_istirahat1">Surat Keterangan Istirahat</a>
                             </li>
                             <li>
-                                <a data-toggle="tab" role="tab" href="#dropdown21">Surat Ket. Sehat</a>
+                                <a data-toggle="tab" role="tab" href="#dropdown21">Surat Keterangan Sehat</a>
                             </li>
                         </ul>
                     </li>
@@ -2321,7 +2319,7 @@ function hitung_tanggal(){
 							                <thead>
 							                    <tr class="merah">
 							                        <th style="color:#fff; text-align:center;">No</th>
-							                        <th style="color:#fff; text-align:center;">Tanggal</th>
+							                        <th style="color:#fff; text-align:center;">Tanggal / Waktu</th>
 							                        <th style="color:#fff; text-align:center;">Tindakan</th>
 							                        <th style="color:#fff; text-align:center;">Tarif</th>
 							                        <th style="color:#fff; text-align:center;">Jumlah</th>
@@ -2694,8 +2692,11 @@ function hitung_tanggal(){
 		                                </span>
 		                            </div>
 		                        </div>
+		                        <div class="col-md-5">
+		                        	<button type="button" class="btn btn-success" id="btn_tambah_pemeriksaan"><i class="fa fa-plus"></i> Tambah Pemeriksaan Manual</button>
+		                        </div>
 		                    </div>
-		                    <!-- <div class="form-group">
+		                    <div class="form-group" id="view_pemeriksaan">
 		                        <label class="col-md-2 control-label">Pemeriksaan</label>
 		                        <div class="col-md-5">
 		                            <div class="input-group">
@@ -2705,7 +2706,10 @@ function hitung_tanggal(){
 		                                </span>
 		                            </div>
 		                        </div>
-		                    </div> -->
+		                        <div class="col-md-5">
+		                        	<button type="button" class="btn btn-danger" id="btn_tutup_pemeriksaan"><i class="fa fa-times"></i> Tutup</button>
+		                        </div>
+		                    </div>
 		                    <div class="form-group">
 		                        <label class="col-md-2 control-label">&nbsp;</label>
 		                        <div class="col-md-8">
@@ -2716,11 +2720,9 @@ function hitung_tanggal(){
 							                        <th style="color:#fff; text-align:center;">Pemeriksaan</th>
 							                        <th style="color:#fff; text-align:center;">Nilai Normal</th>
 							                        <th style="color:#fff; text-align:center;">Tarif</th>
-							                        <th style="color:#fff; text-align:center;">Sub Total</th>
 							                        <th style="color:#fff; text-align:center;">#</th>
 							                    </tr>
 							                </thead>
-
 							                <tbody>
 							                    
 							                </tbody>
@@ -2846,6 +2848,7 @@ function hitung_tanggal(){
 		                            </div>
 		                        </div>
 		                    </div>
+		                    <hr>
 		                    <div class="form-group">
 		                    	<div class="col-md-12">
 		                    		<div class="table-responsive">
@@ -3169,27 +3172,60 @@ function hitung_tanggal(){
 		                </form>
 	                </div>
 
-	                <div role="tabpanel" class="tab-pane fade" id="data_surat_dokter1">
-	                	<form class="form-horizontal" method="post" target="_blank" action="<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/surat_dokter_ada">
-	                		<input type="hidden" name="id_pasien" id="id_pasien_dt_sd" value="<?php echo $dt->ID; ?>">
-	                		<input type="hidden" name="id_poli" id="id_poli_dt_sd" value="<?php echo $dt->ID_POLI; ?>">
-		                	<div class="form-group">
-		                		<div class="col-md-4">
-				                	<div class="table-responsive">
-				                        <table class="table m-0" id="tabel_data_surat_dokter">
-				                            <tbody>
-				                                
-				                            </tbody>
-				                        </table>
-				                    </div>
-		                		</div>
-		                	</div>
+	                <div role="tabpanel" class="tab-pane fade" id="data_surat_pengantar_ri1">
+	                	<form class="form-horizontal" method="post" id="view_surat_pengantar_ri">
+		                	<input type="hidden" name="id_rj_surat_pengantar_ri" id="id_rj_surat_pengantar_ri" value="<?php echo $id; ?>">
+							<input type="hidden" name="id_poli" value="<?php echo $dt->ID_POLI; ?>">
+							<input type="hidden" name="id_dokter" value="<?php echo $dt->ID_DOKTER; ?>">
+							<input type="hidden" name="id_pasien" id="id_pasien_sd" value="<?php echo $dt->ID; ?>">
+							<div class="form-group">
+		                        <label class="col-md-2 control-label">Kode Surat</label>
+		                        <div class="col-md-4">
+		                            <input type="text" class="form-control num_only" name="kode_surat_pengantar" id="kode_surat_pengantar" value="" readonly>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Tinggi Badan</label>
+		                        <div class="col-md-1">
+		                        	<div class="input-group">
+		                            	<input type="text" class="form-control num_only" name="tinggi_badan" id="tinggi_badan" value="">
+		                            	<span class="input-group-btn">
+		                                	<button class="btn btn-primary" type="button" style="cursor:default;">cm</button>
+		                                </span>
+		                        	</div>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Berat Badan</label>
+		                        <div class="col-md-1">
+		                        	<div class="input-group">
+		                            	<input type="text" class="form-control num_only" name="berat_badan" id="berat_badan" value="">
+		                            	<span class="input-group-btn">
+		                                	<button class="btn btn-primary" type="button" style="cursor:default;">kg</button>
+		                                </span>
+		                        	</div>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Diagnosa (Dx)</label>
+		                        <div class="col-md-4">
+		                            <textarea class="form-control" name="diagnosa_dx" id="diagnosa_dx" rows="3"></textarea>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Terapi (Tx)</label>
+		                        <div class="col-md-4">
+		                            <textarea class="form-control" name="terapi_dx" id="terapi_dx" rows="3"></textarea>
+		                        </div>
+		                    </div>
+		                    
 		                    <hr>
 
 		                    <center>
-		                    	<button type="submit" class="btn btn-danger" id="btn_cetak"><i class="fa fa-print"></i> <b>Cetak</b></button>
+		                    	<button type="button" class="btn btn-success" id="simpanPRI"><i class="fa fa-save"></i> <b>Simpan & Cetak</b></button>
+		                        <button type="button" class="btn btn-danger" id="batalPRI"><i class="fa fa-times"></i> <b>Batal</b></button>
 		                    </center>
-	                	</form>
+		                </form>
 	                </div>
 	            </div>
 			</div>
@@ -3425,7 +3461,7 @@ function hitung_tanggal(){
 
 <button id="popup_hapus_lab" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#custom-width-modal2" style="display:none;">Custom width Modal</button>
 <div id="custom-width-modal2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog" style="width:55%;">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="custom-width-modalLabel">Konfirmasi Hapus</h4>
@@ -3449,7 +3485,7 @@ function hitung_tanggal(){
 <!-- DIAGNOSA -->
 <button id="popup_penyakit_dg" class="btn btn-primary" data-toggle="modal" data-target="#myModal2_hasil_dg" style="display:none;">Standard Modal</button>
 <div id="myModal2_hasil_dg" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog" style="width:50%;">
+    <div class="modal-dialog" style="width:45%;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>

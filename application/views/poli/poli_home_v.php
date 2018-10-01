@@ -80,11 +80,20 @@
         <header id="topnav">
             <div class="topbar-main" style="background-color:#00a4e4; height:60px;">
                 <div class="container">
-
                     <!-- LOGO -->
+                    <?php
+                        $sql_logo = "SELECT LOGO FROM admum_setup_logo WHERE POSISI = 'Hor'";
+                        $qry_logo = $this->db->query($sql_logo)->row();
+                        $logo = '';
+                        if($qry_logo->LOGO == null || $qry_logo->LOGO == ""){
+                            $logo = base_url().'picture/logo-default.png';
+                        }else{
+                            $logo = base_url().'picture/logo/'.$qry_logo->LOGO;
+                        }
+                    ?>
                     <div class="topbar-left">
                         <a href="<?php echo base_url(); ?>portal" class="logo" style="margin-top:4px;">
-                            <img src="<?php echo base_url(); ?>picture/logo/logo2.jpeg" style="max-width:150px; max-height:40px;">
+                            <img src="<?php echo $logo; ?>" style="max-width:150px; max-height:40px;">
                         </a>
                     </div>
                     <!-- End Logo container-->
@@ -145,7 +154,7 @@
                                     <?php } ?>
                                     <li><a href="javascript:void(0)"><i class="ti-user m-r-5"></i> Profile</a></li>
                                     <li><a href="javascript:void(0)"><i class="ti-settings m-r-5"></i> Settings</a></li>
-                                    <li><a href="javascript:void(0)"><i class="ti-lock m-r-5"></i> Lock screen</a></li>
+                                    <li><a href="<?php echo base_url(); ?>lockscreen_c"><i class="ti-lock m-r-5"></i> Lock screen</a></li>
                                     <li><a href="<?php echo base_url(); ?>logout"><i class="ti-power-off m-r-5"></i> Logout</a></li>
                                 </ul>
                             </li>
@@ -430,20 +439,13 @@
                                 <table id="tabel_pasien_home" class="table table-hover table-bordered">
                                     <thead>
                                         <tr class="kuning_popup">
-                                            <th style="text-align:center; vertical-align: middle;">
-                                                <!-- <div class="checkbox checkbox-primary">
-                                                    <input id="checkboxAll" type="checkbox" name="centang_semua">
-                                                    <label for="checkboxAll">
-                                                        &nbsp;
-                                                    </label>
-                                                </div> -->
-                                            </th>
                                             <th style="color:#fff; text-align:center; vertical-align: middle;">No</th>
                                             <th style="color:#fff; text-align:center; vertical-align: middle;">No. RM</th>
                                             <th style="color:#fff; text-align:center; vertical-align: middle;">Tgl / Waktu</th>
                                             <th style="color:#fff; text-align:center; vertical-align: middle;">Nama Pasien</th>
                                             <th style="color:#fff; text-align:center; vertical-align: middle;">JK</th>
                                             <th style="color:#fff; text-align:center; vertical-align: middle;">Antrian</th>
+                                            <th style="text-align:center; vertical-align: middle;">#</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -781,20 +783,20 @@
                         for(var i=0; i<result.length; i++){
                             no++;
 
-                            var aksi = '<button class="btn btn-success waves-effect waves-light btn-sm" type="button" onclick="terima_pasien('+result[i].ID+');">Proses Tindakan</button>';
+                            var aksi = '<button class="btn btn-success waves-effect waves-light btn-sm" type="button" onclick="terima_pasien('+result[i].ID+');">Proses</button>';
 
                             result[i].WAKTU = result[i].WAKTU==null?"00:00":result[i].WAKTU;
                             result[i].JENIS_KELAMIN = result[i].JENIS_KELAMIN=='L'?'Laki - Laki':'Perempuan';
                             var antrian = result[i].KODE_ANTRIAN+' - '+result[i].NOMOR_ANTRIAN;
 
                             $tr +=  '<tr>'+
-                                    '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].KODE_PASIEN+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL+' - '+result[i].WAKTU+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+antrian+'</td>'+
+                                    '   <td style="vertical-align:middle;" align="center">'+aksi+'</td>'+
                                     '</tr>';
                         }
                     }
@@ -948,7 +950,7 @@
                             $tr +=  '<tr>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+no+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].KODE_PASIEN+'</td>'+
-                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL_MASUK+' - '+result[i].WAKTU+'</td>'+
+                                    '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].TANGGAL_MRS+' - '+result[i].WAKTU_MRS+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle;">'+result[i].NAMA+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+result[i].JENIS_KELAMIN+'</td>'+
                                     '   <td style="cursor:pointer; vertical-align:middle; text-align:center;">'+kamar+'</td>'+

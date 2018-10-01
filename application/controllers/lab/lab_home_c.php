@@ -24,7 +24,7 @@ class Lab_home_c extends CI_Controller {
 			'title' => 'Laboratorium',
 			'subtitle' => 'Laboratorium',
 			'master_menu' => 'home',
-			'view' => 'home',
+			'view' => 'lab',
 		);
 
 		$this->load->view('lab/lab_home_v',$data); 
@@ -133,9 +133,8 @@ class Lab_home_c extends CI_Controller {
 		$now = date('d-m-Y');
 		// $now = '23-08-2018';
 		$posisi = '2';
-		$dari = 'Admission';
 
-		$data = $this->model->notif_pasien_baru($posisi,$now,$dari);
+		$data = $this->model->notif_pasien_baru($posisi,$now);
 		echo json_encode($data);
 	}
 

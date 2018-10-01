@@ -91,7 +91,7 @@ class Admum_pasien_rj_m extends CI_Model {
 				JENIS_KELAMIN,
 				TANGGAL_LAHIR,
 				UMUR,
-				UMUR_BULAN,
+				IFNULL(UMUR_BULAN,0) AS UMUR_BULAN,
 				NAMA_AYAH,
 				NAMA_IBU,
 				ALAMAT,

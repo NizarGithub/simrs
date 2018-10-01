@@ -381,6 +381,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 			SELECT 
 				a.ID,
 				a.NAMA_PEMERIKSAAN,
+				b.ID AS ID_NILAI,
 				b.NILAI_NORMAL,
 				a.TARIF
 			FROM admum_setup_pemeriksaan a
@@ -388,6 +389,22 @@ class Rk_pelayanan_rj_m extends CI_Model {
 			WHERE $where 
 			AND a.ID_JENIS_LAB = '$id_jenis_lab'
 			ORDER BY a.ID ASC
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
+	function klik_pemeriksaan_manual($id_nilai){
+		$sql = "
+			SELECT 
+				b.ID AS ID_NILAI,
+				a.ID,
+				a.NAMA_PEMERIKSAAN,
+				b.NILAI_NORMAL,
+				a.TARIF
+			FROM admum_setup_pemeriksaan a
+			JOIN admum_setup_pemeriksaan_nilai b ON b.ID_PEMERIKSAAN = a.ID
+			WHERE b.ID = '$id_nilai'
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -555,13 +572,14 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				a.KODE_OBAT,
 				a.NAMA_OBAT,
 				IFNULL(b.STOK,0) AS STOK,
-				IFNULL(c.HARGA_JUAL,0) AS HARGA_JUAL,
+				IFNULL(b.HARGA_BULAT,0) AS HARGA_JUAL,
 				a.SERVICE
 			FROM admum_setup_nama_obat a
 			LEFT JOIN apotek_gudang_obat b ON b.ID_SETUP_NAMA_OBAT = a.ID
 			LEFT JOIN faktur_detail c ON c.ID_SETUP_NAMA_OBAT = a.ID
 			WHERE $where
 			GROUP BY a.ID
+			ORDER BY a.ID DESC
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -573,9 +591,9 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				a.ID,
 				a.KODE_OBAT,
 				a.NAMA_OBAT,
-				a.GOLONGAN_OBAT,
+				a.ID_JENIS_OBAT,
 				IFNULL(b.STOK,0) AS STOK,
-				IFNULL(c.HARGA_JUAL,0) AS HARGA_JUAL,
+				IFNULL(b.HARGA_BULAT,0) AS HARGA_JUAL,
 				a.SERVICE
 			FROM admum_setup_nama_obat a
 			LEFT JOIN apotek_gudang_obat b ON b.ID_SETUP_NAMA_OBAT = a.ID
@@ -782,9 +800,10 @@ class Rk_pelayanan_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_rawat_inap($id_pasien,$tanggal_masuk,$waktu,$bulan,$tahun,$asal_rujukan,$id_poli,$id_dokter){
+	function simpan_rawat_inap($id_rj,$id_pasien,$tanggal_masuk,$waktu,$bulan,$tahun,$asal_rujukan,$id_poli,$id_dokter){
 		$sql = "
 			INSERT INTO admum_rawat_inap(
+				ID_RAWAT_JALAN,
 				ID_PASIEN,
 				TANGGAL_MASUK,
 				WAKTU,
@@ -794,6 +813,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				ID_POLI,
 				ID_DOKTER
 			) VALUES (
+				'$id_rj',
 				'$id_pasien',
 				'$tanggal_masuk',
 				'$waktu',
@@ -1004,6 +1024,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 			LEFT JOIN rk_pasien PSN ON PSN.ID = SD.ID_PASIEN
 			LEFT JOIN kepeg_pegawai PEG ON PEG.ID = SD.ID_PEG_DOKTER
 			WHERE SD.ID_PASIEN = '$id'
+			AND SD.KETERANGAN = 'Surat Keterangan Dokter'
 		";
 		$query = $this->db->query($sql);
 		return $query->row();
@@ -1027,7 +1048,8 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				TAHUN,
 				WAKTU_ISTIRAHAT,
 				MULAI_TANGGAL,
-				SAMPAI_TANGGAL
+				SAMPAI_TANGGAL',
+				KETERANGAN
 			) VALUES (
 				'$id_pelayanan',
 				'$id_poli',
@@ -1038,7 +1060,8 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				'$tahun',
 				'$waktu_istirahat',
 				'$mulai_tanggal',
-				'$sampai_tanggal'
+				'$sampai_tanggal',
+				'Surat Keterangan Dokter'
 			)
 		";
 		$this->db->query($sql);
@@ -1047,6 +1070,86 @@ class Rk_pelayanan_rj_m extends CI_Model {
 	function hapus_surat_dokter($id){
 		$sql = "DELETE FROM rk_surat_dokter_rj WHERE ID = '$id'";
 		$this->db->query($sql);
+	}
+
+	function get_diagnosa_by_idrj($id_rj){
+		$sql = "
+			SELECT
+				*
+			FROM rk_diagnosa_rj 
+			WHERE ID_PELAYANAN = '$id_rj'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function simpan_surat_pengantar_ri($id_pelayanan,$id_poli,$id_dokter,$id_pasien,$waktu,$tanggal,$bulan,$tahun,$kode_surat,$tinggi_badan,$berat_badan,$diagnosa,$terapi){
+		$sql = "
+			INSERT INTO rk_surat_dokter_rj(
+				ID_PELAYANAN,
+				ID_POLI,
+				ID_PEG_DOKTER,
+				ID_PASIEN,
+				WAKTU,
+				TANGGAL,
+				BULAN,
+				TAHUN,
+				KODE_SURAT_PENGANTAR_RI,
+				TINGGI_BADAN,
+				BERAT_BADAN,
+				DIAGNOSA,
+				TERAPI,
+				KETERANGAN
+			) VALUES (
+				'$id_pelayanan',
+				'$id_poli',
+				'$id_dokter',
+				'$id_pasien',
+				'$waktu',
+				'$tanggal',
+				'$bulan',
+				'$tahun',
+				'$kode_surat',
+				'$tinggi_badan',
+				'$berat_badan',
+				'$diagnosa',
+				'$terapi',
+				'Surat Pengantar RI'
+			)
+		";
+		$this->db->query($sql);
+	}
+
+	function cetak_data_surat_pengantar_ri($id_rj){
+		$sql = "
+			SELECT
+				a.ID,
+				a.ID_PELAYANAN,
+				a.ID_POLI,
+				a.ID_PEG_DOKTER,
+				a.ID_PASIEN,
+				a.TANGGAL,
+				a.BULAN,
+				a.TAHUN,
+				a.KODE_SURAT_PENGANTAR_RI,
+				a.TINGGI_BADAN,
+				a.BERAT_BADAN,
+				a.DIAGNOSA,
+				a.TERAPI,
+				a.KETERANGAN,
+				b.NAMA,
+				b.UMUR,
+				b.JENIS_KELAMIN,
+				b.ALAMAT,
+				c.NAMA AS NAMA_DOKTER
+			FROM rk_surat_dokter_rj a
+			JOIN rk_pasien b ON b.ID = a.ID_PASIEN
+			JOIN kepeg_pegawai c ON c.ID = a.ID_PEG_DOKTER
+			WHERE a.ID_PELAYANAN = '$id_rj'
+			AND a.KETERANGAN = 'Surat Pengantar RI'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
 	}
 
 	//PASIEN SUDAH

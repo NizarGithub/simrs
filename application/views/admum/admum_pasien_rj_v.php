@@ -955,20 +955,20 @@ function klik_asuransi(id){
                             </div>
                         </div>
                         <div class="form-group view_poli">
-                            <label class="col-md-2 control-label">Biaya</label>
+                            <label class="col-md-2 control-label">Biaya Poli</label>
                             <div class="col-md-10">
                                 <input type="text" class="form-control" id="biaya" value="" readonly>
                             </div>
                         </div>
                         
                         <div class="form-group view_lab">
-                            <label class="col-md-2 control-label">Biaya</label>
+                            <label class="col-md-2 control-label">Biaya Lab</label>
                             <div class="col-md-10">
                                 <input type="text" class="form-control" id="biaya_lab" value="" readonly>
                             </div>
                         </div>
                         <div class="form-group view_lab">
-                            <label class="col-md-2 control-label">Kode</label>
+                            <label class="col-md-2 control-label">Kode Lab</label>
                             <div class="col-md-5">
                                 <input type="text" class="form-control" name="kode_lab" id="kode_lab" value="" readonly>
                             </div>
@@ -1009,7 +1009,6 @@ function klik_asuransi(id){
                                                 <th style="color:#fff; text-align:center;">#</th>
                                             </tr>
                                         </thead>
-
                                         <tbody>
                                             
                                         </tbody>
@@ -1027,6 +1026,7 @@ function klik_asuransi(id){
                             <label class="col-md-2 control-label">Biaya Reg</label>
                             <div class="col-md-10">
                                 <input type="text" class="form-control" name="biaya_reg" id="biaya_reg" value="" readonly>
+                                <small><i>Biaya registrasi pasien Lama / Baru</i></small>
                             </div>
                         </div>
                         <div class="form-group">

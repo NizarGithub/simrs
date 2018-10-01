@@ -19,8 +19,8 @@ class Rk_pelayanan_ri_m extends CI_Model {
 			SELECT
 				RI.ID,
 				RI.ID_PASIEN,
-				RI.TANGGAL_MASUK,
-				RI.WAKTU,
+				RI.TANGGAL_MRS,
+				RI.WAKTU_MRS,
 				PASIEN.KODE_PASIEN,
 				PASIEN.NAMA,
 				PASIEN.JENIS_KELAMIN,
@@ -43,7 +43,12 @@ class Rk_pelayanan_ri_m extends CI_Model {
 		$where = "1 = 1";
 
 		if($keyword != ""){
-			$where = $where." AND (PASIEN.NAMA LIKE '%$keyword%')";
+			$where = $where." AND (
+						PASIEN.NAMA LIKE '%$keyword%' OR
+						PASIEN.KODE_PASIEN LIKE '%$keyword%' OR
+						PEG.NAMA LIKE '%$keyword%'
+					)
+					";
 		}else{
 			$where = $where;
 		}
@@ -52,9 +57,10 @@ class Rk_pelayanan_ri_m extends CI_Model {
 			SELECT
 				RI.ID,
 				RI.ID_PASIEN,
-				RI.TANGGAL_MASUK,
-				RI.WAKTU,
+				RI.TANGGAL_MRS,
+				RI.WAKTU_MRS,
 				RI.TANGGAL_KELUAR,
+				STR_TO_DATE(RI.TANGGAL_KELUAR, '%d-%m-%Y') AS TGL_KELUAR_BALIK,
 				PASIEN.KODE_PASIEN,
 				PASIEN.NAMA AS NAMA_PASIEN,
 				PASIEN.JENIS_KELAMIN,
@@ -67,8 +73,9 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				KRI.VISITE_DOKTER,
 				PEG.NAMA AS NAMA_DOKTER,
 				RI.ID_BED,
-				BED.NOMOR_BED,
-				IFNULL(KA.DIRAWAT_SELAMA,0) AS DIRAWAT_SELAMA
+				BED.NO AS NOMOR_BED,
+				IFNULL(KA.DIRAWAT_SELAMA,0) AS DIRAWAT_SELAMA,
+				RI.STATUS_SUDAH
 			FROM admum_rawat_inap RI
 			LEFT JOIN rk_pasien PASIEN ON PASIEN.ID = RI.ID_PASIEN
 			LEFT JOIN admum_kamar_rawat_inap KRI ON KRI.ID = RI.ID_KAMAR
@@ -93,7 +100,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				PASIEN.JENIS_KELAMIN,
 				PASIEN.TANGGAL_LAHIR,
 				PASIEN.UMUR,
-				RI.TANGGAL_MASUK,
+				RI.TANGGAL_MRS,
 				RI.ASAL_RUJUKAN,
 				RI.NAMA_PENANGGUNGJAWAB,
 				RI.SISTEM_BAYAR,
@@ -1232,7 +1239,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				a.KODE_OBAT,
 				a.NAMA_OBAT,
 				IFNULL(b.STOK,0) AS STOK,
-				IFNULL(c.HARGA_JUAL,0) AS HARGA_JUAL,
+				IFNULL(b.HARGA_BULAT,0) AS HARGA_JUAL,
 				a.SERVICE
 			FROM admum_setup_nama_obat a
 			LEFT JOIN apotek_gudang_obat b ON b.ID_SETUP_NAMA_OBAT = a.ID
@@ -1252,7 +1259,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 				a.NAMA_OBAT,
 				a.ID_JENIS_OBAT,
 				IFNULL(b.STOK,0) AS STOK,
-				IFNULL(c.HARGA_JUAL,0) AS HARGA_JUAL,
+				IFNULL(b.HARGA_BULAT,0) AS HARGA_JUAL,
 				a.SERVICE
 			FROM admum_setup_nama_obat a
 			LEFT JOIN apotek_gudang_obat b ON b.ID_SETUP_NAMA_OBAT = a.ID

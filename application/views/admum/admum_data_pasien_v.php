@@ -501,6 +501,9 @@ function get_data_pasien_ri(){
 
                     result[i].JENIS_KELAMIN = result[i].JENIS_KELAMIN=="L"?"Laki - Laki":"Perempuan";
                     result[i].TANGGAL_KELUAR = result[i].TANGGAL_KELUAR==null?"-":result[i].TANGGAL_KELUAR;
+                    result[i].KODE_KAMAR = result[i].KODE_KAMAR==null?"-":result[i].KODE_KAMAR;
+                    result[i].KELAS = result[i].KELAS==null?"-":result[i].KELAS;
+                    result[i].NOMOR_BED = result[i].NOMOR_BED==null?"-":result[i].NOMOR_BED;
 
                     var warna = '';
                     if(result[i].STS_APPROVE_RM == '1'){

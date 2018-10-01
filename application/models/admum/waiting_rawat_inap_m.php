@@ -24,8 +24,9 @@ class Waiting_rawat_inap_m extends CI_Model {
 		$sql = "
 			SELECT
 				a.ID,
+				a.ID_RAWAT_JALAN,
 				a.ID_PASIEN,
-				a.TANGGAL_MASUK,
+				a.TANGGAL_MRS,
 				b.KODE_PASIEN,
 				b.NAMA,
 				b.JENIS_KELAMIN,
@@ -35,10 +36,12 @@ class Waiting_rawat_inap_m extends CI_Model {
 				b.NAMA_AYAH,
 				b.NAMA_IBU,
 				c.NAMA AS NAMA_POLI,
-				a.STS_WAITING
+				a.STS_WAITING,
+				d.KODE_SURAT_PENGANTAR_RI
 			FROM admum_rawat_inap a
 			JOIN rk_pasien b ON b.ID = a.ID_PASIEN
 			JOIN admum_poli c ON c.ID = a.ID_POLI
+			JOIN rk_surat_dokter_rj d ON d.ID_PELAYANAN = a.ID_RAWAT_JALAN
 			WHERE $where
 			AND a.ASAL_RUJUKAN = 'Dari Poli'
 			ORDER BY a.ID DESC
@@ -62,10 +65,12 @@ class Waiting_rawat_inap_m extends CI_Model {
 				b.NAMA_AYAH,
 				b.NAMA_IBU,
 				b.TELEPON,
-				c.NAMA AS NAMA_POLI
+				c.NAMA AS NAMA_POLI,
+				d.KODE_SURAT_PENGANTAR_RI
 			FROM admum_rawat_inap a
 			JOIN rk_pasien b ON b.ID = a.ID_PASIEN
 			JOIN admum_poli c ON c.ID = a.ID_POLI
+			JOIN rk_surat_dokter_rj d ON d.ID_PELAYANAN = a.ID_RAWAT_JALAN
 			WHERE a.ID = '$id'
 		";
 		$query = $this->db->query($sql);
@@ -118,9 +123,11 @@ class Waiting_rawat_inap_m extends CI_Model {
 		return $query->row();
 	}
 
-	function update_rawat_inap($id,$pjawab,$telepon,$sistem_bayar,$kelas,$id_kamar,$id_bed,$biaya_kamar,$biaya_charge,$biaya_reg){
+	function update_rawat_inap($id,$tanggal_mrs,$waktu_mrs,$pjawab,$telepon,$sistem_bayar,$kelas,$id_kamar,$id_bed,$biaya_kamar,$biaya_charge,$biaya_reg){
 		$sql = "
 			UPDATE admum_rawat_inap SET
+				TANGGAL_MRS = '$tanggal_mrs',
+				WAKTU_MRS = '$waktu_mrs',
 				NAMA_PENANGGUNGJAWAB = '$pjawab',
 				TELEPON = '$telepon',
 				SISTEM_BAYAR = '$sistem_bayar',

@@ -9,19 +9,32 @@ $dt = $q->result();
 $sql = "SELECT COUNT(*) AS TOTAL FROM rk_antrian_pasien WHERE TANGGAL = '$tanggal' AND STATUS_CLOSING = '0' AND STATUS_PANGGIL = '0'";
 $query = $this->db->query($sql);
 $total = $query->row()->TOTAL;
+
+$sql_rs = "SELECT * FROM admum_setup_logo WHERE POSISI = 'Normal'";
+$qry_rs = $this->db->query($sql_rs);
+$data_rs = $qry_rs->row();
+$logo = '';
+if($data_rs->LOGO == null || $data_rs->LOGO == ""){
+  $logo = base_url().'picture/noimage.png';
+}else{
+  $logo = base_url().'picture/logo/'.$data_rs->LOGO;
+}
 ?>
 
 <hr>
-<table align="center">
-    <tr>
-    	<td style="text-align:center; font-size: 10px;">My Company</td>
-    </tr>
-    <tr>
-      	<td style="text-align:center; font-size: 10px;">My Company Address</td>
-    </tr>
-    <tr>
-      	<td style="text-align:center; font-size: 10px;">Telp. (031) 123456</td>
-    </tr>
+<table align="left">
+  <tr>
+    <td style="padding-top: 0px;">
+      <img src="<?php echo $logo; ?>" style="width: 40px; height: 40px;">
+    </td>
+    <td style="vertical-align: bottom;">
+      <b><?php echo $data_rs->NAMA; ?></b><br>
+      <p style="font-size: 11px;">
+      <?php echo $data_rs->ALAMAT; ?><br>
+      Telp. (031) <?php echo $data_rs->TELEPON; ?>, Fax (031) <?php echo $data_rs->FAX; ?>
+      </p>
+    </td>
+  </tr>
 </table>
 <hr>
 
@@ -33,16 +46,13 @@ $total = $query->row()->TOTAL;
     	<td style="text-align:center; font-size: 10px;"><?php echo $val->TANGGAL; ?>, <?php echo date('H:i:s'); ?></td>
     </tr>
     <tr>
-      	<td style="text-align:center; font-size: 10px;">Helpdesk</td>
-    </tr>
-    <tr>
       	<td style="text-align:center; font-size: 10px;">Nomor Antrian Anda :</td>
     </tr>
     <tr>
       	<td style="">&nbsp;</td>
     </tr>
     <tr>
-      	<td style="text-align:center; font-size: 37px;"><?php echo $val->KODE_ANTRIAN; ?>-<?php echo $val->NOMOR_ANTRIAN; ?></td>
+      	<td style="text-align:center; font-size: 36px;"><?php echo $val->KODE_ANTRIAN; ?>-<?php echo $val->NOMOR_ANTRIAN; ?></td>
     </tr>
     <tr>
       	<td style="">&nbsp;</td>

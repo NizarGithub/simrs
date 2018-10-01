@@ -899,39 +899,7 @@ $(document).ready(function(){
 	});
 
 	$('#dt_kondisi_akhir').click(function(){
-		$('#popup_load').show();
-		var id_pelayanan = $('#id_rj_ka').val();
-
-		$.ajax({
-			url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/data_ka_id',
-			data : {id_pelayanan:id_pelayanan},
-			type : "POST",
-			dataType : "json",
-			success : function(row){
-				if(row['KONDISI_AKHIR'] == "Rawat Inap"){
-				  $('#kondisi_akhir option[value="Rawat Inap"]').attr('selected','selected');
-				}else if(row['KONDISI_AKHIR'] == "Pulang"){
-				  $('#kondisi_akhir option[value="Pulang"]').attr('selected','selected');
-				}else if(row['KONDISI_AKHIR'] == "Dirujuk"){
-				  $('#kondisi_akhir option[value="Dirujuk"]').attr('selected','selected');
-				}
-
-				if(row['DIRAWAT_SELAMA'] != '0'){
-					$('#dirawat_selama').val(row['DIRAWAT_SELAMA']);
-					$('#tanggal_keluar').val(row['TANGGAL_KELUAR']);
-
-					$('#kondisi_akhir').attr('disabled','disabled');
-					$('#dirawat_selama').attr('disabled','disabled');
-					$('#simpanKA').attr('disabled','disabled');
-				}else{
-					$('#kondisi_akhir').removeAttr('disabled');
-					$('#dirawat_selama').removeAttr('disabled');
-					$('#simpanKA').removeAttr('disabled');
-				}
-
-				$('#popup_load').hide();
-			}
-		});
+		get_kondisi_akhir();
 	});
 
 	$('#kondisi_akhir').change(function(){
@@ -976,6 +944,7 @@ $(document).ready(function(){
 			success : function(result){
 				$('#popup_load').fadeOut();
 				notif_simpan();
+				get_kondisi_akhir();
 			}
 		});
 	});
@@ -1401,7 +1370,7 @@ function data_tindakan(){
 					}
 
 					$tr += '<tr class="warning">'+
-								'<td colspan="6"><b>Tanggal : '+res['res'][i].TANGGAL+'</b>'+tombol+'</td>'+
+								'<td colspan="6" style="vertical-align:middle;"><b>Tanggal : '+res['res'][i].TANGGAL+'</b>'+tombol+'</td>'+
 							'</tr>';
 
 					var id_tindakan = res['res'][i].ID;
@@ -1429,11 +1398,11 @@ function data_tindakan(){
 									var tindakan = result['dt'][j].NAMA_TINDAKAN;
 
 									$tr += "<tr>"+
-												"<td style='text-align:center;'>"+no+"</td>"+
-												"<td>"+tindakan+"</td>"+
-												"<td style='text-align:right;'>"+formatNumber(result['dt'][j].TARIF)+"</td>"+
-												"<td style='text-align:center;'>"+result['dt'][j].JUMLAH+"</td>"+
-												"<td style='text-align:right;'>"+formatNumber(result['dt'][j].SUBTOTAL)+"</td>"+
+												"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
+												"<td style='vertical-align:middle;'>"+tindakan+"</td>"+
+												"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result['dt'][j].TARIF)+"</td>"+
+												"<td style='vertical-align:middle; text-align:center;'>"+result['dt'][j].JUMLAH+"</td>"+
+												"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result['dt'][j].SUBTOTAL)+"</td>"+
 												"<td align='center'>"+aksi+"</td>"+
 											"</tr>";
 								}
@@ -2503,7 +2472,7 @@ function data_diagnosa(){
 				for(var i=0; i<result.length; i++){
 					no++;
 
-					var aksi =  '<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_diagnosa('+result[i].ID+');">'+
+					var aksi =  '<button type="button" class="btn btn-danger waves-effect waves-light btn-sm" onclick="hapus_diagnosa('+result[i].ID+');">'+
 						   			'<i class="fa fa-trash"></i>'+
 						   		'</button>';
 								// '<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_diagnosa('+result[i].ID+');">'+
@@ -2512,10 +2481,10 @@ function data_diagnosa(){
 						   		
 
 					$tr += "<tr>"+
-								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td style='text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
-								"<td>"+result[i].DIAGNOSA+"</td>"+
-								"<td>"+result[i].TINDAKAN+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
+								"<td style='vertical-align:middle;'>"+result[i].DIAGNOSA+"</td>"+
+								"<td style='vertical-align:middle;'>"+result[i].TINDAKAN+"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
 							"</tr>";
 				}
@@ -2951,7 +2920,7 @@ function klik_obat(id){
 							"<td align='center'><input type='text' class='form-control' name='aturan_minum[]' value='' style='width:125px;'></td>"+
 							"<td align='center'>"+
 								"<div class='input-group' style='width:125px;'>"+
-									"<input type='text' class='form-control num_only' name='diminum_selama[]' value=''>"+
+									"<input type='text' class='form-control' name='diminum_selama[]' value='' onkeyup='FormatCurrency(this);'>"+
 									"<span class='input-group-addon'>Hari</span>"+
 								"</div>"+
 							"</td>"+
@@ -3024,11 +2993,11 @@ function data_resep(){
 						   		'</button>';
 
 					$tr += "<tr>"+
-								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td style='text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
-								"<td style='text-align:center;'>"+result[i].KODE_RESEP+"</td>"+
-								"<td style='text-align:center;'>"+result[i].BANYAKNYA_RESEP+" Bungkus</td>"+
-								"<td style='text-align:right;'>"+formatNumber(result[i].TOTAL)+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_RESEP+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+result[i].BANYAKNYA_RESEP+" Bungkus</td>"+
+								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TOTAL)+"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
 							"</tr>";
 				}
@@ -3385,6 +3354,46 @@ function hitung_tanggal(){
 		$('#tanggal_keluar').val("");
 	}
 }
+
+//KONDISI AKHIR
+
+function get_kondisi_akhir(){
+	$('#popup_load').show();
+	var id_pelayanan = $('#id_rj_ka').val();
+
+	$.ajax({
+		url : '<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/data_ka_id',
+		data : {id_pelayanan:id_pelayanan},
+		type : "POST",
+		dataType : "json",
+		success : function(row){
+			if(row['KONDISI_AKHIR'] == "Rawat Inap"){
+			  $('#kondisi_akhir option[value="Rawat Inap"]').attr('selected','selected');
+			}else if(row['KONDISI_AKHIR'] == "Pulang"){
+			  $('#kondisi_akhir option[value="Pulang"]').attr('selected','selected');
+			}else if(row['KONDISI_AKHIR'] == "Dirujuk"){
+			  $('#kondisi_akhir option[value="Dirujuk"]').attr('selected','selected');
+			}
+
+			// console.log(row['DIRAWAT_SELAMA']);
+
+			if(row['DIRAWAT_SELAMA'] == null){
+				$('#kondisi_akhir').removeAttr('disabled');
+				$('#dirawat_selama').removeAttr('disabled');
+				$('#simpanKA').removeAttr('disabled');
+			}else{
+				$('#dirawat_selama').val(row['DIRAWAT_SELAMA']);
+				$('#tanggal_keluar').val(row['TANGGAL_KELUAR']);
+
+				$('#kondisi_akhir').attr('disabled','disabled');
+				$('#dirawat_selama').attr('disabled','disabled');
+				$('#simpanKA').attr('disabled','disabled');
+			}
+
+			$('#popup_load').hide();
+		}
+	});
+}
 </script>
 
 <div id="popup_load">
@@ -3434,7 +3443,7 @@ function hitung_tanggal(){
 	            					<span style="color:#0066b2;"><?php echo $dt->UMUR; ?> Tahun</span>
 	            				</td>
 	            				<td style="text-align: center;">
-	            					<span style="color:#0066b2;"><?php echo $dt->TANGGAL_MASUK; ?></span>
+	            					<span style="color:#0066b2;"><?php echo $dt->TANGGAL_MRS; ?></span>
 	            				</td>
 	            				<td style="text-align: center;">
 	            					<span style="color:#0066b2;"><?php echo $dt->KODE_KAMAR; ?> - <?php echo $dt->KELAS; ?> / <?php echo $dt->NO; ?></span>
@@ -3594,7 +3603,7 @@ function hitung_tanggal(){
 	                        <label class="col-md-1 control-label">Tindakan</label>
 	                        <div class="col-md-5">
 	                            <div class="input-group">
-	                                <input type="text" class="form-control" value="" readonly="readonly">
+	                                <input type="text" class="form-control btn_tindakan" value="" placeholder="Klik disini..." readonly>
 	                                <span class="input-group-btn">
 	                                    <button type="button" class="btn btn-inverse btn_tindakan"><i class="fa fa-search"></i></button>
 	                                </span>
@@ -3648,7 +3657,7 @@ function hitung_tanggal(){
 	                        <label class="col-md-1 control-label">Tindakan</label>
 	                        <div class="col-md-5">
 	                            <div class="input-group">
-	                                <input type="text" class="form-control" value="" readonly="readonly">
+	                                <input type="text" class="form-control btn_tindakan" value="" placeholder="Klik disini..." readonly>
 	                                <span class="input-group-btn">
 	                                    <button type="button" class="btn btn-inverse btn_tindakan"><i class="fa fa-search"></i></button>
 	                                </span>
@@ -4057,8 +4066,7 @@ function hitung_tanggal(){
 	                    <div class="form-group">
 	                        <label class="col-md-2 control-label">Tanggal</label>
 	                        <div class="col-md-4">
-	                            <input type="text" class="form-control" name="tanggal_visite" id="tanggal_visite" value="<?php echo date('d-m-Y'); ?>" data-mask="99-99-9999" readonly>
-	                        	<span class="help-block"><small>(dd-mm-yyyy)</small></span>
+	                            <input type="text" class="form-control" name="tanggal_visite" id="tanggal_visite" value="<?php echo date('d-m-Y'); ?>" readonly>
 	                        </div>
 	                    </div>
 	                    <!-- 
@@ -4102,7 +4110,7 @@ function hitung_tanggal(){
 	                            </div>
 	                            <div class="radio radio-inline radio-success">
 	                                <input type="radio" id="inlineRadio2_vis" value="0" name="status_visite">
-	                                <label for="inlineRadio2_vis"> Tidak Visite</label>
+	                                <label for="inlineRadio2_vis"> Tidak Visit</label>
 	                            </div>
 							</div>
 						</div>

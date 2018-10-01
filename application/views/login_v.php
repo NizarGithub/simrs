@@ -45,7 +45,17 @@ $base_url2 .=  str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT
             </div>
         	<div class="card-box">
                 <div class="text-center">
-                    <img src="<?php echo $base_url2; ?>picture/jtech-logo.png" style="max-height:150px; max-width:290px;">
+                    <?php
+                        $sql_logo = "SELECT LOGO FROM admum_setup_logo WHERE POSISI = 'Hor'";
+                        $qry_logo = $this->db->query($sql_logo)->row();
+                        $logo = '';
+                        if($qry_logo->LOGO == null || $qry_logo->LOGO == ""){
+                            $logo = base_url().'picture/logo-default.png';
+                        }else{
+                            $logo = base_url().'picture/logo/'.$qry_logo->LOGO;
+                        }
+                    ?>
+                    <img src="<?php echo $logo; ?>" style="max-height:150px; max-width:290px;">
                 </div>
                 <div class="panel-body">
                     <form class="form-horizontal m-t-20" action="<?=base_url();?>login_c/login" method="post">

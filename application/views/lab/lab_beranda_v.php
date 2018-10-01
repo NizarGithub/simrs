@@ -1309,11 +1309,13 @@ function hitung_pemeriksaan(){
                     <ul class="nav nav-tabs">
                         <li class="active" role="presentation">
                             <a data-toggle="tab" role="tab" href="#home1">
-                                <i class="fa fa-book"></i> Pasien Baru <!-- <span class="badge badge-primary" id="tot_dari_adm">0</span> -->
+                                <i class="fa fa-stethoscope"></i> Pasien Rawat Jalan <!-- <span class="badge badge-primary" id="tot_dari_adm">0</span> -->
                             </a>
                         </li>
                         <li role="presentation">
-                            <a data-toggle="tab" role="tab" href="#profile1" id="btn_tambah_lab"><i class="fa fa-user"></i> Datang Sendiri</a>
+                            <a data-toggle="tab" role="tab" href="#profile1" id="btn_tambah_lab">
+                                <i class="fa fa-hospital-o"></i> Pasien Rawat Inap
+                            </a>
                         </li>
                         <!-- <li role="presentation" id="dt_dari_poli">
                             <a data-toggle="tab" role="tab" href="#profile2">
@@ -1328,7 +1330,7 @@ function hitung_pemeriksaan(){
                                 <input type="hidden" name="nomor_antrian" id="nomor_antrian" value="">
                                 <input type="hidden" name="ord_tmp" id="ord_tmp" value="">
                                 <div class="form-group">
-                                    <label class="col-md-1 control-label" style="width: 5%; text-align: left;">Filter :</label>
+                                    <label class="col-md-2 control-label" style="width: 5%; text-align: left;">Filter :</label>
                                     <?php if(count($level) != 0){ ?>
                                     <div class="col-md-2" style="width: 10%;">
                                         <div class="checkbox checkbox-inline checkbox-success">

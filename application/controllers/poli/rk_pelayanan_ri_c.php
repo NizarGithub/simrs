@@ -1119,7 +1119,7 @@ class Rk_pelayanan_ri_c extends CI_Controller {
 		}
 
 		$this->model->simpan_ka($id_pelayanan,$id_pasien,$tanggal,$bulan,$tahun,$dirawat,$kondisi_akhir);
-		$this->db->query("UPDATE admum_rawat_inap SET STATUS_SUDAH = '1', TANGGAL_KELUAR = '$tanggal_keluar' WHERE ID = '$id_pelayanan'");
+		$this->db->query("UPDATE admum_rawat_inap SET TANGGAL_KELUAR = '$tanggal_keluar' WHERE ID = '$id_pelayanan'");
 
 		echo '1';
 	}

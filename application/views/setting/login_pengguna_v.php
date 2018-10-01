@@ -224,7 +224,7 @@ function cek_username_submit(){
         <div class="card-box">
             <div class="row">
                 <form class="form-horizontal" role="form" method="post" action="<?=base_url().$post_url;?>" onsubmit="return cek_username_submit();">
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                         <div class="form-group">
                             <div class="col-md-6">
                                 <img src="<?=base_url();?>files/foto_pegawai/default_pics_of_rs_jt.png" id="foto_head" style="width: 250px; height: 250px;">
@@ -303,21 +303,19 @@ function cek_username_submit(){
                             <label class="col-md-2 control-label" style="color: #0099e5;"> Level </label>
                             <div class="col-md-6">
                                 <select class="form-control" name="level" id="level">
-                                    <option value="Admission">Admission</option>
-                                    <option value="Poli">Poli</option>
-                                    <option value="Laborat">Laborat</option>
-                                    <option value="Farmasi">Farmasi</option>
-                                    <option value="Finance">Finance</option>
-                                    <option value="Perawat">Perawat</option>
-                                    <option value="Rekam Medik">Rekam Medik</option>
-                                    <option value="Kasir AA">Kasir AA</option>
-                                    <option value="Kasir Rajal">Kasir Rajal</option>
-                                    <option value="Kasir Ranap">Kasir Ranap</option>
-                                    <option value="Super Admin">Super Admin</option>
+                                <?php
+                                    $sql = "SELECT * FROM setup_level WHERE STATUS = '1' ORDER BY ID ASC";
+                                    $qry = $this->db->query($sql)->result();
+                                    foreach ($qry as $key => $val) {
+                                ?>
+                                    <option value="<?php echo $val->LEVEL; ?>"><?php echo $val->LEVEL; ?></option>
+                                <?php
+                                    }
+                                ?>
                                 </select>
                             </div>
                         </div>
-
+                        <hr>
                         <div class="form-group m-b-0">
                             <div class="col-sm-offset-2 col-sm-10">
                               <input type="submit" class="btn btn-info" value="Simpan Akun" name="simpan">

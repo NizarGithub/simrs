@@ -130,8 +130,10 @@ function get_data_pasien_poli() {
                     no++;
                     var umur = res[i].UMUR+' Tahun '+res[i].UMUR_BULAN+' Bulan';
 
+                    res[i].TANGGAL_MRS = res[i].TANGGAL_MRS==null?"-":res[i].TANGGAL_MRS;
                     res[i].JENIS_KELAMIN = res[i].JENIS_KELAMIN=='L'?"Laki - Laki":"Perempuan";
                     res[i].NAMA_IBU = res[i].NAMA_IBU==null?"-":res[i].NAMA_IBU;
+                    res[i].KODE_SURAT_PENGANTAR_RI = res[i].KODE_SURAT_PENGANTAR_RI==null?"-":res[i].KODE_SURAT_PENGANTAR_RI;
 
                     var aksi = '';
 
@@ -143,7 +145,7 @@ function get_data_pasien_poli() {
 
                     $tr +=  '<tr>'+
                             '   <td style="vertical-align:middle; text-align:center;">'+no+'</td>'+
-                            '   <td style="vertical-align:middle; text-align:center;">'+res[i].TANGGAL_MASUK+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+res[i].TANGGAL_MRS+'</td>'+
                             '   <td style="vertical-align:middle; text-align:center;">'+res[i].KODE_PASIEN+'</td>'+
                             '   <td style="vertical-align:middle;">'+res[i].NAMA+'</td>'+
                             '   <td style="vertical-align:middle; text-align:center;">'+res[i].JENIS_KELAMIN+'</td>'+
@@ -152,6 +154,7 @@ function get_data_pasien_poli() {
                             '   <td style="vertical-align:middle;">'+res[i].NAMA_AYAH+'</td>'+
                             '   <td style="vertical-align:middle;">'+res[i].NAMA_IBU+'</td>'+
                             '   <td style="vertical-align:middle;">'+res[i].NAMA_POLI+'</td>'+
+                            '   <td style="vertical-align:middle; text-align:center;">'+res[i].KODE_SURAT_PENGANTAR_RI+'</td>'+
                             '   <td align="center">'+aksi+'</td>'+
                             '</tr>';
                 }
@@ -202,7 +205,7 @@ function klik_pasien_poli(id){
             $('#id_ri').val(id);
             $('#id_pasien').val(row['ID_PASIEN']);
             $('#kode_pasien').val(row['KODE_PASIEN']);
-            $('#tanggal_mrs').val(row['TANGGAL_MASUK']);
+            $('#tanggal_periksa').val(row['TANGGAL_MASUK']);
             $('#nama').val(row['NAMA']);
             $('#jenis_kelamin').val(row['JENIS_KELAMIN']);
             $('#tanggal_lahir').val(row['TANGGAL_LAHIR']);
@@ -210,6 +213,7 @@ function klik_pasien_poli(id){
             $('#umur_bulan').val(row['UMUR_BULAN']);
             $('#nama_ayah').val(row['NAMA_AYAH']);
             $('#nama_ibu').val(row['NAMA_IBU']);
+            $('#kode_pengantar').val(row['KODE_SURAT_PENGANTAR_RI']);
 
             var pjawab = '';
             if(row['NAMA'] != null || row['NAMA'] != ""){
@@ -263,7 +267,14 @@ function load_ruangan(){
                         cash = cash;
                     }
 
-                    $tr += "<tr style='cursor:pointer;' onclick='klik_ruangan("+result[i].ID+","+cash+");'>"+
+                    var klik = '';
+                    if(result[i].STATUS_PENUH == '0'){
+                        klik = "style='cursor:pointer;' onclick='klik_ruangan("+result[i].ID+","+cash+");'";
+                    }else{
+                        klik = "class='active'";
+                    }
+
+                    $tr += "<tr "+klik+">"+
                                 "<td style='text-align:center;'>"+no+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].KODE_KAMAR+"</td>"+
                                 "<td style='text-align:center;'>"+result[i].KELAS+"</td>"+
@@ -400,7 +411,7 @@ function klik_bed(id){
                 <div class="form-group">
                     <div class="col-md-12">
                         <div class="table-responsive">
-                            <div class="scroll-x">
+                            <div class="scroll-xy">
                                 <table id="tabel_pasien2" class="table table-bordered">
                                     <thead>
                                         <tr class="merah">
@@ -414,6 +425,7 @@ function klik_bed(id){
                                             <th style="color:#fff; text-align:center; white-space: nowrap;">Nama Ayah</th>
                                             <th style="color:#fff; text-align:center; white-space: nowrap;">Nama Ibu</th>
                                             <th style="color:#fff; text-align:center; white-space: nowrap;">Dari Poli</th>
+                                            <th style="color:#fff; text-align:center; white-space: nowrap;">Kode Pengantar</th>
                                             <th style="color:#fff; text-align:center; white-space: nowrap;">Aksi</th>
                                         </tr>
                                     </thead>
@@ -468,9 +480,9 @@ function klik_bed(id){
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-3 control-label">Tanggal MRS</label>
+                            <label class="col-md-3 control-label">Tanggal Periksa</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" id="tanggal_mrs" value="" readonly>
+                                <input type="text" class="form-control" id="tanggal_periksa" value="" readonly>
                             </div>
                         </div>
                         <div class="form-group">
@@ -535,6 +547,25 @@ function klik_bed(id){
                         </div>
                     </div>
                     <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Kode Pengantar</label>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="kode_pengantar" id="kode_pengantar" value="" readonly>
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary" data-original-title="Kode Pengantar berisi sesuai dengan Kode Surat Pengantar Rawat Inap" title="" data-placement="right" data-toggle="tooltip">
+                                            <i class="fa fa-info"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Tanggal MRS</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="tanggal_mrs" id="tanggal_mrs" value="<?php echo date('d-m-Y'); ?>" readonly>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label class="col-md-3 control-label">Nama P. Jawab</label>
                             <div class="col-md-9">

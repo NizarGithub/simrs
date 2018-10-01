@@ -76,6 +76,11 @@ class Waiting_rawat_inap_c extends CI_Controller {
 
 	function ubah(){
 		$id = $this->input->post('id_ri');
+		$tanggal_mrs = $this->input->post('tanggal_mrs');
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu_mrs = $format->format('H:i:s');
 		$pjawab = $this->input->post('nama_pjawab');
 		$telepon = $this->input->post('telepon');
 		$sistem_bayar = $this->input->post('sistem_bayar');
@@ -86,8 +91,21 @@ class Waiting_rawat_inap_c extends CI_Controller {
 		$biaya_charge = str_replace(',', '', $this->input->post('biaya_charge_kamar'));
 		$biaya_reg = str_replace(',', '', $this->input->post('biaya_adm'));
 
-		$this->model->update_rawat_inap($id,$pjawab,$telepon,$sistem_bayar,$kelas,$id_kamar,$id_bed,$biaya_kamar,$biaya_charge,$biaya_reg);
+		$this->model->update_rawat_inap($id,$tanggal_mrs,$waktu_mrs,$pjawab,$telepon,$sistem_bayar,$kelas,$id_kamar,$id_bed,$biaya_kamar,$biaya_charge,$biaya_reg);
 		$this->model->update_stt_pakai($id_bed);
+
+		$sql = "
+			SELECT
+				COUNT(*) AS TOTAL
+			FROM admum_bed_rawat_inap
+			WHERE ID_KAMAR_RAWAT_INAP = '$id_kamar'
+			AND STATUS_PAKAI = '0'
+		";
+		$qry = $this->db->query($sql)->row();
+		
+		if($qry->TOTAL == '0'){ //penuh
+			$this->db->query("UPDATE admum_kamar_rawat_inap SET STATUS_PENUH = '1' WHERE ID = '$id_kamar'");
+		}
 
 		$id_asuransi = $this->input->post('id_kerjasama');
 		$no_polis = $this->input->post('nomor_polis');

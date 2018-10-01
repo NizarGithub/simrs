@@ -16,9 +16,6 @@ class Admum_pasien_ri_c extends CI_Controller {
 
 	function index()
 	{
-
-		
-
 		$data = array(
 			'page' => 'admum/admum_pasien_ri_v',
 			'title' => 'Rawat Inap',

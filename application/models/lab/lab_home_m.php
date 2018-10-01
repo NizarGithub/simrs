@@ -100,14 +100,14 @@ class Lab_home_m extends CI_Model {
 		return $query->row();
 	}
 
-	function notif_pasien_baru($posisi,$now,$dari){
+	function notif_pasien_baru($posisi,$now){
 		$sql = "
 			SELECT 
 				COUNT(*) AS TOTAL
-			FROM admum_rawat_jalan b
-			JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
-			JOIN rk_laborat_rj c ON c.ID_PELAYANAN = b.ID
+			FROM rk_laborat_rj a
+			JOIN admum_rawat_jalan b ON a.ID_PELAYANAN = b.ID
 			WHERE b.TANGGAL = '$now'
+			AND (a.TIPE = 'Dari Poli' OR b.STS_POSISI = '$posisi')
 			AND b.STS_TERIMA_LAB = '0'
 		";
 		$query = $this->db->query($sql);
@@ -116,20 +116,34 @@ class Lab_home_m extends CI_Model {
 
 	function data_pasien_baru($posisi,$now){
 		$sql = "
-			SELECT 
-				b.ID,
-				b.TANGGAL,
-				b.WAKTU,
+			SELECT
+				a.ID,
+				a.KODE_LAB,
+				a.ID_PELAYANAN,
+				a.ID_POLI,
+				d.NAMA AS NAMA_POLI,
+				a.ID_PEG_DOKTER,
+				e.NAMA AS NAMA_DOKTER,
+				a.ID_PASIEN,
+				c.KODE_PASIEN,
+				c.NAMA,
+				c.JENIS_KELAMIN,
+				a.JENIS_LABORAT,
+				a.TOTAL_TARIF,
+				a.TANGGAL,
+				a.WAKTU,
+				a.TIPE,
+				a.STATUS_PENANGANAN,
+				a.STATUS_LIHAT,
 				b.STS_POSISI,
-				b.STS_TERIMA,
-				c.TIPE,
-				PSN.KODE_PASIEN,
-				PSN.NAMA,
-				PSN.JENIS_KELAMIN
-			FROM admum_rawat_jalan b
-			JOIN rk_pasien PSN ON b.ID_PASIEN = PSN.ID
-			JOIN rk_laborat_rj c ON c.ID_PELAYANAN = b.ID
-			WHERE b.TANGGAL = '$now'
+				b.STS_TERIMA_LAB
+			FROM rk_laborat_rj a
+			JOIN admum_rawat_jalan b ON a.ID_PELAYANAN = b.ID
+			JOIN rk_pasien c ON a.ID_PASIEN = c.ID
+			JOIN admum_poli d ON a.ID_POLI = d.ID
+			JOIN kepeg_pegawai e ON a.ID_PEG_DOKTER = e.ID
+			WHERE a.TANGGAL = '$now'
+			AND (a.TIPE = 'Dari Poli' OR b.STS_POSISI = '$posisi')
 			AND b.STS_TERIMA_LAB = '0'
 		";
 		$query = $this->db->query($sql);
