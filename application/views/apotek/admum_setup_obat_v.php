@@ -332,6 +332,7 @@ function klik_kategori(no_kategori){
 										1 : 'Obat Bebas',
 										2 : 'Obat Resep',
 										3 : 'Obat Keras',
+										4 : 'Susu',
 			           }
 	 if(ket == 'Tambah'){
 		 	$('#id_kategori').val(kategori[no_kategori]);
@@ -1105,7 +1106,8 @@ function cek_barcode(){
 													$array = array(
 														0 => 'Obat Bebas',
 														1 => 'Obat Resep',
-														2 => 'Obat Keras'
+														2 => 'Obat Keras',
+														3 => 'Susu'
 													);
 													$no = 0;
 

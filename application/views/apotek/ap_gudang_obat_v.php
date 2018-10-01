@@ -1301,6 +1301,33 @@ function hitung_harga_jual(number){
 			$('#harga_jual_'+number).val(NumberToMoney(kategori_bulat));
 			$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
 
+		}else if (kategori == 'Susu') {
+
+			var harga_beli = $('#harga_beli_'+number).val();
+			harga_beli = harga_beli.split(',').join('');
+			if(harga_beli == ""){
+					harga_beli = 0;
+			}
+
+			var total_jumlah = $('#total_'+number).val();
+			total_jumlah = total_jumlah.split(',').join('');
+			if(total_jumlah == ""){
+					total_jumlah = 0;
+			}
+
+			var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
+			var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
+			var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
+
+			var hitung_ppn_awal = parseFloat(hitung_akhir) * 4 / 100;
+			var hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+
+			var bulatan = custom_pembulatan(hitung_kategori, 100);
+			var kategori_bulat = Math.round(hitung_kategori);
+
+			$('#harga_jual_'+number).val(NumberToMoney(kategori_bulat));
+			$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
+
 		}
 	}else if (ket == 'Ubah') {
 		// var harga_beli = $('#harga_beli_ubah').val();
@@ -1445,6 +1472,33 @@ function hitung_harga_jual(number){
 
 			$('#faktur_harga_jual_'+number).val(NumberToMoney(kategori_bulat));
 			$('#faktur_harga_bulat_'+number).val(NumberToMoney(bulatan));
+		}else if (kategori == 'Susu') {
+
+			var harga_beli = $('#faktur_harga_beli_'+number).val();
+			harga_beli = harga_beli.split(',').join('');
+			if(harga_beli == ""){
+					harga_beli = 0;
+			}
+
+			var total_jumlah = $('#faktur_total_'+number).val();
+			total_jumlah = total_jumlah.split(',').join('');
+			if(total_jumlah == ""){
+					total_jumlah = 0;
+			}
+
+			var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
+			var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
+			var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
+
+			var hitung_ppn_awal = parseFloat(hitung_akhir) * 4 / 100;
+			var hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+
+			var bulatan = custom_pembulatan(hitung_kategori, 100);
+			var kategori_bulat = Math.round(hitung_kategori);
+
+			$('#faktur_harga_jual_'+number).val(NumberToMoney(kategori_bulat));
+			$('#faktur_harga_bulat_'+number).val(NumberToMoney(bulatan));
+
 		}
 	}
 }
@@ -2495,7 +2549,7 @@ function hitung_total_harga_beli(){
 
 									</tbody>
 							</table>
-						<div class="form-group">						
+						<div class="form-group">
 								<div id="tablePagingdetail"> </div>
 						</div>
             </div>
