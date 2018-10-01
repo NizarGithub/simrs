@@ -67,9 +67,9 @@
         $user = $this->master_model_m->get_user_info($id_user);
         $level = $user->LEVEL;
         $bulan = array(
-            1 =>    "Januari", 2  =>"Februari", 3  =>"Maret", 4 =>"April",
-            5 =>    "Mei", 6  =>"Juni", 7  =>"Juli", 8 =>"Agustus",
-            9 =>    "September", 10 =>"Oktober", 11 =>"November", 12 =>"Desember"
+            1 =>    "Jan", 2  =>"Feb", 3  =>"Mar", 4 =>"Apr",
+            5 =>    "Mei", 6  =>"Jun", 7  =>"Jul", 8 =>"Agt",
+            9 =>    "Sep", 10 =>"Okt", 11 =>"Nov", 12 =>"Des"
         );
     ?>
 
@@ -282,7 +282,7 @@
                                 <img alt="user" class="img-responsive img-circle" src="<?php echo base_url(); ?>picture/kisspng-calendar-date-computer-icons-time-calendar-icon-5ac41db68edb81.1459769815228021025852.jpg">
                                 <div class="wid-u-info">
                                     <h4 class="m-t-0 m-b-5">Tanggal</h4>
-                                    <h2 class="text-danger"><?php echo date('d'); ?> <?php echo $bulan[date('n')]; ?> <?php echo date('Y'); ?></h2>
+                                    <h2 class="text-danger"><?php echo date('d'); ?>-<?php echo $bulan[date('n')]; ?>-<?php echo date('Y'); ?></h2>
                                 </div>
                             </div>
                         </div>

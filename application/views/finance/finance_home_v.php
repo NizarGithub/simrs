@@ -69,9 +69,19 @@
             <div class="topbar-main" style="background-color:#ff78cb; height:60px;">
                 <div class="container">
                     <!-- LOGO -->
+                    <?php
+                        $sql_logo = "SELECT LOGO FROM admum_setup_logo WHERE POSISI = 'Hor'";
+                        $qry_logo = $this->db->query($sql_logo)->row();
+                        $logo = '';
+                        if($qry_logo->LOGO == null || $qry_logo->LOGO == ""){
+                            $logo = base_url().'picture/logo-default.png';
+                        }else{
+                            $logo = base_url().'picture/logo/'.$qry_logo->LOGO;
+                        }
+                    ?>
                     <div class="topbar-left">
-                        <a href="<?php echo base_url(); ?>portal" class="logo" style="margin-top:4px;">
-                            <img src="<?php echo base_url(); ?>picture/jtech-logo.png" style="max-width:150px; max-height:40px;">
+                        <a href="javascript:;" class="logo" style="margin-top:4px;">
+                            <img src="<?php echo $logo; ?>" style="max-width:150px; max-height:40px;">
                         </a>
                     </div>
                     <!-- End Logo container-->
