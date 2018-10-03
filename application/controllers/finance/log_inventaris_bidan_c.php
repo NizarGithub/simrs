@@ -1,11 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Log_peralatan_medis_c extends CI_Controller {
+class Log_inventaris_bidan_c extends CI_Controller {
 
 	function __construct()
 	{
 		parent::__construct();
-		$this->load->model('finance/log_peralatan_medis_m','model');
+		$this->load->model('finance/log_inventaris_bidan_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
     	$id_user = $sess_user['id'];
 	    if($id_user == "" || $id_user == null){
@@ -16,14 +16,14 @@ class Log_peralatan_medis_c extends CI_Controller {
 	function index()
 	{
 		$data = array(
-			'page' => 'finance/log_peralatan_medis_v',
-			'title' => 'Peralatan Medis',
-			'subtitle' => 'Peralatan Medis',
+			'page' => 'finance/log_inventaris_bidan_v',
+			'title' => 'Inventaris Bidan',
+			'subtitle' => 'Inventaris Bidan',
 			'master_menu' => 'pengadaan_barang',
 			'view' => 'peralatan_medis',
-			'url_simpan' => base_url().'finance/log_peralatan_medis_c/simpan',
-			'url_ubah' => base_url().'finance/log_peralatan_medis_c/ubah',
-			'url_hapus' => base_url().'finance/log_peralatan_medis_c/hapus',
+			'url_simpan' => base_url().'finance/log_inventaris_bidan_c/simpan',
+			'url_ubah' => base_url().'finance/log_inventaris_bidan_c/ubah',
+			'url_hapus' => base_url().'finance/log_inventaris_bidan_c/hapus',
 		);
 
 		$this->load->view('finance/finance_home_v',$data);
@@ -59,7 +59,8 @@ class Log_peralatan_medis_c extends CI_Controller {
 	}
 
 	function data_departemen(){
-		$data = $this->model->data_departemen();
+		$keyword = $this->input->get('keyword');
+		$data = $this->model->data_departemen($keyword);
 		echo json_encode($data);
 	}
 
@@ -70,8 +71,9 @@ class Log_peralatan_medis_c extends CI_Controller {
 	}
 
 	function data_divisi(){
-		$id_departemen = $this->input->post('id_departemen');
-		$data = $this->model->data_divisi($id_departemen);
+		$keyword = $this->input->get('keyword');
+		$id_departemen = $this->input->get('id_departemen');
+		$data = $this->model->data_divisi($keyword,$id_departemen);
 		echo json_encode($data);
 	}
 
@@ -190,7 +192,7 @@ class Log_peralatan_medis_c extends CI_Controller {
 		);
 
 		$this->session->set_flashdata('sukses','1');
-		redirect('finance/log_peralatan_medis_c');
+		redirect('finance/log_inventaris_bidan_c');
 	}
 
 	function ubah(){
@@ -264,7 +266,7 @@ class Log_peralatan_medis_c extends CI_Controller {
 		);
 
 		$this->session->set_flashdata('ubah','1');
-		redirect('finance/log_peralatan_medis_c');
+		redirect('finance/log_inventaris_bidan_c');
 	}
 	function data_peralatan_id(){
 		$id = $this->input->post('id');
@@ -274,6 +276,6 @@ class Log_peralatan_medis_c extends CI_Controller {
 	function hapus(){
 		$id = $this->input->post('id_hapus');
 		$data = $this->model->hapus($id);
-		redirect('finance/log_peralatan_medis_c');
+		redirect('finance/log_inventaris_bidan_c');
 	}
 }

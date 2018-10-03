@@ -266,7 +266,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan_diagnosa($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$tanggal,$bulan,$tahun,$diagnosa,$tindakan,$id_penyakit){
+	function simpan_diagnosa($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$tanggal,$bulan,$tahun,$diagnosa,$id_penyakit){
 		$sql = "
 			INSERT INTO rk_diagnosa_rj(
 				ID_PELAYANAN,
@@ -277,7 +277,6 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				BULAN,
 				TAHUN,
 				DIAGNOSA,
-				TINDAKAN,
 				ID_PENYAKIT
 			) VALUES (
 				'$id_pelayanan',
@@ -288,7 +287,6 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				'$bulan',
 				'$tahun',
 				'$diagnosa',
-				'$tindakan',
 				'$id_penyakit'
 			)
 		";
@@ -329,13 +327,11 @@ class Rk_pelayanan_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function ubah_diagnosa($id,$diagnosa,$tindakan,$kasus,$spesialistik){
+	function ubah_diagnosa($id,$diagnosa,$id_penyakit){
 		$sql = "
 			UPDATE rk_diagnosa_rj SET
 				DIAGNOSA = '$diagnosa',
-				TINDAKAN = '$tindakan',
-				ID_KASUS = '$kasus',
-				ID_SPESIALISTIK = '$spesialistik'
+				ID_PENYAKIT = '$id_penyakit'
 			WHERE ID = '$id'
 		";
 		$this->db->query($sql);
@@ -1075,9 +1071,11 @@ class Rk_pelayanan_rj_m extends CI_Model {
 	function get_diagnosa_by_idrj($id_rj){
 		$sql = "
 			SELECT
-				*
-			FROM rk_diagnosa_rj 
-			WHERE ID_PELAYANAN = '$id_rj'
+				a.*,
+				b.URAIAN AS PENYAKIT
+			FROM rk_diagnosa_rj a
+			JOIN admum_jenis_penyakit b ON a.ID_PENYAKIT = b.ID
+			WHERE a.ID_PELAYANAN = '$id_rj'
 		";
 		$query = $this->db->query($sql);
 		return $query->row();
@@ -1147,6 +1145,172 @@ class Rk_pelayanan_rj_m extends CI_Model {
 			JOIN kepeg_pegawai c ON c.ID = a.ID_PEG_DOKTER
 			WHERE a.ID_PELAYANAN = '$id_rj'
 			AND a.KETERANGAN = 'Surat Pengantar RI'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function simpan_surat_ket_ri($id_pelayanan,$id_poli,$id_dokter,$id_pasien,$waktu,$tanggal,$bulan,$tahun,$mulai_tanggal,$sampai_tanggal,$diagnosa){
+		$sql = "
+			INSERT INTO rk_surat_dokter_rj(
+				ID_PELAYANAN,
+				ID_POLI,
+				ID_PEG_DOKTER,
+				ID_PASIEN,
+				WAKTU,
+				TANGGAL,
+				BULAN,
+				TAHUN,
+				MULAI_TANGGAL,
+				SAMPAI_TANGGAL,
+				ID_PENYAKIT,
+				KETERANGAN
+			) VALUES (
+				'$id_pelayanan',
+				'$id_poli',
+				'$id_dokter',
+				'$id_pasien',
+				'$waktu',
+				'$tanggal',
+				'$bulan',
+				'$tahun',
+				'$mulai_tanggal',
+				'$sampai_tanggal',
+				'$diagnosa',
+				'Surat Keterangan RI'
+			)
+		";
+		$this->db->query($sql);
+	}
+
+	function cetak_data_surat_keterangan_ri($id_rj){
+		$sql = "
+			SELECT
+				a.ID,
+				a.ID_PELAYANAN,
+				a.ID_POLI,
+				a.ID_PEG_DOKTER,
+				a.ID_PASIEN,
+				a.TANGGAL,
+				a.BULAN,
+				a.TAHUN,
+				a.MULAI_TANGGAL,
+				a.SAMPAI_TANGGAL,
+				a.KETERANGAN,
+				b.NAMA,
+				b.UMUR,
+				b.JENIS_KELAMIN,
+				b.ALAMAT,
+				c.NAMA AS NAMA_DOKTER,
+				d.URAIAN AS PENYAKIT
+			FROM rk_surat_dokter_rj a
+			JOIN rk_pasien b ON b.ID = a.ID_PASIEN
+			JOIN kepeg_pegawai c ON c.ID = a.ID_PEG_DOKTER
+			JOIN admum_jenis_penyakit d ON d.ID = a.ID_PENYAKIT
+			WHERE a.ID_PELAYANAN = '$id_rj'
+			AND a.KETERANGAN = 'Surat Keterangan RI'
+		";
+		$query = $this->db->query($sql);
+		return $query->row();
+	}
+
+	function simpan_surat_keterangan_sehat(
+		$id_pelayanan,
+		$id_poli,
+		$id_dokter,
+		$id_pasien,
+		$waktu,
+		$tanggal,
+		$bulan,
+		$tahun,
+		$tinggi_badan,
+		$berat_badan,
+		$pakai_kacamata,
+		$tidak_pakai_kacamata,
+		$buta_warna,
+		$pendengaran,
+		$tensi,
+		$nadi,
+		$dinyatakan,
+		$untuk_keperluan){
+
+		$sql = "
+			INSERT INTO rk_surat_dokter_rj(
+				ID_PELAYANAN,
+				ID_POLI,
+				ID_PEG_DOKTER,
+				ID_PASIEN,
+				WAKTU,
+				TANGGAL,
+				BULAN,
+				TAHUN,
+				TINGGI_BADAN,
+				BERAT_BADAN,
+				PAKAI_KACA_MATA,
+				TIDAK_PAKAI_KACA_MATA,
+				BUTA_WARNA,
+				PENDENGARAN,
+				TENSI,
+				NADI,
+				DINYATAKAN,
+				UNTUK_KEPERLUAN,
+				KETERANGAN
+			) VALUES (
+				'$id_pelayanan',
+				'$id_poli',
+				'$id_dokter',
+				'$id_pasien',
+				'$waktu',
+				'$tanggal',
+				'$bulan',
+				'$tahun',
+				'$tinggi_badan',
+				'$berat_badan',
+				'$pakai_kacamata',
+				'$tidak_pakai_kacamata',
+				'$buta_warna',
+				'$pendengaran',
+				'$tensi',
+				'$nadi',
+				'$dinyatakan',
+				'$untuk_keperluan',
+				'Surat Keterangan Sehat'
+			)
+		";
+		$this->db->query($sql);
+	}
+
+	function cetak_data_surat_keterangan_sehat($id_rj){
+		$sql = "
+			SELECT
+				a.ID,
+				a.ID_PELAYANAN,
+				a.ID_POLI,
+				a.ID_PEG_DOKTER,
+				a.ID_PASIEN,
+				a.TANGGAL,
+				a.BULAN,
+				a.TAHUN,
+				a.TINGGI_BADAN,
+				a.BERAT_BADAN,
+				a.PAKAI_KACA_MATA,
+				a.TIDAK_PAKAI_KACA_MATA,
+				a.BUTA_WARNA,
+				a.PENDENGARAN,
+				a.TENSI,
+				a.NADI,
+				a.DINYATAKAN,
+				a.UNTUK_KEPERLUAN,
+				a.KETERANGAN,
+				b.NAMA,
+				b.UMUR,
+				b.ALAMAT,
+				c.NAMA AS NAMA_DOKTER
+			FROM rk_surat_dokter_rj a
+			JOIN rk_pasien b ON b.ID = a.ID_PASIEN
+			JOIN kepeg_pegawai c ON c.ID = a.ID_PEG_DOKTER
+			WHERE a.ID_PELAYANAN = '$id_rj'
+			AND a.KETERANGAN = 'Surat Keterangan Sehat'
 		";
 		$query = $this->db->query($sql);
 		return $query->row();

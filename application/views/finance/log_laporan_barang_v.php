@@ -346,11 +346,13 @@ function search_divisi(){
    });
 }
 </script>
+
 <div id="popup_load">
     <div class="window_load">
         <img src="<?=base_url()?>picture/progress.gif" height="100" width="125">
     </div>
 </div>
+
 <div class="col-lg-12">
     <div class="card-box">
     	<form class="form-horizontal" role="form" method="POST" action="<?php echo base_url(); ?>finance/log_laporan_barang_c/cetak" target="_blank">
@@ -387,111 +389,111 @@ function search_divisi(){
               </div>
               <button type="button" class="btn btn-info btn-sm" onclick="range_tanggal();" name="button"><i class="fa fa-search"></i> Cari</button>
           </div>
-            <div id="form_filter_bulan" class="form-group">
-                <label class="col-md-1 control-label" style="text-align:left; width: 6%;">Bulan :</label>
-                <div class="col-sm-2">
-                  <select class="form-control input-sm" id="select_bulan" name="select_bulan">
-                      <option value="01">Januari</option>
-                      <option value="02">Februari</option>
-                      <option value="03">Maret</option>
-                      <option value="04">April</option>
-                      <option value="05">Mei</option>
-                      <option value="06">Juni</option>
-                      <option value="07">Juli</option>
-                      <option value="08">Agustus</option>
-                      <option value="09">September</option>
-                      <option value="10">Oktober</option>
-                      <option value="11">November</option>
-                      <option value="12">Desember</option>
-                  </select>
-                </div>
-                <button type="button" class="btn btn-info btn-sm" onclick="range_bulan();" name="button"><i class="fa fa-search"></i> Cari</button>
+          <div id="form_filter_bulan" class="form-group">
+              <label class="col-md-1 control-label" style="text-align:left; width: 6%;">Bulan :</label>
+              <div class="col-sm-2">
+                <select class="form-control input-sm" id="select_bulan" name="select_bulan">
+                    <option value="01">Januari</option>
+                    <option value="02">Februari</option>
+                    <option value="03">Maret</option>
+                    <option value="04">April</option>
+                    <option value="05">Mei</option>
+                    <option value="06">Juni</option>
+                    <option value="07">Juli</option>
+                    <option value="08">Agustus</option>
+                    <option value="09">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+                </select>
+              </div>
+              <button type="button" class="btn btn-info btn-sm" onclick="range_bulan();" name="button"><i class="fa fa-search"></i> Cari</button>
+          </div>
+          <div id="form_filter_divisi" class="form-group">
+              <label class="col-md-1 control-label" style="text-align:left; width: 10%;">Departemen :</label>
+              <div class="col-md-3">
+                  <div class="input-group">
+                      <input type="hidden" id="id_departemen" value="" name="id_departemen">
+                      <input type="text" class="form-control input-sm" id="departemen" value="" required="required" readonly>
+                      <span class="input-group-btn">
+                          <button class="btn waves-effect waves-light btn-default btn_departemen btn-sm" type="button">
+                              <i class="fa fa-search"></i>
+                          </button>
+                      </span>
+                  </div>
+              </div>
+              <label class="col-md-1 control-label" style="text-align:left; width: 6%;">Divisi :</label>
+              <div class="col-md-3">
+                  <div class="input-group">
+                      <input type="hidden" id="id_divisi" value="" name="id_divisi">
+                      <input type="text" class="form-control input-sm" id="divisi" value="" required="required" readonly>
+                      <span class="input-group-btn">
+                          <button class="btn waves-effect waves-light btn-default btn_divisi btn-sm" type="button">
+                              <i class="fa fa-search"></i>
+                          </button>
+                      </span>
+                  </div>
+              </div>
+              <button type="button" class="btn btn-info btn-sm" onclick="search_divisi();" name="button"><i class="fa fa-search"></i> Cari</button>
+          </div>
+          <div class="form-group col-md-12">
+            <div class="table-responsive">
+                  <table id="tabel_alat" class="table table-bordered">
+                      <thead>
+                          <tr class="biru">
+                              <th style="color:#fff; text-align:center;" width="50">No</th>
+                              <th style="color:#fff; text-align:center;">Nama Alat</th>
+                              <th style="color:#fff; text-align:center;">No. FIFO</th>
+                              <th style="color:#fff; text-align:center;">Jenis Alat</th>
+                              <th style="color:#fff; text-align:center;">Harga Beli</th>
+                              <th style="color:#fff; text-align:center;">Stok</th>
+                              <th style="color:#fff; text-align:center;">Tanggal Masuk</th>
+                              <th style="color:#fff; text-align:center;">Waktu</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+          <div class="form-group">
+            <div class="col-md-10">
+              <div id="tablePaging"> </div>
             </div>
-              <div id="form_filter_divisi" class="form-group">
-                  <label class="col-md-1 control-label" style="text-align:left; width: 10%;">Departemen :</label>
-                  <div class="col-md-3">
-                      <div class="input-group">
-                          <input type="hidden" id="id_departemen" value="" name="id_departemen">
-                          <input type="text" class="form-control input-sm" id="departemen" value="" required="required" readonly>
-                          <span class="input-group-btn">
-                              <button class="btn waves-effect waves-light btn-default btn_departemen btn-sm" type="button">
-                                  <i class="fa fa-search"></i>
-                              </button>
-                          </span>
-                      </div>
-                  </div>
-                  <label class="col-md-1 control-label" style="text-align:left; width: 6%;">Divisi :</label>
-                  <div class="col-md-3">
-                      <div class="input-group">
-                          <input type="hidden" id="id_divisi" value="" name="id_divisi">
-                          <input type="text" class="form-control input-sm" id="divisi" value="" required="required" readonly>
-                          <span class="input-group-btn">
-                              <button class="btn waves-effect waves-light btn-default btn_divisi btn-sm" type="button">
-                                  <i class="fa fa-search"></i>
-                              </button>
-                          </span>
-                      </div>
-                  </div>
-                  <button type="button" class="btn btn-info btn-sm" onclick="search_divisi();" name="button"><i class="fa fa-search"></i> Cari</button>
-              </div>
-              <div class="form-group col-md-12">
-                <div class="table-responsive">
-                      <table id="tabel_alat" class="table table-bordered">
-                          <thead>
-                              <tr class="biru">
-                                  <th style="color:#fff; text-align:center;" width="50">No</th>
-                                  <th style="color:#fff; text-align:center;">Nama Alat</th>
-                                  <th style="color:#fff; text-align:center;">No. FIFO</th>
-                                  <th style="color:#fff; text-align:center;">Jenis Alat</th>
-                                  <th style="color:#fff; text-align:center;">Harga Beli</th>
-                                  <th style="color:#fff; text-align:center;">Stok</th>
-                                  <th style="color:#fff; text-align:center;">Tanggal Masuk</th>
-                                  <th style="color:#fff; text-align:center;">Waktu</th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                          </tbody>
-                      </table>
-                  </div>
-              </div>
-              <div class="form-group">
-                <div class="col-md-10">
-                  <div id="tablePaging"> </div>
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="col-md-9">
-                  &nbsp;
-                </div>
-                <label class="col-md-2 control-label">Jumlah Tampil</label>
-                  <div class="col-md-1 pull-right">
-                    <select class="form-control" id="jumlah_tampil">
-                          <option value="10">10</option>
-                          <option value="20">20</option>
-                          <option value="50">50</option>
-                          <option value="100">100</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <div class="col-md-6">
-                      <div class="radio radio-purple radio-inline">
-                          <input type="radio" name="print" id="excel" value="excel" checked="checked">
-                          <label for="excel"> Excel </label>
-                      </div>
-                      <div class="radio radio-purple radio-inline">
-                          <input type="radio" name="print" id="pdf" value="pdf" >
-                          <label for="pdf"> PDF </label>
-                      </div>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <div class="col-md-2" style="width: 10%;">
-                    <button type="submit" class="btn btn-info" name="button"><i class="fa fa-print"></i> Print</button>
-                  </div>
-                </div>
+          </div>
+          <div class="form-group">
+            <div class="col-md-9">
+              &nbsp;
             </div>
-          </form>
+            <label class="col-md-2 control-label">Jumlah Tampil</label>
+              <div class="col-md-1 pull-right">
+                <select class="form-control" id="jumlah_tampil">
+                      <option value="10">10</option>
+                      <option value="20">20</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-md-6">
+                  <div class="radio radio-purple radio-inline">
+                      <input type="radio" name="print" id="excel" value="excel" checked="checked">
+                      <label for="excel"> Excel </label>
+                  </div>
+                  <div class="radio radio-purple radio-inline">
+                      <input type="radio" name="print" id="pdf" value="pdf" >
+                      <label for="pdf"> PDF </label>
+                  </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-md-2" style="width: 10%;">
+                <button type="submit" class="btn btn-info" name="button"><i class="fa fa-print"></i> Print</button>
+              </div>
+            </div>
+        </div>
+      </form>
     </div>
   </div>
 

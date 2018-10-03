@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Admum_setup_peralatan_medis_m extends CI_Model {
+class Admum_setup_nama_barang_m extends CI_Model {
 
 	function __construct()
 	{
@@ -38,7 +38,7 @@ class Admum_setup_peralatan_medis_m extends CI_Model {
 		$where = "1 = 1";
 
 		if($keyword != ""){
-			$where = $where." AND (a.NAMA_ALAT LIKE '%$keyword' OR a.KODE_ALAT LIKE '%$keyword%')";
+			$where = $where." AND (a.NAMA_ALAT LIKE '%$keyword' OR a.KODE_ALAT LIKE '%$keyword%' OR b.NAMA_KATEGORI LIKE '%$keyword%')";
 		}
 
 		$sql = "

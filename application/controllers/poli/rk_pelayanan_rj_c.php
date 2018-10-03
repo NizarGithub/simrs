@@ -162,7 +162,7 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	function simpan_spesialistik(){
+	function simpan_diagnosa(){
 		$id_pelayanan = $this->input->post('id_rj');
 		$id_poli = $this->input->post('id_poli');
 		$id_peg_dokter = $this->input->post('id_dokter');
@@ -171,10 +171,9 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		$bulan = date('n');
 		$tahun = date('Y');
 		$diagnosa = addslashes($this->input->post('diagnosa'));
-		$tindakan = addslashes($this->input->post('tindakan_dg'));
 		$id_penyakit = $this->input->post('id_penyakit');
 
-		$this->model->simpan_diagnosa($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$tanggal,$bulan,$tahun,$diagnosa,$tindakan,$id_penyakit);
+		$this->model->simpan_diagnosa($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$tanggal,$bulan,$tahun,$diagnosa,$id_penyakit);
 
 		echo '1';
 	}
@@ -195,11 +194,9 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 	function ubah_diagnosa(){
 		$id = $this->input->post('id_ubah_dg');
 		$diagnosa = $this->input->post('diagnosa_ubah');
-		$tindakan = $this->input->post('tindakan_dg_ubah');
-		$kasus = $this->input->post('id_kasus_ubah');
-		$spesialistik = $this->input->post('id_spesialistik_ubah');
+		$id_penyakit = $this->input->post('id_penyakit_ubah');
 
-		$this->model->ubah_diagnosa($id,$diagnosa,$tindakan,$kasus,$spesialistik);
+		$this->model->ubah_diagnosa($id,$diagnosa,$id_penyakit);
 
 		echo '1';
 	}
@@ -858,6 +855,99 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		);
 
 		$this->load->view('poli/pdf/rk_surat_pengantar_ri_pdf_v',$data);
+	}
+
+	function simpan_surat_keterangan_ri(){
+		$id_pelayanan = $this->input->post('id_rj_surat_ket_ri');
+		$id_poli = $this->input->post('id_poli');
+		$id_dokter = $this->input->post('id_dokter');
+		$id_pasien = $this->input->post('id_pasien');
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu = $format->format('H:i:s');
+		$tanggal = date('d-m-Y');
+		$bulan = date('n');
+		$tahun = date('Y');
+		$mulai_tanggal = $this->input->post('mulai_tgl_sd_ri');
+		$sampai_tanggal = $this->input->post('sampai_tgl_sd_ri');
+		$diagnosa = $this->input->post('id_penyakit_skri');
+
+		$this->model->simpan_surat_ket_ri($id_pelayanan,$id_poli,$id_dokter,$id_pasien,$waktu,$tanggal,$bulan,$tahun,$mulai_tanggal,$sampai_tanggal,$diagnosa);
+
+		echo '1';
+	}
+
+	function cetak_surat_keterangan_ri($id){
+		$id_rj = $this->decode($id);
+		$data1 = $this->model->cetak_data_surat_keterangan_ri($id_rj);
+
+		$data = array(
+			'settitle' => 'Surat Keterangan Rawat Inap',
+			'filename' => 'surat_keterangan_ri',
+			'data1' => $data1
+		);
+
+		$this->load->view('poli/pdf/rk_surat_keterangan_ri_pdf_v',$data);
+	}
+
+	function simpan_surat_keterangan_sehat(){
+		$id_pelayanan = $this->input->post('id_rj_surat_ket_sehat');
+		$id_poli = $this->input->post('id_poli');
+		$id_dokter = $this->input->post('id_dokter');
+		$id_pasien = $this->input->post('id_pasien');
+		$tz_object = new DateTimeZone('Asia/Jakarta');
+		$datetime = new DateTime();
+		$format = $datetime->setTimezone($tz_object);
+		$waktu = $format->format('H:i:s');
+		$tanggal = date('d-m-Y');
+		$bulan = date('n');
+		$tahun = date('Y');
+		$tinggi_badan = $this->input->post('tinggi_badan_sks');
+		$berat_badan = $this->input->post('berat_badan_sks');
+		$pakai_kacamata = $this->input->post('pakai_kaca_mata');
+		$tidak_pakai_kacamata = $this->input->post('tidak_pakai_kaca_mata');
+		$buta_warna = $this->input->post('buta_warna');
+		$pendengaran = $this->input->post('pendengaran');
+		$tensi = $this->input->post('tensi');
+		$nadi = $this->input->post('nadi');
+		$dinyatakan = $this->input->post('dinyatakan');
+		$untuk_keperluan = $this->input->post('untuk_keperluan');
+
+		$this->model->simpan_surat_keterangan_sehat(
+			$id_pelayanan,
+			$id_poli,
+			$id_dokter,
+			$id_pasien,
+			$waktu,
+			$tanggal,
+			$bulan,
+			$tahun,
+			$tinggi_badan,
+			$berat_badan,
+			$pakai_kacamata,
+			$tidak_pakai_kacamata,
+			$buta_warna,
+			$pendengaran,
+			$tensi,
+			$nadi,
+			$dinyatakan,
+			$untuk_keperluan);
+
+		echo '1';
+	}
+
+	function cetak_surat_keterangan_sehat($id){
+		$id_rj = $this->decode($id);
+		$data1 = $this->model->cetak_data_surat_keterangan_sehat($id_rj);
+
+		$data = array(
+			'settitle' => 'Surat Keterangan Sehat',
+			'filename' => 'surat_keterangan_sehat',
+			'data1' => $data1
+		);
+
+		$this->load->view('poli/pdf/rk_surat_keterangan_sehat_pdf_v',$data);
 	}
 
 }

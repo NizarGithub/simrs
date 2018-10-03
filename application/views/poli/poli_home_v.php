@@ -64,7 +64,7 @@
             $id_user = $sess_user['id'];
             $user = $this->master_model_m->get_user_info($id_user);
             $level = $user->LEVEL;
-            $id_divisi = $sess_user['id_divisi']; //ID POLI
+            $id_divisi = $sess_user['id_poli']; //ID POLI
 
             $is_operator = $this->master_model_m->is_operator($id_user, 'poli');
             $bulan = array(
@@ -445,7 +445,7 @@
                                             <th style="color:#fff; text-align:center; vertical-align: middle;">Nama Pasien</th>
                                             <th style="color:#fff; text-align:center; vertical-align: middle;">JK</th>
                                             <th style="color:#fff; text-align:center; vertical-align: middle;">Antrian</th>
-                                            <th style="text-align:center; vertical-align: middle;">#</th>
+                                            <th style="color:#fff; text-align:center; vertical-align: middle;">#</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -545,6 +545,10 @@
         <script src="<?php echo base_url(); ?>js-devan/js-form.js"></script>
         <script src="<?php echo base_url(); ?>js-devan/pagination.js"></script>
         <script src="<?php echo base_url(); ?>js-devan/md5.js"></script>
+        <script type="text/javascript">
+            var url = "<?php echo base_url(); ?>";
+        </script>
+        <script src="<?php echo base_url(); ?>datepicker/datetimepicker_css.js"></script>
 
         <!-- Plugins Js -->
         <script src="<?php echo base_url(); ?>assets/plugins/bootstrap-inputmask/bootstrap-inputmask.min.js" type="text/javascript"></script>

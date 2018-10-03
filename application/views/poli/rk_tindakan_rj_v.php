@@ -203,7 +203,9 @@ $(document).ready(function(){
 
     //TINDAKAN
 
-    data_tindakan();
+    $('#dt_tindakan').click(function(){
+		data_tindakan();
+	});
 
     $('#simpanTindakan').click(function(){
     	var tr = $('#tabel_tambah_tindakan tbody tr').length;
@@ -356,9 +358,7 @@ $(document).ready(function(){
 
 	//DIAGNOSA
 
-	$('#dt_diagnosa').click(function(){
-		data_diagnosa();
-	});
+	data_diagnosa();
 
 	$('#btn_tambah_dg').click(function(){
 		$('#view_diagnosa_tambah').show();
@@ -395,7 +395,7 @@ $(document).ready(function(){
 			toastr["error"]("Silahkan isi spesialistik dengan benar!", "Notifikasi");
 		}else{
 			$.ajax({
-				url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/simpan_spesialistik',
+				url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/simpan_diagnosa',
 				data : $('#view_diagnosa_tambah').serialize(),
 				type : "POST",
 				dataType : "json",
@@ -778,6 +778,62 @@ $(document).ready(function(){
     	}
     });
 
+    $('#batalPRI').click(function(){
+    	$('#tinggi_badan').val("");
+    	$('#berat_badan').val("");
+    	$('#diagnosa_dx').val("");
+    	$('#terapi_dx').val("");
+    });
+
+    $('#dt_surat_dokter_ri').click(function(){
+    	var id_rj = $('#id_rj_surat_ket_ri').val();
+
+    	$.ajax({
+    		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/get_diagnosa_by_idrj',
+    		data : {id_rj:id_rj},
+    		type : "POST",
+    		dataType : "json",
+    		success : function(row){
+    			$('#id_penyakit_skri').val(row['ID_PENYAKIT']);
+    			$('#diagnosa_sd_ri').val(row['PENYAKIT']);
+    		}
+    	});
+    });
+
+    $('#simpanSDRI').click(function(){
+    	var id_rj = $('#id_rj_surat_ket_ri').val();
+    	var sampai_tgl = $('#sampai_tgl_sd_ri').val();
+    	if(sampai_tgl == ""){
+    		toastr["error"]("Sampai tanggal tidak boleh kosong!", "Notifikasi");
+    		$('#sampai_tgl_sd_ri').focus();
+    	}else{
+    		$.ajax({
+				url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/simpan_surat_keterangan_ri',
+				data : $('#view_surat_keterangan_ri').serialize(),
+				type : "POST",
+				dataType : "json",
+				success : function(result){
+					var encodedString = Base64.encode(id_rj);
+	    			window.open('<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/cetak_surat_keterangan_ri/'+encodedString,'_blank');
+				}
+			});
+    	}
+    });
+
+    $('#simpanSKS').click(function(){
+    	var id_rj = $('#id_rj_surat_ket_sehat').val();
+    	$.ajax({
+			url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/simpan_surat_keterangan_sehat',
+			data : $('#view_surat_keterangan_sehat').serialize(),
+			type : "POST",
+			dataType : "json",
+			success : function(result){
+				var encodedString = Base64.encode(id_rj);
+    			window.open('<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/cetak_surat_keterangan_sehat/'+encodedString,'_blank');
+			}
+		});
+    });
+
 });
 
 //TINDAKAN
@@ -1112,7 +1168,7 @@ function data_diagnosa(){
 			$tr = "";
 
 			if(result == "" || result == null){
-				$tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+				$tr = "<tr><td colspan='5' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
 				var no = 0;
 
@@ -1130,7 +1186,6 @@ function data_diagnosa(){
 								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
 								"<td style='vertical-align:middle;'>"+result[i].DIAGNOSA+"</td>"+
-								"<td style='vertical-align:middle;'>"+result[i].TINDAKAN+"</td>"+
 								"<td style='vertical-align:middle;'>"+result[i].URAIAN+"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
 							"</tr>";
@@ -1157,7 +1212,6 @@ function ubah_diagnosa(id){
 		success : function(row){
 			$('#id_ubah_dg').val(id);
 			$('#diagnosa_ubah').val(row['DIAGNOSA']);
-			$('#tindakan_dg_ubah').val(row['TINDAKAN']);
 			$('#id_penyakit_ubah').val(row['ID_PENYAKIT']);
 			$('#nama_penyakit_ubah').val(row['URAIAN']);
 		}
@@ -2163,6 +2217,53 @@ function hitung_tanggal(){
 		$('#sampai_tgl_sd').val("");
 	}
 }
+
+function hitung_tanggal_kurang_dari(){
+	toastr.options = {
+      "closeButton": false,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": true,
+      "positionClass": "toast-bottom-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+
+	var tanggal = $('#sampai_tgl_sd_ri').val();
+	var d = tanggal.substr(0,2);
+	var m = tanggal.substr(3,2);
+	var y = tanggal.substr(6);
+	var date1 = "<?php echo date('Y-m-d'); ?>";
+	var date2 = y+'-'+m+'-'+d;
+
+	// First we split the values to arrays date1[0] is the year, [1] the month and [2] the day
+	date1 = date1.split('-');
+	date2 = date2.split('-');
+
+	// Now we convert the array to a Date object, which has several helpful methods
+	date1 = new Date(date1[0], date1[1], date1[2]);
+	date2 = new Date(date2[0], date2[1], date2[2]);
+
+	// We use the getTime() method and get the unixtime (in milliseconds, but we want seconds, therefore we divide it through 1000)
+	date1_unixtime = parseInt(date1.getTime() / 1000);
+	date2_unixtime = parseInt(date2.getTime() / 1000);
+
+	if(date2_unixtime < date1_unixtime){
+		toastr["error"]("Tanggal tidak boleh kurang!", "Notifikasi");
+		$('#simpanSDRI').attr('disabled','disabled');
+		$('#sampai_tgl_sd_ri').focus();
+	}else{
+		$('#simpanSDRI').removeAttr('disabled');
+	}
+}
 </script>
 
 <div id="popup_load">
@@ -2261,11 +2362,11 @@ function hitung_tanggal(){
 		<div class="card-box">
 			<div class="row">
 				<ul class="nav nav-tabs">
-	                <li role="presentation" class="active">
-	                    <a href="#tindakan1" role="tab" data-toggle="tab"><i class="fa fa-stethoscope"></i>&nbsp;Tindakan</a>
-	                </li>
-	                <li role="presentation" id="dt_diagnosa">
+					<li role="presentation" id="dt_diagnosa" class="active">
 	                    <a href="#diagnosa1" role="tab" data-toggle="tab"><i class="fa fa-heartbeat"></i>&nbsp;Diagnosa</a>
+	                </li>
+	                <li role="presentation" id="dt_tindakan">
+	                    <a href="#tindakan1" role="tab" data-toggle="tab"><i class="fa fa-stethoscope"></i>&nbsp;Tindakan</a>
 	                </li>
 	                <li role="presentation" id="dt_laborat">
 	                    <a href="#laborat1" role="tab" data-toggle="tab"><i class="fa fa-building"></i>&nbsp;Laborat</a>
@@ -2290,17 +2391,117 @@ function hitung_tanggal(){
                             <li id="dt_surat_dokter_ri">
                                 <a data-toggle="tab" role="tab" href="#data_surat_dokter_ri1">Surat Keterangan RI</a>
                             </li>
-                            <li id="dt_surat_dokter_istirahat">
+                            <!-- <li id="dt_surat_dokter_istirahat">
                                 <a data-toggle="tab" role="tab" href="#data_surat_dokter_istirahat1">Surat Keterangan Istirahat</a>
-                            </li>
-                            <li>
-                                <a data-toggle="tab" role="tab" href="#dropdown21">Surat Keterangan Sehat</a>
+                            </li> -->
+                            <li id="dt_surat_dokter_ket_sehat">
+                                <a data-toggle="tab" role="tab" href="#data_surat_ket_sehat">Surat Keterangan Sehat</a>
                             </li>
                         </ul>
                     </li>
 	            </ul>
 	            <div class="tab-content">
-	                <div role="tabpanel" class="tab-pane fade in active" id="tindakan1">
+	            	<div role="tabpanel" class="tab-pane fade in active" id="diagnosa1">
+	                	<form class="form-horizontal" id="view_diagnosa">
+	                    	<div class="form-group">
+	                    		<div class="col-md-6">
+	                    			<h4 class="m-t-0"><i class="fa fa-table"></i>&nbsp;<b>Tabel Diagnosa</b></h4>
+	                    		</div>
+	                    		<div class="col-md-6">
+				                    <button class="btn btn-primary m-b-5 pull-right" type="button" id="btn_tambah_dg">
+										<i class="fa fa-plus"></i>&nbsp;<b>Tambah Diagnosa</b>
+									</button>
+	                    		</div>
+	                    	</div>
+	                    	<div class="form-group">
+	                    		<div class="col-md-12">
+				                    <div class="table-responsive">
+							            <table id="tabel_diagnosa" class="table table-bordered">
+							                <thead>
+							                    <tr class="merah">
+							                        <th style="color:#fff; text-align:center;">No</th>
+							                        <th style="color:#fff; text-align:center;">Tanggal</th>
+							                        <th style="color:#fff; text-align:center;">Anamnesa</th>
+							                        <th style="color:#fff; text-align:center;">Diagnosa</th>
+							                        <th style="color:#fff; text-align:center;">Aksi</th>
+							                    </tr>
+							                </thead>
+							                <tbody>
+							                    
+							                </tbody>
+							            </table>
+							        </div>
+	                    		</div>
+	                    	</div>
+	                    </form>
+
+	                    <form class="form-horizontal" id="view_diagnosa_tambah" action="" method="post">
+	                    	<input type="hidden" name="id_rj" id="id_rj" value="<?php echo $id; ?>">
+							<input type="hidden" name="id_poli" value="<?php echo $dt->ID_POLI; ?>">
+							<input type="hidden" name="id_dokter" value="<?php echo $dt->ID_DOKTER; ?>">
+							<input type="hidden" name="id_pasien" value="<?php echo $dt->ID; ?>">
+							<h4><i class="fa fa-plus"></i> Tambah Diagnosa</h4>
+							<hr>
+							<div class="form-group">
+								<label class="col-md-2 control-label">Anamnesa</label>
+								<div class="col-md-8">
+									<textarea class="form-control" rows="5" id="diagnosa" name="diagnosa"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+		                        <label class="col-md-2 control-label">Diagnosa</label>
+		                        <div class="col-md-5">
+		                        	<div class="input-group">
+		                        		<input type="hidden" name="id_penyakit" id="id_penyakit" value="">
+		                                <input type="text" class="form-control" id="nama_penyakit" value="" readonly>
+		                                <span class="input-group-btn">
+		                                    <button type="button" class="btn btn-primary btn_penyakit_dg" style="cursor:cursor;"><i class="fa fa-search"></i></button>
+		                                </span>
+		                            </div>
+		                        </div>
+		                    </div>
+		                    <hr>
+		                    <center>
+		                    	<button type="button" class="btn btn-success" id="simpanDg"><i class="fa fa-save"></i> <b>Simpan</b></button>
+		                        <button type="button" class="btn btn-danger" id="batalDg"><i class="fa fa-times"></i> <b>Batal</b></button>
+		                    </center>
+	                    </form>
+
+	                    <form class="form-horizontal" id="view_diagnosa_ubah" action="" method="post">
+	                    	<input type="hidden" name="id_ubah_dg" id="id_ubah_dg" value="">
+	                    	<input type="hidden" name="id_rj" id="id_rj" value="<?php echo $id; ?>">
+							<input type="hidden" name="id_poli" value="<?php echo $dt->ID_POLI; ?>">
+							<input type="hidden" name="id_dokter" value="<?php echo $dt->ID_DOKTER; ?>">
+							<input type="hidden" name="id_pasien" value="<?php echo $dt->ID; ?>">
+							<h4><i class="fa fa-plus"></i> Ubah Diagnosa</h4>
+							<hr>
+							<div class="form-group">
+								<label class="col-md-2 control-label">Anamnesa</label>
+								<div class="col-md-8">
+									<textarea class="form-control" rows="5" id="diagnosa_ubah" name="diagnosa_ubah"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+		                        <label class="col-md-2 control-label">Diagnosa</label>
+		                        <div class="col-md-5">
+		                        	<div class="input-group">
+		                        		<input type="hidden" name="id_penyakit_ubah" id="id_penyakit_ubah" value="">
+		                                <input type="text" class="form-control" id="nama_penyakit_ubah" value="" readonly>
+		                                <span class="input-group-btn">
+		                                    <button type="button" class="btn btn-primary btn_penyakit_dg" style="cursor:cursor;"><i class="fa fa-search"></i></button>
+		                                </span>
+		                            </div>
+		                        </div>
+		                    </div>
+		                    <hr>
+		                    <center>
+		                    	<button type="button" class="btn btn-success" id="simpanDgUbah"><i class="fa fa-save"></i> <b>Simpan</b></button>
+		                        <button type="button" class="btn btn-danger" id="batalDgUbah"><i class="fa fa-times"></i> <b>Batal</b></button>
+		                    </center>
+	                    </form>
+	                </div>
+
+	                <div role="tabpanel" class="tab-pane fade" id="tindakan1">
 	                    <form class="form-horizontal" id="view_tindakan">
 	                    	<div class="form-group">
 	                    		<div class="col-md-6">
@@ -2488,120 +2689,6 @@ function hitung_tanggal(){
 		                        <button type="button" class="btn btn-danger" id="batal_ubah"><i class="fa fa-times"></i> <b>Batal</b></button>
 		                    </center>
 						</form>
-	                </div>
-
-	                <div role="tabpanel" class="tab-pane fade" id="diagnosa1">
-	                	<form class="form-horizontal" id="view_diagnosa">
-	                    	<div class="form-group">
-	                    		<div class="col-md-6">
-	                    			<h4 class="m-t-0"><i class="fa fa-table"></i>&nbsp;<b>Tabel Diagnosa</b></h4>
-	                    		</div>
-	                    		<div class="col-md-6">
-				                    <button class="btn btn-primary m-b-5 pull-right" type="button" id="btn_tambah_dg">
-										<i class="fa fa-plus"></i>&nbsp;<b>Tambah Diagnosa</b>
-									</button>
-	                    		</div>
-	                    	</div>
-	                    	<div class="form-group">
-	                    		<div class="col-md-12">
-				                    <div class="table-responsive">
-							            <table id="tabel_diagnosa" class="table table-bordered">
-							                <thead>
-							                    <tr class="merah">
-							                        <th style="color:#fff; text-align:center;">No</th>
-							                        <th style="color:#fff; text-align:center;">Tanggal</th>
-							                        <th style="color:#fff; text-align:center;">Diagnosa</th>
-							                        <th style="color:#fff; text-align:center;">Tindakan</th>
-							                        <th style="color:#fff; text-align:center;">Jenis Penyakit</th>
-							                        <th style="color:#fff; text-align:center;">Aksi</th>
-							                    </tr>
-							                </thead>
-
-							                <tbody>
-							                    
-							                </tbody>
-							            </table>
-							        </div>
-	                    		</div>
-	                    	</div>
-	                    </form>
-
-	                    <form class="form-horizontal" id="view_diagnosa_tambah" action="" method="post">
-	                    	<input type="hidden" name="id_rj" id="id_rj" value="<?php echo $id; ?>">
-							<input type="hidden" name="id_poli" value="<?php echo $dt->ID_POLI; ?>">
-							<input type="hidden" name="id_dokter" value="<?php echo $dt->ID_DOKTER; ?>">
-							<input type="hidden" name="id_pasien" value="<?php echo $dt->ID; ?>">
-							<h4><i class="fa fa-plus"></i> Tambah Diagnosa</h4>
-							<hr>
-							<div class="form-group">
-								<label class="col-md-2 control-label">Diagnosa</label>
-								<div class="col-md-8">
-									<textarea class="form-control" rows="5" id="diagnosa" name="diagnosa"></textarea>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-md-2 control-label">Tindakan</label>
-								<div class="col-md-8">
-									<textarea class="form-control" rows="5" id="tindakan_dg" name="tindakan_dg"></textarea>
-								</div>
-							</div>
-							<div class="form-group">
-		                        <label class="col-md-2 control-label">Jenis Penyakit</label>
-		                        <div class="col-md-5">
-		                        	<div class="input-group">
-		                        		<input type="hidden" name="id_penyakit" id="id_penyakit" value="">
-		                                <input type="text" class="form-control" id="nama_penyakit" value="" readonly>
-		                                <span class="input-group-btn">
-		                                    <button type="button" class="btn btn-primary btn_penyakit_dg" style="cursor:cursor;"><i class="fa fa-search"></i></button>
-		                                </span>
-		                            </div>
-		                        </div>
-		                    </div>
-		                    <hr>
-		                    <center>
-		                    	<button type="button" class="btn btn-success" id="simpanDg"><i class="fa fa-save"></i> <b>Simpan</b></button>
-		                        <button type="button" class="btn btn-danger" id="batalDg"><i class="fa fa-times"></i> <b>Batal</b></button>
-		                    </center>
-	                    </form>
-
-	                    <form class="form-horizontal" id="view_diagnosa_ubah" action="" method="post">
-	                    	<input type="hidden" name="id_ubah_dg" id="id_ubah_dg" value="">
-	                    	<input type="hidden" name="id_rj" id="id_rj" value="<?php echo $id; ?>">
-							<input type="hidden" name="id_poli" value="<?php echo $dt->ID_POLI; ?>">
-							<input type="hidden" name="id_dokter" value="<?php echo $dt->ID_DOKTER; ?>">
-							<input type="hidden" name="id_pasien" value="<?php echo $dt->ID; ?>">
-							<h4><i class="fa fa-plus"></i> Ubah Diagnosa</h4>
-							<hr>
-							<div class="form-group">
-								<label class="col-md-2 control-label">Diagnosa</label>
-								<div class="col-md-8">
-									<textarea class="form-control" rows="5" id="diagnosa_ubah" name="diagnosa_ubah"></textarea>
-								</div>
-							</div>
-							<div class="form-group">
-								<label class="col-md-2 control-label">Tindakan</label>
-								<div class="col-md-8">
-									<textarea class="form-control" rows="5" id="tindakan_dg_ubah" name="tindakan_dg_ubah"></textarea>
-								</div>
-							</div>
-							<div class="form-group">
-		                        <label class="col-md-2 control-label">Jenis Penyakit</label>
-		                        <div class="col-md-5">
-		                        	<div class="input-group">
-		                        		<input type="hidden" name="id_penyakit_ubah" id="id_penyakit_ubah" value="">
-		                                <input type="text" class="form-control" id="nama_penyakit_ubah" value="" readonly>
-		                                <span class="input-group-btn">
-		                                    <button type="button" class="btn btn-primary btn_penyakit_dg" style="cursor:cursor;"><i class="fa fa-search"></i></button>
-		                                </span>
-		                            </div>
-		                        </div>
-		                    </div>
-		                    <hr>
-		                    <center>
-		                    	<button type="button" class="btn btn-success" id="simpanDgUbah"><i class="fa fa-save"></i> <b>Simpan</b></button>
-		                        <button type="button" class="btn btn-danger" id="batalDgUbah"><i class="fa fa-times"></i> <b>Batal</b></button>
-		                    </center>
-	                    </form>
 	                </div>
 
 	                <div role="tabpanel" class="tab-pane fade" id="laborat1">
@@ -3102,6 +3189,8 @@ function hitung_tanggal(){
 	                </div>
 
 	                <div role="tabpanel" class="tab-pane fade" id="surat_dokter1">
+	                	<h4 class="header-title m-t-0 m-b-20">Surat Keterangan Dokter</h4>
+	                	<hr>
 		                <form class="form-horizontal" method="post" id="view_surat_dokter">
 		                	<input type="hidden" name="id_rj" id="id_rj" value="<?php echo $id; ?>">
 							<input type="hidden" name="id_poli" value="<?php echo $dt->ID_POLI; ?>">
@@ -3173,6 +3262,8 @@ function hitung_tanggal(){
 	                </div>
 
 	                <div role="tabpanel" class="tab-pane fade" id="data_surat_pengantar_ri1">
+	                	<h4 class="header-title m-t-0 m-b-20">Surat Pengantar Rawat Inap</h4>
+	                	<hr>
 	                	<form class="form-horizontal" method="post" id="view_surat_pengantar_ri">
 		                	<input type="hidden" name="id_rj_surat_pengantar_ri" id="id_rj_surat_pengantar_ri" value="<?php echo $id; ?>">
 							<input type="hidden" name="id_poli" value="<?php echo $dt->ID_POLI; ?>">
@@ -3186,7 +3277,7 @@ function hitung_tanggal(){
 		                    </div>
 		                    <div class="form-group">
 		                        <label class="col-md-2 control-label">Tinggi Badan</label>
-		                        <div class="col-md-1">
+		                        <div class="col-md-2">
 		                        	<div class="input-group">
 		                            	<input type="text" class="form-control num_only" name="tinggi_badan" id="tinggi_badan" value="">
 		                            	<span class="input-group-btn">
@@ -3197,7 +3288,7 @@ function hitung_tanggal(){
 		                    </div>
 		                    <div class="form-group">
 		                        <label class="col-md-2 control-label">Berat Badan</label>
-		                        <div class="col-md-1">
+		                        <div class="col-md-2">
 		                        	<div class="input-group">
 		                            	<input type="text" class="form-control num_only" name="berat_badan" id="berat_badan" value="">
 		                            	<span class="input-group-btn">
@@ -3224,6 +3315,157 @@ function hitung_tanggal(){
 		                    <center>
 		                    	<button type="button" class="btn btn-success" id="simpanPRI"><i class="fa fa-save"></i> <b>Simpan & Cetak</b></button>
 		                        <button type="button" class="btn btn-danger" id="batalPRI"><i class="fa fa-times"></i> <b>Batal</b></button>
+		                    </center>
+		                </form>
+	                </div>
+
+	                <div role="tabpanel" class="tab-pane fade" id="data_surat_dokter_ri1">
+	                	<h4 class="header-title m-t-0 m-b-20">Surat Keterangan Rawat Inap</h4>
+	                	<hr>
+	                	<form class="form-horizontal" method="post" id="view_surat_keterangan_ri">
+		                	<input type="hidden" name="id_rj_surat_ket_ri" id="id_rj_surat_ket_ri" value="<?php echo $id; ?>">
+							<input type="hidden" name="id_poli" value="<?php echo $dt->ID_POLI; ?>">
+							<input type="hidden" name="id_dokter" value="<?php echo $dt->ID_DOKTER; ?>">
+							<input type="hidden" name="id_pasien" id="id_pasien_skri" value="<?php echo $dt->ID; ?>">
+							<div class="form-group">
+		                        <label class="col-md-2 control-label">Mulai Tanggal</label>
+		                        <div class="col-md-4">
+		                            <input type="text" class="form-control" name="mulai_tgl_sd_ri" id="mulai_tgl_sd_ri" value="<?php echo date('d-m-Y'); ?>" readonly>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Sampai Tanggal</label>
+		                        <div class="col-md-4">
+		                            <input type="text" class="form-control" name="sampai_tgl_sd_ri" id="sampai_tgl_sd_ri" value="" onclick="javascript:NewCssCal('sampai_tgl_sd_ri');" onchange="hitung_tanggal_kurang_dari();">
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Diagnosa</label>
+		                        <div class="col-md-4">
+		                        	<div class="input-group">
+		                        		<input type="hidden" name="id_penyakit_skri" id="id_penyakit_skri" value="">
+		                                <input type="text" class="form-control" id="diagnosa_sd_ri" value="" readonly>
+		                                <span class="input-group-btn">
+		                                    <button type="button" class="btn btn-primary" style="cursor:cursor;"><i class="fa fa-search"></i></button>
+		                                </span>
+		                            </div>
+		                        </div>
+		                    </div>
+		                    <hr>
+
+		                    <center>
+		                    	<button type="button" class="btn btn-success" id="simpanSDRI"><i class="fa fa-save"></i> <b>Simpan & Cetak</b></button>
+		                        <button type="button" class="btn btn-danger" id="batalSDRI"><i class="fa fa-times"></i> <b>Batal</b></button>
+		                    </center>
+		                </form>
+	                </div>
+
+	                <div role="tabpanel" class="tab-pane fade" id="data_surat_ket_sehat">
+	                	<h4 class="header-title m-t-0 m-b-20">Surat Keterangan Sehat</h4>
+	                	<hr>
+	                	<form class="form-horizontal" method="post" id="view_surat_keterangan_sehat">
+		                	<input type="hidden" name="id_rj_surat_ket_sehat" id="id_rj_surat_ket_sehat" value="<?php echo $id; ?>">
+							<input type="hidden" name="id_poli" value="<?php echo $dt->ID_POLI; ?>">
+							<input type="hidden" name="id_dokter" value="<?php echo $dt->ID_DOKTER; ?>">
+							<input type="hidden" name="id_pasien" id="id_pasien_sks" value="<?php echo $dt->ID; ?>">
+							<div class="form-group">
+								<label class="col-md-2 control-label">Penglihatan :</label>
+								<div class="col-md-5">&nbsp;</div>
+							</div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">&nbsp;</label>
+		                        <div class="col-md-4">
+		                            <input type="text" class="form-control" name="pakai_kaca_mata" id="pakai_kaca_mata" value="" placeholder="Ketikkan disini...">
+		                            <span class="help-block"><small>a. Pakai Kaca Mata</small></span>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">&nbsp;</label>
+		                        <div class="col-md-4">
+		                            <input type="text" class="form-control" name="tidak_pakai_kaca_mata" id="tidak_pakai_kaca_mata" value="" placeholder="Ketikkan disini...">
+		                            <span class="help-block"><small>b. Tidak Pakai Kaca Mata</small></span>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">&nbsp;</label>
+		                        <div class="col-md-4">
+		                            <input type="text" class="form-control" name="buta_warna" id="buta_warna" value="" placeholder="Ketikkan disini...">
+		                            <span class="help-block"><small>c. Buta Warna</small></span>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Pendengaran</label>
+		                        <div class="col-md-4">
+		                        	<input type="text" class="form-control" name="pendengaran" id="pendengaran" value="">
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Tinggi Badan</label>
+		                        <div class="col-md-2">
+		                        	<div class="input-group">
+		                            	<input type="text" class="form-control num_only" name="tinggi_badan_sks" id="tinggi_badan_sks" value="">
+		                            	<span class="input-group-btn">
+		                                	<button class="btn btn-primary" type="button" style="cursor:default;">cm</button>
+		                                </span>
+		                        	</div>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Berat Badan</label>
+		                        <div class="col-md-2">
+		                        	<div class="input-group">
+		                            	<input type="text" class="form-control num_only" name="berat_badan_sks" id="berat_badan_sks" value="">
+		                            	<span class="input-group-btn">
+		                                	<button class="btn btn-primary" type="button" style="cursor:default;">kg</button>
+		                                </span>
+		                        	</div>
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Tensi</label>
+		                        <div class="col-md-4">
+		                        	<input type="text" class="form-control" name="tensi" id="tensi" value="">
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+		                        <label class="col-md-2 control-label">Nadi</label>
+		                        <div class="col-md-4">
+		                        	<input type="text" class="form-control" name="nadi" id="nadi" value="">
+		                        </div>
+		                    </div>
+		                    <div class="form-group">
+								<label class="col-md-2 control-label">Dinyatakan bahwa yang diperiksa :</label>
+								<div class="col-md-5">&nbsp;</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-2 control-label">&nbsp;</label>
+								<div class="col-md-10">
+									<div class="radio radio-inline radio-success">
+		                                <input type="radio" id="inlineRadio1" value="A" name="dinyatakan">
+		                                <label for="inlineRadio1"> a. Sehat untuk bekerja </label>
+		                            </div>
+		                            <div class="radio radio-inline radio-success">
+		                                <input type="radio" id="inlineRadio2" value="B" name="dinyatakan">
+		                                <label for="inlineRadio2"> b. Tidak sehat untuk bekerja </label>
+		                            </div>
+		                            <div class="radio radio-inline radio-success">
+		                                <input type="radio" id="inlineRadio2" value="C" name="dinyatakan">
+		                                <label for="inlineRadio2"> c. Memenuhi syarat hanya untuk pekerjaan tertentu </label>
+		                            </div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-2 control-label">Untuk Keperluan</label>
+								<div class="col-md-8">
+									<textarea class="form-control" rows="5" id="untuk_keperluan" name="untuk_keperluan"></textarea>
+								</div>
+							</div>
+
+		                    <hr>
+
+		                    <center>
+		                    	<button type="button" class="btn btn-success" id="simpanSKS"><i class="fa fa-save"></i> <b>Simpan & Cetak</b></button>
+		                        <button type="reset" class="btn btn-danger" id="batalSKS"><i class="fa fa-times"></i> <b>Batal</b></button>
 		                    </center>
 		                </form>
 	                </div>

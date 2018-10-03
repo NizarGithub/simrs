@@ -1,11 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Admum_setup_peralatan_medis_c extends CI_Controller {
+class Admum_setup_nama_barang_c extends CI_Controller {
 
 	function __construct()
 	{
 		parent::__construct();
-		$this->load->model('finance/admum_setup_peralatan_medis_m','model');
+		$this->load->model('finance/admum_setup_nama_barang_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
 		$id_user = $sess_user['id'];
 		if($id_user == "" || $id_user == null){
@@ -16,16 +16,16 @@ class Admum_setup_peralatan_medis_c extends CI_Controller {
 	function index()
 	{
 		$data = array(
-			'page' => 'finance/admum_setup_peralatan_medis_v',
+			'page' => 'finance/admum_setup_nama_barang_v',
 			'title' => 'Peralatan Medis',
 			'subtitle' => 'Peralatan Medis',
 			'childtitle' => '',
 			'master_menu' => 'master_setup',
 			'view' => 'setup_nama_barang',
-			'url_simpan' => base_url().'finance/admum_setup_peralatan_medis_c/simpan',
-			'url_ubah' => base_url().'finance/admum_setup_peralatan_medis_c/ubah',
-			'url_hapus' => base_url().'finance/admum_setup_peralatan_medis_c/hapus',
-			'url_cetak' => base_url().'finance/admum_setup_peralatan_medis_c/cetak_excel',
+			'url_simpan' => base_url().'finance/admum_setup_nama_barang_c/simpan',
+			'url_ubah' => base_url().'finance/admum_setup_nama_barang_c/ubah',
+			'url_hapus' => base_url().'finance/admum_setup_nama_barang_c/hapus',
+			'url_cetak' => base_url().'finance/admum_setup_nama_barang_c/cetak_excel'
 		);
 
 		$this->load->view('finance/finance_home_v',$data);
@@ -45,7 +45,6 @@ class Admum_setup_peralatan_medis_c extends CI_Controller {
 
 	function kode_peralatan(){
 		$keterangan = "PERALATAN-MEDIS";
-		$tahun = date('Y');
 
 		$sql = "
 			SELECT 
@@ -128,7 +127,7 @@ class Admum_setup_peralatan_medis_c extends CI_Controller {
 		$this->insert_kode();
 
 		$this->session->set_flashdata('sukses','1');
-		redirect('finance/admum_setup_peralatan_medis_c');
+		redirect('finance/admum_setup_nama_barang_c');
 	}
 
 	function ubah(){
@@ -149,7 +148,7 @@ class Admum_setup_peralatan_medis_c extends CI_Controller {
 		$this->model->ubah($id,$barcode,$nama_alat,$id_merk,$jenis_alat);
 
 		$this->session->set_flashdata('ubah','1');
-		redirect('finance/admum_setup_peralatan_medis_c');
+		redirect('finance/admum_setup_nama_barang_c');
 	}
 
 	function hapus(){
@@ -157,7 +156,7 @@ class Admum_setup_peralatan_medis_c extends CI_Controller {
 		$this->model->hapus($id);
 
 		$this->session->set_flashdata('hapus','1');
-		redirect('finance/admum_setup_peralatan_medis_c');
+		redirect('finance/admum_setup_nama_barang_c');
 	}
 
 	function cek_barcode(){

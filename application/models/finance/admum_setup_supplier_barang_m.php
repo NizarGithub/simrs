@@ -12,7 +12,7 @@ class Admum_setup_supplier_barang_m extends CI_Model {
 		$where = "1 = 1";
 
 		if($keyword != ""){
-			$where = $where." AND (KODE_SUPPLIER LIKE '%$keyword%' OR NAMA_SUPPLIER LIKE '%$keyword%')";
+			$where = $where." AND (KODE_SUPPLIER LIKE '%$keyword%' OR NAMA_SUPPLIER LIKE '%$keyword%' OR ALAMAT LIKE '%$keyword%')";
 		}
 
 		$sql = "SELECT * FROM admum_supplier_barang WHERE $where ORDER BY ID DESC";
@@ -26,27 +26,23 @@ class Admum_setup_supplier_barang_m extends CI_Model {
 		return $query->row();
 	}
 
-	function simpan($kode_supplier,$nama_supplier,$merk,$alamat,$email,$telepon,$jenis_barang,$tanggal_daftar,$bulan,$tahun){
+	function simpan($kode_supplier,$nama_supplier,$alamat,$email,$telepon,$tanggal_daftar,$bulan,$tahun){
 		$sql = "
 			INSERT INTO admum_supplier_barang(
 				KODE_SUPPLIER,
 				NAMA_SUPPLIER,
-				MERK,
 				ALAMAT,
 				EMAIL,
 				TELEPON,
-				JENIS_BARANG,
 				TANGGAL_DAFTAR,
 				BULAN,
 				TAHUN
 			) VALUES (
 				'$kode_supplier',
 				'$nama_supplier',
-				'$merk',
 				'$alamat',
 				'$email',
 				'$telepon',
-				'$jenis_barang',
 				'$tanggal_daftar',
 				'$bulan',
 				'$tahun'

@@ -1,3 +1,10 @@
+<?php
+    $lock_user = $this->session->userdata('lock');
+    $id_user_lock = $lock_user['id_user'];
+    if($id_user_lock){
+        redirect('lockscreen_c');
+    }
+?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -120,7 +127,7 @@
                                     <?php } ?>
                                     <li><a href="javascript:void(0)"><i class="ti-user m-r-5"></i> Profile</a></li>
                                     <li><a href="javascript:void(0)"><i class="ti-settings m-r-5"></i> Settings</a></li>
-                                    <li><a href="javascript:void(0)"><i class="ti-lock m-r-5"></i> Lock screen</a></li>
+                                    <li><a href="<?php echo base_url(); ?>lockscreen_c"><i class="ti-lock m-r-5"></i> Lock screen</a></li>
                                     <li><a href="<?php echo base_url(); ?>logout"><i class="ti-power-off m-r-5"></i> Logout</a></li>
                                 </ul>
                             </li>

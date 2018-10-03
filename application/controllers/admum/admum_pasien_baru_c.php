@@ -8,10 +8,12 @@ class Admum_pasien_baru_c extends CI_Controller {
 		date_default_timezone_set('Asia/Jakarta');
 		$this->load->model('admum/admum_pasien_baru_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
+		$sess_lock = $this->session->userdata('lock');
     	$id_user = $sess_user['id'];
+    	$id_lock = $sess_lock['id_user'];
 	    if($id_user == "" || $id_user == null){
 	        redirect('portal');
-	    } 
+	    }
 	}
 
 	function index()

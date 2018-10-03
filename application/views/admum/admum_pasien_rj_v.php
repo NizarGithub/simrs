@@ -435,7 +435,7 @@ function load_poli(){
 
                     result[i].NAMA_DOKTER = result[i].NAMA_DOKTER==null?"-":result[i].NAMA_DOKTER;
 
-                    $tr += "<tr style='cursor:pointer;' onclick='klik_poli("+result[i].ID+");'>"+
+                    $tr += "<tr style='cursor:pointer;' onclick='klik_poli("+result[i].ID+","+result[i].WKT+");'>"+
                                 "<td style='text-align:center;'>"+no+"</td>"+
                                 "<td>"+poli+"</td>"+
                                 "<td>"+result[i].NAMA_DOKTER+"</td>"+

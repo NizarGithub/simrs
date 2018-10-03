@@ -118,7 +118,9 @@ class Admum_pasien_rj_m extends CI_Model {
 		$waktu = $format->format('H:i');
 		$and = '';
 
-		if($waktu > '21:00'){
+		if($waktu >= '21:00' && $waktu <= '24:00'){
+			$and = " AND POLI.`STATUS` != 'Normal'";
+		}else if($waktu >= '00:00' && $waktu <= '06:00'){
 			$and = " AND POLI.`STATUS` != 'Normal'";
 		}else{
 			$and = " AND POLI.`STATUS` != 'Malam'";

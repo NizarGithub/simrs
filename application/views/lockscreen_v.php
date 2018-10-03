@@ -10,7 +10,7 @@
         <link rel="shortcut icon" href="<?php echo base_url(); ?>assets/images/favicon.ico">
 
         <!-- App title -->
-        <title>Adminto - shared on themelock.com</title>
+        <title><?=$title;?></title>
 
         <!-- App CSS -->
         <link href="<?php echo base_url(); ?>assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -32,40 +32,60 @@
 
     </head>
     <body>
-
         <div class="account-pages"></div>
         <div class="clearfix"></div>
         <div class="wrapper-page">
             <div class="text-center">
-                <a href="index.html" class="logo"><span>Admin<span>to</span></span></a>
-                <h5 class="text-muted m-t-0 font-600">Responsive Admin Dashboard</h5>
+                <?php
+                    $sql_logo = "SELECT LOGO FROM admum_setup_logo WHERE POSISI = 'Hor'";
+                    $qry_logo = $this->db->query($sql_logo)->row();
+                    $logo = '';
+                    if($qry_logo->LOGO == null || $qry_logo->LOGO == ""){
+                        $logo = base_url().'picture/logo-default.png';
+                    }else{
+                        $logo = base_url().'picture/logo/'.$qry_logo->LOGO;
+                    }
+                ?> 
+                <img src="<?php echo $logo; ?>" style="max-height:150px; max-width:290px;">
             </div>
         	<div class="m-t-40 card-box">
                 <div class="text-center">
-                    <h4 class="text-uppercase font-bold m-b-0">Welcome Back</h4>
+                    <h4 class="text-uppercase font-bold m-b-0">Halaman Terkunci</h4>
                 </div>
                 <div class="panel-body">
-                    <form method="post" action="index.html" role="form" class="text-center">
+                    <?PHP if($this->session->flashdata('gagal_buka')){ ?>
+                    <div class="alert alert-danger alert-dismissable" style="color: #b96463; font-size: 15px;">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        Maaf, Password Anda salah.
+                    </div>
+                    <?PHP } ?>
+                    <form method="post" action="<?php echo base_url(); ?>lockscreen_c/unlock" role="form" class="text-center">
 						<div class="user-thumb">
-							<img src="<?php echo base_url(); ?>assets/images/users/avatar-1.jpg" class="img-responsive img-circle img-thumbnail" alt="thumbnail">
+							<img src="<?php echo base_url(); ?>picture/lock.png" class="img-responsive img-circle img-thumbnail" alt="thumbnail">
 						</div>
 						<div class="form-group">
-							<p class="text-muted m-t-10">
-								Enter your password to access the admin.
-							</p>
+							<?php
+                                $sess_user = $this->session->userdata('masuk_rs');
+                                $id_user = $sess_user['id'];
+                                $sql = "
+                                    SELECT
+                                        a.NAMA
+                                    FROM kepeg_pegawai a
+                                    WHERE a.ID = '$id_user'
+                                ";
+                                $qry = $this->db->query($sql)->row();
+                            ?>
+                            <h4 class="m-t-10 header-title"><b><?php echo $qry->NAMA; ?></b></h4>
 							<div class="input-group m-t-30">
-								<input type="password" class="form-control" placeholder="Password" required="">
+								<input type="password" class="form-control" name="password" placeholder="Password" required="">
 								<span class="input-group-btn">
-									<button type="submit" class="btn btn-pink w-sm waves-effect waves-light">
-										Log In
+									<button type="submit" class="btn btn-primary w-sm waves-effect waves-light">
+										Buka
 									</button>
 								</span>
 							</div>
 						</div>
-
 					</form>
-
-
                 </div>
             </div>
             <!-- end card-box -->

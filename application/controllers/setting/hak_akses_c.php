@@ -5,6 +5,7 @@ class Hak_akses_c extends CI_Controller {
 	function __construct() 
 	{
 		parent::__construct(); 
+		error_reporting(0);
 		$sess_user = $this->session->userdata('masuk_rs');  
 		$id_user = $sess_user['id']; 
 		if($id_user == "" || $id_user == null){

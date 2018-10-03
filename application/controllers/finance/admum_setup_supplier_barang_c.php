@@ -44,18 +44,8 @@ class Admum_setup_supplier_barang_c extends CI_Controller {
 	}
 
 	function kode_supplier(){
-		$jenis_barang = $this->input->post('jenis_barang');
-		$keterangan = "";
+		$keterangan = "SUPPLIER-BARANG";
 		$tahun = date('Y');
-		$kode_brg = "";
-
-		if($jenis_barang == 'Inventaris'){
-			$kode_brg = "SUPINV-";
-			$keterangan = "SUPPLIER-BARANG-INVENTARIS";
-		}else{
-			$kode_brg = "SUPPMD-";
-			$keterangan = "SUPPLIER-BARANG-MEDIS";
-		}
 
 		$sql = "
 			SELECT 
@@ -71,13 +61,13 @@ class Admum_setup_supplier_barang_c extends CI_Controller {
 		//SUPBRG-001/2016
 		if($total == 0){
 			$no = $this->add_leading_zero(1,3);
-			$kode = $kode_brg.$no."/".$tahun;
+			$kode = "SUP".$no."/".$tahun;
 		}else{
 			$s = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan' AND TAHUN = '$tahun'";
 			$q = $this->db->query($s)->row();
 			$next = $q->NEXT+1;
 			$no = $this->add_leading_zero($next,3);
-			$kode = $kode_brg.$no."/".$tahun;
+			$kode = "SUP".$no."/".$tahun;
 		}
 
 		echo json_encode($kode);
@@ -122,16 +112,14 @@ class Admum_setup_supplier_barang_c extends CI_Controller {
 	function simpan(){
 		$kode_supplier = $this->input->post('kode_supplier');
 		$nama_supplier = $this->input->post('nama_supplier');
-		$merk = $this->input->post('merk');
 		$alamat = $this->input->post('alamat');
 		$email = $this->input->post('email');
 		$telepon = $this->input->post('telepon');
-		$jenis_barang = $this->input->post('jenis_barang');
 		$tanggal_daftar = date('d-m-Y');
 		$bulan = date('n');
 		$tahun = date('Y');
 
-		$this->model->simpan($kode_supplier,$nama_supplier,$merk,$alamat,$email,$telepon,$jenis_barang,$tanggal_daftar,$bulan,$tahun);
+		$this->model->simpan($kode_supplier,$nama_supplier,$alamat,$email,$telepon,$tanggal_daftar,$bulan,$tahun);
 		$this->insert_kode_supplier();
 
 		$this->session->set_flashdata('sukses','1');

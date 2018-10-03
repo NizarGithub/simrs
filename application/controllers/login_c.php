@@ -25,14 +25,22 @@ class Login_c extends CI_Controller {
 
 		$sql = "
 			SELECT
-				a.*,
+				a.ID,
+				a.NAMA,
+				a.USERNAME,
+				a.ID_DEPARTEMEN,
+				a.ID_DIVISI,
+				a.`LEVEL`,
+				a.STS_LOGIN,
 				b.NAMA AS JABATAN,
 				c.NAMA_DEP,
-				d.NAMA_DIV
+				d.NAMA_DIV,
+				e.ID AS ID_POLI
 			FROM kepeg_pegawai a
 			LEFT JOIN kepeg_kel_jabatan b ON a.ID_JABATAN = b.ID
 			LEFT JOIN kepeg_departemen c ON a.ID_DEPARTEMEN = c.ID
 			LEFT JOIN kepeg_divisi d ON a.ID_DIVISI = d.ID
+			LEFT JOIN admum_poli e ON e.ID_PEG_DOKTER = a.ID
 			WHERE a.USERNAME = '$user' AND a.PASSWORD = '$pass'
 		";
 		$qry = $this->db->query($sql);
@@ -49,7 +57,8 @@ class Login_c extends CI_Controller {
 				'departemen' => $data->NAMA_DEP,
 				'divisi' => $data->NAMA_DIV,
 				'level' => $data->LEVEL,
-				'sts_login' => $data->STS_LOGIN
+				'sts_login' => $data->STS_LOGIN,
+				'id_poli' => $data->ID_POLI
 			);
 
 			$this->session->set_userdata('masuk_rs', $sess_array);

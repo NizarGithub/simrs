@@ -77,9 +77,9 @@ class Poli_home_m extends CI_Model {
 		}
 
 		if($hasil_cek == 'True'){
-			$where = $where." AND c.ID_DIVISI = '$id_divisi' AND b.STS_POSISI = '$posisi'";
+			$where = $where." AND b.ID_POLI = '$id_divisi' AND b.STS_POSISI = '$posisi'";
 		}else{
-			if($level == null){
+			if($level == null || $level == 'Super Admin'){
 				if($poli == 'Semua'){
 					$where = $where;
 				}else{
@@ -117,7 +117,7 @@ class Poli_home_m extends CI_Model {
 				}else{
 					$where = $where." 
 						AND b.TANGGAL = '$now'
-						AND c.ID_DIVISI = '$id_divisi' 
+						AND b.ID_POLI = '$id_divisi' 
 						AND b.STS_POSISI = '$posisi' 
 						AND b.STS_TERIMA = '1'
 					";
@@ -126,9 +126,16 @@ class Poli_home_m extends CI_Model {
 		}
 
 		$sql = "
-			SELECT 
-				PSN.*,
+			SELECT
 				b.ID AS ID_RJ,
+				PSN.ID,
+				PSN.KODE_PASIEN,
+				PSN.NAMA,
+				PSN.JENIS_KELAMIN,
+				PSN.TANGGAL_LAHIR,
+				PSN.UMUR,
+				PSN.UMUR_BULAN,
+				PSN.ALAMAT,
 				b.TANGGAL,
 				b.WAKTU,
 				b.BULAN,
@@ -297,7 +304,7 @@ class Poli_home_m extends CI_Model {
 		if($level == null){
 			$where = $where;
 		}else{
-			$where = $where." AND c.ID_DIVISI = '$id_divisi' AND b.STS_POSISI = '$posisi' AND b.TANGGAL = '$now'";
+			$where = $where." AND b.ID_POLI = '$id_divisi' AND b.STS_POSISI = '$posisi' AND b.TANGGAL = '$now'";
 		}
 
 		$sql = "
@@ -320,7 +327,7 @@ class Poli_home_m extends CI_Model {
 		if($level == null){
 			$where = $where;
 		}else{
-			$where = $where." AND c.ID_DIVISI = '$id_divisi' AND b.STS_POSISI = '$posisi' AND b.TANGGAL = '$now'";
+			$where = $where." AND b.ID_POLI = '$id_divisi' AND b.STS_POSISI = '$posisi' AND b.TANGGAL = '$now'";
 		}
 
 		$sql = "

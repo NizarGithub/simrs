@@ -61,7 +61,7 @@ function get_pegawai(){
             var isine = '';
 
             if(result.length == 0){
-                isine = "<tr><td colspan='4' style='text-align:center'><b style='font-size: 15px;'> Data tidak tersedia </b></td></tr>";
+                isine = "<tr><td colspan='6' style='text-align:center'><b style='font-size: 15px;'> Data tidak tersedia </b></td></tr>";
             }else{
                 var no = 0;
 
@@ -72,10 +72,19 @@ function get_pegawai(){
                         username = "(Tanpa username)";
                     }
 
+                    var poli = '';
+                    if(res.NAMA_POLI == null){
+                        poli = '-';
+                    }else{
+                        poli = res.NAMA_POLI+' - '+res.STATUS;
+                    }
+
                     isine += '<tr onclick="get_data_pegawai('+res.ID+');" style="cursor:pointer;">'+
                                 '<td align="center">'+no+'</td>'+
                                 '<td align="center">'+res.NIP+'</td>'+
                                 '<td align="left">'+res.NAMA+'</td>'+
+                                '<td align="left">'+res.JABATAN+'</td>'+
+                                '<td align="left">'+poli+'</td>'+
                                 '<td align="center">'+username+'</td>'+
                             '</tr>';
                 });
@@ -101,6 +110,7 @@ function get_data_pegawai(id){
         dataType : "json",
         success : function(res){
             $('#nama_pegawai').val(res.NAMA);
+            $('#poli').val(res.NAMA_POLI);
             $('#username').val(res.USERNAME);
             $('#id_pegawai').val(id);
 
@@ -112,7 +122,12 @@ function get_data_pegawai(id){
                 $('#inlineRadio2').prop('checked', true);
             }
 
-            $('#foto_head').attr('src','<?=base_url();?>files/foto_pegawai/'+res.FOTO);
+            if(res.FOTO != null || res.FOTO != ""){
+                $('#foto_head').attr('src','<?=base_url();?>files/foto_pegawai/'+res.FOTO);
+            }else{
+                $('#foto_head').attr('src','<?=base_url();?>files/foto_pegawai/default_pics_of_rs_jt.png');
+            }
+
 
             if(res.PASSWORD == null || res.PASSWORD == ""){
                 $("#pass1").prop('required',true);
@@ -248,6 +263,13 @@ function cek_username_submit(){
                         </div>
 
                         <div class="form-group">
+                            <label class="col-md-2 control-label" style="color: #0099e5;"> Poli </label>
+                            <div class="col-md-6">
+                                <input name="poli" id="poli" class="form-control" value="" type="text" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
                             <label class="col-md-2 control-label" style="color: #0099e5;"> Status Akun </label>
                             <div class="col-md-6">
                                 <div class="radio radio-primary radio-inline">
@@ -331,7 +353,7 @@ function cek_username_submit(){
 <!-- sample modal content -->
 <button id="popup_pegawai" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal">Standard Modal</button>
 <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -341,7 +363,7 @@ function cek_username_submit(){
                 <form class="form-horizontal">
                     <div class="form-group">
                         <div class="col-md-12">
-                            <input id="cari_pegawai" class="form-control" type="text" value="">
+                            <input id="cari_pegawai" class="form-control" type="text" value="" placeholder="Cari pegawai...">
                         </div>
                     </div>
                 </form>
@@ -352,6 +374,8 @@ function cek_username_submit(){
                                <th style="text-align:center;">NO</th>
                                <th style="text-align:center;" style="white-space:nowrap;"> NIP </th>
                                <th style="text-align:center;"> NAMA </th>
+                               <th style="text-align:center;"> JABATAN </th>
+                               <th style="text-align:center;"> POLI </th>
                                <th style="text-align:center;"> USERNAME </th>
                            </tr>
                        </thead>
@@ -363,7 +387,7 @@ function cek_username_submit(){
                <div id="tablePaging"> </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="btn_tutup" class="btn btn-default waves-effect" data-dismiss="modal">Tutup</button>
+                <button type="button" id="btn_tutup" class="btn btn-inverse waves-effect" data-dismiss="modal">Tutup</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

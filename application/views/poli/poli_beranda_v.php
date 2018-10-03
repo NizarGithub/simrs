@@ -2,7 +2,7 @@
 <?php
 $sess_user = $this->session->userdata('masuk_rs');
 $id_user = $sess_user['id'];
-$id_divisi = $sess_user['id_divisi']; //ID POLI
+$id_divisi = $sess_user['id_poli']; //ID POLI
 $user = $this->master_model_m->get_user_info($id_user);
 $level = $user->LEVEL;
 ?>

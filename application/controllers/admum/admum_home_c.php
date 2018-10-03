@@ -18,8 +18,8 @@ class Admum_home_c extends CI_Controller {
 	{
 		$data = array(
 			'page' => 'admum/admum_beranda_v',
-			'title' => 'Administrasi Umum',
-			'subtitle' => 'Administrasi Umum',
+			'title' => 'Admission',
+			'subtitle' => 'Admission',
 			'childtitle' => '',
 			'master_menu' => 'home',
 			'view' => 'home',

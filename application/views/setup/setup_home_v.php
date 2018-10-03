@@ -69,9 +69,19 @@
             <div class="topbar-main" style="background-color:#faae40; height:60px;">
                 <div class="container">
                     <!-- LOGO -->
+                    <?php
+                        $sql_logo = "SELECT LOGO FROM admum_setup_logo WHERE POSISI = 'Hor'";
+                        $qry_logo = $this->db->query($sql_logo)->row();
+                        $logo = '';
+                        if($qry_logo->LOGO == null || $qry_logo->LOGO == ""){
+                            $logo = base_url().'picture/logo-default.png';
+                        }else{
+                            $logo = base_url().'picture/logo/'.$qry_logo->LOGO;
+                        }
+                    ?>
                     <div class="topbar-left">
-                        <a href="<?php echo base_url(); ?>portal" class="logo" style="margin-top:4px;">
-                            <img src="<?php echo base_url(); ?>picture/jtech-logo.png" style="max-width:150px; max-height:40px;">
+                        <a href="javascript:;" class="logo" style="margin-top:4px;">
+                            <img src="<?php echo $logo; ?>" style="max-width:150px; max-height:40px;">
                         </a>
                     </div>
                     <!-- End Logo container-->
@@ -97,7 +107,7 @@
                                     <img src="<?php echo base_url(); ?>files/foto_pegawai/<?php echo $user->FOTO;?>" alt="user-img" class="img-circle user-img">
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <?php if($level == null){ ?>
+                                    <?php if($level == null || $level == 'Super Admin'){ ?>
                                     <li><a href="<?php echo base_url(); ?>portal"><i class="fa fa-th m-r-5"></i> Portal Depan</a></li>
                                     <?php } ?>
                                     <li><a href="javascript:void(0)"><i class="ti-user m-r-5"></i> Profile</a></li>

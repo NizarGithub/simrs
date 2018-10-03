@@ -20,14 +20,6 @@ $(document).ready(function(){
     data_supplier();
 
     $('#btn_tambah').click(function(){
-    	$('#ket').val('Tambah');
-    });
-
-    $("input[name='jenis_barang']").click(function(){
-    	get_kode_supplier();
-    });
-
-    $('#jenis_barang_ubah').change(function(){
     	get_kode_supplier();
     });
 
@@ -57,26 +49,12 @@ $(document).ready(function(){
 });
 
 function get_kode_supplier(){
-	var ket = $('#ket').val();
-	var jenis_barang = "";
-
-	if(ket == 'Tambah'){
-		jenis_barang = $("input[name='jenis_barang']:checked").val();
-	}else{
-		jenis_barang = $('#jenis_barang_ubah').val();
-	}
-
 	$.ajax({
         url : '<?php echo base_url(); ?>finance/admum_setup_supplier_barang_c/kode_supplier',
-        data : {jenis_barang:jenis_barang},
         type : "POST",
         dataType : "json",
         success : function(kode){
-        	if(ket == 'Tambah'){
-        		$('#kode_supplier').val(kode);
-        	}else{
-        		$('#kode_supplier_ubah').val(kode);
-        	}
+        	$('#kode_supplier').val(kode);
         }
     });
 }
@@ -128,31 +106,27 @@ function data_supplier(){
         	$tr = "";
 
         	if(result == "" || result == null){
-        		$tr = "<tr><td colspan='8' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+        		$tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
         	}else{
         		var no = 0;
 
         		for(var i=0; i<result.length; i++){
         			no++;
 
-        			var aksi =  '<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_supplier('+result[i].ID+');">'+
+        			var aksi =  '<button type="button" class="btn btn-success waves-effect waves-light btn-sm" onclick="ubah_supplier('+result[i].ID+');">'+
 									'<i class="fa fa-pencil"></i>'+
 								'</button>&nbsp;'+
-						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_supplier('+result[i].ID+');">'+
+						   		'<button type="button" class="btn btn-danger waves-effect waves-light btn-sm" onclick="hapus_supplier('+result[i].ID+');">'+
 						   			'<i class="fa fa-trash"></i>'+
 						   		'</button>';
 
         			$tr += "<tr>"+
-        						"<td style='text-align:center;'>"+no+"</td>"+
-        						"<td>"+
-        							result[i].NAMA_SUPPLIER+"<br/>"+
-        							"<small>"+result[i].KODE_SUPPLIER+"</small>"+
-        						"</td>"+
-        						"<td>"+result[i].JENIS_BARANG+"</td>"+
-        						"<td>"+result[i].MERK+"</td>"+
-        						"<td>"+result[i].ALAMAT+"</td>"+
-        						"<td>"+result[i].EMAIL+"</td>"+
-        						"<td style='text-align:center;'>"+result[i].TELEPON+"</td>"+
+        						"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
+        						"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_SUPPLIER+"</td>"+
+        						"<td style='vertical-align:middle;'>"+result[i].NAMA_SUPPLIER+"</td>"+
+        						"<td style='vertical-align:middle;'>"+result[i].ALAMAT+"</td>"+
+        						"<td style='vertical-align:middle;'>"+result[i].EMAIL+"</td>"+
+        						"<td style='vertical-align:middle; text-align:center;'>"+result[i].TELEPON+"</td>"+
         						"<td align='center'>"+aksi+"</td>"+
         					"</tr>";
         		}
@@ -190,7 +164,6 @@ function onEnterText(e){
 function ubah_supplier(id){
 	$('#view_ubah').show();
 	$('#view_data').hide();
-	$('#ket').val('Ubah');
 
 	$.ajax({
 		url : '<?php echo base_url(); ?>finance/admum_setup_supplier_barang_c/data_supplier_id',
@@ -217,7 +190,6 @@ function ubah_supplier(id){
 	$('#batal_ubah').click(function(){
 		$('#view_ubah').hide();
 		$('#view_data').show();
-		$('#ket').val("");
 	});
 }
 
@@ -243,8 +215,6 @@ function hapus_supplier(id){
         <img src="<?=base_url()?>picture/progress.gif" height="100" width="125">
     </div>
 </div>
-
-<input type="hidden" id="ket" value="">
 
 <div class="col-lg-12">
 	<div class="card-box card-tabs" id="view_data">
@@ -280,6 +250,9 @@ function hapus_supplier(id){
 			                    	</button>
 			                    </span>
 			                </div>
+			                <span class="help-block" style="margin-bottom: 0px;">
+		                        <small><i>*pencarian berdasarkan Kode Supplier, Nama Supplier dan Alamat, lalu tekan Enter</i></small>
+		                    </span>
 		                </div>
 		            </div>
 		        </form>
@@ -288,16 +261,14 @@ function hapus_supplier(id){
 		                <thead>
 		                    <tr class="biru">
 		                        <th style="color:#fff; text-align:center;" width="50">No</th>
+		                        <th style="color:#fff; text-align:center;">Kode Supplier</th>
 		                        <th style="color:#fff; text-align:center;">Nama Supplier</th>
-		                        <th style="color:#fff; text-align:center;">Jenis Barang</th>
-		                        <th style="color:#fff; text-align:center;">Merk</th>
 		                        <th style="color:#fff; text-align:center;">Alamat</th>
 		                        <th style="color:#fff; text-align:center;">Email</th>
 		                        <th style="color:#fff; text-align:center;">Telepon</th>
 		                        <th style="color:#fff; text-align:center;">Aksi</th>
 		                    </tr>
 		                </thead>
-
 		                <tbody>
 		                    
 		                </tbody>
@@ -330,19 +301,6 @@ function hapus_supplier(id){
                     <div class="col-md-12">
                         <form class="form-horizontal" role="form" action="<?php echo $url_simpan; ?>" method="post">
                         	<div class="form-group">
-				            	<label class="col-md-2 control-label">Jenis Barang</label>
-		            			<div class="col-md-4">
-		                			<div class="radio radio-success radio-inline">
-		                                <input type="radio" name="jenis_barang" value="Inventaris">
-		                                <label for="nama_poli"> Inventaris </label>
-		                            </div>
-		                            <div class="radio radio-success radio-inline">
-		                                <input type="radio" name="jenis_barang" value="Peralatan Medis">
-		                                <label for="jenis"> Peralatan Medis </label>
-		                            </div>
-		            			</div>
-				            </div>
-                        	<div class="form-group">
 		                        <label class="col-md-2 control-label">Kode Supplier</label>
 		                        <div class="col-md-4">
 		                            <input type="text" class="form-control" name="kode_supplier" id="kode_supplier" value="" readonly>
@@ -352,12 +310,6 @@ function hapus_supplier(id){
 		                        <label class="col-md-2 control-label">Nama Supplier</label>
 		                        <div class="col-md-4">
 		                            <input type="text" class="form-control" name="nama_supplier" value="" required="required">
-		                        </div>
-		                    </div>
-		                    <div class="form-group">
-		                        <label class="col-md-2 control-label">Merk</label>
-		                        <div class="col-md-4">
-		                            <input type="text" class="form-control" name="merk" value="" required="required">
 		                        </div>
 		                    </div>
 		                    <div class="form-group">
@@ -378,6 +330,7 @@ function hapus_supplier(id){
 		                            <input type="text" class="form-control num_only" name="telepon" value="" required="required" maxlength="12">
 		                        </div>
 		                    </div>
+		                    <hr>
 		                    <div class="form-group">
 		                        <label class="col-md-2 control-label">&nbsp;</label>
 		                        <div class="col-md-3">

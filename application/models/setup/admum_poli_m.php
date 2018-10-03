@@ -54,7 +54,7 @@ class Admum_poli_m extends CI_Model {
 		$order = "";
 
 		if($keyword != ""){
-			$where = $where." AND (POLI.NAMA LIKE '%$keyword%' OR POLI.INITIAL_POLI LIKE '%$keyword%')";
+			$where = $where." AND (POLI.NAMA LIKE '%$keyword%')";
 		}else{
 			$where = $where;
 		}

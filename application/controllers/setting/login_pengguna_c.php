@@ -89,12 +89,23 @@ class Login_pengguna_c extends CI_Controller {
 		$where = "1=1";
 		$keyword = $this->input->post('keyword');
 		if($keyword != "" || $keyword != null){
-			$where = $where." AND (NIP LIKE '%$keyword%' OR NAMA LIKE '%$keyword%' OR USERNAME LIKE '%$keyword%')";
+			$where = $where." AND (a.NIP LIKE '%$keyword%' OR a.NAMA LIKE '%$keyword%' OR a.USERNAME LIKE '%$keyword%' OR c.NAMA LIKE '%$keyword%')";
 		}
 
 		$sql = "
-		SELECT * FROM kepeg_pegawai WHERE $where
-		ORDER BY ID ASC
+			SELECT 
+				a.ID, 
+				a.NIP, 
+				a.NAMA, 
+				a.USERNAME,
+				b.NAMA AS NAMA_POLI,
+				b.STATUS,
+				c.NAMA AS JABATAN
+			FROM kepeg_pegawai a
+			LEFT JOIN admum_poli b ON b.ID_PEG_DOKTER = a.ID
+			LEFT JOIN kepeg_kel_jabatan c ON a.ID_JABATAN = c.ID
+			WHERE $where
+			ORDER BY a.ID ASC
 		";
 
 		$dt = $this->db->query($sql)->result();
@@ -106,7 +117,19 @@ class Login_pengguna_c extends CI_Controller {
 		$id = $this->input->post('id');
 
 		$sql = "
-		SELECT * FROM kepeg_pegawai WHERE ID = $id
+			SELECT 
+				a.ID, 
+				a.NIP, 
+				a.NAMA,
+				a.FOTO,
+				a.USERNAME,
+				a.PASSWORD,
+				a.LEVEL,
+				b.NAMA AS NAMA_POLI,
+				b.STATUS
+			FROM kepeg_pegawai a
+			LEFT JOIN admum_poli b ON b.ID_PEG_DOKTER = a.ID
+			WHERE a.ID = '$id'
 		";
 
 		$dt = $this->db->query($sql)->row();

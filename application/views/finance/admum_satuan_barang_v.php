@@ -259,6 +259,7 @@ function hapus_satuan(id){
                     </div>
 		        </form>
             </div>
+            
             <div id="cardpills-2" class="tab-pane fade in">
             	<div class="row">
                     <div class="col-md-12">

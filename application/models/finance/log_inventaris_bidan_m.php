@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Log_peralatan_medis_m extends CI_Model {
+class Log_inventaris_bidan_m extends CI_Model {
 
 	function __construct()
 	{
@@ -12,20 +12,17 @@ class Log_peralatan_medis_m extends CI_Model {
 		$where = "1 = 1";
 
 		if($keyword != ""){
-			$where = $where." AND (MEDIS.KODE_ALAT LIKE '%$keyword%' OR MEDIS.BARCODE LIKE '%$keyword%' OR MEDIS.NAMA_ALAT LIKE '%$keyword%')";
+			$where = $where." AND (MEDIS.KODE_ALAT LIKE '%$keyword%' OR MEDIS.NAMA_ALAT LIKE '%$keyword%')";
 		}
 
 		$sql = "
 			SELECT
 				MEDIS.ID,
 				MEDIS.KODE_ALAT,
-				MEDIS.BARCODE,
-				MEDIS.NAMA_ALAT,
-				SUP.MERK,
-				MEDIS.JENIS_ALAT
+				MEDIS.NAMA_ALAT
 			FROM admum_setup_peralatan_medis MEDIS
-			LEFT JOIN admum_supplier_barang SUP ON SUP.ID = MEDIS.ID_MERK
 			WHERE $where
+			ORDER BY MEDIS.ID ASC
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
@@ -63,16 +60,16 @@ class Log_peralatan_medis_m extends CI_Model {
 
 	function get_edit_data($id){
 		$sql = $this->db->query("SELECT
-															*,
-															a.ID AS ID_LOG
-															FROM log_peralatan_medis a
-															LEFT JOIN admum_setup_peralatan_medis b ON a.ID_SETUP_NAMA_ALAT=b.ID
-															LEFT JOIN admum_supplier_barang SUP ON b.ID_MERK=SUP.ID
-															LEFT JOIN kepeg_departemen c ON a.ID_DEPARTEMEN=c.ID
-															LEFT JOIN kepeg_divisi d ON a.ID_DIVISI=d.ID
-															LEFT JOIN obat_satuan e ON a.ID_SATUAN_ALAT=e.ID
-															WHERE a.ID = '$id'
-														");
+									*,
+									a.ID AS ID_LOG
+									FROM log_peralatan_medis a
+									LEFT JOIN admum_setup_peralatan_medis b ON a.ID_SETUP_NAMA_ALAT=b.ID
+									LEFT JOIN admum_supplier_barang SUP ON b.ID_MERK=SUP.ID
+									LEFT JOIN kepeg_departemen c ON a.ID_DEPARTEMEN=c.ID
+									LEFT JOIN kepeg_divisi d ON a.ID_DIVISI=d.ID
+									LEFT JOIN obat_satuan e ON a.ID_SATUAN_ALAT=e.ID
+									WHERE a.ID = '$id'
+								");
 		return $sql->row();
 	}
 
@@ -88,8 +85,14 @@ class Log_peralatan_medis_m extends CI_Model {
 		return $query->row();
 	}
 
-	function data_departemen(){
-		$sql = "SELECT * FROM kepeg_departemen ORDER BY ID DESC";
+	function data_departemen($keyword){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND NAMA_DEP LIKE '%$keyword%'";
+		}
+
+		$sql = "SELECT * FROM kepeg_departemen WHERE $where ORDER BY ID DESC";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
@@ -100,8 +103,14 @@ class Log_peralatan_medis_m extends CI_Model {
 		return $query->row();
 	}
 
-	function data_divisi($id_departemen){
-		$sql = "SELECT * FROM kepeg_divisi WHERE ID_DEPARTEMEN = '$id_departemen' ORDER BY ID DESC";
+	function data_divisi($keyword,$id_departemen){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND NAMA_DIV LIKE '%$keyword%'";
+		}
+
+		$sql = "SELECT * FROM kepeg_divisi WHERE $where AND ID_DEPARTEMEN = '$id_departemen' ORDER BY ID DESC";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
@@ -136,9 +145,7 @@ class Log_peralatan_medis_m extends CI_Model {
 			SELECT
 				MEDIS.ID,
 				ALAT.KODE_ALAT,
-				ALAT.BARCODE,
 				ALAT.NAMA_ALAT,
-				ALAT.JENIS_ALAT,
 				SAT.NAMA_SATUAN,
 				MEDIS.PEMAKAIAN,
 				MEDIS.JUMLAH,

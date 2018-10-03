@@ -629,64 +629,6 @@ a {
 ?>
 
 <div class="row">
-<?PHP 
-    $get_menu2 = $this->master_model_m->get_menu_2($id_user, 1);
-    foreach ($get_menu2 as $key => $menu2) {
-        $link = base_url().$menu2->LINK;
-        $icon = base_url().$menu2->GAMBAR_ICON;
-        if($menu2->LINK != null || $menu2->LINK != ""){
-            $id1 = $menu2->ID;
-            $text1 = "";
-            if($id1 % 2 == 0){
-                $text1 = "text-custom";
-            }else{
-                $text1 = "text-success";
-            }
-?>
-    <div class="col-lg-2 col-md-6" onclick="klik_menu('<?php echo $link; ?>');" style="cursor: pointer;">
-        <div class="card-box widget-user">
-            <div>
-                <img alt="user" class="img-responsive img-circle" src="<?php echo $icon; ?>">
-                <div class="wid-u-info">
-                    <h4 class="m-t-0 m-b-5"><?php echo $menu2->NAMA; ?></h4>
-                </div>
-                <small class="<?php echo $text1; ?>" style="margin-left: 20px;"><b><?php echo str_replace('_', ' ', strtoupper($menu2->VIEW)); ?></b></small>
-            </div>
-        </div>
-    </div>
-<?php
-        }else{
-            $get_menu3 = $this->master_model_m->get_menu_3($id_user, $menu2->ID);
-                foreach ($get_menu3 as $key => $menu3) {
-                    $link3 = base_url().$menu3->LINK;
-                    $icon3 = base_url().$menu3->GAMBAR_ICON;
-                    $id = $menu3->ID;
-                    $text = "";
-                    if($id % 2 == 0){
-                        $text = "text-success";
-                    }else{
-                        $text = "text-custom";
-                    }
-?>
-    <div class="col-lg-2 col-md-6" onclick="klik_menu('<?php echo $link3; ?>');" style="cursor: pointer;">
-        <div class="card-box widget-user">
-            <div>
-                <img alt="user" class="img-responsive img-circle" src="<?php echo $icon3; ?>">
-                <div class="wid-u-info">
-                    <h4 class="m-t-0 m-b-5"><?php echo $menu3->NAMA; ?></h4>
-                    <small class="<?php echo $text; ?>"><b><?php echo str_replace('_', ' ', strtoupper($menu3->VIEW)); ?></b></small>
-                </div>
-            </div>
-        </div>
-    </div>
-<?php
-                }
-        }
-    }
-?>
-</div>
-
-<div class="row">
     <div class="col-lg-12" id="view_data">
         <div class="card-box">
             <form class="form-horizontal" role="form" action="" method="post">

@@ -45,11 +45,11 @@ $(document).ready(function(){
 	});
 
 	$('#batal').click(function(){
-		window.location = "<?php echo base_url(); ?>finance/log_peralatan_medis_c";
+		window.location = "<?php echo base_url(); ?>finance/log_inventaris_bidan_c";
 	});
 
 	$('#batal_ubah').click(function(){
-		window.location = "<?php echo base_url(); ?>finance/log_peralatan_medis_c";
+		window.location = "<?php echo base_url(); ?>finance/log_inventaris_bidan_c";
 	});
 
 	$('#kode_alat').click(function(){
@@ -100,6 +100,7 @@ $(document).ready(function(){
 		get_divisi();
 	});
 });
+
 function load_nama_alat(){
 	var keyword = $('#cari_nama_alat').val();
 
@@ -108,7 +109,7 @@ function load_nama_alat(){
 	}
 
 	ajax = $.ajax({
-		url : '<?php echo base_url()?>finance/log_peralatan_medis_c/load_nama_alat',
+		url : '<?php echo base_url()?>finance/log_inventaris_bidan_c/load_nama_alat',
 		data : {keyword:keyword},
 		type : "GET",
 		dataType : "json",
@@ -116,7 +117,7 @@ function load_nama_alat(){
 			$tr = "";
 
 			if(result == "" || result == null){
-				$tr = "<tr><td colspan='5' style='text-align:center;'><b>Data tidak ditemukan</b></td></tr>";
+				$tr = "<tr><td colspan='3' style='text-align:center;'><b>Data tidak ditemukan</b></td></tr>";
 			}else{
 				var no = 0;
 				for(var i=0; i<result.length; i++){
@@ -125,9 +126,7 @@ function load_nama_alat(){
 					$tr += "<tr style='cursor:pointer;' onclick='klik_nama_alat("+result[i].ID+");'>"+
 								"<td style='text-align:center;'>"+no+"</td>"+
 								"<td style='text-align:center;'>"+result[i].KODE_ALAT+"</td>"+
-								"<td style='text-align:center;'>"+result[i].BARCODE+"</td>"+
 								"<td>"+result[i].NAMA_ALAT+"</td>"+
-								"<td>"+result[i].MERK+"</td>"+
 							"</tr>";
 				}
 			}
@@ -145,7 +144,7 @@ function klik_nama_alat(id){
 	$('#tutup_nama_alat').click();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/klik_nama_alat',
+		url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/klik_nama_alat',
 		data : {id:id},
 		type : "POST",
 		dataType : "json",
@@ -199,7 +198,7 @@ function get_satuan(){
 	}
 
 	ajax = $.ajax({
-        url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/data_satuan',
+        url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/data_satuan',
         data : {keyword:keyword},
         type : "GET",
         dataType : "json",
@@ -232,16 +231,19 @@ function get_satuan(){
 
 function get_departemen(){
 	var keyword = $('#cari_departemen').val();
+
 	if(ajax){
 		ajax.abort();
 	}
+
 	ajax = $.ajax({
-        url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/data_departemen',
+        url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/data_departemen',
         data : {keyword:keyword},
         type : "GET",
         dataType : "json",
         success : function(result){
             $tr = "";
+
             if(result == "" || result == null){
             	$tr = "<tr><td colspan='2' style='text-align:center;'><b>Data tidak ditemukan</b></td></tr>";
             }else{
@@ -249,11 +251,12 @@ function get_departemen(){
 	            for(var i=0; i<result.length; i++){
 	            	no++;
 	             $tr += '<tr style="cursor:pointer;" onclick="klik_departemen('+result[i].ID+');">'+
-	            					'<td style="text-align:center;">'+no+'</td>'+
-	            					'<td style="text-align:center;">'+result[i].NAMA_DEP+'</td>'+
-	            				'</tr>';
+        					'<td style="text-align:center;">'+no+'</td>'+
+        					'<td>'+result[i].NAMA_DEP+'</td>'+
+        				'</tr>';
 	            }
             }
+
             $('#tabel_departemen tbody').html($tr);
         }
     });
@@ -266,64 +269,73 @@ function get_departemen(){
 function get_divisi(){
 	var keyword = $('#cari_divisi').val();
 	var keterangan = $('#ket').val();
+
 	if(ajax){
 		ajax.abort();
 	}
-	if(ket == 'Tambah'){
-			var id_departemen = $('#id_departemen').val();
-			ajax = $.ajax({
-		        url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/data_divisi',
-		        data : {
-										keyword:keyword,
-										id_departemen:id_departemen
-									 },
-		        type : "POST",
-		        dataType : "json",
-		        success : function(result){
-		            $tr = "";
-		            if(result == "" || result == null){
-		            	$tr = "<tr><td colspan='2' style='text-align:center;'><b>Data tidak ditemukan</b></td></tr>";
-		            }else{
-			            var no = 0;
-			            for(var i=0; i<result.length; i++){
-			            	no++;
-			             $tr += '<tr style="cursor:pointer;" onclick="klik_divisi('+result[i].ID+');">'+
-			            					'<td style="text-align:center;">'+no+'</td>'+
-			            					'<td style="text-align:center;">'+result[i].NAMA_DIV+'</td>'+
-			            				'</tr>';
-			            }
+
+	if(keterangan == 'Tambah'){
+		var id_departemen = $('#id_departemen').val();
+
+		ajax = $.ajax({
+	        url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/data_divisi',
+	        data : {
+				keyword:keyword,
+				id_departemen:id_departemen
+			},
+	        type : "GET",
+	        dataType : "json",
+	        success : function(result){
+	            $tr = "";
+
+	            if(result == "" || result == null){
+	            	$tr = "<tr><td colspan='2' style='text-align:center;'><b>Data tidak ditemukan</b></td></tr>";
+	            }else{
+		            var no = 0;
+		            for(var i=0; i<result.length; i++){
+		            	no++;
+		             $tr += '<tr style="cursor:pointer;" onclick="klik_divisi('+result[i].ID+');">'+
+            					'<td style="text-align:center;">'+no+'</td>'+
+            					'<td>'+result[i].NAMA_DIV+'</td>'+
+            				'</tr>';
 		            }
-		            $('#tabel_divisi tbody').html($tr);
-		        }
-		    });
+	            }
+
+	            $('#tabel_divisi tbody').html($tr);
+	        }
+	    });
 	}else{
-			var id_departemen = $('#id_departemen_ubah').val();
-			ajax = $.ajax({
-		        url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/data_divisi',
-		        data : {
-										keyword:keyword,
-										id_departemen:id_departemen
-									 },
-		        type : "POST",
-		        dataType : "json",
-		        success : function(result){
-		            $tr = "";
-		            if(result == "" || result == null){
-		            	$tr = "<tr><td colspan='2' style='text-align:center;'><b>Data tidak ditemukan</b></td></tr>";
-		            }else{
-			            var no = 0;
-			            for(var i=0; i<result.length; i++){
-			            	no++;
-			             $tr += '<tr style="cursor:pointer;" onclick="klik_divisi('+result[i].ID+');">'+
-			            					'<td style="text-align:center;">'+no+'</td>'+
-			            					'<td style="text-align:center;">'+result[i].NAMA_DIV+'</td>'+
-			            				'</tr>';
-			            }
+		var id_departemen = $('#id_departemen_ubah').val();
+
+		ajax = $.ajax({
+	        url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/data_divisi',
+	        data : {
+				keyword:keyword,
+				id_departemen:id_departemen
+			},
+	        type : "GET",
+	        dataType : "json",
+	        success : function(result){
+	            $tr = "";
+
+	            if(result == "" || result == null){
+	            	$tr = "<tr><td colspan='2' style='text-align:center;'><b>Data tidak ditemukan</b></td></tr>";
+	            }else{
+		            var no = 0;
+		            for(var i=0; i<result.length; i++){
+		            	no++;
+		             $tr += '<tr style="cursor:pointer;" onclick="klik_divisi('+result[i].ID+');">'+
+		            					'<td style="text-align:center;">'+no+'</td>'+
+		            					'<td style="text-align:center;">'+result[i].NAMA_DIV+'</td>'+
+		            				'</tr>';
 		            }
-		            $('#tabel_divisi tbody').html($tr);
-		        }
-		    });
+	            }
+
+	            $('#tabel_divisi tbody').html($tr);
+	        }
+	    });
 	}
+
     $('#cari_divisi').off('keyup').keyup(function(){
     	get_divisi();
     });
@@ -333,7 +345,7 @@ function klik_satuan(id_satuan){
 	$('#tutup_satuan').click();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/klik_satuan',
+		url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/klik_satuan',
 		data : {id_satuan:id_satuan},
 		type : "POST",
 		dataType : "json",
@@ -355,7 +367,7 @@ function klik_departemen(id_departemen){
 	$('#tutup_departemen').click();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/klik_departemen',
+		url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/klik_departemen',
 		data : {id_departemen:id_departemen},
 		type : "POST",
 		dataType : "json",
@@ -377,7 +389,7 @@ function klik_divisi(id_divisi){
 	$('#tutup_divisi').click();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/klik_divisi',
+		url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/klik_divisi',
 		data : {id_divisi:id_divisi},
 		type : "POST",
 		dataType : "json",
@@ -463,7 +475,7 @@ function data_peralatan(){
 	}
 
 	ajax = $.ajax({
-		url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/data_peralatan',
+		url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/data_peralatan',
 		data : {
 			keyword:keyword,
 			urutkan:urutkan,
@@ -619,7 +631,7 @@ function ubah_alat(id){
 	$('#ket').val('Ubah');
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/get_edit_data',
+		url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/get_edit_data',
 		data : {id:id},
 		type : "POST",
 		dataType : "json",
@@ -662,7 +674,7 @@ function ubah_alat(id){
 function hapus_alat(id){
     $('#popup_hapus').click();
     $.ajax({
-        url : '<?php echo base_url(); ?>finance/log_peralatan_medis_c/data_peralatan_id',
+        url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/data_peralatan_id',
         data : {id:id},
         type : "POST",
         dataType : "json",
@@ -794,46 +806,46 @@ function hapus_alat(id){
 
     <div class="card-box" id="view_tambah">
     	<form class="form-horizontal" role="form" action="<?php echo $url_simpan; ?>" method="post" enctype="multipart/form-data">
-            <h4 class="header-title m-t-0 m-b-30">Tambah Alat</h4>
+            <h4 class="header-title m-t-0 m-b-30">Tambah Inventaris Bidan</h4>
             <hr/>
             <div class="row">
                 <div class="col-lg-6">
-									<div class="form-group">
-											<label class="col-md-2 control-label">Departemen</label>
-											<div class="col-md-8">
-													<div class="input-group">
-															<input type="hidden" name="id_departemen" id="id_departemen" value="">
-															<input type="text" class="form-control" id="departemen" value="" required="required" readonly>
-															<span class="input-group-btn">
-																	<button class="btn waves-effect waves-light btn-default btn_departemen" type="button">
-																			<i class="fa fa-search"></i>
-																	</button>
-															</span>
-													</div>
-											</div>
-									</div>
-									<div class="form-group">
-											<label class="col-md-2 control-label">Divisi</label>
-											<div class="col-md-8">
-													<div class="input-group">
-															<input type="hidden" name="id_divisi" id="id_divisi" value="">
-															<input type="text" class="form-control" id="divisi" value="" required="required" readonly>
-															<span class="input-group-btn">
-																	<button class="btn waves-effect waves-light btn-default btn_divisi" type="button">
-																			<i class="fa fa-search"></i>
-																	</button>
-															</span>
-													</div>
-											</div>
-									</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label">Departemen</label>
+						<div class="col-md-8">
+							<div class="input-group">
+								<input type="hidden" name="id_departemen" id="id_departemen" value="">
+								<input type="text" class="form-control" id="departemen" value="" required="required" readonly>
+								<span class="input-group-btn">
+									<button class="btn waves-effect waves-light btn-danger btn_departemen" type="button">
+										<i class="fa fa-search"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label">Divisi</label>
+						<div class="col-md-8">
+							<div class="input-group">
+								<input type="hidden" name="id_divisi" id="id_divisi" value="">
+								<input type="text" class="form-control" id="divisi" value="" required="required" readonly>
+								<span class="input-group-btn">
+									<button class="btn waves-effect waves-light btn-warning btn_divisi" type="button">
+										<i class="fa fa-search"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+					</div>
                     <div class="form-group">
-                        <label class="col-md-2 control-label">Kode Alat</label>
+                        <label class="col-md-2 control-label">Kode Barang</label>
                         <div class="col-md-8">
                             <div class="input-group">
                                 <input type="hidden" name="id_nama_alat" id="id_nama_alat" value="">
                                 <input type="text" class="form-control" id="kode_alat" value="" required="required" readonly>
                                 <span class="input-group-btn">
-                                    <button class="btn waves-effect waves-light btn-default btn_nama_alat" type="button">
+                                    <button class="btn waves-effect waves-light btn-success btn_nama_alat" type="button">
                                         <i class="fa fa-search"></i>
                                     </button>
                                 </span>
@@ -841,7 +853,7 @@ function hapus_alat(id){
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-2 control-label">Nama Alat</label>
+                        <label class="col-md-2 control-label">Nama Barang</label>
                         <div class="col-md-8">
                             <input type="text" class="form-control" id="nama_alat" value="" readonly>
                         </div>
@@ -865,20 +877,20 @@ function hapus_alat(id){
                             	<input type="hidden" name="id_satuan" id="id_satuan" value="">
                                 <input type="text" class="form-control" id="satuan" value="" required="required" readonly>
                                 <span class="input-group-btn">
-                                	<button class="btn waves-effect waves-light btn-default btn_satuan" type="button">
+                                	<button class="btn waves-effect waves-light btn-primary btn_satuan" type="button">
                                 		<i class="fa fa-search"></i>
                                 	</button>
                                 </span>
                             </div>
                         </div>
                     </div>
-										<div class="form-group">
+					<div class="form-group">
                         <label class="col-md-2 control-label">Golongan</label>
                         <div class="col-md-8">
                             <div class="input-group">
                                 <input type="text" class="form-control" name="golongan" id="golongan" value="" required="required" readonly>
                                 <span class="input-group-btn">
-                                	<button class="btn waves-effect waves-light btn-default btn_golongan" type="button">
+                                	<button class="btn waves-effect waves-light btn-inverse btn_golongan" type="button">
                                 		<i class="fa fa-search"></i>
                                 	</button>
                                 </span>
@@ -963,41 +975,41 @@ function hapus_alat(id){
             </center>
     	</form>
     </div>
-		<div class="card-box" id="view_ubah">
+	<div class="card-box" id="view_ubah">
     	<form class="form-horizontal" role="form" action="<?php echo $url_ubah; ?>" method="post" enctype="multipart/form-data">
             <h4 class="header-title m-t-0 m-b-30">Ubah Alat</h4>
             <hr/>
             <div class="row">
                 <div class="col-lg-6">
-									<input type="hidden" name="id_log" id="id_ubah" value="">
-									<div class="form-group">
-											<label class="col-md-2 control-label">Departemen</label>
-											<div class="col-md-8">
-													<div class="input-group">
-															<input type="hidden" name="id_departemen" id="id_departemen_ubah" value="">
-															<input type="text" class="form-control" id="departemen_ubah" value="" required="required" readonly>
-															<span class="input-group-btn">
-																	<button class="btn waves-effect waves-light btn-default btn_departemen" type="button">
-																			<i class="fa fa-search"></i>
-																	</button>
-															</span>
-													</div>
-											</div>
-									</div>
-									<div class="form-group">
-											<label class="col-md-2 control-label">Divisi</label>
-											<div class="col-md-8">
-													<div class="input-group">
-															<input type="hidden" name="id_divisi" id="id_divisi_ubah" value="">
-															<input type="text" class="form-control" id="divisi_ubah" value="" required="required" readonly>
-															<span class="input-group-btn">
-																	<button class="btn waves-effect waves-light btn-default btn_divisi" type="button">
-																			<i class="fa fa-search"></i>
-																	</button>
-															</span>
-													</div>
-											</div>
-									</div>
+					<input type="hidden" name="id_log" id="id_ubah" value="">
+					<div class="form-group">
+						<label class="col-md-2 control-label">Departemen</label>
+						<div class="col-md-8">
+							<div class="input-group">
+								<input type="hidden" name="id_departemen" id="id_departemen_ubah" value="">
+								<input type="text" class="form-control" id="departemen_ubah" value="" required="required" readonly>
+								<span class="input-group-btn">
+									<button class="btn waves-effect waves-light btn-default btn_departemen" type="button">
+										<i class="fa fa-search"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label">Divisi</label>
+						<div class="col-md-8">
+							<div class="input-group">
+								<input type="hidden" name="id_divisi" id="id_divisi_ubah" value="">
+								<input type="text" class="form-control" id="divisi_ubah" value="" required="required" readonly>
+								<span class="input-group-btn">
+									<button class="btn waves-effect waves-light btn-default btn_divisi" type="button">
+										<i class="fa fa-search"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+					</div>
                     <div class="form-group">
                         <label class="col-md-2 control-label">Kode Alat</label>
                         <div class="col-md-8">
@@ -1139,11 +1151,11 @@ function hapus_alat(id){
 
 <button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal1" id="popup_nama_alat" style="display:none;">Standard Modal</button>
 <div id="myModal1" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="width: 50%;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title" id="myModalLabel">Data Nama Alat Medis</h4>
+                <h4 class="modal-title" id="myModalLabel">Data Barang</h4>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" role="form">
@@ -1166,10 +1178,8 @@ function hapus_alat(id){
                             <thead>
                                 <tr class="merah_popup">
                                     <th style="text-align:center; color: #fff;" width="50">No</th>
-                                    <th style="text-align:center; color: #fff;">Kode Alat</th>
-                                    <th style="text-align:center; color: #fff;">Barcode</th>
-                                    <th style="text-align:center; color: #fff;">Nama Alat</th>
-                                    <th style="text-align:center; color: #fff;">Merk</th>
+                                    <th style="text-align:center; color: #fff;">Kode Barang</th>
+                                    <th style="text-align:center; color: #fff;">Nama Barang</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1314,7 +1324,7 @@ function hapus_alat(id){
 		        </form>
             	<div class="table-responsive">
             		<div class="scroll-y">
-		                <table class="table table-hover" id="tabel_departemen">
+		                <table class="table table-hover table-bordered" id="tabel_departemen">
 		                    <thead>
 		                        <tr class="merah_popup">
 		                            <th style="text-align:center; color: #fff;" width="50">No</th>
@@ -1361,7 +1371,7 @@ function hapus_alat(id){
 		        </form>
             	<div class="table-responsive">
             		<div class="scroll-y">
-		                <table class="table table-hover" id="tabel_divisi">
+		                <table class="table table-hover table-bordered" id="tabel_divisi">
 		                    <thead>
 		                        <tr class="merah_popup">
 		                            <th style="text-align:center; color: #fff;" width="50">No</th>
