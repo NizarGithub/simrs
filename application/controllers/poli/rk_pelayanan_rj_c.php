@@ -471,6 +471,7 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		$total = str_replace(',', '', $this->input->post('grandtotal_resep'));
 		$tot_service = $this->input->post('total_biaya_service');
 		$total_biaya_service = $total + $tot_service;
+		$iter = $this->input->post('iter');
 
 		$id_obat = $this->input->post('id_obat_resep');
 		$harga = $this->input->post('harga_obat');
@@ -479,7 +480,7 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		$aturan_minum = $this->input->post('aturan_minum');
 		$diminum_selama = $this->input->post('diminum_selama');
 
-		$this->model->simpan_resep($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$kode_resep,$alergi,$uraian,$banyaknya_resep,$tanggal,$bulan,$tahun,$total,$total_biaya_service);
+		$this->model->simpan_resep($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$kode_resep,$alergi,$uraian,$banyaknya_resep,$tanggal,$bulan,$tahun,$total,$total_biaya_service,$iter);
 		$id_resep = $this->db->insert_id();
 
 		foreach ($id_obat as $key => $value) {

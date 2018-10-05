@@ -632,7 +632,7 @@ class Rk_pelayanan_rj_m extends CI_Model {
 		return $query->result();
 	}
 
-	function simpan_resep($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$kode_resep,$alergi,$uraian,$banyaknya_resep,$tanggal,$bulan,$tahun,$total,$total_dgn_service){
+	function simpan_resep($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$kode_resep,$alergi,$uraian,$banyaknya_resep,$tanggal,$bulan,$tahun,$total,$total_dgn_service,$iter){
 		$sql = "
 			INSERT INTO rk_resep_rj(
 				ID_PELAYANAN,
@@ -647,7 +647,8 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				BULAN,
 				TAHUN,
 				TOTAL,
-				TOTAL_DGN_SERVICE
+				TOTAL_DGN_SERVICE,
+				ITER
 			) VALUES (
 				'$id_pelayanan',
 				'$id_poli',
@@ -661,7 +662,8 @@ class Rk_pelayanan_rj_m extends CI_Model {
 				'$bulan',
 				'$tahun',
 				'$total',
-				'$total_dgn_service'
+				'$total_dgn_service',
+				'$iter'
 			)
 		";
 		$this->db->query($sql);

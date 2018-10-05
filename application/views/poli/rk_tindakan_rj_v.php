@@ -2969,15 +2969,12 @@ function hitung_tanggal_kurang_dari(){
 							        </div>
 		                    	</div>
 		                    </div>
-		                    <!-- <div class="form-group">
-		                    	<label class="col-md-2 control-label">Diminum Selama</label>
+		                    <div class="form-group">
+		                    	<label class="col-md-2 control-label">Iter</label>
 		                    	<div class="col-sm-5">
-	                				<div class="input-group">
-	                                    <input type="text" class="form-control num_only" name="diminum_selama" id="diminum_selama" value="">
-	                                    <span class="input-group-addon">Hari</span>
-	                                </div>
+	                                <input type="text" class="form-control num_only" name="iter" id="iter" value="">
 	                			</div>
-		                    </div> -->
+		                    </div>
 		                    <hr>
 		                    <center>
 		                    	<button type="button" class="btn btn-success" id="simpanResep"><i class="fa fa-save"></i> <b>Simpan</b></button>
