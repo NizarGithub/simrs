@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Log_inventaris_bidan_m extends CI_Model {
+class Data_barang_m extends CI_Model {
 
 	function __construct()
 	{
@@ -45,14 +45,20 @@ class Log_inventaris_bidan_m extends CI_Model {
 		return $query->row();
 	}
 
-	function data_satuan(){
-		$sql = "SELECT * FROM obat_satuan ORDER BY ID DESC";
+	function data_satuan($keyword){
+		$where = "1 = 1";
+
+		if($keyword != ""){
+			$where = $where." AND NAMA_SATUAN LIKE '%$keyword%'";
+		}
+
+		$sql = "SELECT * FROM admum_satuan_barang WHERE $where ORDER BY ID DESC";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
 
 	function klik_satuan($id_satuan){
-		$sql = "SELECT * FROM obat_satuan WHERE ID = '$id_satuan'";
+		$sql = "SELECT * FROM admum_satuan_barang WHERE ID = '$id_satuan'";
 		$query = $this->db->query($sql);
 		return $query->row();
 	}
@@ -98,7 +104,15 @@ class Log_inventaris_bidan_m extends CI_Model {
 		$order = "";
 
 		if($urutkan == 'Default'){
-			$order = "ORDER BY a.ID ASC";
+			$order = "ORDER BY a.ID DESC";
+		}else if($urutkan == 'Nama Alat'){
+			$order = "ORDER BY b.NAMA_ALAT ASC";
+		}else if($urutkan == 'Stok'){
+			if($urutkan_stok == 'Rendah'){
+				$order = "ORDER BY a.TOTAL ASC";
+			}else{
+				$order = "ORDER BY a.TOTAL DESC";
+			}
 		}
 
 		if($keyword != ""){
@@ -114,7 +128,6 @@ class Log_inventaris_bidan_m extends CI_Model {
 				b.NAMA_KATEGORI,
 				a.TOTAL,
 				a.HARGA_BELI,
-				c.NAMA_DEP,
 				a.KETERANGAN
 			FROM log_gudang_barang a
 			LEFT JOIN (
@@ -126,7 +139,6 @@ class Log_inventaris_bidan_m extends CI_Model {
 				FROM admum_setup_peralatan_medis a
 				JOIN log_kategori b ON b.ID = a.ID_KATEGORI
 			) b ON b.ID = a.ID_BARANG
-			JOIN kepeg_departemen c ON c.ID = a.ID_DEPARTEMEN
 			WHERE $where
 			$order
 		";
@@ -166,7 +178,7 @@ class Log_inventaris_bidan_m extends CI_Model {
 				FROM admum_setup_peralatan_medis a
 				JOIN log_kategori b ON b.ID = a.ID_KATEGORI
 			) b ON b.ID = a.ID_BARANG
-			JOIN kepeg_departemen c ON c.ID = a.ID_DEPARTEMEN
+			LEFT JOIN kepeg_departemen c ON c.ID = a.ID_DEPARTEMEN
 			LEFT JOIN kepeg_divisi d ON d.ID = a.ID_DIVISI
 			LEFT JOIN admum_satuan_barang e ON e.ID = a.ID_SATUAN
 			WHERE a.ID = '$id'
@@ -176,8 +188,6 @@ class Log_inventaris_bidan_m extends CI_Model {
 	}
 
 	function simpan(
-		$id_departemen,
-		$id_divisi,
 		$id_barang,
 		$id_satuan,
 		$golongan,
@@ -191,13 +201,10 @@ class Log_inventaris_bidan_m extends CI_Model {
 		$waktu_masuk,
 		$bulan,
 		$tahun,
-		$gambar,
-		$keterangan){
+		$gambar){
 		
 		$sql = "
 			INSERT INTO log_gudang_barang(
-				ID_DEPARTEMEN,
-				ID_DIVISI,
 				ID_BARANG,
 				ID_SATUAN,
 				GOLONGAN,
@@ -212,11 +219,8 @@ class Log_inventaris_bidan_m extends CI_Model {
 				BULAN,
 				TAHUN,
 				GAMBAR,
-				AKTIF,
-				KETERANGAN
+				AKTIF
 			) VALUES(
-				'$id_departemen',
-				'$id_divisi',
 				'$id_barang',
 				'$id_satuan',
 				'$golongan',
@@ -231,17 +235,14 @@ class Log_inventaris_bidan_m extends CI_Model {
 				'$bulan',
 				'$tahun',
 				'$gambar',
-				'1',
-				'$keterangan'
+				'1'
 		)";
 		$this->db->query($sql);
 	}
 
-	function ubah($id,$id_departemen,$id_divisi,$id_barang,$id_satuan,$golongan,$merk,$jumlah,$isi,$total,$harga_beli,$total_harga,$gambar,$keterangan){
+	function ubah($id,$id_barang,$id_satuan,$golongan,$merk,$jumlah,$isi,$total,$harga_beli,$total_harga,$gambar,$keterangan){
 		$sql = "
 			UPDATE log_gudang_barang SET
-				ID_DEPARTEMEN = '$id_departemen',
-				ID_DIVISI = '$id_divisi',
 				ID_BARANG = '$id_barang',
 				ID_SATUAN = '$id_satuan',
 				GOLONGAN = '$golongan',

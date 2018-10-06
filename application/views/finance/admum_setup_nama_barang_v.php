@@ -1,7 +1,7 @@
 <script type="text/javascript" src="<?php echo base_url(); ?>js-devan/jquery-1.11.1.min.js"></script>
 
 <style type="text/css">
-#view_tambah, #view_ubah, #view_merk, #view_jenis_alat, #tombol_reset, #msg_barcode{
+#view_tambah, #view_ubah, #view_kat, #tombol_reset, #msg_barcode{
 	display: none;
 }
 </style>
@@ -45,34 +45,12 @@ $(document).ready(function(){
 	$('#checkbox2').click(function(){
 		var cek = $('#checkbox2').is(":checked");
 		if(cek == true){
-			$('#view_merk').show();
+			$('#view_kat').show();
 		}else{
-			$('#view_merk').hide();
-			$('#id_merk_ubah').val("");
-			$('#merk_ubah').val("");
+			$('#view_kat').hide();
 		}
 	});
 
-    $('#checkbox3').click(function(){
-        var cek = $('#checkbox3').is(":checked");
-        if(cek == true){
-            $('#view_jenis_alat').show();
-        }else{
-            $('#view_jenis_alat').hide();
-        }
-    });
-
-	$('#merk_ubah').click(function(){
-		$('#ket').val('Ubah');
-		$('#popup_merk').click();
-		get_merk();
-	});
-
-	$('#btn_merk_ubah').click(function(){
-		$('#ket').val('Ubah');
-		$('#popup_merk').click();
-		get_merk();
-	});
 });
 
 function get_kode_peralatan(){
@@ -85,74 +63,6 @@ function get_kode_peralatan(){
         }
     });
 }
-
-//MERK BARANG
-
-function get_merk(){
-	var keyword = $('#cari_merk').val();
-
-	if(ajax){
-		ajax.abort();
-	}
-
-	ajax = $.ajax({
-        url : '<?php echo base_url(); ?>finance/admum_setup_nama_barang_c/data_merk',
-        data : {keyword:keyword},
-        type : "GET",
-        dataType : "json",
-        success : function(result){
-            $tr = "";
-
-            if(result == "" || result == null){
-            	$tr = "<tr><td colspan='2' style='text-align:center;'><b>Merk yang dicari tidak ada</b></td></tr>";
-            }else{
-	            var no = 0;
-	            for(var i=0; i<result.length; i++){
-	            	no++;
-
-	            	$tr += '<tr style="cursor:pointer;" onclick="klik_merk('+result[i].ID+');">'+
-	                        '    <td style="text-align:center;">'+no+'</td>'+
-	                        '    <td>'+result[i].MERK+'</td>'+
-	                        '</tr>';
-	            }
-            }
-
-            $('#tabel_merk tbody').html($tr);
-        }
-    });
-
-    $('#cari_merk').off('keyup').keyup(function(){
-    	get_merk();
-    });
-}
-
-function klik_merk(id_merk){
-	$('#tutup_merk').click();
-
-	$.ajax({
-		url : '<?php echo base_url(); ?>finance/admum_setup_nama_barang_c/klik_merk',
-		data : {id_merk:id_merk},
-		type : "POST",
-		dataType : "json",
-		success : function(row){
-			var ket = $('#ket').val();
-
-			if(ket == 'Tambah'){
-				$('#id_merk').val(id_merk);
-				$('#merk').val(row['MERK']);
-				$('#id_merk_ubah').val("");
-				$('#merk_ubah').val("");
-			}else{
-				$('#id_merk').val("");
-				$('#merk').val("");
-				$('#id_merk_ubah').val(id_merk);
-				$('#merk_ubah').val(row['MERK']);
-			}
-		}
-	});
-}
-
-//-------------
 
 function paging($selector){
 	var jumlah_tampil = $('#jumlah_tampil').val();
@@ -266,11 +176,9 @@ function ubah_alat(id){
 		success : function(row){
 			$('#id_ubah').val(id);
 			$('#kode_barang_ubah').val(row['KODE_ALAT']);
-			$('#barcode_ubah').val(row['BARCODE']);
 			$('#nama_barang_ubah').val(row['NAMA_ALAT']);
-			$('#id_merk_lama').val(row['ID_MERK']);
-            $('#merk_txt').val(row['MERK']);
-			$('#jenis_alat_txt').val(row['JENIS_ALAT']);
+			$('#id_kat_lama').val(row['ID_KATEGORI']);
+            $('#kat_txt').val(row['NAMA_KATEGORI']);
 		}
 	});
 
@@ -331,7 +239,7 @@ function cek_barcode(){
             <div class="form-group">
             	<div class="col-md-7">
         			<button type="button" class="btn btn-purple waves-effect w-md waves-light" id="btn_tambah">
-        				<i class="fa fa-plus"></i> Tambah Peralatan
+        				<i class="fa fa-plus"></i> <b>Tambah Data</b>
         			</button>
                     <button type="submit" class="btn btn-success waves-effect w-md waves-light">
                         <i class="fa fa-file-text-o"></i> <b>Cetak Excel</b>
@@ -461,72 +369,42 @@ function cek_barcode(){
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-2 control-label">Barcode</label>
-                <div class="col-md-6">
-                    <input type="text" class="form-control" name="barcode_ubah" id="barcode_ubah" value="">
-                </div>
-            </div>
-            <div class="form-group">
                 <label class="col-md-2 control-label">Nama Barang</label>
                 <div class="col-md-6">
                     <input type="text" class="form-control" name="nama_barang_ubah" id="nama_barang_ubah" value="">
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-2 control-label">Merk</label>
+                <label class="col-md-2 control-label">Kategori</label>
                 <div class="col-md-4">
-                	<input type="hidden" class="form-control" name="id_merk_lama" id="id_merk_lama" value="" readonly>
-                    <input type="text" class="form-control" id="merk_txt" value="" readonly>
+                	<input type="hidden" class="form-control" name="id_kat_lama" id="id_kat_lama" value="" readonly>
+                    <input type="text" class="form-control" id="kat_txt" value="" readonly>
                 </div>
                 <div class="col-md-2">
                 	<div class="checkbox checkbox-primary">
-                        <input type="checkbox" id="checkbox2">
+                        <input type="checkbox" id="checkbox2" name="checkbox2">
                         <label for="checkbox2">
                             Ubah
                         </label>
                     </div>
                 </div>
             </div>
-            <div class="form-group" id="view_merk">
+            <div class="form-group" id="view_kat">
                 <label class="col-md-2 control-label">&nbsp;</label>
                 <div class="col-md-4">
-                    <div class="input-group">
-                        <input type="hidden" name="id_merk_ubah" id="id_merk_ubah" value="">
-                        <input type="text" class="form-control" name="merk_ubah" id="merk_ubah" value="" required="required" readonly>
-                        <span class="input-group-btn">
-                            <button class="btn waves-effect waves-light btn-default" type="button" id="btn_merk_ubah">
-                                <i class="fa fa-search"></i>
-                            </button>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label">Jenis Alat</label>
-                <div class="col-md-4">
-                    <input type="text" class="form-control" id="jenis_alat_txt" value="" readonly>
-                </div>
-                <div class="col-md-2">
-                    <div class="checkbox checkbox-primary">
-                        <input type="checkbox" id="checkbox3">
-                        <label for="checkbox3">
-                            Ubah
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group" id="view_jenis_alat">
-                <label class="col-md-2 control-label">&nbsp;</label>
-                <div class="col-md-4">
-                    <select name="jenis_alat_ubah" class="form-control">
-                        <option value="Alat Pembalut Luka">Alat Pembalut Luka</option>
-                        <option value="Alat Pembalut Luka">Alat Perawatan Pasien</option>
-                        <option value="Alat Tindakan Medis">Alat Tindakan Medis</option>
-                        <option value="Alat Diagnosa Penyakit">Alat Diagnosa Penyakit</option>
-                        <option value="Alat Bedah">Alat Bedah</option>
+                    <select name="id_kategori_ubah" class="form-control">
+                    <?php
+                        $kat = $this->model->data_kategori();
+                        foreach ($kat as $val) {
+                    ?>
+                        <option value="<?php echo $val->ID; ?>"><?php echo $val->NAMA_KATEGORI; ?></option>
+                    <?php
+                        }
+                    ?>
                     </select>
                 </div>
             </div>
+            <hr>
             <div class="form-group">
                 <label class="col-md-2 control-label">&nbsp;</label>
                 <div class="col-md-3">
@@ -535,50 +413,6 @@ function cek_barcode(){
                 </div>
             </div>
         </form>
-    </div>
-</div>
-
-<button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#myModal" id="popup_merk" style="display:none;">Standard Modal</button>
-<div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title" id="myModalLabel">Data Merk Barang</h4>
-            </div>
-            <div class="modal-body">
-            	<form class="form-horizontal" role="form">
-		            <div class="form-group">
-		                <div class="col-md-12">
-			                <div class="input-group">
-			                    <input type="text" class="form-control" id="cari_merk" placeholder="Cari merk..." value="">
-			                    <span class="input-group-btn">
-			                    	<button type="button" class="btn waves-effect waves-light btn-custom" style="cursor:default;">
-			                    		<i class="fa fa-search"></i>
-			                    	</button>
-			                    </span>
-			                </div>
-		                </div>
-		            </div>
-		        </form>
-            	<div class="table-responsive">
-	                <table class="table table-hover" id="tabel_merk">
-	                    <thead>
-	                        <tr class="merah_popup">
-	                            <th style="text-align:center; color: #fff;" width="50">No</th>
-	                            <th style="text-align:center; color: #fff;">Merk Barang</th>
-	                        </tr>
-	                    </thead>
-	                    <tbody>
-	                        
-	                    </tbody>
-	                </table>
-            	</div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-inverse waves-effect" data-dismiss="modal" id="tutup_merk">Tutup</button>
-            </div>
-        </div>
     </div>
 </div>
 

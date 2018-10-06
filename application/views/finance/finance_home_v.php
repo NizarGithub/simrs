@@ -10,6 +10,8 @@
 
         <title><?php echo $title; ?></title>
 
+        <link href="<?php echo base_url(); ?>assets/plugins/fileuploads/css/dropify.min.css" rel="stylesheet" type="text/css" />
+
         <!--Morris Chart CSS -->
         <link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/morris/morris.css">
 
@@ -301,6 +303,10 @@
         <script src="<?php echo base_url(); ?>js-devan/alert.js"></script>
         <script src="<?php echo base_url(); ?>js-devan/js-form.js"></script>
         <script src="<?php echo base_url(); ?>js-devan/pagination.js"></script>
+        <script type="text/javascript">
+            var url = "<?php echo base_url(); ?>";
+        </script>
+        <script src="<?php echo base_url(); ?>datepicker/datetimepicker_css.js"></script>
 
         <!-- Plugins Js -->
         <script src="<?php echo base_url(); ?>assets/plugins/bootstrap-inputmask/bootstrap-inputmask.min.js" type="text/javascript"></script>
@@ -321,6 +327,9 @@
         <!-- Dashboard init -->
         <script src="<?php echo base_url(); ?>assets/pages/jquery.dashboard.js"></script>
 
+        <!-- file uploads js -->
+        <script src="<?php echo base_url(); ?>assets/plugins/fileuploads/js/dropify.min.js"></script>
+
         <!-- App js -->
         <script src="<?php echo base_url(); ?>assets/js/jquery.core.js"></script>
         <script src="<?php echo base_url(); ?>assets/js/jquery.app.js"></script>
@@ -340,6 +349,18 @@
             $('#datatable-scroller').DataTable( { ajax: "<?php echo base_url(); ?>assets/plugins/datatables/json/scroller-demo.json", deferRender: true, scrollY: 380, scrollCollapse: true, scroller: true } );
             var table = $('#datatable-fixed-header').DataTable( { fixedHeader: true } );
             $(".select2").select2(); 
+
+            $('.dropify').dropify({
+                messages: {
+                    'default': 'Drag and drop a file here or click',
+                    'replace': 'Drag and drop or click to replace',
+                    'remove': 'Remove',
+                    'error': 'Ooops, something wrong appended.'
+                },
+                error: {
+                    'fileSize': 'The file size is too big (1M max).'
+                }
+            });
         });
         </script>
     </body>

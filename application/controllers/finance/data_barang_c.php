@@ -1,29 +1,29 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Log_inventaris_bidan_c extends CI_Controller {
+class Data_barang_c extends CI_Controller {
 
 	function __construct()
 	{
 		parent::__construct();
-		$this->load->model('finance/log_inventaris_bidan_m','model');
+		$this->load->model('finance/data_barang_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
     	$id_user = $sess_user['id'];
 	    if($id_user == "" || $id_user == null){
-	        redirect('portal');
+	        redirect('login_c');
 	    }
 	}
 
 	function index()
 	{
 		$data = array(
-			'page' => 'finance/log_inventaris_bidan_v',
-			'title' => 'Inventaris Bidan',
-			'subtitle' => 'Inventaris Bidan',
+			'page' => 'finance/data_barang_v',
+			'title' => 'Data Barang',
+			'subtitle' => 'Data Barang',
 			'master_menu' => 'pengadaan_barang',
-			'view' => 'inventaris_bidan',
-			'url_simpan' => base_url().'finance/log_inventaris_bidan_c/simpan',
-			'url_ubah' => base_url().'finance/log_inventaris_bidan_c/ubah',
-			'url_hapus' => base_url().'finance/log_inventaris_bidan_c/hapus',
+			'view' => 'data_barang',
+			'url_simpan' => base_url().'finance/data_barang_c/simpan',
+			'url_ubah' => base_url().'finance/data_barang_c/ubah',
+			'url_hapus' => base_url().'finance/data_barang_c/hapus'
 		);
 
 		$this->load->view('finance/finance_home_v',$data);
@@ -42,7 +42,8 @@ class Log_inventaris_bidan_c extends CI_Controller {
 	}
 
 	function data_satuan(){
-		$data = $this->model->data_satuan();
+		$keyword = $this->input->get('keyword');
+		$data = $this->model->data_satuan($keyword);
 		echo json_encode($data);
 	}
 
@@ -78,9 +79,9 @@ class Log_inventaris_bidan_c extends CI_Controller {
 	}
 
 	function data_peralatan(){
-		$keyword = $this->input->post('keyword');
-		$urutkan = $this->input->post('urutkan');
-		$urutkan_stok = $this->input->post('urutkan_stok');
+		$keyword = $this->input->get('keyword');
+		$urutkan = $this->input->get('urutkan');
+		$urutkan_stok = $this->input->get('urutkan_stok');
 		$data = $this->model->data_peralatan($keyword,$urutkan,$urutkan_stok);
 		echo json_encode($data);
 	}
@@ -124,8 +125,6 @@ class Log_inventaris_bidan_c extends CI_Controller {
 	}
 
 	function simpan(){
-		$id_departemen = $this->input->post('id_departemen');
-		$id_divisi = $this->input->post('id_divisi');
 		$id_barang = $this->input->post('id_barang');
 		$id_satuan = $this->input->post('id_satuan');
 		$golongan = $this->input->post('golongan');
@@ -143,7 +142,6 @@ class Log_inventaris_bidan_c extends CI_Controller {
 		$bulan = date('n');
 		$tahun = date('Y');
 		$gambar = "";
-		$keterangan = $this->input->post('keterangan');
 
 		if(!empty($_FILES['userfile']['name'])){
 			$gambar = $_FILES['userfile']['name'];
@@ -153,8 +151,6 @@ class Log_inventaris_bidan_c extends CI_Controller {
 		}
 
 		$this->model->simpan(
-			$id_departemen,
-			$id_divisi,
 			$id_barang,
 			$id_satuan,
 			$golongan,
@@ -168,17 +164,14 @@ class Log_inventaris_bidan_c extends CI_Controller {
 			$waktu_masuk,
 			$bulan,
 			$tahun,
-			$gambar,
-			$keterangan);
+			$gambar);
 
 		$this->session->set_flashdata('sukses','1');
-		redirect('finance/log_inventaris_bidan_c');
+		redirect('finance/data_barang_c');
 	}
 
 	function ubah(){
 		$id = $this->input->post('id_ubah');
-		$id_departemen = $this->input->post('id_departemen_ubah');
-		$id_divisi = $this->input->post('id_divisi_ubah');
 		$id_barang = $this->input->post('id_nama_alat_ubah');
 		$id_satuan = $this->input->post('id_satuan_ubah');
 		$golongan = $this->input->post('golongan_ubah');
@@ -198,17 +191,19 @@ class Log_inventaris_bidan_c extends CI_Controller {
 			$gambar = $this->input->post('file_hidden');
 		}
 
-		$this->model->ubah($id,$id_departemen,$id_divisi,$id_barang,$id_satuan,$golongan,$merk,$jumlah,$isi,$total,$harga_beli,$total_harga,$gambar,$keterangan);
+		$this->model->ubah($id,$id_barang,$id_satuan,$golongan,$merk,$jumlah,$isi,$total,$harga_beli,$total_harga,$gambar,$keterangan);
 
 		$this->session->set_flashdata('ubah','1');
-		redirect('finance/log_inventaris_bidan_c');
+		redirect('finance/data_barang_c');
 	}
-	
+	function data_peralatan_id(){
+		$id = $this->input->post('id');
+		$data = $this->model->data_peralatan_id($id);
+		echo json_encode($data);
+	}
 	function hapus(){
 		$id = $this->input->post('id_hapus');
 		$data = $this->model->hapus($id);
-
-		$this->session->set_flashdata('hapus','1');
-		redirect('finance/log_inventaris_bidan_c');
+		redirect('finance/data_barang_c');
 	}
 }

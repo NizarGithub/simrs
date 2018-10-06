@@ -1,9 +1,32 @@
-
 <script type="text/javascript" src="<?php echo base_url(); ?>js-devan/jquery-1.11.1.min.js"></script>
 
 <style type="text/css">
 #view_tambah, #view_stok, #tombol_reset, #view_gambar, #view_input_pemakaian, #view_ubah{
 	display: none;
+}
+
+.loading_tabel_dep{
+    z-index: 9999;
+    position: absolute;
+    left: 45%;
+    top: 40%;
+    display: none;
+}
+
+.loading_tabel_div{
+    z-index: 9999;
+    position: absolute;
+    left: 45%;
+    top: 40%;
+    display: none;
+}
+
+.loading_tabel_brg{
+    z-index: 9999;
+    position: absolute;
+    left: 45%;
+    top: 40%;
+    display: none;
 }
 </style>
 
@@ -45,30 +68,60 @@ $(document).ready(function(){
 	});
 
 	$('#batal').click(function(){
-		window.location = "<?php echo base_url(); ?>finance/log_inventaris_bidan_c";
+		window.location = "<?php echo base_url(); ?>finance/data_barang_c";
 	});
 
 	$('#batal_ubah').click(function(){
-		window.location = "<?php echo base_url(); ?>finance/log_inventaris_bidan_c";
+		$('#id_ubah').val("");
+		$('#view_data').show();
+		$('#view_ubah').hide();
 	});
 
-	$('#kode_alat').click(function(){
-		$('#popup_nama_alat').click();
-		load_nama_alat();
+	$('.btn_departemen').click(function(){
+		$('#popup_departemen').click();
+		$("#cari_departemen").val("");
+		get_departemen();
+	});
+
+	$('#departemen').click(function(){
+		$('#popup_departemen').click();
+		$("#cari_departemen").val("");
+		get_departemen();
+	});
+
+	$('.btn_divisi').click(function(){
+		$('#popup_divisi').click();
+		$("#cari_divisi").val("");
+		get_divisi();
+	});
+
+	$('#divisi').click(function(){
+		$('#popup_divisi').click();
+		$("#cari_divisi").val("");
+		get_divisi();
 	});
 
 	$('.btn_nama_alat').click(function(){
 		$('#popup_nama_alat').click();
+		$("#cari_nama_alat").val("");
+		load_nama_alat();
+	});
+
+	$('#kode_alat').click(function(){
+		$('#popup_nama_alat').click();
+		$("#cari_nama_alat").val("");
 		load_nama_alat();
 	});
 
 	$('#satuan').click(function(){
 		$('#popup_satuan').click();
+		$('#cari_satuan').val("");
 		get_satuan();
 	});
 
 	$('.btn_satuan').click(function(){
 		$('#popup_satuan').click();
+		$('#cari_satuan').val("");
 		get_satuan();
 	});
 
@@ -79,29 +132,11 @@ $(document).ready(function(){
 	$('.btn_golongan').click(function(){
 		$('#popup_golongan').click();
 	});
-
-	$('#departemen').click(function(){
-		$('#popup_departemen').click();
-		get_departemen();
-	});
-
-	$('.btn_departemen').click(function(){
-		$('#popup_departemen').click();
-		get_departemen();
-	});
-
-	$('#divisi').click(function(){
-		$('#popup_divisi').click();
-		get_divisi();
-	});
-
-	$('.btn_divisi').click(function(){
-		$('#popup_divisi').click();
-		get_divisi();
-	});
+	
 });
 
 function load_nama_alat(){
+	$('.loading_tabel_brg').show();
 	var keyword = $('#cari_nama_alat').val();
 
 	if(ajax){
@@ -109,7 +144,7 @@ function load_nama_alat(){
 	}
 
 	ajax = $.ajax({
-		url : '<?php echo base_url()?>finance/log_inventaris_bidan_c/load_nama_alat',
+		url : '<?php echo base_url()?>finance/data_barang_c/load_nama_alat',
 		data : {keyword:keyword},
 		type : "GET",
 		dataType : "json",
@@ -133,6 +168,7 @@ function load_nama_alat(){
 			}
 
 			$('#tabel_nama_alat tbody').html($tr);
+			$('.loading_tabel_brg').hide();
 		}
 	});
 
@@ -145,23 +181,15 @@ function klik_nama_alat(id){
 	$('#tutup_nama_alat').click();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/klik_nama_alat',
+		url : '<?php echo base_url(); ?>finance/data_barang_c/klik_nama_alat',
 		data : {id:id},
 		type : "POST",
 		dataType : "json",
 		success : function(row){
-			var id_ubah = $('#id_ubah').val();
-			if(id_ubah == ""){
-				$('#id_barang').val(id);
-				$('#kode_alat').val(row['KODE_ALAT']);
-				$('#nama_alat').val(row['NAMA_ALAT']);
-				$('#jenis_alat').val(row['NAMA_KATEGORI']);
-			}else{
-				$('#id_nama_alat_ubah').val(id);
-				$('#kode_alat_ubah').val(row['KODE_ALAT']);
-				$('#nama_alat_ubah').val(row['NAMA_ALAT']);
-				$('#kategori_ubah').val(row['NAMA_KATEGORI']);
-			}
+			$('#id_barang').val(id);
+			$('#kode_alat').val(row['KODE_ALAT']);
+			$('#nama_alat').val(row['NAMA_ALAT']);
+			$('#jenis_alat').val(row['NAMA_KATEGORI']);
 		}
 	});
 }
@@ -174,7 +202,7 @@ function get_satuan(){
 	}
 
 	ajax = $.ajax({
-        url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/data_satuan',
+        url : '<?php echo base_url(); ?>finance/data_barang_c/data_satuan',
         data : {keyword:keyword},
         type : "GET",
         dataType : "json",
@@ -205,7 +233,30 @@ function get_satuan(){
     });
 }
 
+function klik_satuan(id_satuan){
+	$('#tutup_satuan').click();
+
+	$.ajax({
+		url : '<?php echo base_url(); ?>finance/data_barang_c/klik_satuan',
+		data : {id_satuan:id_satuan},
+		type : "POST",
+		dataType : "json",
+		success : function(row){
+            var ket = $('#ket').val();
+
+            if(ket == 'Tambah'){
+                $('#id_satuan').val(id_satuan);
+                $('#satuan').val(row['NAMA_SATUAN']);
+            }else{
+                $('#id_satuan_ubah').val(id_satuan);
+                $('#satuan_ubah').val(row['NAMA_SATUAN']);
+            }
+		}
+	});
+}
+
 function get_departemen(){
+	$('.loading_tabel_dep').show();
 	var keyword = $('#cari_departemen').val();
 
 	if(ajax){
@@ -213,7 +264,7 @@ function get_departemen(){
 	}
 
 	ajax = $.ajax({
-        url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/data_departemen',
+        url : '<?php echo base_url(); ?>finance/data_barang_c/data_departemen',
         data : {keyword:keyword},
         type : "GET",
         dataType : "json",
@@ -234,12 +285,35 @@ function get_departemen(){
             }
 
             $('#tabel_departemen tbody').html($tr);
+            $('.loading_tabel_dep').hide();
         }
     });
 
     $('#cari_departemen').off('keyup').keyup(function(){
     	get_departemen();
     });
+}
+
+function klik_departemen(id_departemen){
+	$('#tutup_departemen').click();
+
+	$.ajax({
+		url : '<?php echo base_url(); ?>finance/data_barang_c/klik_departemen',
+		data : {id_departemen:id_departemen},
+		type : "POST",
+		dataType : "json",
+		success : function(row){
+            var ket = $('#ket').val();
+
+            if(ket == 'Tambah'){
+                $('#id_departemen').val(id_departemen);
+                $('#departemen').val(row['NAMA_DEP']);
+            }else{
+                $('#id_departemen_ubah').val(id_departemen);
+                $('#departemen_ubah').val(row['NAMA_DEP']);
+            }
+		}
+	});
 }
 
 function get_divisi(){
@@ -251,10 +325,11 @@ function get_divisi(){
 	}
 
 	if(keterangan == 'Tambah'){
+		$('.loading_tabel_div').show();
 		var id_departemen = $('#id_departemen').val();
 
 		ajax = $.ajax({
-	        url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/data_divisi',
+	        url : '<?php echo base_url(); ?>finance/data_barang_c/data_divisi',
 	        data : {
 				keyword:keyword,
 				id_departemen:id_departemen
@@ -278,13 +353,15 @@ function get_divisi(){
 	            }
 
 	            $('#tabel_divisi tbody').html($tr);
+	            $('.loading_tabel_div').hide();
 	        }
 	    });
 	}else{
+		$('.loading_tabel_div').show();
 		var id_departemen = $('#id_departemen_ubah').val();
 
 		ajax = $.ajax({
-	        url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/data_divisi',
+	        url : '<?php echo base_url(); ?>finance/data_barang_c/data_divisi',
 	        data : {
 				keyword:keyword,
 				id_departemen:id_departemen
@@ -308,6 +385,7 @@ function get_divisi(){
 	            }
 
 	            $('#tabel_divisi tbody').html($tr);
+	            $('.loading_tabel_div').hide();
 	        }
 	    });
 	}
@@ -317,55 +395,11 @@ function get_divisi(){
     });
 }
 
-function klik_satuan(id_satuan){
-	$('#tutup_satuan').click();
-
-	$.ajax({
-		url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/klik_satuan',
-		data : {id_satuan:id_satuan},
-		type : "POST",
-		dataType : "json",
-		success : function(row){
-            var ket = $('#ket').val();
-
-            if(ket == 'Tambah'){
-                $('#id_satuan').val(id_satuan);
-                $('#satuan').val(row['NAMA_SATUAN']);
-            }else{
-                $('#id_satuan_ubah').val(id_satuan);
-                $('#satuan_ubah').val(row['NAMA_SATUAN']);
-            }
-		}
-	});
-}
-
-function klik_departemen(id_departemen){
-	$('#tutup_departemen').click();
-
-	$.ajax({
-		url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/klik_departemen',
-		data : {id_departemen:id_departemen},
-		type : "POST",
-		dataType : "json",
-		success : function(row){
-            var ket = $('#ket').val();
-
-            if(ket == 'Tambah'){
-                $('#id_departemen').val(id_departemen);
-                $('#departemen').val(row['NAMA_DEP']);
-            }else{
-                $('#id_departemen_ubah').val(id_departemen);
-                $('#departemen_ubah').val(row['NAMA_DEP']);
-            }
-		}
-	});
-}
-
 function klik_divisi(id_divisi){
 	$('#tutup_divisi').click();
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/klik_divisi',
+		url : '<?php echo base_url(); ?>finance/data_barang_c/klik_divisi',
 		data : {id_divisi:id_divisi},
 		type : "POST",
 		dataType : "json",
@@ -397,13 +431,14 @@ function klik_golongan(no_golongan){
 		7  : 'Alat Medis',
 		8  : 'Alat Bedah',
 		9  : 'Furniture Rumah Sakit',
-		10  : 'Breathalyzer',
+		10 : 'Breathalyzer',
 		11 : 'Alat Ginekologi',
 		12 : 'Alat Neurologi',
-		13 : 'Alat Forensik'
+		13 : 'Alat Forensik',
+		14 : 'Lain - Lain'
    	}
 
-	console.log(golongan[0]);
+	// console.log(golongan[0]);
 
 	if(ket == 'Tambah'){
  		$('#golongan').val(golongan[no_golongan]);
@@ -453,13 +488,13 @@ function data_peralatan(){
 	}
 
 	ajax = $.ajax({
-		url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/data_peralatan',
+		url : '<?php echo base_url(); ?>finance/data_barang_c/data_peralatan',
 		data : {
 			keyword:keyword,
 			urutkan:urutkan,
 			urutkan_stok:urutkan_stok
 		},
-		type : "POST",
+		type : "GET",
 		dataType : "json",
 		success : function(result){
 			$tr = "";
@@ -479,7 +514,7 @@ function data_peralatan(){
                                     '<i class="fa fa-trash"></i>'+
                                 '</button>';
 
-                    result[i].KETERANGAN = result[i].KETERANGAN==null?"-":result[i].KETERANGAN;       
+                    result[i].KETERANGAN = result[i].KETERANGAN==null?"-":result[i].KETERANGAN;
 
 					$tr += "<tr>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
@@ -562,7 +597,6 @@ function hitung_total(){
         $('#total_ubah').val(NumberToMoney(total));
     }
 }
-
 function hitung_total_harga(){
     var ket = $('#ket').val();
 
@@ -609,17 +643,17 @@ function ubah_alat(id){
 	$('#ket').val('Ubah');
 
 	$.ajax({
-		url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/get_edit_data',
+		url : '<?php echo base_url(); ?>finance/data_barang_c/get_edit_data',
 		data : {id:id},
 		type : "POST",
 		dataType : "json",
 		success : function(row){
 			$('#id_ubah').val(row['ID']);
-			$('#id_departemen_ubah').val(row['ID_DEPARTEMEN']);
-			$('#departemen_ubah').val(row['NAMA_DEP']);
+			// $('#id_departemen_ubah').val(row['ID_DEPARTEMEN']);
+			// $('#departemen_ubah').val(row['NAMA_DEP']);
 
-			$('#id_divisi_ubah').val(row['ID_DIVISI']);
-			$('#divisi_ubah').val(row['NAMA_DIV']);
+			// $('#id_divisi_ubah').val(row['ID_DIVISI']);
+			// $('#divisi_ubah').val(row['NAMA_DIV']);
 
 			$('#id_nama_alat_ubah').val(row['ID_BARANG']);
 			$('#kode_alat_ubah').val(row['KODE_ALAT']);
@@ -653,18 +687,17 @@ function ubah_alat(id){
 		}
 	});
 }
-
 function hapus_alat(id){
     $('#popup_hapus').click();
     $.ajax({
-        url : '<?php echo base_url(); ?>finance/log_inventaris_bidan_c/get_edit_data',
+        url : '<?php echo base_url(); ?>finance/data_barang_c/data_peralatan_id',
         data : {id:id},
         type : "POST",
         dataType : "json",
         success : function(row){
             $('#id_hapus').val(id);
-            var txt = row['NAMA_ALAT'];
-            $('#msg').html('Apakah barang <b>'+txt+'</b> ingin dihapus?');
+            var txt = row['KODE_ALAT']+' - '+row['NAMA_ALAT'];
+            $('#msg').html('Apakah data logistik <b>'+txt+'</b> ingin dihapus?');
         }
     });
 }
@@ -684,7 +717,7 @@ function hapus_alat(id){
             <div class="form-group">
                 <div class="col-md-7">
                     <button type="button" class="btn btn-purple waves-effect w-md waves-light" id="btn_tambah">
-                        <i class="fa fa-plus"></i> Tambah
+                        <i class="fa fa-plus"></i> Tambah Barang
                     </button>
                 </div>
             </div>
@@ -773,24 +806,33 @@ function hapus_alat(id){
                 </div>
             </div>
             <div class="form-group">
-                <table>
-                    <tr>
-                        <td><div class="merah_tr" style="width:15px; height:15px;"></div></td>
-                        <td>&nbsp;</td>
-                        <td>Keterangan warna tabel</td>
-                    </tr>
-                </table>
+            	<div class="col-md-4">
+	                <table class="table table-bordered">
+	                    <thead>
+	                        <tr class="active">
+	                            <th style="text-align:center;">Warna</th>
+	                            <th style="text-align:center;">Keterangan</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody>
+	                        <tr>
+	                            <td class="kuning">Kuning</td>
+	                            <td>Stok barang akan habis</td>
+	                        </tr>
+	                    </tbody>
+	                </table>
+            	</div>
             </div>
         </form>
     </div>
 
     <div class="card-box" id="view_tambah">
     	<form class="form-horizontal" role="form" action="<?php echo $url_simpan; ?>" method="post" enctype="multipart/form-data">
-            <h4 class="header-title m-t-0 m-b-30">Tambah Inventaris Bidan</h4>
+            <h4 class="header-title m-t-0 m-b-30">Tambah Barang</h4>
             <hr/>
             <div class="row">
                 <div class="col-lg-6">
-					<div class="form-group">
+					<!-- <div class="form-group">
 						<label class="col-md-2 control-label">Departemen</label>
 						<div class="col-md-8">
 							<div class="input-group">
@@ -817,7 +859,7 @@ function hapus_alat(id){
 								</span>
 							</div>
 						</div>
-					</div>
+					</div> -->
                     <div class="form-group">
                         <label class="col-md-2 control-label">Kode Barang</label>
                         <div class="col-md-8">
@@ -969,34 +1011,34 @@ function hapus_alat(id){
             <div class="row">
                 <div class="col-lg-6">
 					<input type="hidden" name="id_ubah" id="id_ubah" value="">
-					<div class="form-group">
+					<!-- <div class="form-group">
 						<label class="col-md-2 control-label">Departemen</label>
 						<div class="col-md-8">
-							<input type="hidden" name="id_departemen_ubah" id="id_departemen_ubah" value="">
-							<input type="text" class="form-control" id="departemen_ubah" value="" readonly>
-							<!-- <div class="input-group">
+							<div class="input-group">
+								<input type="hidden" name="id_departemen_ubah" id="id_departemen_ubah" value="">
+								<input type="text" class="form-control" id="departemen_ubah" value="" readonly>
 								<span class="input-group-btn">
 									<button class="btn waves-effect waves-light btn-danger btn_departemen" type="button">
 										<i class="fa fa-search"></i>
 									</button>
 								</span>
-							</div> -->
+							</div>
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="col-md-2 control-label">Divisi</label>
 						<div class="col-md-8">
-							<input type="hidden" name="id_divisi_ubah" id="id_divisi_ubah" value="">
-							<input type="text" class="form-control" id="divisi_ubah" value="" readonly>
-							<!-- <div class="input-group">
+							<div class="input-group">
+								<input type="hidden" name="id_divisi_ubah" id="id_divisi_ubah" value="">
+								<input type="text" class="form-control" id="divisi_ubah" value="" readonly>
 								<span class="input-group-btn">
 									<button class="btn waves-effect waves-light btn-warning btn_divisi" type="button">
 										<i class="fa fa-search"></i>
 									</button>
 								</span>
-							</div> -->
+							</div>
 						</div>
-					</div>
+					</div> -->
                     <div class="form-group">
                         <label class="col-md-2 control-label">Kode Barang</label>
                         <div class="col-md-8">
@@ -1153,6 +1195,9 @@ function hapus_alat(id){
                         </div>
                     </div>
                 </form>
+                <div class="loading_tabel_brg">
+		        	<img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
+		        </div>
                 <div class="table-responsive">
                     <div class="scroll-y">
                         <table class="table table-hover" id="tabel_nama_alat">
@@ -1243,7 +1288,7 @@ function hapus_alat(id){
 		                        </tr>
 		                    </thead>
 		                    <tbody>
-								<?php
+							<?php
 								$array = array(
 									0 => 'Alat Kardiologi',
 									1 => 'Alat Farmasi',
@@ -1257,7 +1302,8 @@ function hapus_alat(id){
 									9 => 'Breathalyzer',
 									10 => 'Alat Ginekologi',
 									11 => 'Alat Neurologi',
-									12 => 'Alat Forensik'
+									12 => 'Alat Forensik',
+									13 => 'Lain - Lain'
 								);
 								$no = 0;
 
@@ -1268,7 +1314,7 @@ function hapus_alat(id){
 									<td><?php echo $no; ?></td>
 									<td><?php echo $array[$i]; ?></td>
 								</tr>
-								<?php } ?>
+							<?php } ?>
 		                    </tbody>
 		                </table>
             		</div>
@@ -1304,6 +1350,9 @@ function hapus_alat(id){
 		                </div>
 		            </div>
 		        </form>
+		        <div class="loading_tabel_dep">
+		        	<img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
+		        </div>
             	<div class="table-responsive">
             		<div class="scroll-y">
 		                <table class="table table-hover table-bordered" id="tabel_departemen">
@@ -1351,6 +1400,9 @@ function hapus_alat(id){
 		                </div>
 		            </div>
 		        </form>
+		        <div class="loading_tabel_div">
+		        	<img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
+		        </div>
             	<div class="table-responsive">
             		<div class="scroll-y">
 		                <table class="table table-hover table-bordered" id="tabel_divisi">
@@ -1376,7 +1428,7 @@ function hapus_alat(id){
 
 <button id="popup_hapus" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#custom-width-modal" style="display:none;">Custom width Modal</button>
 <div id="custom-width-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="width:55%;">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="custom-width-modalLabel">Konfirmasi Hapus</h4>

@@ -14,26 +14,6 @@ class Admum_setup_nama_barang_m extends CI_Model {
 		return $query->result();
 	}
 
-	function data_merk($keyword){
-		$where = "1 = 1";
-
-		if($keyword != ""){
-			$where = $where." AND (MERK LIKE '%$keyword%' OR NAMA_SUPPLIER LIKE '%$keyword%' OR KODE_SUPPLIER LIKE '%$keyword%')";
-		}else{
-			$where = $where;
-		}
-
-		$sql = "SELECT * FROM admum_supplier_barang WHERE $where AND JENIS_BARANG = 'Peralatan Medis' ORDER BY ID DESC";
-		$query = $this->db->query($sql);
-		return $query->result();
-	}
-
-	function klik_merk($id_merk){
-		$sql = "SELECT * FROM admum_supplier_barang WHERE ID = '$id_merk'";
-		$query = $this->db->query($sql);
-		return $query->row();
-	}
-
 	function data_peralatan($keyword){
 		$where = "1 = 1";
 
@@ -59,16 +39,14 @@ class Admum_setup_nama_barang_m extends CI_Model {
 	function data_peralatan_id($id){
 		$sql = "
 			SELECT 
-				ALAT.ID,
-				ALAT.KODE_ALAT,
-				ALAT.BARCODE,
-				ALAT.NAMA_ALAT,
-				ALAT.ID_MERK,
-				SUP.MERK,
-				ALAT.JENIS_ALAT
-			FROM admum_setup_peralatan_medis ALAT
-			LEFT JOIN admum_supplier_barang SUP ON SUP.ID = ALAT.ID_MERK
-			WHERE ALAT.ID = '$id'
+				a.ID,
+				a.KODE_ALAT,
+				a.NAMA_ALAT,
+				a.ID_KATEGORI,
+				b.NAMA_KATEGORI
+			FROM admum_setup_peralatan_medis a
+			LEFT JOIN log_kategori b ON b.ID = a.ID_KATEGORI
+			WHERE a.ID = '$id'
 		";
 		$query = $this->db->query($sql);
 		return $query->row();
@@ -89,13 +67,11 @@ class Admum_setup_nama_barang_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
-	function ubah($id,$barcode,$nama_alat,$id_merk,$jenis_alat){
+	function ubah($id,$nama_alat,$id_kategori){
 		$sql = "
 			UPDATE admum_setup_peralatan_medis SET 
-				BARCODE = '$barcode',
 				NAMA_ALAT = '$nama_alat',
-				ID_MERK = '$id_merk',
-				JENIS_ALAT = '$jenis_alat'
+				ID_KATEGORI = '$id_kategori'
 			WHERE ID = '$id'";
 		$this->db->query($sql);
 	}

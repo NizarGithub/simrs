@@ -17,8 +17,8 @@ class Admum_setup_nama_barang_c extends CI_Controller {
 	{
 		$data = array(
 			'page' => 'finance/admum_setup_nama_barang_v',
-			'title' => 'Peralatan Medis',
-			'subtitle' => 'Peralatan Medis',
+			'title' => 'Setup Nama Barang',
+			'subtitle' => 'Setup Nama Barang',
 			'childtitle' => '',
 			'master_menu' => 'master_setup',
 			'view' => 'setup_nama_barang',
@@ -94,18 +94,6 @@ class Admum_setup_nama_barang_c extends CI_Controller {
 		}
 	}
 
-	function data_merk(){
-		$keyword = $this->input->get('keyword');
-		$data = $this->model->data_merk($keyword);
-		echo json_encode($data);
-	}
-
-	function klik_merk(){
-		$id_merk = $this->input->post('id_merk');
-		$data = $this->model->klik_merk($id_merk);
-		echo json_encode($data);
-	}
-
 	function get_data_alat(){
 		$keyword = $this->input->get('keyword');
 		$data = $this->model->data_peralatan($keyword);
@@ -132,20 +120,17 @@ class Admum_setup_nama_barang_c extends CI_Controller {
 
 	function ubah(){
 		$id = $this->input->post('id_ubah');
-		$barcode = $this->input->post('barcode_ubah');
 		$nama_alat = $this->input->post('nama_barang_ubah');
-		$id_merk_ubah = $this->input->post('id_merk_ubah');
-		$jenis_alat = $this->input->post('jenis_alat_ubah');
+		$id_kategori = '';
+		$checkbox2 = $this->input->post('checkbox2');
 
-		$id_merk = "";
-
-		if($id_merk_ubah != ""){
-			$id_merk = $id_merk_ubah;
+		if($checkbox2){
+			$id_kategori = $this->input->post('id_kategori_ubah');
 		}else{
-			$id_merk = $this->input->post('id_merk_lama');
+			$id_kategori = $this->input->post('id_kat_lama');
 		}
 
-		$this->model->ubah($id,$barcode,$nama_alat,$id_merk,$jenis_alat);
+		$this->model->ubah($id,$nama_alat,$id_kategori);
 
 		$this->session->set_flashdata('ubah','1');
 		redirect('finance/admum_setup_nama_barang_c');
