@@ -1645,7 +1645,7 @@ function ini_obatnya(id){
 
 					$tr = 	"<tr id='tr_resep2_"+result[i].ID+"'>"+
 								"<input type='hidden' name='id_obat_resep[]' value='"+result[i].ID+"'>"+
-								"<input type='hidden' name='harga_obat[]' id='harga_obat_"+result[i].ID+"' value='"+result[i].HARGA_JUAL+"'>"+
+								"<input type='hidden' name='harga_obat[]' id='harga_obat_"+result[i].ID+"' value='"+harga+"'>"+
 								"<input type='hidden' name='service[]' id='service_"+result[i].ID+"' value='"+result[i].SERVICE+"'>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_OBAT+"</td>"+
 								"<td style='vertical-align:middle;'>"+result[i].NAMA_OBAT+"</td>"+
