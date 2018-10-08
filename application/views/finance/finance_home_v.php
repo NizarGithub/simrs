@@ -190,9 +190,7 @@
         <div class="wrapper">
             <div class="container">
                 <div class="row">
-                    <div class="col-sm-12">
-                        <h4 class="page-title"><?php echo $subtitle; ?></h4>
-                    </div>
+                    <h4 class="page-title"><?php echo $subtitle; ?></h4>
                 </div>
 
                 <div class="row">

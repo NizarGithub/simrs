@@ -227,6 +227,38 @@ function data_rawat_inap(){
 						tgl_krs = '-';
 					}else{
 						tgl_krs = result[i].TANGGAL_KELUAR;
+						// Here are the two dates to compare
+						var date1 = "<?php echo date('Y-m-d'); ?>";
+						var date2 = result[i].TGL_KELUAR_BALIK;
+						// First we split the values to arrays date1[0] is the year, [1] the month and [2] the day
+						date1 = date1.split('-');
+						date2 = date2.split('-');
+						// Now we convert the array to a Date object, which has several helpful methods
+						date1 = new Date(date1[0], date1[1], date1[2]);
+						date2 = new Date(date2[0], date2[1], date2[2]);
+						// We use the getTime() method and get the unixtime (in milliseconds, but we want seconds, therefore we divide it through 1000)
+						date1_unixtime = parseInt(date1.getTime() / 1000);
+						date2_unixtime = parseInt(date2.getTime() / 1000);
+						// This is the calculated difference in seconds
+						var timeDifference = date2_unixtime - date1_unixtime;
+						// in Hours
+						var timeDifferenceInHours = timeDifference / 60 / 60;
+						// and finaly, in days :)
+						var timeDifferenceInDays = timeDifferenceInHours  / 24;
+						//in month
+						var timeDifferenceInMonth = (date2.getFullYear() - date1.getFullYear()) * 12 + (date2.getMonth() - date1.getMonth());
+
+						var hari = parseFloat(timeDifferenceInDays)-1;
+						var warna = '';
+						var keterangan = '';
+
+						if(parseFloat(hari) > 0 && parseFloat(hari) <= 2){
+							warna = "class='deezer_hj'";
+							keterangan = "Sisa Rawat Inap tinggal <b>"+hari+" hari</b>";
+						}else{
+							warna = '';
+							keterangan = keterangan;
+						}
 					}
 
 					var sistem_bayar = '';
@@ -241,39 +273,6 @@ function data_rawat_inap(){
 						bed = 'Selesai Ditangani';
 					}else{
 						bed = result[i].KODE_KAMAR+' - '+result[i].KELAS+' / '+result[i].NOMOR_BED;
-					}
-
-					// Here are the two dates to compare
-					var date1 = "<?php echo date('Y-m-d'); ?>";
-					var date2 = result[i].TGL_KELUAR_BALIK;
-					// First we split the values to arrays date1[0] is the year, [1] the month and [2] the day
-					date1 = date1.split('-');
-					date2 = date2.split('-');
-					// Now we convert the array to a Date object, which has several helpful methods
-					date1 = new Date(date1[0], date1[1], date1[2]);
-					date2 = new Date(date2[0], date2[1], date2[2]);
-					// We use the getTime() method and get the unixtime (in milliseconds, but we want seconds, therefore we divide it through 1000)
-					date1_unixtime = parseInt(date1.getTime() / 1000);
-					date2_unixtime = parseInt(date2.getTime() / 1000);
-					// This is the calculated difference in seconds
-					var timeDifference = date2_unixtime - date1_unixtime;
-					// in Hours
-					var timeDifferenceInHours = timeDifference / 60 / 60;
-					// and finaly, in days :)
-					var timeDifferenceInDays = timeDifferenceInHours  / 24;
-					//in month
-					var timeDifferenceInMonth = (date2.getFullYear() - date1.getFullYear()) * 12 + (date2.getMonth() - date1.getMonth());
-
-					var hari = parseFloat(timeDifferenceInDays)-1;
-					var warna = '';
-					var keterangan = '';
-
-					if(parseFloat(hari) > 0 && parseFloat(hari) <= 2){
-						warna = "class='deezer_hj'";
-						keterangan = "Sisa Rawat Inap tinggal <b>"+hari+" hari</b>";
-					}else{
-						warna = warna;
-						keterangan = keterangan;
 					}
 
 					// <button data-original-title="Tooltip on top" title="" data-placement="top" data-toggle="tooltip" class="btn btn-default" type="button">Tooltip on top</button>

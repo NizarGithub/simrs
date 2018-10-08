@@ -13,6 +13,7 @@ class Log_laporan_barang_c extends CI_Controller {
 	        redirect('portal');
 	    }
 	}
+
 	function index(){
 		$data = array(
 			'page' => 'finance/log_laporan_barang_v',
@@ -24,129 +25,94 @@ class Log_laporan_barang_c extends CI_Controller {
 
 		$this->load->view('finance/finance_home_v',$data);
 	}
+
   function data_peralatan(){
-    $data = $this->model->data_peralatan();
+    $by = $this->input->get('by');
+    $tanggal_sekarang = $this->input->get('tanggal_sekarang');
+    $tanggal_sampai = $this->input->get('tanggal_sampai');
+    $bulan = $this->input->get('bulan');
+    $tahun = $this->input->get('tahun');
+
+    $data = $this->model->data_peralatan($by,$tanggal_sekarang,$tanggal_sampai,$bulan,$tahun);
+
     echo json_encode($data);
   }
-  function range_tanggal(){
+
+  function cetak_pdf(){
+    $by = $this->input->post('by');
     $tanggal_sekarang = $this->input->post('tanggal_sekarang');
     $tanggal_sampai = $this->input->post('tanggal_sampai');
-    $data = $this->model->range_tanggal($tanggal_sekarang, $tanggal_sampai);
-    echo json_encode($data);
-  }
-  function range_bulan(){
     $bulan = $this->input->post('select_bulan');
-    $data = $this->model->range_bulan($bulan);
-    echo json_encode($data);
-  }
-  function data_departemen(){
-		$data = $this->model->data_departemen();
-		echo json_encode($data);
-	}
-  function klik_departemen(){
-		$id_departemen = $this->input->post('id_departemen');
-		$data = $this->model->klik_departemen($id_departemen);
-		echo json_encode($data);
-	}
-  function data_divisi(){
-		$id_departemen = $this->input->post('id_departemen');
-		$data = $this->model->data_divisi($id_departemen);
-		echo json_encode($data);
-	}
-	function klik_divisi(){
-		$id_divisi = $this->input->post('id_divisi');
-		$data = $this->model->klik_divisi($id_divisi);
-		echo json_encode($data);
-	}
-  function search_divisi(){
-    $id_divisi = $this->input->post('id_divisi');
-    $data = $this->model->search_divisi($id_divisi);
-    echo json_encode($data);
-  }
-  function semua_pdf(){
-    $by = $this->input->post('by');
-    $tanggal_sekarang = $this->input->post('tanggal_sekarang');
-    $tanggal_sampai = $this->input->post('tanggal_sampai');
-    $select_bulan = $this->input->post('select_bulan');
-    $id_departemen = $this->input->post('id_departemen');
-    $id_divisi = $this->input->post('id_divisi');
+    $tahun = $this->input->post('tahun');
+    $judul = "";
 
-    $data = $this->model->semua_pdf(
-      $by,
-      $tanggal_sekarang,
-      $tanggal_sampai,
-      $select_bulan,
-      $id_departemen,
-      $id_divisi
+    $bulan_arr = array(
+      1 =>  "Januari", 2  =>"Februari", 3  =>"Maret", 4 =>"April",
+      5 =>  "Mei", 6  =>"Juni", 7  =>"Juli", 8 =>"Agustus",
+      9 =>  "September", 10 =>"Oktober", 11 =>"November", 12 =>"Desember"
     );
 
-		$data_row = $this->model->semua_pdf_row(
-      $by,
-      $tanggal_sekarang,
-      $tanggal_sampai,
-      $select_bulan,
-      $id_departemen,
-      $id_divisi
-    );
+    if($by == 'Semua'){
+      $judul = "Semua Barang";
+    }else if($by == 'Tanggal'){
+      $judul = "Tanggal : ".$tanggal_sekarang." s/d ".$tanggal_sampai;
+    }else if($by == 'Bulan'){
+      $judul = "Bulan : ".$bulan_arr[$bulan];
+    }
+
+		$data = $this->model->data_peralatan($by,$tanggal_sekarang,$tanggal_sampai,$bulan,$tahun);
 
     $array = array(
       'settitle' => 'Laporan Barang',
       'filename' => date('dmY').'_laporan_barang',
-      'data' => $data,
-			'data_row' => $data_row,
-			'by' => $by,
-			'tanggal_sekarang' => $tanggal_sekarang,
-			'tanggal_sampai' => $tanggal_sampai,
-			'bulan' => $select_bulan,
-			'id_divisi' => $id_divisi
+      'dt' => $data,
+      'judul' => $judul
     );
-    $this->load->view('finance/semua_pdf', $array);
+
+    $this->load->view('finance/pdf/lap_laporan_barang_pdf_v', $array);
   }
-	function semua_excel(){
+
+	function cetak_excel(){
     $by = $this->input->post('by');
     $tanggal_sekarang = $this->input->post('tanggal_sekarang');
     $tanggal_sampai = $this->input->post('tanggal_sampai');
-    $select_bulan = $this->input->post('select_bulan');
-    $id_departemen = $this->input->post('id_departemen');
-    $id_divisi = $this->input->post('id_divisi');
+    $bulan = $this->input->post('select_bulan');
+    $tahun = $this->input->post('tahun');
+    $judul = "";
 
-    $data = $this->model->semua_excel(
-      $by,
-      $tanggal_sekarang,
-      $tanggal_sampai,
-      $select_bulan,
-      $id_departemen,
-      $id_divisi
+    $bulan_arr = array(
+      1 =>  "Januari", 2  =>"Februari", 3  =>"Maret", 4 =>"April",
+      5 =>  "Mei", 6  =>"Juni", 7  =>"Juli", 8 =>"Agustus",
+      9 =>  "September", 10 =>"Oktober", 11 =>"November", 12 =>"Desember"
     );
 
-		$data_row = $this->model->semua_excel_row(
-      $by,
-      $tanggal_sekarang,
-      $tanggal_sampai,
-      $select_bulan,
-      $id_departemen,
-      $id_divisi
-    );
+    if($by == 'Semua'){
+      $judul = "Semua Barang";
+    }else if($by == 'Tanggal'){
+      $judul = "Tanggal : ".$tanggal_sekarang." s/d ".$tanggal_sampai;
+    }else if($by == 'Bulan'){
+      $judul = "Bulan : ".$bulan_arr[$bulan];
+    }
+
+    $data = $this->model->data_peralatan($by,$tanggal_sekarang,$tanggal_sampai,$bulan,$tahun);
 
     $array = array(
       'settitle' => 'Laporan Barang',
       'filename' => date('dmY').'_laporan_barang',
-      'data' => $data,
-			'data_row' => $data_row,
-			'by' => $by,
-			'tanggal_sekarang' => $tanggal_sekarang,
-			'tanggal_sampai' => $tanggal_sampai,
-			'bulan' => $select_bulan,
-			'id_divisi' => $id_divisi
+      'dt' => $data,
+      'judul' => $judul
     );
-    $this->load->view('finance/semua_excel', $array);
+    
+    $this->load->view('finance/xls/lap_laporan_barang_xls_v', $array);
   }
+
   function cetak(){
     $cetak = $this->input->post('print');
     if ($cetak == 'excel') {
-      $this->semua_excel();
+      $this->cetak_excel();
     }else {
-      $this->semua_pdf();
+      $this->cetak_pdf();
     }
   }
+
 }

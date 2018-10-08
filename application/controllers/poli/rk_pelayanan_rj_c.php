@@ -951,4 +951,11 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		$this->load->view('poli/pdf/rk_surat_keterangan_sehat_pdf_v',$data);
 	}
 
+	function get_data_cetak_darurat(){
+		$id_pelayanan = $this->input->post('id_pelayanan');
+		$tanggal = date('d-m-Y');
+		$data = $this->model->data_cetak_darurat($id_pelayanan,$tanggal);
+		echo json_encode($data);
+	}
+
 }
