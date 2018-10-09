@@ -271,7 +271,7 @@ function load_ruangan(){
                     if(result[i].STATUS_PENUH == '0'){
                         klik = "style='cursor:pointer;' onclick='klik_ruangan("+result[i].ID+","+cash+");'";
                     }else{
-                        klik = "class='active'";
+                        klik = "class='abu'";
                     }
 
                     $tr += "<tr "+klik+">"+
@@ -744,7 +744,7 @@ function klik_bed(id){
                 </div>
                 <div class="table-responsive">
                     <div class="scroll-y">
-                        <table class="table table-hover table-bordered" id="tabel_kamar">
+                        <table class="table table-bordered" id="tabel_kamar">
                             <thead>
                                 <tr class="merah_popup">
                                     <th style="text-align:center; color: #fff;" width="50">No</th>

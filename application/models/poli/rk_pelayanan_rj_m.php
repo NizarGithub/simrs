@@ -1318,6 +1318,26 @@ class Rk_pelayanan_rj_m extends CI_Model {
 		return $query->row();
 	}
 
+	function data_cetak_darurat($id_pelayanan,$tanggal){
+		$sql = "
+			SELECT
+				SD.ID,
+				SD.ID_PELAYANAN,
+				SD.TANGGAL,
+				SD.ID_PASIEN,
+				PSN.NAMA,
+				PSN.JENIS_KELAMIN,
+				PSN.UMUR
+			FROM rk_surat_dokter_rj SD
+			LEFT JOIN rk_pasien PSN ON PSN.ID = SD.ID_PASIEN
+			WHERE SD.ID_PELAYANAN = '$id_pelayanan'
+			AND SD.TANGGAL = '$tanggal'
+			ORDER BY SD.ID DESC
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
 	//PASIEN SUDAH
 
 	function data_pasien_sudah($keyword){

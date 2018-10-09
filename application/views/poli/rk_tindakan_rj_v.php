@@ -834,6 +834,10 @@ $(document).ready(function(){
 		});
     });
 
+    $('#dt_cetak_darurat').click(function(){
+    	get_data_cetak_darurat();
+    });
+
 });
 
 //TINDAKAN
@@ -1645,7 +1649,7 @@ function ini_obatnya(id){
 
 					$tr = 	"<tr id='tr_resep2_"+result[i].ID+"'>"+
 								"<input type='hidden' name='id_obat_resep[]' value='"+result[i].ID+"'>"+
-								"<input type='hidden' name='harga_obat[]' id='harga_obat_"+result[i].ID+"' value='"+result[i].HARGA_JUAL+"'>"+
+								"<input type='hidden' name='harga_obat[]' id='harga_obat_"+result[i].ID+"' value='"+harga+"'>"+
 								"<input type='hidden' name='service[]' id='service_"+result[i].ID+"' value='"+result[i].SERVICE+"'>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_OBAT+"</td>"+
 								"<td style='vertical-align:middle;'>"+result[i].NAMA_OBAT+"</td>"+
@@ -1714,6 +1718,7 @@ function data_resep(){
 								"<td style='vertical-align:middle; text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].KODE_RESEP+"</td>"+
 								"<td style='vertical-align:middle; text-align:center;'>"+result[i].BANYAKNYA_RESEP+" Bungkus</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+result[i].ITER+" x</td>"+
 								"<td style='vertical-align:middle;' align='center'>"+alergi+"</td>"+
 								"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TOTAL)+"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
@@ -2264,6 +2269,65 @@ function hitung_tanggal_kurang_dari(){
 		$('#simpanSDRI').removeAttr('disabled');
 	}
 }
+
+function get_data_cetak_darurat(){
+	$('#popup_load').show();
+	var id_pelayanan = "<?php echo $id; ?>";
+
+	$.ajax({
+		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/get_data_cetak_darurat',
+		data : {id_pelayanan:id_pelayanan},
+		type : "POST",
+		dataType : "json",
+		success : function(result){
+			$tr = "";
+
+			if(result == "" || result == null){
+				$tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+			}else{
+				var no = 0;
+
+				for(var i=0; i<result.length; i++){
+					no++;
+
+					$tr += "<tr>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
+								"<td style='vertical-align:middle; text-align:center;'>"+
+									"<button type='button' class='btn btn-primary waves-effect waves-light btn-sm' onclick='cetak_surat_keterangan("+result[i].ID_PASIEN+");'>"+
+							   			'<i class="fa fa-print"></i>'+
+							   		"</button>"+
+								"</td>"+
+								"<td align='center'>"+
+									"<button type='button' class='btn btn-primary waves-effect waves-light btn-sm' onclick='hapus_resep("+result[i].ID+");'>"+
+							   			'<i class="fa fa-print"></i>'+
+							   		"</button>"+
+								"</td>"+
+								"<td align='center'>"+
+									"<button type='button' class='btn btn-primary waves-effect waves-light btn-sm' onclick='hapus_resep("+result[i].ID+");'>"+
+							   			'<i class="fa fa-print"></i>'+
+							   		"</button>"+
+								"</td>"+
+								"<td align='center'>"+
+									"<button type='button' class='btn btn-primary waves-effect waves-light btn-sm' onclick='hapus_resep("+result[i].ID+");'>"+
+							   			'<i class="fa fa-print"></i>'+
+							   		"</button>"+
+								"</td>"+
+							"</tr>";
+				}
+			}
+
+			$('#tabel_cetak_darurat tbody').html($tr);
+			$('#popup_load').fadeOut();
+		}
+	});
+}
+
+function cetak_surat_keterangan(id_pasien){
+	// var encodedString = atob(id_pasien);
+	// console.log(id_pasien);
+	window.open('<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/surat_dokter/'+id_pasien,'_blank');
+}
 </script>
 
 <div id="popup_load">
@@ -2399,6 +2463,9 @@ function hitung_tanggal_kurang_dari(){
                             </li>
                         </ul>
                     </li>
+                    <li role="presentation" id="dt_cetak_darurat">
+	                    <a href="#cetak_darurat1" role="tab" data-toggle="tab"><i class="fa fa-file"></i>&nbsp;Cetak Darurat</a>
+	                </li>
 	            </ul>
 	            <div class="tab-content">
 	            	<div role="tabpanel" class="tab-pane fade in active" id="diagnosa1">
@@ -2866,6 +2933,7 @@ function hitung_tanggal_kurang_dari(){
 							                        <th style="color:#fff; text-align:center;">Tanggal</th>
 							                        <th style="color:#fff; text-align:center;">Kode Resep</th>
 							                        <th style="color:#fff; text-align:center;">Banyak Resep</th>
+							                        <th style="color:#fff; text-align:center;">Iter</th>
 							                        <th style="color:#fff; text-align:center;">Alergi Obat</th>
 							                        <th style="color:#fff; text-align:center;">Total</th>
 							                        <th style="color:#fff; text-align:center;">Aksi</th>
@@ -3465,6 +3533,37 @@ function hitung_tanggal_kurang_dari(){
 		                        <button type="reset" class="btn btn-danger" id="batalSKS"><i class="fa fa-times"></i> <b>Batal</b></button>
 		                    </center>
 		                </form>
+	                </div>
+
+	                <div role="tabpanel" class="tab-pane fade" id="cetak_darurat1">
+	                	<form class="form-horizontal">
+	                    	<div class="form-group">
+	                    		<div class="col-md-6">
+	                    			<h4 class="m-t-0"><i class="fa fa-table"></i>&nbsp;<b>Data Surat Keterangan</b></h4>
+	                    		</div>
+	                    	</div>
+	                    	<div class="form-group">
+	                    		<div class="col-md-12">
+				                    <div class="table-responsive">
+							            <table id="tabel_cetak_darurat" class="table table-bordered">
+							                <thead>
+							                    <tr class="merah">
+							                        <th style="color:#fff; text-align:center;">No</th>
+							                        <th style="color:#fff; text-align:center;">Tanggal</th>
+							                        <th style="color:#fff; text-align:center;">Surat Keterangan Dokter</th>
+							                        <th style="color:#fff; text-align:center;">Surat Pengantar RI</th>
+							                        <th style="color:#fff; text-align:center;">Surat Keterangan RI</th>
+							                        <th style="color:#fff; text-align:center;">Surat Keterangan Sehat</th>
+							                    </tr>
+							                </thead>
+							                <tbody>
+							                    
+							                </tbody>
+							            </table>
+							        </div>
+	                    		</div>
+	                    	</div>
+	                    </form>
 	                </div>
 	            </div>
 			</div>

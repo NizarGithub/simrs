@@ -26,6 +26,10 @@ $(document).ready(function(){
     <?php } ?>
 
 	data_barang();
+
+	$('#btn_import').click(function(){
+		$('#popup_load').show();
+	});
 });
 
 function paging($selector){
@@ -117,7 +121,7 @@ function data_barang(){
             </ul>
             <div class="tab-content">
             	<div id="daftar1" class="tab-pane fade in active" role="tabpanel">
-			        <form class="form-horizontal" role="form" action="<?php echo base_url(); ?>finance/stok_awal_barang_c/export_excel" method="post" target="_blank" enctype="multiple-part/form-data">
+			        <form class="form-horizontal" role="form" action="<?php echo base_url(); ?>finance/stok_awal_barang_c/export_excel" method="post" target="_blank" enctype="multipart/form-data">
 			        	<div class="form-group">
 			                <div class="col-md-7">
 			                    <button type="submit" class="btn btn-success waves-effect w-md waves-light">
@@ -131,7 +135,7 @@ function data_barang(){
 						            <table id="tabel_barang" class="table table-bordered">
 						                <thead>
 						                    <tr class="biru">
-						                        <th style="color:#fff; text-align:center;" width="50">No</th>
+						                        <th style="color:#fff; text-align:center;">No</th>
 						                        <th style="color:#fff; text-align:center;">Nama Barang</th>
 						                        <th style="color:#fff; text-align:center;">Kategori</th>
 						                        <th style="color:#fff; text-align:center;">Stok</th>
@@ -172,7 +176,7 @@ function data_barang(){
             	</div>
 
             	<div id="import1" class="tab-pane fade in" role="tabpanel">
-            		<form class="form-horizontal" role="form" action="<?php echo base_url(); ?>finance/stok_awal_barang_c/import_excel" method="post" enctype="multiple-part/form-data">
+            		<form class="form-horizontal" role="form" action="<?php echo base_url(); ?>finance/stok_awal_barang_c/import_excel" method="post" enctype="multipart/form-data">
 			            <div class="form-group">
 			                <div class="col-md-4">
 			                    <input type="file" class="dropify" name="fileexcel" accept="application/vnd.ms-excel" data-max-file-size="5M">
@@ -180,7 +184,7 @@ function data_barang(){
 			            </div>
 			            <div class="form-group">
 			                <div class="col-md-7">
-			                    <button type="submit" class="btn btn-success waves-effect w-md waves-light">
+			                    <button type="submit" class="btn btn-success waves-effect w-md waves-light" id="btn_import">
 			                        <i class="fa fa-download"></i> Import
 			                    </button>
 			                </div>

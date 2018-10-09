@@ -5,6 +5,7 @@ class Stok_awal_barang_c extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();
+		error_reporting(0);
 		$this->load->helper('url');
 		$this->load->library('excel_reader2');
 		$this->load->model('finance/stok_awal_barang_m','model');
