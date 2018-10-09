@@ -14,7 +14,7 @@
         <link href="<?php echo base_url(); ?>assets/plugins/fileuploads/css/dropify.min.css" rel="stylesheet" type="text/css" />
 
         <!--Morris Chart CSS -->
-		<link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/morris/morris.css">
+		     <link rel="stylesheet" href="<?php echo base_url(); ?>assets/plugins/morris/morris.css">
 
         <!-- Notification css (Toastr) -->
         <link href="<?php echo base_url(); ?>assets/plugins/toastr/toastr.min.css" rel="stylesheet" type="text/css" />
@@ -56,7 +56,7 @@
         <![endif]-->
 
         <script src="<?php echo base_url(); ?>assets/js/modernizr.min.js"></script>
-        <?PHP 
+        <?PHP
             $sess_user = $this->session->userdata('masuk_rs');
             $id_user = $sess_user['id'];
             $user = $this->master_model_m->get_user_info($id_user);
@@ -74,42 +74,52 @@
                 <div class="container">
 
                     <!-- LOGO -->
+                    <?php
+                        $sql_logo = "SELECT LOGO FROM admum_setup_logo WHERE POSISI = 'Hor'";
+                        $qry_logo = $this->db->query($sql_logo)->row();
+                        $logo = '';
+                        if($qry_logo->LOGO == null || $qry_logo->LOGO == ""){
+                            $logo = base_url().'picture/logo-default.png';
+                        }else{
+                            $logo = base_url().'picture/logo/'.$qry_logo->LOGO;
+                        }
+                    ?>
                     <div class="topbar-left">
-                        <a href="<?php echo base_url(); ?>apotek/ap_home_c" class="logo" style="margin-top:4px;">
-                            <img src="<?php echo base_url(); ?>picture/jtech-logo.png" style="max-width:150px; max-height:40px;">
+                        <a href="javascript:;" class="logo" style="margin-top:4px;">
+                            <img src="<?php echo $logo; ?>" style="max-width:150px; max-height:40px;">
                         </a>
                     </div>
                     <!-- End Logo container-->
 
                     <!-- LOKET -->
-                    <?PHP 
-                    if(count($is_operator) > 0){ 
+                    <?PHP
+                    if(count($is_operator) > 0){
                         $get_loket = $this->master_model_m->getLoket($id_user, 'apotek');
-                        $get_jml_antrian = $this->master_model_m->getJmlAntrian($get_loket->KODE_ANTRIAN); 
+                        $get_jml_antrian = $this->master_model_m->getJmlAntrian($get_loket->KODE_ANTRIAN);
                     ?>
                     <center>
                     <div style="width: 87%; position: absolute; float: left; margin-top: 7px;">
-                        <button type="button" class="btn btn-warning waves-effect waves-light w-md m-b-5" style="padding-top: 10px; padding-bottom: 10px;"> 
-                            <b id="nama_loket_antrian_txt"> <?=strtoupper($get_loket->NAMA_LOKET);?> </b> 
+                        <button type="button" class="btn btn-warning waves-effect waves-light w-md m-b-5" style="padding-top: 10px; padding-bottom: 10px;">
+                            <b id="nama_loket_antrian_txt"> <?=strtoupper($get_loket->NAMA_LOKET);?> </b>
                         </button>
 
-                        <button type="button" class="btn btn-danger" style="margin-left: 100px; font-size: 32px; margin-top: -8px;"> 
-                            <b><?=$get_loket->KODE;?>-<font id="jml_antrian_txt"><?=count($get_jml_antrian) + 0;?></font></b> 
+                        <button type="button" class="btn btn-danger" style="margin-left: 100px; font-size: 32px; margin-top: -8px;">
+                            <b><?=$get_loket->KODE;?>-<font id="jml_antrian_txt"><?=count($get_jml_antrian) + 0;?></font></b>
 
                             <input type="hidden" id="kode_antrian_now" value="<?=$get_loket->KODE;?>" />
                             <input type="hidden" id="jml_antrian_now" value="<?=count($get_jml_antrian) + 0;?>" />
                             <input type="hidden" id="id_antrian_now" value="<?=$get_loket->KODE_ANTRIAN;?>" />
                         </button>
 
-                        <button class="btn btn-purple waves-effect waves-light m-b-5" style="margin-left: 40px;" onclick="panggil_antrian();"> 
-                           <i class="fa fa-bullhorn m-r-5"></i>   <span> Panggil </span> 
+                        <button class="btn btn-purple waves-effect waves-light m-b-5" style="margin-left: 40px;" onclick="panggil_antrian();">
+                           <i class="fa fa-bullhorn m-r-5"></i>   <span> Panggil </span>
                         </button>
 
-                        <button class="btn btn-primary waves-effect waves-light m-b-5" style="margin-left: 10px;" data-toggle="modal" data-target="#next_antrian"> 
-                            <span> Berikutnya </span> <i class="fa fa-chevron-circle-right m-r-5"></i>  
+                        <button class="btn btn-primary waves-effect waves-light m-b-5" style="margin-left: 10px;" data-toggle="modal" data-target="#next_antrian">
+                            <span> Berikutnya </span> <i class="fa fa-chevron-circle-right m-r-5"></i>
                         </button>
 
-                        
+
                     </div>
                     </center>
                     <?PHP } ?>
@@ -160,10 +170,10 @@
                         <ul class="navigation-menu">
                             <li <?php if($master_menu == 'home'){ echo 'class="active"';}else{echo '';} ?> >
                                 <a href="<?php echo base_url(); ?>apotek/ap_home_c">
-                                    <i class="zmdi zmdi-view-dashboard"></i> <span> Dashboard </span> 
+                                    <i class="zmdi zmdi-view-dashboard"></i> <span> Dashboard </span>
                                 </a>
                             </li>
-                            <?PHP 
+                            <?PHP
                             $get_menu2 = $this->master_model_m->get_menu_2($id_user, 3);
                             foreach ($get_menu2 as $key => $menu2) {
                             ?>
@@ -173,7 +183,7 @@
                                         <a href="#"><i class="<?=$menu2->ICON;?>"></i><span> <?=$menu2->NAMA;?> </span> </a>
                                         <ul class="submenu">
 
-                                            <?PHP 
+                                            <?PHP
                                                 $get_menu3 = $this->master_model_m->get_menu_3($id_user, $menu2->ID);
                                                 foreach ($get_menu3 as $key => $menu3) {
                                             ?>
@@ -191,7 +201,7 @@
                                 <?PHP } else { ?>
                                     <li <?php if($view == $menu2->VIEW){ echo 'class="active"';}else{echo '';} ?> >
                                         <a href="<?php echo base_url().$menu2->LINK;?>">
-                                            <i class="<?=$menu2->ICON;?>"></i> <span> <?=$menu2->NAMA;?> </span> 
+                                            <i class="<?=$menu2->ICON;?>"></i> <span> <?=$menu2->NAMA;?> </span>
                                         </a>
                                     </li>
                                 <?PHP } ?>
@@ -343,7 +353,7 @@
                                 <button type="button" class="btn btn-inverse " data-dismiss="modal" id="close_next_antrian">Tidak</button>
                                  &nbsp;&nbsp;&nbsp;&nbsp;
                                 <button onclick="next_antri();" type="button" class="btn btn-danger"> Ya </button>
-                            </center>                        
+                            </center>
                         </div>
                     </div>
                 </div>
@@ -474,8 +484,8 @@
                           "Pengunjung dengan nomor antrian, "+kode_antrian+","+jml_antrian_next+", silahkan menuju ke "+nama_loket_antrian_txt+". Terima kasih.",
                           "Indonesian Female",
                           {
-                           pitch: 1, 
-                           rate: 1, 
+                           pitch: 1,
+                           rate: 1,
                            volume: 1
                           }
                          );
@@ -494,8 +504,8 @@
               "Pengunjung dengan nomor antrian, "+kode_antrian+","+jml_antrian+", silahkan menuju ke "+nama_loket_antrian_txt+". Terima kasih.",
               "Indonesian Female",
               {
-               pitch: 1, 
-               rate: 1, 
+               pitch: 1,
+               rate: 1,
                volume: 1
               }
              );

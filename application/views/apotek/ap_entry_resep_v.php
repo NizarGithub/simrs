@@ -1,6 +1,7 @@
 <?PHP
 $sess_user = $this->session->userdata('masuk_rs');
 $id_user = $sess_user['id'];  //ID PEGAWAI
+$shift = $sess_user['shift'];
 
 $user_detail = $this->model->get_user_detail($id_user);
 
@@ -62,10 +63,15 @@ $user_detail = $this->model->get_user_detail($id_user);
     </div>
 </div> -->
 <body data-page="medias" onload="startTime(); startNotifClosing();">
+	<div id="popup_load">
+	    <div class="window_load">
+	        <img src="<?=base_url()?>picture/progress.gif" height="100" width="125">
+	    </div>
+	</div>
     <!-- BEGIN TOP MENU -->
     <input type="hidden" id="sts_edit" value="0" />
     <input type="hidden" id="sts_lunas" value="0" />
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="background-color: #b57ee0; color: white;">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#sidebar">
@@ -74,11 +80,11 @@ $user_detail = $this->model->get_user_detail($id_user);
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a id="menu-medium" class="sidebar-toggle toggle_fullscreen tooltips">
+                <a id="menu-medium" class="sidebar-toggle toggle_fullscreen tooltips" style="color: white; border-right: 1px solid #ffffff;">
                     <i class="glyphicon glyphicon-fullscreen"></i>
                 </a>
             </div>
-            <div class="navbar-center"> Entry Resep </div>
+            <div class="navbar-center" style="color: white;"> Entry Resep</div>
             <div class="navbar-collapse collapse">
                 <!-- BEGIN TOP NAVIGATION MENU -->
                 <!-- <ul class="nav navbar-nav pull-right header-menu">
@@ -133,45 +139,65 @@ $user_detail = $this->model->get_user_detail($id_user);
 														</div>
 												</div>
 										</div>
+										<div class="col-sm-6">
+												<div class="panel panel-default">
+														<div class="panel-heading clearfix pos-rel">
+															<div class="pos-abs top-12 l-15 f-18 c-gray"><i class="fa fa-table"></i></div>
+															<h2 class="panel-title width-100p c-red text-center w-500 f-20 carrois">Data Pasien Iter</h2>
+														</div>
+														<div class="panel-body messages">
+															<div class="row">
+																<div class="col-md-12 col-sm-12 col-xs-12">
+																	<div class="scroll-y" style="height: 477px;" id="tabel_pasien_iter">
+
+																	</div>
+																</div>
+															</div>
+														</div>
+												</div>
+										</div>
 
 									<!-- <form class="" id="form_pembayaran"> -->
-										<div class="col-sm-6">
+										<div class="col-sm-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <!-- <h3 class="panel-title">Striped rows <strong>Table</strong></h3> -->
                                 <span style="padding-bottom: 6px; padding-top: 6px;" class="label label-success" style="">
                                     Invoice : #<b id="invoice_txt"></b>
                                 </span>
-                                <button type="button" class="btn btn-danger btn-sm" onclick="window.location='<?=base_url();?>finance/kasir_ranap_c';">Reset</button>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="window.location='<?=base_url();?>apotek/ap_entry_resep_c';">Reset</button>
                             </div>
                             <div class="panel-body messages">
 															<form id="form_pembayaran">
 																<input type="hidden" name="id_pegawai" id="id_pegawai" value="<?php echo $id_user; ?>">
-																<input type="hidden" name="shift" id="shift" value="">
+																<input type="hidden" name="shift" id="shift" value="<?php echo $shift; ?>">
 																<input type="hidden" name="invoice" id="invoice" value="">
 																<input type="hidden" name="total_tagihan" id="total_tagihan">
+																<input type="hidden" name="total_tagihan_normal" id="total_tagihan_normal">
+																<input type="hidden" name="id_pasien" id="id_pasien">
+																<input type="hidden" name="id_dokter" id="id_dokter">
+																<input type="hidden" name="id_resep" id="id_resep">
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <div class="withScroll" data-height="432">
+                                        <div class="withScroll">
                                             <table class="table table-bordered" id="tabel_keranjang">
                                                 <thead>
                                                     <tr class="warning">
-                                                        <th style="text-align: center;">No</th>
-																												<th style="text-align: center;">Barcode</th>
                                                         <th style="text-align: center;">Nama Obat</th>
                                                         <th style="text-align: center;" width="100">Jumlah Beli</th>
                                                         <th style="text-align: center;">Total</th>
+																												<th style="text-align: center;">Jenis Obat</th>
+																												<th style="text-align: center;">Aturan Minum</th>
+																												<th style="text-align: center;">Diminum Selama</th>
 																												<th style="text-align: center;">Aksi</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-
                                                 </tbody>
                                                 <tfoot>
                                                     <tr class="active">
-                                                        <td colspan="4" style="text-align: center; font-weight: bold;">Total Biaya</td>
-                                                        <td style="text-align: right;"><b id="tot_biaya_keranjang">0</b></td>
-																												<td></td>
+                                                        <td colspan="6" style="text-align: center; font-weight: bold;">Total Biaya</td>
+                                                        <td style="text-align: left; "><b id="tot_biaya_keranjang">0</b></td>
                                                     </tr>
                                                 </tfoot>
                                             </table>
@@ -208,13 +234,13 @@ $user_detail = $this->model->get_user_detail($id_user);
 		                                      </div>
 		                                  </div>
 		                                  <div class="panel-footer bg-blue">
-		                                      <h4><strong>Shift <b class="shift_user">0</b></strong></h4>
+		                                      <h4><strong>Shift <b class="shift_user"><?php echo $shift; ?></b></strong></h4>
 		                                      <p><?=$user_detail->NAMA;?></p>
 		                                  </div>
 		                              </div>
 		                          </div>
 
-															<div class="col-lg-2 col-md-2" id="btn_rekap_penjualan" style="cursor: pointer;">
+															<!-- <div class="col-lg-2 col-md-2" id="btn_rekap_penjualan" style="cursor: pointer;">
 																	<div class="panel panel-icon no-bd bg-green hover-effect">
 																			<div class="panel-body bg-green">
 																					<div class="row">
@@ -227,6 +253,23 @@ $user_detail = $this->model->get_user_detail($id_user);
 																			<div class="panel-footer bg-green">
 																					<h4><strong>Rekap Penjualan</strong></h4>
 																					<p>Hari, Bulan Dan Tahun</p>
+																			</div>
+																	</div>
+															</div> -->
+
+															<div class="col-lg-2 col-md-2">
+																	<div class="panel panel-icon no-bd bg-green hover-effect">
+																			<div class="panel-body bg-green">
+																					<div class="row">
+																							<div class="col-md-12">
+																									<div class="icon"><i class="fa fa-file-text"></i>
+																									</div>
+																							</div>
+																					</div>
+																			</div>
+																			<div class="panel-footer bg-green">
+																					<h4><strong>Penjualan</strong></h4>
+																					<p>Entry Resep</p>
 																			</div>
 																	</div>
 															</div>
@@ -242,6 +285,7 @@ $user_detail = $this->model->get_user_detail($id_user);
 																					</div>
 																			</div>
 																			<div class="panel-footer" style="background-color: #F57F17;">
+																				<input type="hidden" id="date_now" value="<?php echo date('d-m-Y'); ?>">
 																				<?php
 		                                        $bulan_arr = array(
 		                                            1 =>    "Januari", 2  =>"Februari", 3  =>"Maret", 4 =>"April",
@@ -328,10 +372,10 @@ $user_detail = $this->model->get_user_detail($id_user);
                 <p>Cara penggunaan shortcut keys :</p>
                 <ul>
                     <li><strong>F1:</strong> Tampilkan Bantuan </li>
-                    <li><strong>F2:</strong> Pencarian obat berdasarkan Nama Obat</li>
+                    <!-- <li><strong>F2:</strong> Pencarian obat berdasarkan Nama Obat</li> -->
                     <!-- <li><strong>F3:</strong> Menampilkan data resi yang tersimpan </li>
                     <li><strong>F4:</strong> Simpan Resi </li> -->
-                    <li><strong>F5:</strong> Proses Pembayaran </li>
+                    <!-- <li><strong>F5:</strong> Proses Pembayaran </li> -->
                 </ul>
                 <button onclick="$('#modal-12').removeClass('md-show');" class="btn btn-default"> Tutup </button>
             </div>
@@ -539,11 +583,13 @@ var snd = new Audio("<?php echo base_url(); ?>sound/Google_Event-1.mp3"); // buf
 $(document).ready(function(){
 	data_obat();
 
+	data_pasien_iter();
+
 	get_invoice();
 
 	// get_kode_trx();
 
-	data_keranjang();
+	// data_keranjang();
 
 	// $('#jumlah_tampil').change(function(){
   //       data_obat();
@@ -607,42 +653,40 @@ $(document).ready(function(){
 });
 
 function simpan_proses(){
+	$('#popup_load').show();
+
 	$.ajax({
-		url : '<?php echo base_url(); ?>apotek/ap_obat_hv_c/simpan_proses',
+		url : '<?php echo base_url(); ?>apotek/ap_entry_resep_c/simpan_proses',
 		data : $('#form_pembayaran').serialize(),
 		type : "POST",
 		dataType : "json",
 		success : function(row){
 			var id = row.ID;
-			// window.open('<?php echo base_url(); ?>apotek/ap_obat_hv_c/cetak/'+id, '_blank', 'location=yes,height=700,width=600,scrollbars=yes,status=yes');
+			// window.open('<?php echo base_url(); ?>apotek/ap_entry_resep_c/cetak/'+id, '_blank', 'location=yes,height=700,width=600,scrollbars=yes,status=yes');
+			data_pasien_iter();
+			data_obat();
+			$('.btn_hapus_row').click();
 			$('#btn_tidak_proses').click();
 			$('#notif_berhasil').click();
-			data_keranjang();
-			data_obat();
+
+			$('#total_tagihan').val();
+			$('#total_tagihan_normal').val();
+			$('#id_pasien').val();
+			$('#id_dokter').val();
+			$('#id_resep').val();
+			$('#tot_biaya_keranjang').html();
+
 			$('#btn_klik_proses').attr('disabled','disabled');
+			$('#popup_load').fadeOut();
 		}
 	});
 }
 
-function simpan_closing(){
-    $.ajax({
-      url : '<?php echo base_url(); ?>apotek/ap_kasir_aa_c/simpan_closing',
-      type : "POST",
-      dataType : "json",
-      success : function(){
-        $('#btn_tutup_closing').click();
-        $('#btn_closing_kasir').hide();
-        $('#notif_closing').hide();
-				snd.pause();
-				$('#btn_logout').click();
-      }
-    });
-}
-
 function data_obat(){
 	var keyword = $('#cari_nama_menu').val();
+	var tanggal_sekarang = $('#date_now').val();
 	$.ajax({
-			url : '<?php echo base_url(); ?>apotek/ap_obat_hv_c/data_obat',
+			url : '<?php echo base_url(); ?>apotek/ap_entry_resep_c/data_obat',
 			data : {keyword:keyword},
 			type : "GET",
 			dataType : "json",
@@ -667,11 +711,40 @@ function data_obat(){
                 }else {
                   status_obat = 'Obat Racik';
                 }
-									$tr +=  '<a href="javascript:;" class="message-item media" onclick="klik_obat('+result[i].ID+', '+result[i].TOTAL_JUAL+');">'+
+
+								var kadaluarsa = result[i].EXPIRED;
+								var balik_hari_kadaluarsa = kadaluarsa.substr(1,1);
+								var balik_bulan_kadaluarsa = kadaluarsa.substr(4,1);
+								var balik_tahun_kadaluarsa = kadaluarsa.substr(6,4);
+								var satuan_tanggal_kadaluarsa = balik_tahun_kadaluarsa+'-'+balik_bulan_kadaluarsa+'-'+balik_hari_kadaluarsa;
+
+								var tanggal = new Date();
+								var tahun = tanggal.getFullYear();
+								var bulan = tanggal.getMonth() + 1;
+								var hari = tanggal.getDate();
+
+								var satuan_tanggal_sekarang = tahun+'-'+bulan+'-'+hari;
+
+								var kadal = '';
+								if (new Date(satuan_tanggal_sekarang) >= new Date(satuan_tanggal_kadaluarsa)) {
+									kadal = '<small class="pull-right" style="color: red;">Exp : '+result[i].EXPIRED+'</small>';
+								}else {
+									kadal = '<small class="pull-right" style="color: black;">Exp : '+result[i].EXPIRED+'</small>';
+								}
+
+								var stok_habis = '';
+								var stok = result[i].TOTAL_STOK_OBAT;
+								if (stok < 10 || stok == 10) {
+									stok_habis = '<h4 class="c-red">'+result[i].TOTAL_STOK_OBAT+'</h4>';
+								}else {
+									stok_habis = '<h4 class="c-dark">'+result[i].TOTAL_STOK_OBAT+'</h4>';
+								}
+
+									$tr +=  '<a href="javascript:;" class="message-item media" onclick="klik_obat('+result[i].ID+', '+result[i].TOTAL_JUAL+', '+result[i].SERVICE+');">'+
 														'<div class="media">'+
 															'<img src="<?php echo base_url(); ?>picture/pills.png" width="50" class="pull-left">'+
 																'<div class="media-body">'+
-                                '<small class="pull-right" style="color: black;">Exp : '+result[i].EXPIRED+'</small>'+
+                                ''+kadal+''+
 																'<div class="col-md-3">'+
 																	'<h5 class="c-dark"><strong>'+result[i].BARCODE+'</strong></h5>'+
 																	'<h4 class="c-dark">'+result[i].NAMA_OBAT+'</h4>'+
@@ -686,7 +759,7 @@ function data_obat(){
 																'</div>'+
 																'<div class="col-md-2">'+
 																			'<h5 class="c-dark"><strong>Stok</strong></h5>'+
-																			'<h4 class="c-dark">'+result[i].TOTAL_STOK_OBAT+'</h4>'+
+																			''+stok_habis+''+
 																'</div>'+
 															'</div>'+
 														'</div>'+
@@ -701,77 +774,250 @@ function data_obat(){
 	});
 }
 
-function klik_obat(id, harga_beli){
+function klik_obat(id, harga_beli, service){
 	$.ajax({
-		url : '<?php echo base_url(); ?>apotek/ap_obat_hv_c/simpan_keranjang',
+		url : '<?php echo base_url(); ?>apotek/ap_entry_resep_c/get_obat',
 		data : {
 						id:id,
-						harga_beli:harga_beli
+						harga_beli:harga_beli,
+						service:service
 					},
 		type : "POST",
 		dataType : "json",
 		success: function(res){
-			data_keranjang();
-			$('#btn_klik_proses').removeAttr('disabled');
+			// data_keranjang();
+			// $('#btn_klik_proses').removeAttr('disabled');
+			var $tab = "";
+			var no = 0;
+			var harga = 0;
+			var harga_bulat = 0;
+			for(var i=0; i<res.length; i++){
+					no++;
+					$tab +=  '<tr>'+
+										'<td style="text-align:center; display:none;"><input type="hidden" name="id_gudang_obat[]" value="'+res[i].ID_OBAT+'">'+no+'</td>'+
+										'<td style="text-align:center;">'+res[i].NAMA_OBAT+'</td>'+
+										'<td align="center"><input type="text" id="jumlah_beli_'+res[i].ID+'" onkeyup="hitung_jumlah_total('+res[i].ID+'); get_grand_total();" value="1" name="jumlah_beli[]" class="form-control" style="width:125px;"></td>'+
+										'<td style="text-align:right;" id="harga_beli_'+res[i].ID+'">'+
+										''+formatNumber(res[i].SUBTOTAL)+''+
+										'</td>'+
+										'<td style="display:none;">'+
+										'<input type="text" value="'+res[i].SUBTOTAL+'" id="hidden_harga_beli_'+res[i].ID+'" name="harga_obat[]">'+
+										'<input type="text" class="total_keranjang" name="total_keranjang_name[]" id="hidden_total_keranjang_'+res[i].ID+'" value="'+res[i].SUBTOTAL+'">'+
+										'<input type="text" value="'+res[i].SERVICE+'" name="service[]">'+
+										'<input type="text" value="'+res[i].HARGA_BULAT+'" id="harga_normal_'+res[i].ID+'" name="harga_normal[]">'+
+										'<input type="text" class="total_normal" value="'+res[i].HARGA_BULAT+'" id="total_normal_name_'+res[i].ID+'" name="total_keranjang_normal[]">'+
+										'</td>'+
+										'<td style="text-align:center;">'+res[i].ID_JENIS_OBAT+'</td>'+
+										'<td style="text-align:center;"><input type="text" id="aturan_minum_'+res[i].ID+'" name="aturan_minum[]" class="form-control" style="width:150px;"></td>'+
+										'<td align="center"><div class="input-group" style="width:175px;"><input type="text" id="diminum_selama_'+res[i].ID+'" name="diminum_selama[]" class="form-control"><span class="input-group-addon">Hari</span></div></td>'+
+										'<td style="padding-left: 0px; text-align: center;"><button class="btn btn-danger btn-sm btn_hapus_row" type="button" onclick="hapus_keranjang(this, '+res[i].ID+');"><i class="fa fa-trash-o"></i></button></td>'+
+									'</tr>';
+					harga = res[i].SUBTOTAL;
+					harga_bulat = res[i].HARGA_BULAT;
+					var total_harga = $('#total_tagihan').val();
+					total_harga = total_harga.split(',').join('');
+					if (total_harga == '0' || total_harga == '') {
+						total_harga = 0;
+					}
+
+					var total_harga_normal = $('#total_tagihan_normal').val();
+					total_harga_normal = total_harga_normal.split(',').join('');
+					if (total_harga_normal == '0' || total_harga_normal == '') {
+						total_harga_normal = 0;
+					}
+
+					var hitung = parseFloat(harga) + parseFloat(total_harga);
+					var hitung_normal = parseFloat(harga_bulat) + parseFloat(total_harga_normal);
+			}
+			// $('#btn_klik_proses').removeAttr('disabled');
+			$('#tot_biaya_keranjang').html(formatNumber(hitung));
+			$('#total_tagihan').val(formatNumber(hitung));
+			$('#total_tagihan_normal').val(formatNumber(hitung_normal));
+			$('#tabel_keranjang tbody').append($tab);
 		}
 	});
 }
 
-function data_keranjang(){
+function data_pasien_iter(){
+	var keyword = $('#cari_nama_menu').val();
+	var tanggal_sekarang = $('#date_now').val();
 	$.ajax({
-			url : '<?php echo base_url(); ?>apotek/ap_obat_hv_c/data_keranjang',
-			type : "POST",
+			url : '<?php echo base_url(); ?>apotek/ap_entry_resep_c/data_pasien_iter',
+			data : {keyword:keyword},
+			type : "GET",
 			dataType : "json",
-			success : function(res){
-					$tr = '';
-					var tot = 0;
-					if(res == null || res == ""){
-							$tr = '<tr><td colspan="6" style="text-align:center;">Data Tidak Ada</td></tr>';
-					}else{
-							var no = 0;
-							for(var i=0; i<res.length; i++){
-									no++;
-									var total = $('.total_keranjang').val();
-									tot += parseFloat(res[i].HARGA_OBAT);
+			success : function(result){
+					$tr = "";
 
-									$tr += '<tr>'+
-													'<td style="text-align:center;"><input type="hidden" name="id_gudang_obat[]" value="'+res[i].ID_GUDANG_OBAT+'">'+no+'</td>'+
-													'<td style="text-align:center;">'+res[i].BARCODE+'</td>'+
-													'<td style="text-align:center;">'+res[i].NAMA_OBAT+'</td>'+
-													'<td><input type="text" id="jumlah_beli_'+res[i].ID+'" onkeyup="hitung_jumlah_total('+res[i].ID+'); get_grand_total();" value="1" name="jumlah_beli[]" class="form-control"></td>'+
-													'<td style="text-align:right;" id="harga_beli_'+res[i].ID+'">'+
-													''+formatNumber(res[i].HARGA_OBAT)+''+
-													'</td>'+
-													'<td style="display:none;">'+
-													'<input type="text" value="'+res[i].HARGA_OBAT+'" id="hidden_harga_beli_'+res[i].ID+'" name="harga_obat[]">'+
-													'<input type="text" class="total_keranjang" name="total_keranjang_name[]" id="hidden_total_keranjang_'+res[i].ID+'" value="'+res[i].HARGA_OBAT+'">'+
-													'</td>'+
-													'<td style="padding-left: 0px; text-align: center;"><button class="btn btn-danger btn-sm" onclick="hapus_keranjang('+res[i].ID+');"><i class="fa fa-trash-o"></i></button></td>'+
-												'</tr>';
+					if(result == null || result == ""){
+							$tr =   '<a href="javascript:;" class="message-item media">'+
+												'<div class="media">'+
+													'<img src="<?php echo base_url(); ?>picture/forbidden.png" width="50" class="pull-left">'+
+													'<div class="media-body">'+
+													'<h5 class="c-dark"><strong>Perhatian!</strong></h5>'+
+													'<h4 class="c-dark">Data Tidak Ditemukan</h4>'+
+													'</div>'+
+												'</div>'+
+											'</a>';
+					}else{
+							for(var i=0; i<result.length; i++){
+								var jenis_kelamin = result[i].JENIS_KELAMIN;
+								var gambar_kelamin = '';
+								if (jenis_kelamin == 'L') {
+									gambar_kelamin = '<img src="<?php echo base_url(); ?>kasir-apotek/assets/img/avatars/avatar1_big.png" width="50" class="pull-left">';
+								}else {
+									gambar_kelamin = '<img src="<?php echo base_url(); ?>kasir-apotek/assets/img/avatars/avatar5_big.png" width="50" class="pull-left">';
+								}
+
+									$tr +=  '<a href="javascript:;" class="message-item media" onclick="klik_pasien_iter('+result[i].ID_RESEP+', '+result[i].ID_PASIEN+', '+result[i].ID_PEG_DOKTER+');">'+
+														'<div class="media">'+
+															''+gambar_kelamin+''+
+																'<div class="media-body">'+
+                                // ''+kadal+''+
+																'<div class="col-md-3">'+
+																	'<h5 class="c-dark"><strong>'+result[i].KODE_RESEP+'</strong></h5>'+
+																	'<h4 class="c-dark">'+result[i].NAMA_PASIEN+'</h4>'+
+																'</div>'+
+                                '<div class="col-md-3">'+
+																		'<h5 class="c-dark"><strong>Dokter</strong></h5>'+
+																		'<h4 class="c-dark">'+result[i].NAMA_DOKTER+'</h4>'+
+																'</div>'+
+																'<div class="col-md-3">'+
+																		'<h5 class="c-dark"><strong>Tanggal</strong></h5>'+
+																		'<h4 class="c-dark">'+result[i].TANGGAL+'</h4>'+
+																'</div>'+
+																'<div class="col-md-3">'+
+																			'<h5 class="c-dark"><strong>Total Harga</strong></h5>'+
+																			'<h4 class="c-dark">Rp. '+NumberToMoney(result[i].TOTAL_DGN_SERVICE)+'</h4>'+
+																'</div>'+
+															'</div>'+
+														'</div>'+
+													'</a>';
 							}
 					}
-					$('#tot_biaya_keranjang').html(formatNumber(tot));
-					$('#total_tagihan').val(formatNumber(tot));
-					$('#tabel_keranjang tbody').html($tr);
+					$('#tabel_pasien_iter').html($tr);
 			}
+	});
+	// $('#cari_nama_menu').off('keyup').keyup(function(){
+	// 		data_obat();
+	// });
+}
+
+function klik_pasien_iter(id_resep, id_pasien, id_dokter){
+	$.ajax({
+		url : '<?php echo base_url(); ?>apotek/ap_entry_resep_c/get_pasien_iter',
+		data : {
+						id_resep:id_resep
+					},
+		type : "POST",
+		dataType : "json",
+		success: function(res){
+			var $tab = "";
+			var tot = 0;
+			var no = 0;
+			var tot_nor = 0;
+			for(var i=0; i<res.length; i++){
+					tot += parseFloat(res[i].TOTAL_SERVICE);
+					tot_nor += parseFloat(res[i].SUBTOTAL);
+					no++;
+					$tab +=  '<tr>'+
+										'<td style="text-align:center; display:none;"><input type="hidden" name="id_gudang_obat[]" value="'+res[i].ID_OBAT+'">'+no+'</td>'+
+										'<td style="text-align:center;">'+res[i].NAMA_OBAT+'</td>'+
+										'<td align="center"><input type="text" id="jumlah_beli_'+res[i].ID+'" onkeyup="hitung_jumlah_total('+res[i].ID+'); get_grand_total();" value="'+res[i].JUMLAH_BELI+'" name="jumlah_beli[]" class="form-control" style="width:125;"></td>'+
+										'<td style="text-align:right;" id="harga_beli_'+res[i].ID+'">'+
+										''+formatNumber(res[i].TOTAL_SERVICE)+''+
+										'</td>'+
+										'<td style="display:none;">'+
+										'<input type="text" value="'+res[i].HARGA_SERVICE+'" id="hidden_harga_beli_'+res[i].ID+'" name="harga_obat[]">'+
+										'<input type="text" class="total_keranjang" name="total_keranjang_name[]" id="hidden_total_keranjang_'+res[i].ID+'" value="'+res[i].TOTAL_SERVICE+'">'+
+										'<input type="text" value="'+res[i].SERVICE+'" name="service[]">'+
+										'<input type="text" value="'+res[i].HARGA+'" id="harga_normal_'+res[i].ID+'" name="harga_normal[]">'+
+										'<input type="text" class="total_normal" value="'+res[i].SUBTOTAL+'" id="total_normal_name_'+res[i].ID+'" name="total_keranjang_normal[]">'+
+										'</td>'+
+										'<td style="text-align:center;">'+res[i].ID_JENIS_OBAT+'</td>'+
+										'<td style="text-align:center;"><input type="text" id="aturan_minum_'+res[i].ID+'" name="aturan_minum[]" class="form-control" value="'+res[i].ATURAN_MINUM+'" style="width:150px;"></td>'+
+										'<td align="center"><div class="input-group" style="width:175px;"><input type="text" id="diminum_selama_'+res[i].ID+'" name="diminum_selama[]" value="'+res[i].DIMINUM_SELAMA+'" class="form-control"><span class="input-group-addon">Hari</span></div></td>'+
+										'<td style="padding-left: 0px; text-align: center;"><button class="btn btn-danger btn-sm btn_hapus_row" type="button" onclick="hapus_keranjang(this, '+res[i].ID+');"><i class="fa fa-trash-o"></i></button></td>'+
+									'</tr>';
+			}
+			$('#id_pasien').val(id_pasien);
+			$('#id_dokter').val(id_dokter);
+			$('#id_resep').val(id_resep);
+			$('#btn_klik_proses').removeAttr('disabled');
+			$('#tot_biaya_keranjang').html(formatNumber(tot));
+			$('#total_tagihan').val(formatNumber(tot));
+			$('#total_tagihan_normal').val(formatNumber(tot_nor));
+			$('#tabel_keranjang tbody').html($tab);
+		}
 	});
 }
 
-function hapus_keranjang(id){
-			var jawab = confirm("Yakin untuk menghapus data?");
-            if (jawab === true) {
-							$.ajax({
-								url : '<?php echo base_url(); ?>apotek/ap_obat_hv_c/hapus_keranjang',
-								data : {id:id},
-								type : "POST",
-								dataType : "json",
-								success : function(res){
-									data_keranjang();
-								}
-						});
-            } else {
-              return false;
-            }
+// function data_keranjang(){
+// 	$.ajax({
+// 			url : '<?php //echo base_url(); ?>apotek/ap_entry_resep_c/data_keranjang',
+// 			type : "POST",
+// 			dataType : "json",
+// 			success : function(res){
+// 					$tr = '';
+// 					var tot = 0;
+// 					if(res == null || res == ""){
+// 							$tr = '<tr><td colspan="7" style="text-align:center;">Data Tidak Ada</td></tr>';
+// 					}else{
+// 							var no = 0;
+// 							for(var i=0; i<res.length; i++){
+// 									no++;
+// 									var total = $('.total_keranjang').val();
+// 									tot += parseFloat(res[i].HARGA_OBAT);
+//
+// 									$tr += '<tr>'+
+// 													'<td style="text-align:center; display:none;"><input type="hidden" name="id_gudang_obat[]" value="'+res[i].ID_GUDANG_OBAT+'">'+no+'</td>'+
+// 													'<td style="text-align:center;">'+res[i].NAMA_OBAT+'</td>'+
+// 													'<td><input type="text" id="jumlah_beli_'+res[i].ID+'" onkeyup="hitung_jumlah_total('+res[i].ID+'); get_grand_total();" value="1" name="jumlah_beli[]" class="form-control"></td>'+
+// 													'<td style="text-align:right;" id="harga_beli_'+res[i].ID+'">'+
+// 													''+formatNumber(res[i].HARGA_OBAT)+''+
+// 													'</td>'+
+// 													'<td style="display:none;">'+
+// 													'<input type="text" value="'+res[i].HARGA_OBAT+'" id="hidden_harga_beli_'+res[i].ID+'" name="harga_obat[]">'+
+// 													'<input type="text" class="total_keranjang" name="total_keranjang_name[]" id="hidden_total_keranjang_'+res[i].ID+'" value="'+res[i].HARGA_OBAT+'">'+
+// 													'<input type="text" value="'+res[i].SERVICE+'" name="service[]">'+
+// 													'</td>'+
+// 													'<td style="text-align:center;">'+res[i].ID_JENIS_OBAT+'</td>'+
+// 													'<td style="text-align:center;"><input type="text" id="aturan_minum_'+res[i].ID+'" name="aturan_minum[]" class="form-control" style="width:150px;"></td>'+
+// 													'<td align="center"><div class="input-group" style="width:175px;"><input type="text" id="aturan_minum_'+res[i].ID+'" name="aturan_minum[]" class="form-control"><span class="input-group-addon">Hari</span></div></td>'+
+// 													'<td style="padding-left: 0px; text-align: center;"><button class="btn btn-danger btn-sm" type="button" onclick="hapus_keranjang(this, '+res[i].ID+');"><i class="fa fa-trash-o"></i></button></td>'+
+// 												'</tr>';
+// 							}
+// 					}
+// 					$('#tot_biaya_keranjang').html(formatNumber(tot));
+// 					$('#total_tagihan').val(formatNumber(tot));
+// 					$('#tabel_keranjang tbody').html($tr);
+// 			}
+// 	});
+// }
+
+function hapus_keranjang(btn, id){
+							var total = $('#total_tagihan').val();
+							total = total.split(',').join('');
+
+							var total_normal = $('#total_tagihan_normal').val();
+							total_normal = total_normal.split(',').join('');
+
+							var harga_dipilih = $('#hidden_total_keranjang_'+id).val();
+							var harga_dipilih_normal = $('#total_normal_name_'+id).val();
+
+							var jumlah = parseFloat(total) - parseFloat(harga_dipilih);
+							var jumlah_normal = parseFloat(total_normal) - parseFloat(harga_dipilih_normal);
+
+							$('#tot_biaya_keranjang').html(formatNumber(jumlah));
+							$('#total_tagihan').val(formatNumber(jumlah));
+							$('#total_tagihan_normal').val(formatNumber(jumlah_normal));
+
+							var row = btn.parentNode.parentNode;
+						  row.parentNode.removeChild(row);
+
+							if (jumlah == '0') {
+								$('#btn_klik_proses').attr('disabled','disabled');
+							}
 
 }
 
@@ -781,20 +1027,30 @@ function hitung_jumlah_total(id){
 		jumlah_beli = 0;
 	}
 	var harga = $('#hidden_harga_beli_'+id).val();
+	var harga_normal = $('#harga_normal_'+id).val();
+
 	var jumlah = parseFloat(jumlah_beli) * parseFloat(harga);
+	var jumlah_normal = parseFloat(jumlah_beli) * parseFloat(harga_normal);
 
 	$('#harga_beli_'+id).html(formatNumber(jumlah));
 	$('#hidden_total_keranjang_'+id).val(jumlah);
+	$('#total_normal_name_'+id).val(jumlah_normal);
 }
 
 function get_grand_total(){
 	var total = 0;
 	$('.total_keranjang').each(function(idx, elm){
-		console.log(elm.value);
+		// console.log(elm.value);
 		total += parseFloat(elm.value);
+	});
+	var total_normal = 0;
+	$('.total_normal').each(function(idx, elm){
+		// console.log(elm.value);
+		total_normal += parseFloat(elm.value);
 	});
 	$('#tot_biaya_keranjang').html(formatNumber(total));
 	$('#total_tagihan').val(formatNumber(total));
+	$('#total_tagihan_normal').val(formatNumber(total_normal));
 }
 
 function get_invoice(){
@@ -952,18 +1208,7 @@ function startTime() {
     $('#waktu').val(h + ":" + m + ":" + s);
     var t = setTimeout(startTime, 500);
     var jam = h+':'+m;
-    console.log(jam);
-
-    if(h >= 7 && h < 14){
-        $('.shift_user').html('1');
-        $('#shift').val('1');
-    }else if(h >= 14 && h < 23){
-        $('.shift_user').html('2');
-        $('#shift').val('2');
-    }else{
-        $('.shift_user').html('3');
-        $('#shift').val('3');
-    }
+    // console.log(jam);
 }
 
 function startNotifClosing() {
@@ -977,41 +1222,41 @@ function startNotifClosing() {
     $('#waktu').val(h + ":" + m + ":" + s);
     var t = setTimeout(startNotifClosing, 6000);
     var jam = h+':'+m;
-    console.log(jam);
+    // console.log(jam);
 
-    if (jam == '13:45') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 15 menit lagi");
-      $('#notif_closing').click();
-      $('#btn_suara_closing').click();
-    }else if (jam == '13:50') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 10 menit lagi");
-      $('#notif_closing').click();
-      $('#btn_suara_closing').click();
-    }else if (jam == '13:55') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 5 menit lagi");
-      $('#notif_closing').click();
-      $('#btn_suara_closing').click();
-    }else if (jam == '20:45') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 15 menit lagi");
-      $('#notif_closing').click();
-      $('#btn_suara_closing').click();
-    }else if (jam == '20:50') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 10 menit lagi");
-      $('#notif_closing').click();
-      $('#btn_suara_closing').click();
-    }else if (jam == '20:55') {
-      $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 5 menit lagi");
-      $('#notif_closing').click();
-      $('#btn_suara_closing').click();
-    }
-
-		if (((parseInt(h) >= 13 || parseInt(m) >= 45)) && ((parseInt(h) < 14 || parseInt(m) < 00))) {
-			$('#btn_closing_kasir_disabled').hide();
-      $('#btn_closing_kasir').show();
-    }else if (((parseInt(h) >= 20 || parseInt(m) >= 45)) && ((parseInt(h) < 21 || parseInt(m) < 00))) {
-			$('#btn_closing_kasir_disabled').hide();
-      $('#btn_closing_kasir').show();
-    }
+    // if (jam == '13:45') {
+    //   $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 15 menit lagi");
+    //   $('#notif_closing').click();
+    //   $('#btn_suara_closing').click();
+    // }else if (jam == '13:50') {
+    //   $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 10 menit lagi");
+    //   $('#notif_closing').click();
+    //   $('#btn_suara_closing').click();
+    // }else if (jam == '13:55') {
+    //   $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 1 kurang 5 menit lagi");
+    //   $('#notif_closing').click();
+    //   $('#btn_suara_closing').click();
+    // }else if (jam == '20:45') {
+    //   $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 15 menit lagi");
+    //   $('#notif_closing').click();
+    //   $('#btn_suara_closing').click();
+    // }else if (jam == '20:50') {
+    //   $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 10 menit lagi");
+    //   $('#notif_closing').click();
+    //   $('#btn_suara_closing').click();
+    // }else if (jam == '20:55') {
+    //   $('#notif_closing').attr("data-message","<i class='fa fa-warning' style='padding-right:6px'></i> Waktu closing shift 2 kurang 5 menit lagi");
+    //   $('#notif_closing').click();
+    //   $('#btn_suara_closing').click();
+    // }
+		//
+		// if (((parseInt(h) >= 13 || parseInt(m) >= 45)) && ((parseInt(h) < 14 || parseInt(m) < 00))) {
+		// 	$('#btn_closing_kasir_disabled').hide();
+    //   $('#btn_closing_kasir').show();
+    // }else if (((parseInt(h) >= 20 || parseInt(m) >= 45)) && ((parseInt(h) < 21 || parseInt(m) < 00))) {
+		// 	$('#btn_closing_kasir_disabled').hide();
+    //   $('#btn_closing_kasir').show();
+    // }
 }
 
 function checkTime(i) {

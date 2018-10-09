@@ -31,11 +31,11 @@
     }
     </style>
       <div style="text-align: center;">
+        <span style="text-transform: uppercase; font-weight : bold; font-size: 23px;">RS.  ANAK  &  BERSALIN  SOERYA</span><br>
         <span style="text-transform: uppercase;">jl. raya kalijaten 11-14 sepanjang - sidoarjo</span><br>
         <span>Telp. (031) 7885011, Fax. (031) 7873633</span><br>
         <span>Website: WWW.rsabsoerya.com</span>
       </div>
-      <br>
       <div style="clear: both;"></div>
         <hr style="border: 1px dotted black; width: 10px;">
         <table style="width: 100%;">
@@ -51,12 +51,13 @@
             <tr>
               <td style="width: 10%;">Terima Dari</td>
               <td style="width: 2%;">:</td>
-              <td colspan="2" style="text-transform: uppercase;"><?php echo $row['NAMA_PASIEN']; ?></td>
+              <td colspan="2" style="text-transform: uppercase;"></td>
             </tr>
             <tr>
               <td style="width: 10%;">Uang Sebesar</td>
               <td style="width: 2%;">:</td>
-              <td colspan="2" style="text-transform: uppercase;">
+              <td colspan="2">
+                <span style="text-transform: uppercase;">
                 <?php
                 function Terbilang($a) {
                     $ambil = array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
@@ -79,23 +80,25 @@
                     }
                   echo Terbilang($row['TOTAL']);
                  ?>
+                 </span>
+                 Rupiah
               </td>
             </tr>
             <tr>
               <td style="width: 10%;">Alamat</td>
               <td style="width: 2%;">:</td>
-              <td colspan="2" style="text-transform: uppercase;"><?php echo $row['ALAMAT_PASIEN']; ?></td>
+              <td colspan="2" style="text-transform: uppercase;"></td>
             </tr>
             <tr>
               <td style="width: 10%;">Nama Pasien</td>
               <td style="width: 2%;">:</td>
-              <td colspan="2" style="text-transform: uppercase;"><?php echo $row['NAMA_PASIEN']; ?></td>
+              <td colspan="2" style="text-transform: uppercase;"></td>
             </tr>
             <tr>
               <td style="width: 10%;">Pembayaran</td>
               <td style="width: 2%;">:</td>
-              <td style="text-transform: uppercase; width: 21%;">apotik resep rj</td>
-              <td>TUJUAN : <?php echo $row['NAMA_POLI']; ?></td>
+              <td style="text-transform: uppercase; width: 21%;">apotik resep hv</td>
+              <td>TUJUAN : APOTEK</td>
             </tr>
           </tbody>
         </table>
@@ -104,21 +107,20 @@
       <div style="margin: 0 auto; max-width: 950px;">
         <table style="width: 100%;">
           <?php
-            $id_resep = $row['ID_RESEP'];
+            $id_hv = $row['ID_PENJUALAN_HV'];
             $this->db->select('*');
-            $this->db->from('rk_resep_detail_rj');
-            $this->db->join('admum_setup_nama_obat', 'admum_setup_nama_obat.ID=rk_resep_detail_rj.ID_OBAT');
-            $this->db->where('ID_RESEP', $id_resep);
+            $this->db->from('ap_penjualan_obat_hv_detail');
+            $this->db->join('apotek_gudang_obat', 'apotek_gudang_obat.ID=ap_penjualan_obat_hv_detail.ID_GUDANG_OBAT');
+            $this->db->join('admum_setup_nama_obat', 'admum_setup_nama_obat.ID=apotek_gudang_obat.ID_SETUP_NAMA_OBAT');
+            $this->db->where('ap_penjualan_obat_hv_detail.ID_PENJUALAN_OBAT_HV', $id_hv);
             $result_obat = $this->db->get()->result_array();
             foreach ($result_obat as $ro) {
            ?>
           <tr>
             <td>-</td>
-            <td style="text-transform: uppercase;"><?php echo $ro['NAMA_OBAT']; ?>, <?php echo $ro['TAKARAN']; ?></td>
+            <td style="text-transform: uppercase; width: 25%;"><?php echo $ro['NAMA_OBAT']; ?></td>
             <td style="width: 2%;">,</td>
-            <td><?php echo $ro['JUMLAH_BELI']; ?> X Rp. <?php echo number_format($ro['HARGA']); ?></td>
-            <td style="width: 3%;">, Rp.</td>
-            <td><?php echo number_format($ro['SUBTOTAL']); ?></td>
+            <td><?php echo $ro['JUMLAH_BELI']; ?></td>
           </tr>
           <?php
             }
@@ -138,7 +140,7 @@
           <tr>
             <td style="width: 20%;">Nama Dokter</td>
             <td style="width: 3%;">:</td>
-            <td style="text-transform: uppercase; width: 60%;"><?php echo $row['NAMA_DOKTER']; ?></td>
+            <td style="text-transform: uppercase; width: 60%;"></td>
             <td>Sidoarjo,
               <?php
                 $tgl = $row['TANGGAL'];
@@ -179,7 +181,7 @@
           <tr>
             <td style="width: 20%;">Total Biaya</td>
             <td style="width: 3%;">:</td>
-            <td colspan="2" style="text-transform: uppercase">Rp. <?php echo number_format($row['TOTAL']); ?> <?php echo $row['JENIS_PEMBAYARAN']; ?></td>
+            <td colspan="2" style="text-transform: uppercase">Rp. <?php echo number_format($row['TOTAL']); ?>  <?php echo $row['JENIS_PEMBAYARAN']; ?></td>
           </tr>
           <tr><td colspan="4"></td></tr>
           <tr><td colspan="4"></td></tr>
@@ -190,7 +192,7 @@
           <tr>
             <td style="width: 20%;">SHIFT</td>
             <td style="width: 3%;">:</td>
-            <td style="text-transform: uppercase; width: 60%;"><?php echo $row['TANGGAL']; ?> (<?php echo $row['SHIFT']; ?>)</td>
+            <td style="text-transform: uppercase; width: 60%;"><?php echo $row['TANGGAL']; ?>  ( <?php echo $row['SHIFT']; ?> )</td>
             <td style="text-align: center;"><?php echo $row['NAMA_PEGAWAI']; ?></td>
           </tr>
         </table>
@@ -199,7 +201,7 @@
         // ----ukuran kertas dalam inch----//
         // custom
         $width_custom = 4.527559;
-        $height_custom = 3.74016;
+        $height_custom = 5.11811;
 
         //A2
         // $width_a2 = 23.4;

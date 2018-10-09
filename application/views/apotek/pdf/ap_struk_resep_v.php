@@ -50,23 +50,23 @@ table{
 	<table style="width: 75%;">
     <tr>
       <td style="text-align:center; width: 10%;" rowspan="7">
-        <img src="<?php echo base_url(); ?>picture/Indonesian_Red_Cross_Society_logo.png" style="width: 100px; height: 100px;">
+        <img src="<?php echo base_url(); ?>picture/logo/3.png" style="width: 95px; height: 100px;">
       </td>
     </tr>
     <tr>
-      <td style="text-align:center; font-weight: bold; width: 100%;">Nama RS</td>
+      <td style="text-align:center; font-weight: bold; width: 100%;">Rumah Sakit Ibu & Anak SOERYA</td>
     </tr>
     <tr>
-      <td style="text-align:center; font-size: 13px; width: 100%;">Alamat</td>
+      <td style="text-align:center; font-size: 13px; width: 100%;">Jl. Raya Kalijaten 11-15 Taman Sepanjang</td>
     </tr>
     <tr>
       <td style="text-align:center; width: 100%;">S I D O A R J O</td>
     </tr>
     <tr>
-      <td style="text-align:center; font-size: 12px; width: 100%;">Telepon</td>
+      <td style="text-align:center; font-size: 12px; width: 100%;">Telp : (031) 788 5011 Fax : (031) 787 3633</td>
     </tr>
     <tr>
-      <td style="text-align:center; font-size: 12px; width: 100%;">No Ijin</td>
+      <td style="text-align:center; font-size: 12px; width: 100%;">No. Ijin : 442.1/1515/111/4/2007</td>
     </tr>
 	</table>
   <br>
@@ -168,9 +168,14 @@ table{
       ?>
         <tr>
           <td style="font-size: 14px;"><?php echo $val->NAMA_OBAT; ?></td>
-          <td style="font-size: 14px;">x <?php echo $val->JUMLAH_BELI; ?></td>
+          <td style="font-size: 14px;">, x <?php echo $val->JUMLAH_BELI; ?></td>
           <td style="font-size: 14px;">, <?php echo $val->TAKARAN; ?></td>
           <td style="font-size: 14px;">, <?php echo $val->ATURAN_MINUM; ?></td>
+        </tr>
+        <tr>
+          <td>
+            <br>
+          </td>
         </tr>
       <?php
         }
@@ -182,7 +187,7 @@ table{
   <table>
     <tr>
       <td>Nama</td>
-      <td style="width: 43%;">: <?php echo $row['NAMA']; ?></td>
+      <td style="width: 53%;">: <?php echo $row['NAMA']; ?></td>
       <td>Umur / BB</td>
       <td>: <?php echo $row['UMUR']; ?> Tahun / -</td>
     </tr>
@@ -198,7 +203,7 @@ table{
     </tr>
     <tr><td><br></td></tr>
     <tr>
-      <td style="text-align: center; width: 63%;" colspan="4"><i>Penggantian resep harus seijin dokter</i></td>
+        <td style="text-align: center; width: 70%;" colspan="4"><i>Penggantian resep harus seijin dokter</i></td>
     </tr>
   </table>
 </div>

@@ -46,6 +46,10 @@ $(document).ready(function(){
         $('#ket').val('Tambah');
 	});
 
+	// $('.btn_obat').click(function(){
+	// 	$('#popup_nama_obat').click();
+	// });
+
 	$('#batal').click(function(){
 		window.location = "<?php echo base_url(); ?>apotek/ap_gudang_obat_c";
 	});
@@ -90,6 +94,10 @@ $(document).ready(function(){
     });
 });
 
+function popup_obat(number){
+	$('#popup_nama_obat').click();
+}
+
 //NAMA OBAT
 function check_tablet(number){
 	var ket = $('#ket').val();
@@ -125,8 +133,6 @@ function check_tablet(number){
 }
 
 function get_nama_obat(number){
-	$('#popup_nama_obat').click();
-
     var keyword = $('#cari_nama_obat').val();
 
     if(ajax){
@@ -201,14 +207,14 @@ function klik_nama_obat(id, number){
                 // $('#id_merk_ubah').val(row['ID_MERK']);
                 // $('#merk_ubah').val(row['MERK']);
             }else if (ket == 'Tambah_faktur') {
-							$('#faktur_id_nama_obat_'+number).val(id);
-							$('#faktur_kode_obat_'+number).val(row['KODE_OBAT']);
-							$('#faktur_nama_obat_'+number).val(row['NAMA_OBAT']);
-							$('#faktur_jenis_obat_'+number).val(row['ID_JENIS_OBAT']);
-							$('#faktur_expired_'+number).val(row['EXPIRED']);
-							$('#faktur_golongan_'+number).val(row['GOLONGAN_OBAT']);
-							$('#faktur_kategori_'+number).val(row['KATEGORI_OBAT']);
-							$('#faktur_service_'+number).val(row['SERVICE']);
+								$('#faktur_id_nama_obat_'+number).val(id);
+								$('#faktur_kode_obat_'+number).val(row['KODE_OBAT']);
+								$('#faktur_nama_obat_'+number).val(row['NAMA_OBAT']);
+								$('#faktur_jenis_obat_'+number).val(row['ID_JENIS_OBAT']);
+								$('#faktur_expired_'+number).val(row['EXPIRED']);
+								$('#faktur_golongan_'+number).val(row['GOLONGAN_OBAT']);
+								$('#faktur_kategori_'+number).val(row['KATEGORI_OBAT']);
+								$('#faktur_service_'+number).val(row['SERVICE']);
             }
         }
     });
@@ -399,13 +405,14 @@ function data_obat(){
                                 '</button>&nbsp;'+
 																'<button type="button" class="btn btn-info waves-effect waves-light btn-sm m-b-5" onclick="detail_obat('+result[i].ID_FAKTUR+');">'+
                                     '<i class="fa fa-search"></i>'+
-                                '</button>&nbsp;'+
+                                '</button>&nbsp;'
 																// '<button type="button" class="btn btn-success waves-effect waves-light btn-sm m-b-5" onclick="ubah_obat('+result[i].ID+');">'+
                                 //     '<i class="fa fa-pencil"></i>'+
                                 // '</button>&nbsp;'+
-                                '<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_obat('+result[i].ID_FAKTUR+');">'+
-                                    '<i class="fa fa-trash"></i>'+
-                                '</button>';
+                                // '<button type="button" class="btn btn-danger waves-effect waves-light btn-sm m-b-5" onclick="hapus_obat('+result[i].ID_FAKTUR+');">'+
+                                //     '<i class="fa fa-trash"></i>'+
+                                // '</button>'
+																;
 
                     var warna = "";
                     if(result[i].AKTIF == 0){
@@ -414,14 +421,6 @@ function data_obat(){
                         warna = "";
                     }
 
-										var cek_diskon = "";
-										if (result[i].CEK_DISKON == 'Persen') {
-											cek_diskon = ""+NumberToMoney(result[i].DISKON_FAKTUR)+"%";
-										} else if (result[i].CEK_DISKON == 'Kosong') {
-											cek_diskon = 0;
-										} else if (result[i].CEK_DISKON == 'Harga') {
-											cek_diskon = "Rp. "+NumberToMoney(result[i].DISKON_FAKTUR)+"";
-										}
 
         			$tr += "<tr class='"+warna+"'>"+
         						"<td style='text-align:center;'>"+no+"</td>"+
@@ -431,7 +430,6 @@ function data_obat(){
         						"</td>"+
 										"<td>"+result[i].NO_FAKTUR+"</td>"+
 										"<td>"+formatTanggal(result[i].TANGGAL_FAKTUR)+" : "+result[i].WAKTU_FAKTUR+"</td>"+
-                    "<td style='text-align:right;'>"+cek_diskon+"</td>"+
 										"<td style='text-align:right;'>Rp. "+NumberToMoney(result[i].TOTAL_FAKTUR)+"</td>"+
                     "<td align='center'>"+aksi+"</td>"+
         					"</tr>";
@@ -690,10 +688,10 @@ function detail_obat(id){
 											"<td>"+result[i].NAMA_OBAT+"</td>"+
 											"<td>"+result[i].TOTAL+"</td>"+
 											"<td>Rp. "+pertablet+"</td>"+
-											"<td>Rp. "+result[i].HARGA_BELI+"</td>"+
-											"<td>Rp. "+result[i].HARGA_JUAL+"</td>"+
+											"<td>Rp. "+NumberToMoney(result[i].HARGA_BELI)+"</td>"+
+											"<td>Rp. "+NumberToMoney(result[i].HARGA_JUAL)+"</td>"+
 											"<td>"+formatTanggal(result[i].TANGGAL_MASUK)+" : "+result[i].WAKTU_MASUK+"</td>"+
-											"<td align='center'>"+aksi+"</td>"+
+											// "<td align='center'>"+aksi+"</td>"+
 										"</tr>";
 						}
 					}
@@ -778,7 +776,7 @@ function tambah_obat(){
 																							'<input type="hidden" name="id_nama_obat[]" id="id_nama_obat_'+i+'" value="">'+
 																							'<input type="text" class="form-control" id="kode_obat_'+i+'" value="" required="required" readonly>'+
 																							'<span class="input-group-btn">'+
-																									'<button class="btn waves-effect waves-light btn-default" type="button" onclick="get_nama_obat('+i+')">'+
+																									'<button class="btn waves-effect waves-light btn-default btn_obat" type="button" onclick="popup_obat('+i+'); get_nama_obat('+i+')">'+
 																											'<i class="fa fa-search"></i>'+
 																									'</button>'+
 																							'</span>'+
@@ -798,12 +796,6 @@ function tambah_obat(){
 																			'</div>'+
 																	'</div>'+
 																	'<div class="form-group">'+
-																			'<label class="col-md-2 control-label">Expired</label>'+
-																			'<div class="col-md-8">'+
-																					'<input type="text" class="form-control" id="expired_'+i+'" value="" readonly>'+
-																			'</div>'+
-																	'</div>'+
-																	'<div class="form-group">'+
 																			'<label class="col-md-2 control-label">Golongan Obat</label>'+
 																			'<div class="col-md-8">'+
 																					'<input type="text" class="form-control" id="golongan_'+i+'" value="" readonly>'+
@@ -819,6 +811,21 @@ function tambah_obat(){
 																			'<label class="col-md-2 control-label">Service</label>'+
 																			'<div class="col-md-8">'+
 																					'<input type="text" class="form-control" id="service_'+i+'" value="" readonly>'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">No Batch</label>'+
+																			'<div class="col-md-8">'+
+																							'<input type="text" class="form-control" name="no_batch[]" id="no_batch_'+i+'" value="" required="required">'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Expired</label>'+
+																			'<div class="col-md-8">'+
+																				'<div class="input-group">'+
+																						'<span class="input-group-addon"><i class="fa fa-calendar"></i></span>'+
+																						'<input type="text" class="form-control" name="kadaluarsa[]" id="kadaluarsa_'+i+'" value="" required="required" data-mask="99-99-9999">'+
+																				'</div>'+
 																			'</div>'+
 																	'</div>'+
 															'</div>'+
@@ -886,6 +893,15 @@ function tambah_obat(){
 																					'</div>'+
 																			'</div>'+
 																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Diskon</label>'+
+																			'<div class="col-md-8">'+
+																					'<div class="input-group">'+
+																							'<input type="text" class="form-control" name="diskon[]" id="diskon_'+i+'" value="0" required="required" onkeyup="FormatCurrency(this); hitung_diskon_jual('+i+'); hitung_harga_jual('+i+'); hitung_total_harga_beli();">'+
+																							'<span class="input-group-addon">%</span>'+
+																					'</div>'+
+																			'</div>'+
+																	'</div>'+
 															'</div>'+
 													'</div>'+
 												'</div>'+
@@ -897,6 +913,7 @@ function tambah_obat(){
 
 				$('#form_tambah_obat').append($menu_1);
 				$('#number').val(i);
+
 }
 
 function faktur_tambah_obat(){
@@ -928,7 +945,7 @@ function faktur_tambah_obat(){
 																							'<input type="hidden" name="id_nama_obat[]" id="faktur_id_nama_obat_'+i+'" value="">'+
 																							'<input type="text" class="form-control" id="faktur_kode_obat_'+i+'" value="" required="required" readonly>'+
 																							'<span class="input-group-btn">'+
-																									'<button class="btn waves-effect waves-light btn-default" type="button" onclick="get_nama_obat('+i+')">'+
+																									'<button class="btn waves-effect waves-light btn-default" type="button" onclick="popup_obat('+i+'); get_nama_obat('+i+');">'+
 																											'<i class="fa fa-search"></i>'+
 																									'</button>'+
 																							'</span>'+
@@ -948,12 +965,6 @@ function faktur_tambah_obat(){
 																			'</div>'+
 																	'</div>'+
 																	'<div class="form-group">'+
-																			'<label class="col-md-2 control-label">Expired</label>'+
-																			'<div class="col-md-8">'+
-																					'<input type="text" class="form-control" id="faktur_expired_'+i+'" value="" readonly>'+
-																			'</div>'+
-																	'</div>'+
-																	'<div class="form-group">'+
 																			'<label class="col-md-2 control-label">Golongan Obat</label>'+
 																			'<div class="col-md-8">'+
 																					'<input type="text" class="form-control" id="faktur_golongan_'+i+'" value="" readonly>'+
@@ -969,6 +980,21 @@ function faktur_tambah_obat(){
 																			'<label class="col-md-2 control-label">Service</label>'+
 																			'<div class="col-md-8">'+
 																					'<input type="text" class="form-control" id="faktur_service_'+i+'" value="" readonly>'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">No Batch</label>'+
+																			'<div class="col-md-8">'+
+																							'<input type="text" class="form-control" name="no_batch[]" id="faktur_no_batch_'+i+'" value="" required="required">'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Expired</label>'+
+																			'<div class="col-md-8">'+
+																				'<div class="input-group">'+
+																						'<span class="input-group-addon"><i class="fa fa-calendar"></i></span>'+
+																						'<input type="text" class="form-control" name="kadaluarsa[]" id="faktur_kadaluarsa_'+i+'" value="" required="required" data-mask="99-99-9999">'+
+																				'</div>'+
 																			'</div>'+
 																	'</div>'+
 															'</div>'+
@@ -1033,6 +1059,15 @@ function faktur_tambah_obat(){
 																							'<span class="input-group-addon">Rp</span>'+
 																							'<input type="text" class="form-control" name="harga_jual[]" id="faktur_harga_jual_'+i+'" value="" required="required" onkeyup="FormatCurrency(this);" readonly>'+
 																							'<input type="hidden" class="form-control" name="harga_bulat[]" id="faktur_harga_bulat_'+i+'" value="" required="required" onkeyup="FormatCurrency(this);" readonly>'+
+																					'</div>'+
+																			'</div>'+
+																	'</div>'+
+																	'<div class="form-group">'+
+																			'<label class="col-md-2 control-label">Diskon</label>'+
+																			'<div class="col-md-8">'+
+																					'<div class="input-group">'+
+																							'<input type="text" class="form-control" name="diskon[]" id="faktur_diskon_'+i+'" value="0" required="required" onkeyup="FormatCurrency(this); hitung_diskon_jual('+i+'); hitung_harga_jual('+i+'); hitung_total_harga_beli();">'+
+																							'<span class="input-group-addon">%</span>'+
 																					'</div>'+
 																			'</div>'+
 																	'</div>'+
@@ -1174,42 +1209,88 @@ function hitung_harga_jual(number){
 		var kategori = $('#kategori_'+number).val();
 		if (kategori == 'Obat Bebas') {
 
-			var harga_beli = $('#harga_beli_'+number).val();
-			harga_beli = harga_beli.split(',').join('');
-			if(harga_beli == ""){
-					harga_beli = 0;
+			var jenis_obat = $('#jenis_obat_'+number).val();
+			if (jenis_obat == 'Salep / Krim') {
+				var harga_beli = $('#harga_beli_'+number).val();
+				harga_beli = harga_beli.split(',').join('');
+				if(harga_beli == ""){
+						harga_beli = 0;
+				}
+
+				var total_jumlah = $('#total_'+number).val();
+				total_jumlah = total_jumlah.split(',').join('');
+				if(total_jumlah == ""){
+						total_jumlah = 0;
+				}
+
+				var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
+				var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
+				var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
+
+				var hitung_kategori = '';
+				if (parseFloat(hitung_akhir) <= 100) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 150 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				} else if (parseFloat(hitung_akhir) <= 500) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 45 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) <= 1000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 25 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 1000 && parseFloat(hitung_akhir) <= 10000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 20 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 10000  && parseFloat(hitung_akhir) <= 100000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 15 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 100000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 10 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}
+
+				var bulatan = custom_pembulatan(hitung_kategori, 100);
+				var kategori_bulat = Math.round(hitung_kategori);
+
+				$('#harga_jual_'+number).val(NumberToMoney(kategori_bulat));
+				$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
+			}else {
+				var harga_beli = $('#harga_beli_'+number).val();
+				harga_beli = harga_beli.split(',').join('');
+				if(harga_beli == ""){
+						harga_beli = 0;
+				}
+
+				var total_jumlah = $('#total_'+number).val();
+				total_jumlah = total_jumlah.split(',').join('');
+				if(total_jumlah == ""){
+						total_jumlah = 0;
+				}
+
+				var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
+				var hitung_ppn = (parseFloat(hitung_awal) * 10) / 100;
+				var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
+
+				var hitung_kategori = '';
+				if (parseFloat(hitung_akhir) <= 100) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 100 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				} else if (parseFloat(hitung_akhir) <= 500) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 40 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) <= 1000) {
+					hitung_ppn_awal = (parseFloat(hitung_akhir) * 20) / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 1000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 10 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}
+
+			var bulatan = custom_pembulatan(hitung_kategori, 100);
+			var kategori_bulat = Math.round(hitung_kategori);
+
+			$('#harga_jual_'+number).val(NumberToMoney(kategori_bulat));
+			$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
 			}
-
-			var total_jumlah = $('#total_'+number).val();
-			total_jumlah = total_jumlah.split(',').join('');
-			if(total_jumlah == ""){
-					total_jumlah = 0;
-			}
-
-			var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
-			var hitung_ppn = (parseFloat(hitung_awal) * 10) / 100;
-			var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
-
-			var hitung_kategori = '';
-			if (parseFloat(hitung_akhir) <= 100) {
-				hitung_ppn_awal = parseFloat(hitung_akhir) * 100 / 100;
-				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
-			} else if (parseFloat(hitung_akhir) <= 500) {
-				hitung_ppn_awal = parseFloat(hitung_akhir) * 40 / 100;
-				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
-			}else if (parseFloat(hitung_akhir) <= 1000) {
-				hitung_ppn_awal = (parseFloat(hitung_akhir) * 20) / 100;
-				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
-			}else if (parseFloat(hitung_akhir) >= 1000) {
-				hitung_ppn_awal = parseFloat(hitung_akhir) * 10 / 100;
-				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
-			}
-
-		var bulatan = custom_pembulatan(hitung_kategori, 100);
-		var kategori_bulat = Math.round(hitung_kategori);
-
-		$('#harga_jual_'+number).val(NumberToMoney(kategori_bulat));
-		$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
 
 		}else if (kategori == 'Obat Resep') {
 
@@ -1257,49 +1338,96 @@ function hitung_harga_jual(number){
 			$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
 
 		}else if (kategori == 'Obat Keras') {
+			var jenis_obat = $('#jenis_obat_'+number).val();
+			var golongan_obat = $('#golongan_'+number).val();
 
-			var harga_beli = $('#harga_beli_'+number).val();
-			harga_beli = harga_beli.split(',').join('');
-			if(harga_beli == ""){
-					harga_beli = 0;
+			if (jenis_obat == 'Injeksi' && golongan_obat == 'Obat Psikotropika (OKT)') {
+				var harga_beli = $('#harga_beli_'+number).val();
+				harga_beli = harga_beli.split(',').join('');
+				if(harga_beli == ""){
+						harga_beli = 0;
+				}
+
+				var total_jumlah = $('#total_'+number).val();
+				total_jumlah = total_jumlah.split(',').join('');
+				if(total_jumlah == ""){
+						total_jumlah = 0;
+				}
+
+				var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
+				var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
+				var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
+
+				var hitung_kategori = '';
+				if (parseFloat(hitung_akhir) <= 100) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 200 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				} else if (parseFloat(hitung_akhir) <= 500) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 50 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) <= 1000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 35 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 1000 && parseFloat(hitung_akhir) <= 10000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 25 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 10000  && parseFloat(hitung_akhir) <= 100000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 20 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 100000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 15 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}
+
+				var bulatan = custom_pembulatan(hitung_kategori, 100);
+				var kategori_bulat = Math.round(hitung_kategori);
+
+				$('#harga_jual_'+number).val(NumberToMoney(kategori_bulat));
+				$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
+			}else {
+				var harga_beli = $('#harga_beli_'+number).val();
+				harga_beli = harga_beli.split(',').join('');
+				if(harga_beli == ""){
+						harga_beli = 0;
+				}
+
+				var total_jumlah = $('#total_'+number).val();
+				total_jumlah = total_jumlah.split(',').join('');
+				if(total_jumlah == ""){
+						total_jumlah = 0;
+				}
+
+				var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
+				var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
+				var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
+
+				var hitung_kategori = '';
+				if (parseFloat(hitung_akhir) <= 100) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 150 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				} else if (parseFloat(hitung_akhir) <= 500) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 45 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) <= 1000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 25 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 1000 && parseFloat(hitung_akhir) <= 10000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 20 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 10000  && parseFloat(hitung_akhir) <= 100000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 15 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 100000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 10 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}
+
+				var bulatan = custom_pembulatan(hitung_kategori, 100);
+				var kategori_bulat = Math.round(hitung_kategori);
+
+				$('#harga_jual_'+number).val(NumberToMoney(kategori_bulat));
+				$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
 			}
-
-			var total_jumlah = $('#total_'+number).val();
-			total_jumlah = total_jumlah.split(',').join('');
-			if(total_jumlah == ""){
-					total_jumlah = 0;
-			}
-
-			var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
-			var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
-			var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
-
-			var hitung_kategori = '';
-			if (parseFloat(hitung_akhir) <= 100) {
-				hitung_ppn_awal = parseFloat(hitung_akhir) * 150 / 100;
-				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
-			} else if (parseFloat(hitung_akhir) <= 500) {
-				hitung_ppn_awal = parseFloat(hitung_akhir) * 45 / 100;
-				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
-			}else if (parseFloat(hitung_akhir) <= 1000) {
-				hitung_ppn_awal = parseFloat(hitung_akhir) * 25 / 100;
-				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
-			}else if (parseFloat(hitung_akhir) >= 1000 && parseFloat(hitung_akhir) <= 10000) {
-				hitung_ppn_awal = parseFloat(hitung_akhir) * 20 / 100;
-				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
-			}else if (parseFloat(hitung_akhir) >= 10000  && parseFloat(hitung_akhir) <= 100000) {
-				hitung_ppn_awal = parseFloat(hitung_akhir) * 15 / 100;
-				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
-			}else if (parseFloat(hitung_akhir) >= 100000) {
-				hitung_ppn_awal = parseFloat(hitung_akhir) * 10 / 100;
-				hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
-			}
-
-			var bulatan = custom_pembulatan(hitung_kategori, 100);
-			var kategori_bulat = Math.round(hitung_kategori);
-
-			$('#harga_jual_'+number).val(NumberToMoney(kategori_bulat));
-			$('#harga_bulat_'+number).val(NumberToMoney(bulatan));
 
 		}else if (kategori == 'Susu') {
 
@@ -1346,6 +1474,51 @@ function hitung_harga_jual(number){
 		var kategori = $('#faktur_kategori_'+number).val();
 		if (kategori == 'Obat Bebas') {
 
+			var jenis_obat = $('#faktur_jenis_obat_'+number).val();
+			if (jenis_obat == 'Salep / Krim') {
+				var harga_beli = $('#faktur_harga_beli_'+number).val();
+				harga_beli = harga_beli.split(',').join('');
+				if(harga_beli == ""){
+						harga_beli = 0;
+				}
+
+				var total_jumlah = $('#faktur_total_'+number).val();
+				total_jumlah = total_jumlah.split(',').join('');
+				if(total_jumlah == ""){
+						total_jumlah = 0;
+				}
+
+				var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
+				var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
+				var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
+
+				var hitung_kategori = '';
+				if (parseFloat(hitung_akhir) <= 100) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 150 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				} else if (parseFloat(hitung_akhir) <= 500) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 45 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) <= 1000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 25 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 1000 && parseFloat(hitung_akhir) <= 10000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 20 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 10000  && parseFloat(hitung_akhir) <= 100000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 15 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 100000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 10 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}
+
+				var bulatan = custom_pembulatan(hitung_kategori, 100);
+				var kategori_bulat = Math.round(hitung_kategori);
+
+				$('#faktur_harga_jual_'+number).val(NumberToMoney(kategori_bulat));
+				$('#faktur_harga_bulat_'+number).val(NumberToMoney(bulatan));
+			}else {
 			var harga_beli = $('#faktur_harga_beli_'+number).val();
 			harga_beli = harga_beli.split(',').join('');
 			if(harga_beli == ""){
@@ -1382,6 +1555,7 @@ function hitung_harga_jual(number){
 
 		$('#faktur_harga_jual_'+number).val(NumberToMoney(kategori_bulat));
 		$('#faktur_harga_bulat_'+number).val(NumberToMoney(bulatan));
+		}
 
 		}else if (kategori == 'Obat Resep') {
 
@@ -1430,6 +1604,54 @@ function hitung_harga_jual(number){
 
 		}else if (kategori == 'Obat Keras') {
 
+			var jenis_obat = $('#faktur_jenis_obat_'+number).val();
+			var golongan_obat = $('#faktur_golongan_'+number).val();
+			if (jenis_obat == 'Injeksi' && golongan_obat == 'Obat Psikotropika (OKT)') {
+				var harga_beli = $('#faktur_harga_beli_'+number).val();
+				harga_beli = harga_beli.split(',').join('');
+				if(harga_beli == ""){
+						harga_beli = 0;
+				}
+
+				var total_jumlah = $('#faktur_total_'+number).val();
+				total_jumlah = total_jumlah.split(',').join('');
+				if(total_jumlah == ""){
+						total_jumlah = 0;
+				}
+
+				var hitung_awal = parseFloat(harga_beli) / parseFloat(total_jumlah);
+				var hitung_ppn = parseFloat(hitung_awal) * 10 / 100;
+				var hitung_akhir = parseFloat(hitung_awal) + parseFloat(hitung_ppn);
+
+				var hitung_kategori = '';
+				if (parseFloat(hitung_akhir) <= 100) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 200 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				} else if (parseFloat(hitung_akhir) <= 500) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 50 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) <= 1000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 35 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 1000 && parseFloat(hitung_akhir) <= 10000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 25 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 10000  && parseFloat(hitung_akhir) <= 100000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 20 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}else if (parseFloat(hitung_akhir) >= 100000) {
+					hitung_ppn_awal = parseFloat(hitung_akhir) * 15 / 100;
+					hitung_kategori = parseFloat(hitung_akhir) + parseFloat(hitung_ppn_awal);
+				}
+
+				var bulatan = custom_pembulatan(hitung_kategori, 100);
+				var kategori_bulat = Math.round(hitung_kategori);
+
+				$('#faktur_harga_jual_'+number).val(NumberToMoney(kategori_bulat));
+				$('#faktur_harga_bulat_'+number).val(NumberToMoney(bulatan));
+
+			}else {
+
 			var harga_beli = $('#faktur_harga_beli_'+number).val();
 			harga_beli = harga_beli.split(',').join('');
 			if(harga_beli == ""){
@@ -1472,6 +1694,7 @@ function hitung_harga_jual(number){
 
 			$('#faktur_harga_jual_'+number).val(NumberToMoney(kategori_bulat));
 			$('#faktur_harga_bulat_'+number).val(NumberToMoney(bulatan));
+		}
 		}else if (kategori == 'Susu') {
 
 			var harga_beli = $('#faktur_harga_beli_'+number).val();
@@ -1530,6 +1753,46 @@ function hitung_diskon(){
 
 		$('#grand_total').val(hitung);
 	}
+}
+
+function hitung_diskon_jual(number){
+		var ket = $('#ket').val();
+
+		if (ket == 'Tambah') {
+			var harga_beli = $('#harga_beli_'+number).val();
+			harga_beli = harga_beli.split(',').join('');
+			if(harga_beli == ""){
+					harga_beli = 0;
+			}
+
+			var diskon = $('#diskon_'+number).val();
+			if(diskon == ""){
+					diskon = 0;
+			}
+
+			var hitung_diskon = diskon / 100;
+			var hitung =  harga_beli - (harga_beli * hitung_diskon);
+			var total = Math.ceil(hitung);
+
+			$('#harga_beli_'+number).val(NumberToMoney(total));
+		}else {
+			var harga_beli = $('#faktur_harga_beli_'+number).val();
+			harga_beli = harga_beli.split(',').join('');
+			if(harga_beli == ""){
+					harga_beli = 0;
+			}
+
+			var diskon = $('#faktur_diskon_'+number).val();
+			if(diskon == ""){
+					diskon = 0;
+			}
+
+			var hitung_diskon = diskon / 100;
+			var hitung =  harga_beli - (harga_beli * hitung_diskon);
+			var total = Math.ceil(hitung);
+
+			$('#faktur_harga_beli_'+number).val(NumberToMoney(total));
+		}
 }
 
 function hitung_total_harga_beli(){
@@ -1640,7 +1903,6 @@ function hitung_total_harga_beli(){
                         <th style="color:#fff; text-align:center;">Nama Supplier</th>
                         <th style="color:#fff; text-align:center;">No Faktur</th>
                         <th style="color:#fff; text-align:center;">Tanggal & Waktu</th>
-                        <th style="color:#fff; text-align:center;">Diskon</th>
 												<th style="color:#fff; text-align:center;">Total</th>
                         <th style="color:#fff; text-align:center;">Aksi</th>
                     </tr>
@@ -1733,7 +1995,7 @@ function hitung_total_harga_beli(){
 																												<input type="hidden" name="id_nama_obat[]" id="id_nama_obat_1" value="">
 																												<input type="text" class="form-control" id="kode_obat_1" value="" required="required" readonly>
 																												<span class="input-group-btn">
-																														<button class="btn waves-effect waves-light btn-default" type="button" onclick="get_nama_obat(1)">
+																														<button class="btn waves-effect waves-light btn-default btn_obat" type="button" onclick="popup_obat(1); get_nama_obat(1);">
 																																<i class="fa fa-search"></i>
 																														</button>
 																												</span>
@@ -1753,12 +2015,6 @@ function hitung_total_harga_beli(){
 																								</div>
 																						</div>
 																						<div class="form-group">
-																								<label class="col-md-2 control-label">Expired</label>
-																								<div class="col-md-8">
-																										<input type="text" class="form-control" id="expired_1" value="" readonly>
-																								</div>
-																						</div>
-																						<div class="form-group">
 																								<label class="col-md-2 control-label">Golongan Obat</label>
 																								<div class="col-md-8">
 																										<input type="text" class="form-control" id="golongan_1" value="" readonly>
@@ -1774,6 +2030,21 @@ function hitung_total_harga_beli(){
 																								<label class="col-md-2 control-label">Service</label>
 																								<div class="col-md-8">
 																										<input type="text" class="form-control" id="service_1" value="" readonly>
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">No Batch</label>
+																								<div class="col-md-8">
+																												<input type="text" class="form-control" name="no_batch[]" id="no_batch_1" value="" required="required">
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Expired</label>
+																								<div class="col-md-8">
+																									<div class="input-group">
+																											<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+																											<input type="text" class="form-control" name="kadaluarsa[]" id="kadaluarsa_1" value="" required="required" data-mask="99-99-9999">
+																									</div>
 																								</div>
 																						</div>
 																				</div>
@@ -1841,6 +2112,15 @@ function hitung_total_harga_beli(){
 																										</div>
 																								</div>
 																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Diskon</label>
+																								<div class="col-md-8">
+																										<div class="input-group">
+																												<input type="text" class="form-control" name="diskon[]" id="diskon_1" value="0" required="required" onkeyup="FormatCurrency(this); hitung_diskon_jual(1); hitung_harga_jual(1); hitung_total_harga_beli();">
+																												<span class="input-group-addon">%</span>
+																										</div>
+																								</div>
+																						</div>
 																				</div>
 																		</div>
 						                      </div>
@@ -1850,7 +2130,7 @@ function hitung_total_harga_beli(){
 								</td>
 							</tr>
 						</table>
-						<div class="form-group">
+						<!-- <div class="form-group">
 								<label class="col-md-1 control-label">&nbsp;</label>
 								<div class="col-md-8">
 										<div class="radio radio-purple radio-inline">
@@ -1866,17 +2146,17 @@ function hitung_total_harga_beli(){
 												<label for="diskon_harga"> Diskon Harga </label>
 										</div>
 								</div>
-						</div>
+						</div> -->
 						<div class="row">
 							<div class="col-md-12">
 										<label class="col-md-1 control-label">Total</label>
 										<div class="col-md-2">
 													<input type="text" class="form-control" name="total_semua" id="total" value="" required="required" readonly>
 										</div>
-										<label class="col-md-1 control-label">Diskon</label>
+										<!-- <label class="col-md-1 control-label">Diskon</label>
 										<div class="col-md-2">
 													<input type="text" class="form-control" name="diskon" id="diskon" value="" onkeyup="hitung_diskon();" disabled="disabled">
-										</div>
+										</div> -->
 										<label class="col-md-1 control-label">Grand Total</label>
 										<div class="col-md-2">
 													<input type="text" class="form-control" name="grand_total" id="grand_total" value="" required="required" readonly>
@@ -1939,7 +2219,7 @@ function hitung_total_harga_beli(){
 																												<input type="hidden" name="id_nama_obat[]" id="faktur_id_nama_obat_1" value="">
 																												<input type="text" class="form-control" id="faktur_kode_obat_1" value="" required="required" readonly>
 																												<span class="input-group-btn">
-																														<button class="btn waves-effect waves-light btn-default" type="button" onclick="get_nama_obat(1)">
+																														<button class="btn waves-effect waves-light btn-default" type="button" onclick="popup_obat(1); get_nama_obat(1)">
 																																<i class="fa fa-search"></i>
 																														</button>
 																												</span>
@@ -1959,12 +2239,6 @@ function hitung_total_harga_beli(){
 																								</div>
 																						</div>
 																						<div class="form-group">
-																								<label class="col-md-2 control-label">Expired</label>
-																								<div class="col-md-8">
-																										<input type="text" class="form-control" id="faktur_expired_1" value="" readonly>
-																								</div>
-																						</div>
-																						<div class="form-group">
 																								<label class="col-md-2 control-label">Golongan Obat</label>
 																								<div class="col-md-8">
 																										<input type="text" class="form-control" id="faktur_golongan_1" value="" readonly>
@@ -1980,6 +2254,21 @@ function hitung_total_harga_beli(){
 																								<label class="col-md-2 control-label">Service</label>
 																								<div class="col-md-8">
 																										<input type="text" class="form-control" id="faktur_service_1" value="" readonly>
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">No Batch</label>
+																								<div class="col-md-8">
+																												<input type="text" class="form-control" name="no_batch[]" id="faktur_no_batch_1" value="" required="required">
+																								</div>
+																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Expired</label>
+																								<div class="col-md-8">
+																									<div class="input-group">
+																											<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+																											<input type="text" class="form-control" name="kadaluarsa[]" id="faktur_kadaluarsa_1" value="" required="required" data-mask="99-99-9999">
+																									</div>
 																								</div>
 																						</div>
 																				</div>
@@ -2047,6 +2336,15 @@ function hitung_total_harga_beli(){
 																										</div>
 																								</div>
 																						</div>
+																						<div class="form-group">
+																								<label class="col-md-2 control-label">Diskon</label>
+																								<div class="col-md-8">
+																										<div class="input-group">
+																												<input type="text" class="form-control" name="diskon[]" id="faktur_diskon_1" value="0" required="required" onkeyup="FormatCurrency(this); hitung_diskon_jual(1); hitung_harga_jual(1); hitung_total_harga_beli();">
+																												<span class="input-group-addon">%</span>
+																										</div>
+																								</div>
+																						</div>
 																				</div>
 																		</div>
 						                      </div>
@@ -2056,7 +2354,7 @@ function hitung_total_harga_beli(){
 								</td>
 							</tr>
 						</table>
-						<div class="form-group">
+						<!-- <div class="form-group">
 								<label class="col-md-1 control-label">&nbsp;</label>
 								<div class="col-md-8">
 										<div class="radio radio-purple radio-inline">
@@ -2072,17 +2370,17 @@ function hitung_total_harga_beli(){
 												<label for="diskon_harga"> Diskon Harga </label>
 										</div>
 								</div>
-						</div>
+						</div> -->
 						<div class="row">
 							<div class="col-md-12">
 										<label class="col-md-1 control-label">Total</label>
 										<div class="col-md-2">
 													<input type="text" class="form-control" name="total_semua" id="faktur_total" value="" required="required" readonly>
 										</div>
-										<label class="col-md-1 control-label">Diskon</label>
+										<!-- <label class="col-md-1 control-label">Diskon</label>
 										<div class="col-md-2">
 													<input type="text" class="form-control" name="diskon" id="faktur_diskon" value="" onkeyup="hitung_diskon();" disabled="disabled">
-										</div>
+										</div> -->
 										<label class="col-md-1 control-label">Grand Total</label>
 										<div class="col-md-2">
 													<input type="hidden" class="form-control faktur_harga_beli" id="faktur_grand_total_hidden" value="" required="required">
@@ -2542,7 +2840,7 @@ function hitung_total_harga_beli(){
 													<th style="color:#fff; text-align:center;">Harga Beli</th>
 													<th style="color:#fff; text-align:center;">Harga Jual</th>
 													<th style="color:#fff; text-align:center;">Tanggal & Waktu Masuk</th>
-													<th style="color:#fff; text-align:center;">Aksi</th>
+													<!-- <th style="color:#fff; text-align:center;">Aksi</th> -->
 											</tr>
 									</thead>
 									<tbody>

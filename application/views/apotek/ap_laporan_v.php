@@ -173,8 +173,8 @@ function data_obat(){
 	$('#popup_load').show();
 
 	var keyword = $('#cari_obat').val();
-    var urutkan = $("input[name='urutkan']:checked").val();
-    var urutkan_stok = $('#urutkan_stok').val();
+  var urutkan = $("input[name='urutkan']:checked").val();
+  var urutkan_stok = $('#urutkan_stok').val();
 
 	$.ajax({
 		url : '<?php echo base_url(); ?>apotek/ap_laporan_c/get_data_obat',
@@ -227,7 +227,7 @@ function data_obat(){
 					var keterangan = "";
 					var aksi = "";
 
-					if(timeDifferenceInDays <= 14 && timeDifferenceInDays > 0){
+					if(timeDifferenceInDays <= 120 && timeDifferenceInDays > 0){
 						warna = "class='warning'";
 						keterangan = "Masa kadaluarsa tinggal <b>"+timeDifferenceInDays+" hari</b>";
 					}else if(timeDifferenceInDays == 0){

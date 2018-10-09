@@ -28,7 +28,7 @@ class Ap_obat_hv_m extends CI_Model {
 						b.KODE_OBAT,
 						b.BARCODE,
 						b.NAMA_OBAT,
-						b.EXPIRED,
+						a.EXPIRED,
 						b.STATUS_OBAT,
 						b.SERVICE,
 						b.ID_JENIS_OBAT,

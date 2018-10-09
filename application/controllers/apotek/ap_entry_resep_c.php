@@ -32,6 +32,12 @@ class Ap_entry_resep_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function data_pasien_iter(){
+		$keyword = $this->input->get('keyword');
+		$data = $this->model->data_pasien_iter($keyword);
+		echo json_encode($data);
+	}
+
 	function data_keranjang(){
 		$data = $this->model->data_keranjang();
 		echo json_encode($data);
@@ -40,10 +46,11 @@ class Ap_entry_resep_c extends CI_Controller {
 	function simpan_keranjang(){
 		$id_gudang = $this->input->post('id');
 		$harga_beli = $this->input->post('harga_beli');
+		$service = $this->input->post('service');
 
-		$sql_check = $this->db->query("SELECT COUNT(*) AS TOTAL FROM keranjang_beli_hv WHERE ID_GUDANG_OBAT = '$id_gudang'")->row();
+		$sql_check = $this->db->query("SELECT COUNT(*) AS TOTAL FROM keranjang_beli WHERE ID_GUDANG_OBAT = '$id_gudang'")->row();
 		if ($sql_check->TOTAL == '0') {
-			$this->model->simpan_keranjang($id_gudang, $harga_beli);
+			$this->model->simpan_keranjang($id_gudang, $harga_beli, $service);
 		}else {
 		}
 		echo '1';
@@ -60,27 +67,64 @@ class Ap_entry_resep_c extends CI_Controller {
 		$total_keranjang_name = $this->input->post('total_keranjang_name');
 		$jumlah_beli = $this->input->post('jumlah_beli');
 		$harga_obat = $this->input->post('harga_obat');
+		$service = $this->input->post('service');
+		$aturan_minum = $this->input->post('aturan_minum');
+		$diminum_selama = $this->input->post('diminum_selama');
+
+		$harga_obat_normal = $this->input->post('harga_normal');
+		$total_normal = $this->input->post('total_keranjang_normal');
+		$total_tagihan_normal = str_replace(',','',  $this->input->post('total_tagihan_normal'));
 
 		$invoice = $this->input->post('invoice');
 		$shift = $this->input->post('shift');
 		$id_pegawai = $this->input->post('id_pegawai');
 		$total = str_replace(',','',  $this->input->post('total_tagihan'));
+		$tanggal = date('d-m-Y');
+    $tahun = date('Y');
+    $bulan = date('m');
+		$waktu = date('H:i:s');
+		$id_resep = $this->input->post('id_resep');
+		$id_pasien = $this->input->post('id_pasien');
+		$id_dokter = $this->input->post('id_dokter');
 
 		$data = array(
 			'INVOICE' => $invoice,
 			'SHIFT' => $shift,
 			'ID_PEGAWAI' => $id_pegawai,
 			'TOTAL' => $total,
-			'STATUS' => 'Penjualan HV / OTC'
+			'STATUS' => 'Entry Resep',
+			'TANGGAL' => $tanggal,
+			'BULAN' => $bulan,
+			'TAHUN' => $tahun,
+			'WAKTU' => $waktu,
+			'TOTAL_NORMAL' => $total_tagihan_normal,
+			'ID_RESEP' => $id_resep,
+			'ID_PASIEN' => $id_pasien,
+			'ID_DOKTER' => $id_dokter
 		);
-		$this->db->insert('ap_penjualan_obat_hv', $data);
-		$id_penjualan_obat_hv = $this->db->insert_id();
+		$this->db->insert('ap_iter', $data);
+		$id_iter = $this->db->insert_id();
+
+		$data_update = array(
+			'TOTAL' => $total_tagihan_normal,
+			'TOTAL_DGN_SERVICE' => $total
+		);
+		$this->db->where('ID', $id_resep);
+		$this->db->update('rk_resep_rj', $data_update);
 
 		foreach ($id_gudang_obat as $key => $value) {
-			$this->model->simpan_proses($value, $total_keranjang_name[$key], $jumlah_beli[$key], $harga_obat[$key], $id_penjualan_obat_hv);
+			$this->db->where('ID_RESEP', $id_resep);
+			$this->db->delete('rk_resep_detail_rj');
+
+			$this->model->simpan_proses($value, $total_keranjang_name[$key], $jumlah_beli[$key], $harga_obat[$key], $service[$key], $aturan_minum[$key], $diminum_selama[$key], $id_iter, $harga_obat_normal[$key], $total_normal[$key], $id_resep);
 		}
 
-		$sql = $this->db->query("SELECT * FROM ap_penjualan_obat WHERE ID = '$id_penjualan_obat_hv'");
+		foreach ($id_gudang_obat as $key => $value) {
+
+			$this->model->simpan_proses_resep($value, $total_keranjang_name[$key], $jumlah_beli[$key], $harga_obat[$key], $service[$key], $aturan_minum[$key], $diminum_selama[$key], $id_iter, $harga_obat_normal[$key], $total_normal[$key], $id_resep);
+		}
+
+		$sql = $this->db->query("SELECT * FROM ap_iter WHERE ID = '$id_iter'");
 		$back = $sql->row_array();
 		echo json_encode($back);
 
@@ -142,6 +186,21 @@ class Ap_entry_resep_c extends CI_Controller {
 		}
 	}
 
+	function get_pasien_iter(){
+		$id_resep = $this->input->post('id_resep');
+		$data = $this->model->get_pasien_iter($id_resep);
+
+		echo json_encode($data);
+	}
+
+	function get_obat(){
+		$id = $this->input->post('id');
+		$harga_beli = $this->input->post('harga_beli');
+		$service = $this->input->post('service');
+		$data = $this->model->get_obat($id);
+
+		echo json_encode($data);
+	}
 }
 
 /* End of file welcome.php */

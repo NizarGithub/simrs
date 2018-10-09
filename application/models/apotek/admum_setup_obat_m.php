@@ -77,12 +77,10 @@ class Admum_setup_obat_m extends CI_Model {
 							OBAT.NAMA_OBAT,
 							OBAT.ID_MERK,
 							OBAT.ID_JENIS_OBAT,
-							OBAT.EXPIRED,
 							OBAT.GOLONGAN_OBAT,
 							OBAT.KATEGORI_OBAT,
 							OBAT.STATUS_OBAT,
 							OBAT.SERVICE,
-							OBAT.NO_BATCH,
 							SUP.MERK
 							-- JENIS.NAMA_JENIS
 						FROM admum_setup_nama_obat OBAT
@@ -94,47 +92,41 @@ class Admum_setup_obat_m extends CI_Model {
 					return $query->row();
 	}
 
-	function simpan($kode_obat,$barcode,$nama_obat,$id_jenis,$expired,$golongan,$kategori,$status_obat,$service,$no_batch){
+	function simpan($kode_obat,$barcode,$nama_obat,$id_jenis,$golongan,$kategori,$status_obat,$service){
 		$sql = "
 			INSERT INTO admum_setup_nama_obat(
 				KODE_OBAT,
 				BARCODE,
 				NAMA_OBAT,
 				ID_JENIS_OBAT,
-				EXPIRED,
 				GOLONGAN_OBAT,
 				KATEGORI_OBAT,
 				STATUS_OBAT,
-				SERVICE,
-				NO_BATCH
+				SERVICE
 			) VALUES (
 				'$kode_obat',
 				'$barcode',
 				'$nama_obat',
 				'$id_jenis',
-				'$expired',
 				'$golongan',
 				'$kategori',
 				'$status_obat',
-				'$service',
-				'$no_batch'
+				'$service'
 			)
 		";
 		$this->db->query($sql);
 	}
 
-	function ubah($id,$barcode,$nama_obat,$jenis,$expired,$golongan,$kategori,$status_racik,$service,$no_batch){
+	function ubah($id,$barcode,$nama_obat,$jenis,$golongan,$kategori,$status_racik,$service){
 		$sql = "
 			UPDATE admum_setup_nama_obat SET
 				BARCODE = '$barcode',
 				NAMA_OBAT = '$nama_obat',
 				ID_JENIS_OBAT = '$jenis',
-				EXPIRED = '$expired',
 				GOLONGAN_OBAT = '$golongan',
 				KATEGORI_OBAT = '$kategori',
 				STATUS_OBAT = '$status_racik',
-				SERVICE = '$service',
-				NO_BATCH = '$no_batch'
+				SERVICE = '$service'				
 			WHERE ID = '$id'";
 		$this->db->query($sql);
 	}

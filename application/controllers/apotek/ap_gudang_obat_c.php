@@ -226,6 +226,8 @@ class Ap_gudang_obat_c extends CI_Controller {
 		$id_supplier = $this->input->post('id_supplier');
 		$no_faktur = $this->input->post('no_faktur');
 		$diskon = str_replace(',', '', $this->input->post('diskon'));
+		$no_batch = $this->input->post('no_batch');
+		$kadaluarsa = $this->input->post('kadaluarsa');
 		$grand_total = str_replace(',', '', $this->input->post('grand_total'));
 
 		$tanggal_masuk = date('d-m-Y');
@@ -234,52 +236,19 @@ class Ap_gudang_obat_c extends CI_Controller {
 		$format = $datetime->setTimezone($tz_object);
 		$waktu_masuk = $format->format('H:i:s');
 
-		$status_obat_ubah = '';
-		if ($this->input->post('status_obat_ubah') == '0') {
-			$status_obat_ubah = 'Kosong';
-		}elseif ($this->input->post('status_obat_ubah') == '1') {
-			$status_obat_ubah = 'Persen';
-		}elseif ($this->input->post('status_obat_ubah') == '2') {
-			$status_obat_ubah = 'Harga';
-		}
-
 		$data_faktur = array(
 			'ID_SUPPLIER' => $id_supplier,
 			'NO_FAKTUR' => $no_faktur,
 			'TANGGAL' => $tanggal_masuk,
 			'WAKTU' => $waktu_masuk,
-			'DISKON' => $diskon,
 			'TOTAL' => $grand_total,
-			'CEK_DISKON' => $status_obat_ubah
 		);
 
 		$this->db->insert('faktur', $data_faktur);
 		$insert_id = $this->db->insert_id();
-		// $sq_cek = "SELECT ID FROM apotek_gudang_obat ORDER BY ID DESC LIMIT 1";
-		// $qr_cek = $this->db->query($sq_cek)->row();
-		// $last_id = $qr_cek->ID;
-		// $id = $last_id+1;
-		//
 
 
 	foreach ($id_nama_obat as $key => $value) {
-
-		// $sql_cek = "SELECT COUNT(*) AS TOTAL FROM apotek_gudang_obat WHERE ID_SETUP_NAMA_OBAT = '$value'";
-		// $qry_cek = $this->db->query($sql_cek)->row();
-		// $total_data = $qry_cek->TOTAL;
-
-		// if($total_data == 0){
-		// 	$aktif = '1';
-		// 	$urut_barang = '1';
-		// 	$first_out = '1';
-		// }else{
-		// 	$aktif = '0';
-		// 	$sql = "SELECT * FROM apotek_gudang_obat WHERE ID_SETUP_NAMA_OBAT = '$id_nama_obat' ORDER BY URUT_BARANG DESC LIMIT 1";
-		// 	$qry = $this->db->query($sql)->row();
-		// 	$urut = $qry->URUT_BARANG;
-		// 	$urut_barang = $urut+1;
-		// 	$first_out = $urut_barang;
-		// }
 
 		$this->model->simpan(
 			$insert_id,
@@ -292,6 +261,9 @@ class Ap_gudang_obat_c extends CI_Controller {
 			$harga_beli[$key],
 			$harga_jual[$key],
 			$harga_bulat[$key],
+			$no_batch[$key],
+			$kadaluarsa[$key],
+			$diskon[$key],
 			$tanggal_masuk,
 			$waktu_masuk
 		);
@@ -316,26 +288,17 @@ class Ap_gudang_obat_c extends CI_Controller {
 		$no_faktur = $this->input->post('no_faktur');
 		$diskon = str_replace(',', '', $this->input->post('diskon'));
 		$grand_total = str_replace(',', '', $this->input->post('grand_total'));
+		$no_batch = $this->input->post('no_batch');
+		$kadaluarsa = $this->input->post('kadaluarsa');
 
 		$tanggal_masuk = date('d-m-Y');
 		$tz_object = new DateTimeZone('Asia/Jakarta');
 		$datetime = new DateTime();
 		$format = $datetime->setTimezone($tz_object);
-		$waktu_masuk = $format->format('H:i:s');
-
-		$status_obat_ubah = '';
-		if ($this->input->post('status_obat_ubah') == '0') {
-			$status_obat_ubah = 'Kosong';
-		}elseif ($this->input->post('status_obat_ubah') == '1') {
-			$status_obat_ubah = 'Persen';
-		}elseif ($this->input->post('status_obat_ubah') == '2') {
-			$status_obat_ubah = 'Harga';
-		}
+		$waktu_masuk = $format->format('H:i:s');		
 
 		$data_faktur = array(
-			'DISKON' => $diskon,
-			'TOTAL' => $grand_total,
-			'CEK_DISKON' => $status_obat_ubah
+			'TOTAL' => $grand_total
 		);
 
 		$this->db->where('ID', $id_faktur);
@@ -355,6 +318,9 @@ class Ap_gudang_obat_c extends CI_Controller {
 			$harga_beli[$key],
 			$harga_jual[$key],
 			$harga_bulat[$key],
+			$no_batch[$key],
+			$diskon[$key],
+			$kadaluarsa[$key],
 			$tanggal_masuk,
 			$waktu_masuk
 		);

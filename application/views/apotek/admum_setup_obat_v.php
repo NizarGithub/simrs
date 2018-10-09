@@ -618,12 +618,6 @@ function cek_barcode(){
                     </span>
                 </div>
             </div>
-						<div class="form-group">
-                <label class="col-md-2 control-label">No Batch</label>
-                <div class="col-md-8">
-                    <input type="text" class="form-control" name="no_batch" id="no_batch" value="" required="required">
-                </div>
-            </div>
             <div class="form-group">
                 <label class="col-md-2 control-label">Nama Obat</label>
                 <div class="col-md-8">
@@ -641,15 +635,6 @@ function cek_barcode(){
 														<i class="fa fa-search"></i>
 													</button>
 												</span>
-										</div>
-								</div>
-						</div>
-						<div class="form-group">
-								<label class="col-md-2 control-label">Expired</label>
-								<div class="col-md-8">
-										<div class="input-group">
-												<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-												<input type="text" class="form-control datepicker-here" name="tanggal_expired" id="tanggal_expired" value="" required="required" data-language="en" data-date-format="dd-mm-yyyy">
 										</div>
 								</div>
 						</div>
@@ -755,12 +740,6 @@ function cek_barcode(){
                     <input type="text" class="form-control" name="barcode_ubah" id="barcode_ubah" value="">
                 </div>
             </div>
-						<div class="form-group">
-                <label class="col-md-2 control-label">No Batch</label>
-                <div class="col-md-8">
-                    <input type="text" class="form-control" name="no_batch_ubah" id="no_batch_ubah" value="">
-                </div>
-            </div>
             <div class="form-group">
                 <label class="col-md-2 control-label">Nama Obat</label>
                 <div class="col-md-8">
@@ -780,16 +759,7 @@ function cek_barcode(){
 												</span>
 										</div>
 								</div>
-						</div>
-						<div class="form-group">
-								<label class="col-md-2 control-label">Expired</label>
-								<div class="col-md-8">
-										<div class="input-group">
-												<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-												<input type="text" class="form-control datepicker-here" name="tanggal_expired_ubah" id="tanggal_expired_ubah" value="" required="required" data-language="en" data-date-format="dd-mm-yyyy">
-										</div>
-								</div>
-						</div>
+						</div>						
 					</div>
 					<div class="col-md-6">
 						<div class="form-group">

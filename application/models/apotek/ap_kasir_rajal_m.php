@@ -40,6 +40,7 @@ class Ap_kasir_rajal_m extends CI_Model {
 							'' AS ID_HV,
 							'' AS ID_PAKET,
 							'' AS ID_RESEP_RANAP,
+							'' AS ID_ENTRY_RESEP,
 							c.INVOICE
 						FROM admum_rawat_jalan a
 						LEFT JOIN rk_pasien b ON b.ID = a.ID_PASIEN
@@ -70,6 +71,7 @@ class Ap_kasir_rajal_m extends CI_Model {
 							a.ID AS ID_HV,
 							'' AS ID_PAKET,
 							'' AS ID_RESEP_RANAP,
+							'' AS ID_ENTRY_RESEP,
 							a.INVOICE
 						FROM ap_penjualan_obat_hv a
 
@@ -94,6 +96,7 @@ class Ap_kasir_rajal_m extends CI_Model {
 							'' AS ID_HV,
 							a.ID AS ID_PAKET,
 							'' AS ID_RESEP_RANAP,
+							'' AS ID_ENTRY_RESEP,
 							a.INVOICE
 						FROM ap_penjualan_obat_paket a
 
@@ -118,8 +121,35 @@ class Ap_kasir_rajal_m extends CI_Model {
 							'' AS ID_HV,
 							'' AS ID_PAKET,
 							a.ID AS ID_RESEP_RANAP,
+							'' AS ID_ENTRY_RESEP,
 							a.KODE_RESEP AS INVOICE
 						FROM rk_ri_resep a
+						LEFT JOIN rk_pasien b ON a.ID_PASIEN = b.ID
+
+						UNION ALL
+
+						SELECT
+							a.ID,
+							a.TANGGAL,
+							a.ID_PASIEN,
+							b.NAMA,
+							a.STS_BAYAR,
+							'' AS ID_KASIR_RAJAL,
+							'0' AS TOT_POLI,
+							'0' AS TOT_TDK,
+							'0' AS TOT_RESEP,
+							a.TOTAL AS TOT_TARIF,
+							'0' AS BIAYA_REG,
+							'0' AS BIAYA_ADMIN,
+							a.STATUS,
+							'5' AS TIPE,
+							a.STATUS_CLOSING,
+							'' AS ID_HV,
+							'' AS ID_PAKET,
+							'' AS ID_RESEP_RANAP,
+							a.ID AS ID_ENTRY_RESEP,
+							a.INVOICE
+						FROM ap_iter a
 						LEFT JOIN rk_pasien b ON a.ID_PASIEN = b.ID
 						) a
 						WHERE 1=1
@@ -135,14 +165,18 @@ class Ap_kasir_rajal_m extends CI_Model {
 		$sql = "SELECT
 							RJ.*,
 							PS.NAMA AS NAMA_PASIEN,
+							PS.JENIS_PASIEN,
 							P.ID AS ID_POLI,
 							P.NAMA AS NAMA_POLI,
 							P.BIAYA,
-							PEG.NAMA AS NAMA_DOKTER
+							PEG.NAMA AS NAMA_DOKTER,
+							RES.ID AS ID_RESEP,
+							RES.STS_ITER
 						FROM admum_rawat_jalan RJ
 						LEFT JOIN admum_poli P ON P.ID = RJ.ID_POLI
 						LEFT JOIN kepeg_pegawai PEG ON PEG.ID = P.ID_PEG_DOKTER
 						LEFT JOIN rk_pasien PS ON PS.ID = RJ.ID_PASIEN
+						LEFT JOIN rk_resep_rj RES ON RES.ID_PELAYANAN = RJ.ID
 						WHERE RJ.ID = '$id'
 					";
 		$query = $this->db->query($sql);
@@ -413,6 +447,7 @@ class Ap_kasir_rajal_m extends CI_Model {
 															$id_rj,
 															$id_pasien,
 															$id_poli,
+															$id_resep,
 															$id_pegawai,
 															$shift,
 															$tanggal,
@@ -426,7 +461,8 @@ class Ap_kasir_rajal_m extends CI_Model {
 															$bayar,
 															$kartu_provider,
 															$no_kartu,
-															$tambahan){
+															$tambahan,
+															$status_iter){
 		$sql = "INSERT INTO rk_pembayaran_kasir(
 							INVOICE,
 							ID_PELAYANAN,
@@ -477,6 +513,12 @@ class Ap_kasir_rajal_m extends CI_Model {
 
 		$this->db->where('ID_PELAYANAN', $id_rj);
     $this->db->update('rk_resep_rj', $data_update);
+
+		if ($status_iter == '1') {
+			$this->db->query("UPDATE rk_resep_rj SET ITER_KURANG = ITER_KURANG - 1 WHERE ID = '$id_resep'");
+		}	else {
+
+		}
 	}
 
 	function simpan_pembayaran_obat($invoice,
@@ -492,7 +534,11 @@ class Ap_kasir_rajal_m extends CI_Model {
 																	$no_kartu,
 																	$tambahan,
 																	$kembali,
-																	$tipe){
+																	$tipe,
+																	$id_dokter,
+																	$id_pasien,
+																	$id_resep
+																){
     if ($tipe == '2') {
     	$data= array(
 				'ID_PENJUALAN_HV' => $id_penjualan,
@@ -544,32 +590,62 @@ class Ap_kasir_rajal_m extends CI_Model {
 				$this->db->query("UPDATE apotek_gudang_obat SET STOK = STOK - $jumlah_beli WHERE ID = '$id_gudang'");
 			}
     }elseif ($tipe == '4') {
-			// $data= array(
-			// 	'ID_RESEP_RANAP' => $id_penjualan,
-			// 	'ID_PEGAWAI' => $id_pegawai,
-			// 	'SHIFT' => $shift,
-			// 	'TANGGAL' => $tanggal,
-			// 	'WAKTU' => $waktu,
-			// 	'TOTAL' => $total,
-			// 	'JENIS_PEMBAYARAN' => $jenis_pembayaran,
-			// 	'BAYAR' => $bayar,
-			// 	'KARTU_PROVIDER' => $kartu_provider,
-			// 	'NO_KARTU' => $no_kartu,
-			// 	'TAMBAHAN' => $tambahan,
-			// 	'KEMBALI' => $kembali
-			// );
-			//
-			// $this->db->insert('rk_pembayaran_resep_ranap', $data);
-			//
-			// $query = $this->db->query("SELECT * FROM rk_ri_resep_detail WHERE ID_RESEP = '$id_penjualan'")->result_array();
-			// foreach ($query as $q) {
-			// 	$id_gudang = $q['ID_OBAT'];
-			// 	$jumlah_beli = $q['JUMLAH_BELI'];
-			//
-			// 	$this->db->query("UPDATE apotek_gudang_obat SET STOK = STOK - $jumlah_beli WHERE ID = '$id_gudang'");
-			// }
+			$data= array(
+				'ID_RESEP_RANAP' => $id_penjualan,
+				'ID_PEGAWAI' => $id_pegawai,
+				'SHIFT' => $shift,
+				'TANGGAL' => $tanggal,
+				'WAKTU' => $waktu,
+				'TOTAL' => $total,
+				'JENIS_PEMBAYARAN' => $jenis_pembayaran,
+				'BAYAR' => $bayar,
+				'KARTU_PROVIDER' => $kartu_provider,
+				'NO_KARTU' => $no_kartu,
+				'TAMBAHAN' => $tambahan,
+				'KEMBALI' => $kembali
+			);
+
+			$this->db->insert('rk_pembayaran_resep_ranap', $data);
+
+			$query = $this->db->query("SELECT * FROM rk_ri_resep_detail WHERE ID_RESEP = '$id_penjualan'")->result_array();
+			foreach ($query as $q) {
+				$id_gudang = $q['ID_OBAT'];
+				$jumlah_beli = $q['JUMLAH_BELI'];
+
+				$this->db->query("UPDATE apotek_gudang_obat SET STOK = STOK - $jumlah_beli WHERE ID = '$id_gudang'");
+			}
+    }elseif ($tipe == '5') {
+			$data= array(
+				'ID_ITER' => $id_penjualan,
+				'ID_PEGAWAI' => $id_pegawai,
+				'SHIFT' => $shift,
+				'TANGGAL' => $tanggal,
+				'WAKTU' => $waktu,
+				'TOTAL' => $total,
+				'JENIS_PEMBAYARAN' => $jenis_pembayaran,
+				'BAYAR' => $bayar,
+				'KARTU_PROVIDER' => $kartu_provider,
+				'NO_KARTU' => $no_kartu,
+				'TAMBAHAN' => $tambahan,
+				'KEMBALI' => $kembali,
+				'ID_RESEP' => $id_resep,
+				'ID_PASIEN' => $id_pasien,
+				'ID_DOKTER' => $id_dokter
+			);
+
+			$this->db->insert('ap_pembayaran_iter', $data);
+
+			$query = $this->db->query("SELECT * FROM ap_penjualan_obat_detail WHERE ID_PENJUALAN_OBAT = '$id_penjualan'")->result_array();
+			foreach ($query as $q) {
+				$id_gudang = $q['ID_GUDANG_OBAT'];
+				$jumlah_beli = $q['JUMLAH_BELI'];
+
+			  $this->db->query("UPDATE apotek_gudang_obat SET STOK = STOK - $jumlah_beli WHERE ID = '$id_gudang'");
     }
+
+			$this->db->query("UPDATE rk_resep_rj SET ITER_KURANG = ITER_KURANG - 1 WHERE ID = '$id_resep'");
 	}
+}
 
 	function struk_resep($id_rj){
 		$sql = $this->db->query("SELECT
@@ -604,6 +680,39 @@ class Ap_kasir_rajal_m extends CI_Model {
 														LEFT JOIN rk_resep_rj RS ON RS.ID_PELAYANAN = RJ.ID
 														LEFT JOIN rk_laborat_rj LAB ON LAB.ID_PELAYANAN = RJ.ID
 													  	WHERE RJ.ID = '$id_rj'
+		");
+
+		return $sql->row_array();
+	}
+
+	function struk_copy_resep($id_rj){
+		$sql = $this->db->query("SELECT
+															RJ.ID,
+															RJ.ID_PASIEN,
+															PS.NAMA,
+															PS.UMUR,
+															PS.ALAMAT AS ALAMAT_PASIEN,
+															PS.KODE_PASIEN,
+															PS.TELEPON AS TELEPON_PASIEN,
+															RJ.TANGGAL,
+															RJ.ID_POLI,
+															PEG.NAMA AS NAMA_DOKTER,
+															RJ.STS_BAYAR,
+															RS.ID AS ID_RESEP,
+															RS.ALERGI_OBAT,
+															RS.KODE_RESEP,
+															PAG.NAMA AS NAMA_PEGAWAI,
+															RS.ITER
+														FROM admum_rawat_jalan RJ
+														LEFT JOIN rk_pasien PS ON PS.ID = RJ.ID_PASIEN
+														LEFT JOIN (SELECT * FROM admum_poli WHERE AKTIF = '1') PL ON PL.ID = RJ.ID_POLI
+														LEFT JOIN kepeg_pegawai PEG ON PEG.ID = RJ.ID_DOKTER
+														LEFT JOIN rk_pembayaran_kasir KAS ON KAS.ID_PELAYANAN = RJ.ID
+														LEFT JOIN kepeg_pegawai PAG ON PAG.ID = KAS.ID_PEGAWAI
+														LEFT JOIN rk_tindakan_rj TD ON TD.ID_PELAYANAN = RJ.ID
+														LEFT JOIN rk_resep_rj RS ON RS.ID_PELAYANAN = RJ.ID
+														LEFT JOIN rk_laborat_rj LAB ON LAB.ID_PELAYANAN = RJ.ID
+													  WHERE RJ.ID = '$id_rj'
 		");
 
 		return $sql->row_array();
@@ -764,6 +873,28 @@ class Ap_kasir_rajal_m extends CI_Model {
 		);
 		$this->db->where('ID', $id_semua);
     $this->db->update('rk_ri_resep', $data_update);
+	}
+
+	function simpan_closing_entry($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup, $invoice){
+		$data = array(
+			'ID_TUTUP' => $id_tutup,
+			'ID_ITER' => $id_semua,
+			'TANGGAL' => $tanggal,
+			'WAKTU' => $pukul,
+			'ID_PEGAWAI' => $id_pegawai,
+			'SHIFT' => $shift,
+			'TOTAL' => $total,
+			'INVOICE' => $invoice,
+			'STATUS' => 'Entry Resep'
+		);
+
+	  $this->db->insert('ap_tutup_kasir_rajal_detail', $data);
+
+		$data_update = array(
+			'STATUS_CLOSING' => 1
+		);
+		$this->db->where('ID', $id_semua);
+    $this->db->update('ap_iter', $data_update);
 	}
 
 	function data_pembayaran($keyword){
@@ -1026,8 +1157,60 @@ class Ap_kasir_rajal_m extends CI_Model {
 		return $query->row_array();
 	}
 
+	function get_entry_resep_by_id($id){
+		$query = $this->db->query("SELECT * FROM ap_iter WHERE ID = '$id'");
+		return $query->row_array();
+	}
+
 	function get_ranap_by_id($id){
 		$query = $this->db->query("SELECT * FROM rk_ri_resep a LEFT JOIN rk_pasien b ON a.ID_PASIEN = b.ID WHERE a.ID = '$id'");
 		return $query->row_array();
+	}
+
+	function struk_pembayaran_hv($id_rj){
+		$sql = $this->db->query("SELECT
+														a.TOTAL,
+														a.SHIFT,
+														a.TANGGAL,
+														a.ID_PENJUALAN_HV,
+														a.JENIS_PEMBAYARAN,
+														b.INVOICE,
+														c.NAMA AS NAMA_PEGAWAI
+														FROM
+														ap_pembayaran_hv a
+														LEFT JOIN ap_penjualan_obat_hv b ON a.ID_PENJUALAN_HV = b.ID
+														LEFT JOIN kepeg_pegawai c ON a.ID_PEGAWAI = c.ID
+														WHERE b.ID = '$id_rj'
+		");
+
+		return $sql->row_array();
+	}
+
+	function struk_copy_resep_entry($id_rj){
+			$sql = $this->db->query("SELECT
+															b.NAMA AS NAMA_PEGAWAI,
+															c.INVOICE,
+															-- c.TANGGAL,
+															d.NAMA AS NAMA_APOTEKER,
+															e.NAMA AS NAMA_PASIEN,
+															e.UMUR,
+															e.ALAMAT AS ALAMAT_PASIEN,
+															f.TANGGAL AS TANGGAL_DIBUAT,
+															g.NAMA AS NAMA_DOKTER,
+															f.KODE_RESEP,
+															f.ITER,
+															a.ID_ITER
+															FROM
+															ap_pembayaran_iter a
+															LEFT JOIN kepeg_pegawai b ON a.ID_PEGAWAI = b.ID
+															LEFT JOIN ap_iter c ON a.ID_ITER = c.ID
+															LEFT JOIN kepeg_pegawai d ON c.ID_PEGAWAI = d.ID
+															LEFT JOIN rk_pasien e ON c.ID_PASIEN = e.ID
+															LEFT JOIN rk_resep_rj f ON f.ID = c.ID_RESEP
+															LEFT JOIN kepeg_pegawai g ON g.ID = c.ID_DOKTER
+															WHERE c.ID = '$id_rj'
+			");
+
+			return $sql->row_array();
 	}
 }

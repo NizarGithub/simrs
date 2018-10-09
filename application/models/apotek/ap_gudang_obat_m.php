@@ -40,7 +40,6 @@ class Ap_gudang_obat_m extends CI_Model {
 						NM_OBT.KODE_OBAT,
 						NM_OBT.BARCODE,
 						NM_OBT.NAMA_OBAT,
-						NM_OBT.EXPIRED,
 						NM_OBT.GOLONGAN_OBAT,
 						NM_OBT.KATEGORI_OBAT,
 						NM_OBT.SERVICE,
@@ -111,7 +110,6 @@ class Ap_gudang_obat_m extends CI_Model {
 							NM_OBT.KODE_OBAT,
 							NM_OBT.BARCODE,
 							NM_OBT.NAMA_OBAT,
-							NM_OBT.EXPIRED,
 							JENIS.NAMA_JENIS,
 							OBAT.JUMLAH,
 							OBAT.ISI,
@@ -127,8 +125,6 @@ class Ap_gudang_obat_m extends CI_Model {
 							FAKTUR.TANGGAL AS TANGGAL_FAKTUR,
 							FAKTUR.WAKTU AS WAKTU_FAKTUR,
 							FAKTUR.TOTAL AS TOTAL_FAKTUR,
-							FAKTUR.DISKON AS DISKON_FAKTUR,
-							FAKTUR.CEK_DISKON,
 							SUPLY.NAMA_SUPPLIER
 						FROM faktur_detail OBAT
 						LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
@@ -188,7 +184,6 @@ class Ap_gudang_obat_m extends CI_Model {
 							NM_OBT.BARCODE,
 							NM_OBT.NAMA_OBAT,
 							NM_OBT.ID_JENIS_OBAT,
-							NM_OBT.EXPIRED,
 							NM_OBT.GOLONGAN_OBAT,
 							NM_OBT.KATEGORI_OBAT,
 							NM_OBT.SERVICE,
@@ -218,9 +213,7 @@ class Ap_gudang_obat_m extends CI_Model {
 		$sql = "SELECT
 						a.ID AS ID_FAKTUR_UTAMA,
 						a.NO_FAKTUR,
-						a.DISKON,
 						a.TOTAL AS TOTAL_FAKTUR,
-						a.CEK_DISKON,
 						a.ID_SUPPLIER,
 						b.*,
 						c.NAMA_OBAT,
@@ -240,9 +233,7 @@ class Ap_gudang_obat_m extends CI_Model {
 		$sql = "SELECT
 						a.ID AS ID_FAKTUR_UTAMA,
 						a.NO_FAKTUR,
-						a.DISKON,
 						a.TOTAL AS TOTAL_FAKTUR,
-						a.CEK_DISKON,
 						a.ID_SUPPLIER,
 						b.*,
 						c.NAMA_OBAT,
@@ -269,12 +260,13 @@ class Ap_gudang_obat_m extends CI_Model {
 		$harga_beli,
 		$harga_jual,
 		$harga_bulat,
+		$no_batch,
+		$kadaluarsa,
+		$diskon,
 		$tanggal_masuk,
 		$waktu_masuk
 	){
 
-		// print_r($harga_beli);
-		// die();
 		$data_faktur_detail = array(
 			'ID_FAKTUR' => $insert_id,
 			'ID_SETUP_NAMA_OBAT' => $value,
@@ -286,6 +278,9 @@ class Ap_gudang_obat_m extends CI_Model {
 			'HARGA_BELI' => $harga_beli,
 			'HARGA_JUAL' => $harga_jual,
 			'HARGA_BULAT' => $harga_bulat,
+			'DISKON' => $diskon,
+			'NO_BATCH' => $no_batch,
+			'EXPIRED' => $kadaluarsa,
 			'TANGGAL_MASUK' => $tanggal_masuk,
 			'WAKTU_MASUK' => $waktu_masuk
 		);
@@ -305,7 +300,9 @@ class Ap_gudang_obat_m extends CI_Model {
 				'STOK' => $total,
 				'HARGA_JUAL' => $harga_jual,
 				'HARGA_BELI' => $harga_beli,
-				'HARGA_BULAT' => $harga_bulat
+				'HARGA_BULAT' => $harga_bulat,
+				'EXPIRED' => $kadaluarsa,
+				'DISKON' => $diskon
 			);
 			$this->db->insert('apotek_gudang_obat', $data_gudang);
 		}else {
@@ -318,7 +315,9 @@ class Ap_gudang_obat_m extends CI_Model {
 				'STOK' => $jumlah_stok,
 				'HARGA_JUAL' => $harga_jual,
 				'HARGA_BELI' => $harga_beli,
-				'HARGA_BULAT' => $harga_bulat
+				'HARGA_BULAT' => $harga_bulat,
+				'EXPIRED' => $kadaluarsa,
+				'DISKON' => $diskon
 			);
 			$this->db->where('ID', $id_gudang);
       $this->db->update('apotek_gudang_obat', $data_gudang);
@@ -336,6 +335,9 @@ class Ap_gudang_obat_m extends CI_Model {
 		$harga_beli,
 		$harga_jual,
 		$harga_bulat,
+		$no_batch,
+		$diskon,
+		$kadaluarsa,
 		$tanggal_masuk,
 		$waktu_masuk
 	){
@@ -353,6 +355,9 @@ class Ap_gudang_obat_m extends CI_Model {
 			'HARGA_BELI' => $harga_beli,
 			'HARGA_JUAL' => $harga_jual,
 			'HARGA_BULAT' => $harga_bulat,
+			'DISKON' => $diskon,
+			'NO_BATCH' => $no_batch,
+			'EXPIRED' => $kadaluarsa,
 			'TANGGAL_MASUK' => $tanggal_masuk,
 			'WAKTU_MASUK' => $waktu_masuk
 		);
@@ -372,7 +377,9 @@ class Ap_gudang_obat_m extends CI_Model {
 				'STOK' => $total,
 				'HARGA_BELI' => $harga_beli,
 				'HARGA_JUAL' => $harga_jual,
-				'HARGA_BULAT' => $harga_bulat
+				'HARGA_BULAT' => $harga_bulat,
+				'EXPIRED' => $kadaluarsa,
+				'DISKON' => $diskon
 			);
 			$this->db->insert('apotek_gudang_obat', $data_gudang);
 		}else {
@@ -385,7 +392,9 @@ class Ap_gudang_obat_m extends CI_Model {
 				'STOK' => $jumlah_stok,
 				'HARGA_BELI' => $harga_beli,
 				'HARGA_JUAL' => $harga_jual,
-				'HARGA_BULAT' => $harga_bulat
+				'HARGA_BULAT' => $harga_bulat,
+				'EXPIRED' => $kadaluarsa,
+				'DISKON' => $diskon
 			);
 			$this->db->where('ID', $id_gudang);
       $this->db->update('apotek_gudang_obat', $data_gudang);

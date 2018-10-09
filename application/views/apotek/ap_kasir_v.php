@@ -105,10 +105,15 @@ $user_detail = $this->model->get_user_detail($id_user);
 </head>
 
 <body data-page="medias" onload="startTime(); startNotifClosing();">
+  <div id="popup_load">
+	    <div class="window_load">
+	        <img src="<?=base_url()?>picture/progress.gif" height="100" width="125">
+	    </div>
+	</div>
     <!-- BEGIN TOP MENU -->
     <input type="hidden" id="sts_edit" value="0" />
     <input type="hidden" id="sts_lunas" value="0" />
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="background-color: #c75757; color: white;">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#sidebar">
@@ -117,11 +122,11 @@ $user_detail = $this->model->get_user_detail($id_user);
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a id="menu-medium" class="sidebar-toggle toggle_fullscreen tooltips">
+                <a id="menu-medium" class="sidebar-toggle toggle_fullscreen tooltips" style="color: white; border-right: 1px solid #ffffff;">
                     <i class="glyphicon glyphicon-fullscreen"></i>
                 </a>
             </div>
-            <div class="navbar-center"> Kasir Rajal </div>
+            <div class="navbar-center" style="color: white;"> Kasir Rajal </div>
             <div class="navbar-collapse collapse">
                 <!-- BEGIN TOP NAVIGATION MENU -->
                 <ul class="nav navbar-nav pull-right header-menu">
@@ -374,6 +379,9 @@ $user_detail = $this->model->get_user_detail($id_user);
                     <input type="hidden" name="tanggal" id="tanggal" value="<?php echo date('d-m-Y'); ?>">
                     <input type="hidden" name="waktu" id="waktu" value="">
                     <input type="hidden" name="jenis_pembayaran" id="jenis_pembayaran" value="">
+                    <input type="hidden" name="jenis_pasien_rajal" id="jenis_pasien_rajal" value="">
+                    <input type="hidden" name="id_resep" id="id_resep" value="">
+                    <input type="hidden" name="status_iter" id="status_iter" value="">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                         <h4 class="modal-title" id="myLargeModalLabel">
@@ -806,6 +814,9 @@ $user_detail = $this->model->get_user_detail($id_user);
                       <input type="hidden" name="tanggal" id="tanggal_pj" value="<?php echo date('d-m-Y'); ?>">
                       <input type="hidden" name="waktu" id="waktu_pj" value="">
                       <input type="hidden" name="tipe" id="tipe_pj" value="">
+                      <input type="hidden" name="id_pasien" id="id_pasien_pj" value="">
+                      <input type="hidden" name="id_resep" id="id_resep_pj" value="">
+                      <input type="hidden" name="id_dokter" id="id_dokter_pj" value="">
                         <div>
                             <div id="warning_kelebihan" class="alert alert-danger fade in" style="width:100%; display:none;">
                                 <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
@@ -890,7 +901,8 @@ $user_detail = $this->model->get_user_detail($id_user);
                       </div>
                         <div class="modal-body">
                           <center>
-                            <button type="button" class="btn btn-success btn-rounded btn-lg" id="btn_copy_resep" name="button" onclick=""><i class="fa fa-print"></i> Copy Resep</button>
+                            <button type="button" class="btn btn-success btn-rounded btn-lg" id="btn_resep" name="button" onclick=""><i class="fa fa-print"></i> Resep</button>
+                            <button type="button" class="btn btn-warning btn-rounded btn-lg" id="btn_copy_resep" name="button" onclick=""><i class="fa fa-print"></i> Copy Resep</button>
                             <button type="button" class="btn btn-primary btn-rounded btn-lg" id="btn_nota_poli" name="button" onclick=""><i class="fa fa-print"></i> Nota Poli</button>
                           </center>
                         </div>
@@ -1255,6 +1267,8 @@ $(document).ready(function(){
                 get_invoice();
                 if (tipe == '4') {
                   window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_pembayaran_ranap/'+id_rj, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+                }else if (tipe == '2') {
+                  window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_pembayaran_hv/'+id_rj, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
                 }
             }
         });
@@ -1421,6 +1435,7 @@ function paging_pembayaran($selector){
 }
 
 function simpan_closing(){
+  $('#popup_load').show();
   var id_pegawai = $('#id_pegawai').val();
   var shift = $('#shift').val();
   var nilai_resep = $('#nilai_resep_input').val();
@@ -1451,9 +1466,11 @@ function simpan_closing(){
       simpan_closing_hv(id_tutup);
       simpan_closing_paket(id_tutup);
       simpan_closing_ranap(id_tutup);
+      simpan_closing_entry(id_tutup);
       $('#btn_tutup_closing').click();
       $('#notif_sukses').click();
       snd.pause();
+      $('#popup_load').fadeOut();
       $('#notif_closing').hide();
     }
   });
@@ -1464,26 +1481,33 @@ function simpan_closing_rajal(id_tutup){
   var shift = $('#shift').val();
   $("input[name='id_rajal[]']").each(function(idx, elm){
     var id_rajal = elm.value;
+    var status_bayar = $('#id_status_bayar_'+id_rajal).val();
     var total_rajal = $('#total_semua_'+id_rajal).val();
     var invoice = $('#id_invoice_'+id_rajal).val();
     var tipe = 1;
-    $.ajax({
-      url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing_rajal',
-      data : {
-        id_rajal:id_rajal,
-        tipe:tipe,
-        total_rajal:total_rajal,
-        id_pegawai:id_pegawai,
-        shift:shift,
-        id_tutup:id_tutup,
-        invoice:invoice
-      },
-      type : "POST",
-      dataType : "json",
-      success : function(){
-        console.log();
-      }
-    });
+
+    if (status_bayar == '1') {
+      $.ajax({
+        url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing_rajal',
+        data : {
+          id_rajal:id_rajal,
+          tipe:tipe,
+          total_rajal:total_rajal,
+          id_pegawai:id_pegawai,
+          shift:shift,
+          id_tutup:id_tutup,
+          invoice:invoice
+        },
+        type : "POST",
+        dataType : "json",
+        success : function(){
+          console.log();
+        }
+      });
+    }else {
+
+    }
+
   });
 }
 
@@ -1492,26 +1516,33 @@ function simpan_closing_hv(id_tutup){
   var shift = $('#shift').val();
   $("input[name='id_hv[]']").each(function(idx, elm){
     var id_hv = elm.value;
+    var status_bayar = $('#id_status_bayar_'+id_hv).val();
     var total_hv = $('#total_semua_'+id_hv).val();
     var invoice = $('#id_invoice_'+id_hv).val();
     var tipe = 2;
-    $.ajax({
-      url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing_hv',
-      data : {
-        id_hv:id_hv,
-        tipe:tipe,
-        total_hv:total_hv,
-        id_pegawai:id_pegawai,
-        shift:shift,
-        id_tutup:id_tutup,
-        invoice:invoice
-      },
-      type : "POST",
-      dataType : "json",
-      success : function(){
-        console.log();
-      }
-    });
+
+    if (status_bayar == '1') {
+      $.ajax({
+        url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing_hv',
+        data : {
+          id_hv:id_hv,
+          tipe:tipe,
+          total_hv:total_hv,
+          id_pegawai:id_pegawai,
+          shift:shift,
+          id_tutup:id_tutup,
+          invoice:invoice
+        },
+        type : "POST",
+        dataType : "json",
+        success : function(){
+          console.log();
+        }
+      });
+    }else {
+
+    }
+
   });
 }
 
@@ -1520,26 +1551,33 @@ function simpan_closing_paket(id_tutup){
   var shift = $('#shift').val();
   $("input[name='id_paket[]']").each(function(idx, elm){
     var id_paket = elm.value;
+    var status_bayar = $('#id_status_bayar_'+id_paket).val();
     var total_paket = $('#total_semua_'+id_paket).val();
     var invoice = $('#id_invoice_'+id_paket).val();
     var tipe = 3;
-    $.ajax({
-      url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing_paket',
-      data : {
-        id_paket:id_paket,
-        tipe:tipe,
-        total_paket:total_paket,
-        id_pegawai:id_pegawai,
-        shift:shift,
-        id_tutup:id_tutup,
-        invoice:invoice
-      },
-      type : "POST",
-      dataType : "json",
-      success : function(){
-        console.log();
-      }
-    });
+
+    if (status_bayar == '1') {
+      $.ajax({
+        url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing_paket',
+        data : {
+          id_paket:id_paket,
+          tipe:tipe,
+          total_paket:total_paket,
+          id_pegawai:id_pegawai,
+          shift:shift,
+          id_tutup:id_tutup,
+          invoice:invoice
+        },
+        type : "POST",
+        dataType : "json",
+        success : function(){
+          console.log();
+        }
+      });
+    }else {
+
+    }
+
   });
 }
 
@@ -1548,26 +1586,68 @@ function simpan_closing_ranap(id_tutup){
   var shift = $('#shift').val();
   $("input[name='id_ranap[]']").each(function(idx, elm){
     var id_ranap = elm.value;
+    var status_bayar = $('#id_status_bayar_'+id_ranap).val();
     var total_ranap = $('#total_semua_'+id_ranap).val();
     var invoice = $('#id_invoice_'+id_ranap).val();
     var tipe = 3;
-    $.ajax({
-      url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing_ranap',
-      data : {
-        id_ranap:id_ranap,
-        tipe:tipe,
-        total_ranap:total_ranap,
-        id_pegawai:id_pegawai,
-        shift:shift,
-        id_tutup:id_tutup,
-        invoice:invoice
-      },
-      type : "POST",
-      dataType : "json",
-      success : function(){
-        console.log();
-      }
-    });
+
+    if (status_bayar == '1') {
+      $.ajax({
+        url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing_ranap',
+        data : {
+          id_ranap:id_ranap,
+          tipe:tipe,
+          total_ranap:total_ranap,
+          id_pegawai:id_pegawai,
+          shift:shift,
+          id_tutup:id_tutup,
+          invoice:invoice
+        },
+        type : "POST",
+        dataType : "json",
+        success : function(){
+          console.log();
+        }
+      });
+    }else {
+
+    }
+
+  });
+}
+
+function simpan_closing_entry(id_tutup){
+  var id_pegawai = $('#id_pegawai').val();
+  var shift = $('#shift').val();
+  $("input[name='id_entry_resep[]']").each(function(idx, elm){
+    var id_entry_resep = elm.value;
+    var status_bayar = $('#id_status_bayar_'+id_entry_resep).val();
+    var total_entry = $('#total_semua_'+id_entry_resep).val();
+    var invoice = $('#id_invoice_'+id_entry_resep).val();
+    var tipe = 2;
+
+    if (status_bayar == '1') {
+      $.ajax({
+        url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing_entry',
+        data : {
+          id_entry_resep:id_entry_resep,
+          tipe:tipe,
+          total_entry:total_entry,
+          id_pegawai:id_pegawai,
+          shift:shift,
+          id_tutup:id_tutup,
+          invoice:invoice
+        },
+        type : "POST",
+        dataType : "json",
+        success : function(){
+          console.log();
+        }
+      });
+    }else {
+
+    }
+
   });
 }
 
@@ -1671,11 +1751,13 @@ function get_pasien(){
                       if (result[i].TIPE == '1') {
                         aksi = "<button class='btn btn-dark btn-transparent' type='button' onclick='klik_pasien("+result[i].ID+","+result[i].ID_PASIEN+","+result[i].TOTAL+");'>"+formatNumber(result[i].TOTAL)+"</button>";
                       }else if (result[i].TIPE == '2') {
-                        aksi = "<button class='btn btn-dark btn-transparent' type='button' onclick='klik_invoice("+result[i].ID+","+result[i].TOTAL+","+result[i].TIPE+","+result[i].NAMA+");'>"+formatNumber(result[i].TOTAL)+"</button>";
+                        aksi = "<button class='btn btn-dark btn-transparent' type='button' onclick='klik_invoice("+result[i].ID+","+result[i].TOTAL+","+result[i].TIPE+","+result[i].NAMA+","+result[i].INVOICE+");'>"+formatNumber(result[i].TOTAL)+"</button>";
                       }else if (result[i].TIPE == '3') {
-                        aksi = "<button class='btn btn-dark btn-transparent' type='button' onclick='klik_invoice("+result[i].ID+","+result[i].TOTAL+","+result[i].TIPE+","+result[i].NAMA+");'>"+formatNumber(result[i].TOTAL)+"</button>";
+                        aksi = "<button class='btn btn-dark btn-transparent' type='button' onclick='klik_invoice("+result[i].ID+","+result[i].TOTAL+","+result[i].TIPE+","+result[i].NAMA+","+result[i].INVOICE+");'>"+formatNumber(result[i].TOTAL)+"</button>";
                       }else if (result[i].TIPE == '4') {
-                        aksi = "<button class='btn btn-dark btn-transparent' type='button' onclick='klik_invoice("+result[i].ID+","+result[i].TOTAL+","+result[i].TIPE+","+result[i].ID_PASIEN+");'>"+formatNumber(result[i].TOTAL)+"</button>";
+                        aksi = "<button class='btn btn-dark btn-transparent' type='button' onclick='klik_invoice("+result[i].ID+","+result[i].TOTAL+","+result[i].TIPE+","+result[i].ID_PASIEN+","+result[i].INVOICE+");'>"+formatNumber(result[i].TOTAL)+"</button>";
+                      }else if (result[i].TIPE == '5') {
+                        aksi = "<button class='btn btn-dark btn-transparent' type='button' onclick='klik_invoice("+result[i].ID+","+result[i].TOTAL+","+result[i].TIPE+",&quot;"+result[i].NAMA+"&quot;,"+result[i].INVOICE+");'>"+formatNumber(result[i].TOTAL)+"</button>";
                       }
                     }else{
                       if (result[i].TIPE == '1') {
@@ -1685,6 +1767,8 @@ function get_pasien(){
                       }else if (result[i].TIPE == '3') {
                         aksi = "<button class='btn btn-success' type='button'><i class='fa fa-check-square-o'></i>"+formatNumber(result[i].TOTAL)+"</button>";
                       }else if (result[i].TIPE == '4') {
+                        aksi = "<button class='btn btn-success' type='button' onclick='klik_detail_pasien("+result[i].ID+","+result[i].TIPE+");'><i class='fa fa-check-square-o'></i> "+formatNumber(result[i].TOTAL)+"</button>";
+                      }else if (result[i].TIPE == '5') {
                         aksi = "<button class='btn btn-success' type='button' onclick='klik_detail_pasien("+result[i].ID+","+result[i].TIPE+");'><i class='fa fa-check-square-o'></i> "+formatNumber(result[i].TOTAL)+"</button>";
                       }
                     }
@@ -1719,27 +1803,39 @@ function get_pasien(){
                       status = "<span class='label label-warning'><b>"+result[i].STATUS+"</b></span>";
                     }else if (result[i].STATUS == 'Rawat Inap') {
                       status = "<span class='label label-primary'><b>"+result[i].STATUS+"</b></span>";
+                    }else if (result[i].STATUS == 'Entry Resep') {
+                      status = "<span class='label' style='background-color: #B57EE0;'><b>"+result[i].STATUS+"</b></span>";
                     }
 
                     var id_semua = '';
                     var total_semua = '';
                     var invoice_semua = '';
+                    var sts_bayar = '';
                     if (result[i].TIPE == '1') {
                       id_semua = "<input type='hidden' value='"+result[i].ID_KASIR_RAJAL+"' name='id_rajal[]'>";
                       total_semua = "<input type='hidden' value='"+result[i].TOTAL+"' id='total_semua_"+result[i].ID_KASIR_RAJAL+"' name='total[]'>";
                       invoice_semua = "<input type='hidden' value='"+result[i].INVOICE+"' id='id_invoice_"+result[i].ID_KASIR_RAJAL+"' name='invoice[]'>";
+                      sts_bayar = "<input type='hidden' value='"+result[i].STS_BAYAR+"' id='id_status_bayar_"+result[i].ID_KASIR_RAJAL+"'>";
                     }else if (result[i].TIPE == '2') {
                       id_semua = "<input type='hidden' value='"+result[i].ID_HV+"' name='id_hv[]'>";
                       total_semua = "<input type='hidden' value='"+result[i].TOTAL+"' id='total_semua_"+result[i].ID_HV+"' name='total[]'>";
                       invoice_semua = "<input type='hidden' value='"+result[i].INVOICE+"' id='id_invoice_"+result[i].ID_HV+"' name='invoice[]'>";
+                      sts_bayar = "<input type='hidden' value='"+result[i].STS_BAYAR+"' id='id_status_bayar_"+result[i].ID_HV+"'>";
                     }else if (result[i].TIPE == '3') {
                       id_semua = "<input type='hidden' value='"+result[i].ID_PAKET+"' name='id_paket[]'>";
                       total_semua = "<input type='hidden' value='"+result[i].TOTAL+"' id='total_semua_"+result[i].ID_PAKET+"' name='total[]'>";
                       invoice_semua = "<input type='hidden' value='"+result[i].INVOICE+"' id='id_invoice_"+result[i].ID_PAKET+"' name='invoice[]'>";
+                      sts_bayar = "<input type='hidden' value='"+result[i].STS_BAYAR+"' id='id_status_bayar_"+result[i].ID_PAKET+"'>";
                     }else if (result[i].TIPE == '4') {
                       id_semua = "<input type='hidden' value='"+result[i].ID_RESEP_RANAP+"' name='id_ranap[]'>";
                       total_semua = "<input type='hidden' value='"+result[i].TOTAL+"' id='total_semua_"+result[i].ID_RESEP_RANAP+"' name='total[]'>";
                       invoice_semua = "<input type='hidden' value='"+result[i].INVOICE+"' id='id_invoice_"+result[i].ID_RESEP_RANAP+"' name='invoice[]'>";
+                      sts_bayar = "<input type='hidden' value='"+result[i].STS_BAYAR+"' id='id_status_bayar_"+result[i].ID_RESEP_RANAP+"'>";
+                    }else if (result[i].TIPE == '5') {
+                      id_semua = "<input type='hidden' value='"+result[i].ID_ENTRY_RESEP+"' name='id_entry_resep[]'>";
+                      total_semua = "<input type='hidden' value='"+result[i].TOTAL+"' id='total_semua_"+result[i].ID_ENTRY_RESEP+"' name='total[]'>";
+                      invoice_semua = "<input type='hidden' value='"+result[i].INVOICE+"' id='id_invoice_"+result[i].ID_ENTRY_RESEP+"' name='invoice[]'>";
+                      sts_bayar = "<input type='hidden' value='"+result[i].STS_BAYAR+"' id='id_status_bayar_"+result[i].ID_ENTRY_RESEP+"'>";
                     }
 
                     $tr += "<tr>"+
@@ -1748,6 +1844,7 @@ function get_pasien(){
                                 ""+total_semua+""+
                                 ""+no+""+
                                 ""+invoice_semua+""+
+                                ""+sts_bayar+""+
                                 "</td>"+
                                 "<td style='text-align:center;'>"+result[i].TANGGAL+"</td>"+
                                 "<td>"+result[i].NAMA+" "+status_bayar+"</td>"+
@@ -1771,20 +1868,34 @@ function klik_detail_pasien(id,tipe){
   var name = 'Detail';
   $('#detail_name_pasien').html(name);
   $('#btn_nota_poli').show();
+  $('#btn_resep').attr('onclick','klik_resep('+id+','+tipe+')');
   $('#btn_copy_resep').attr('onclick','klik_copy_resep('+id+','+tipe+')');
   if (tipe == '1') {
     $('#btn_nota_poli').attr('onclick','klik_print_poli('+id+','+tipe+')');
-  } else {
+  } else if (tipe == '2') {
+    $('#btn_nota_poli').hide();
+    $('#btn_copy_resep').hide();
+  }else if (tipe == '5') {
+    $('#btn_resep').hide();
     $('#btn_nota_poli').hide();
   }
 }
 
-function klik_copy_resep(id,tipe){
+function klik_resep(id,tipe){
           // var encodedString = Base64.encode(id);
           if (tipe == '1') {
             window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_resep/'+id, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
           }else {
             window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_resep_ranap/'+id, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+          }
+}
+
+function klik_copy_resep(id,tipe){
+          // var encodedString = Base64.encode(id);
+          if (tipe == '1') {
+            window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_copy_resep/'+id, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
+          }else if (tipe == '5') {
+            window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/struk_copy_resep_entry/'+id, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
           }
 }
 
@@ -1805,9 +1916,12 @@ function klik_pasien(id,id_pasien,total){
             $('#id_rj').val(id);
             $('#id_pasien').val(id_pasien);
             $('#id_poli').val(row['ID_POLI']);
+            $('#id_resep').val(row['ID_RESEP']);
             $('#nama_pasien_txt').html(row['NAMA_PASIEN']);
             $('#biaya_poli').val(formatNumber(row['BIAYA']));
             $('#grandtotal2').val(formatNumber(total));
+            $('#jenis_pasien_rajal').val(row['JENIS_PASIEN']);
+            $('#status_iter').val(row['STS_ITER']);
 
             get_tindakan(id_pasien);
             get_resep(id_pasien);
@@ -1816,7 +1930,7 @@ function klik_pasien(id,id_pasien,total){
     });
 }
 
-function klik_invoice(id,total,tipe,invoice){
+function klik_invoice(id,total,tipe,invoice,inv){
     $('#popup_pembayaran').click();
     $('.tunai_grp').show();
     $('.non_tunai_grp').hide();
@@ -1870,6 +1984,23 @@ function klik_invoice(id,total,tipe,invoice){
             $('#invoice_text').html(row['NAMA']);
         }
     });
+  }else if (tipe == '5') {
+    $.ajax({
+        url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/get_entry_resep_by_id',
+        data : {id:id},
+        type : "POST",
+        dataType : "json",
+        success : function(row){
+            $('#id_pj').val(id);
+            $('#invoice_pj').val(inv);
+            $('#grandtotal_pj').val(formatNumber(total));
+            $('#tipe_pj').val(tipe);
+            $('#invoice_text').html(invoice);
+            $('#id_resep_pj').val(row['ID_RESEP']);
+            $('#id_dokter_pj').val(row['ID_DOKTER']);
+            $('#id_pasien_pj').val(row['ID_PASIEN']);
+        }
+    });
   }
 }
 
@@ -1900,6 +2031,10 @@ function get_resep(id_pasien){
                         '<td style="text-align:center; font-weight:bold;">JUMLAH</td>'+
                         '<td style="text-align:center;">&nbsp;</td>'+
                       '</tr>';
+                $tr3 = '<tr class="info">'+
+                          '<td style="text-align:center;">&nbsp;</td>'+
+                          '<td style="text-align:left; font-weight:bold;" colspan="3">ITER : '+res['ind']['ITER']+'</td>'+
+                       '</tr>';
 
                 for(var i=0; i<res['det'].length; i++){
                     total_resep += parseFloat(res['det'][i].SUBTOTAL);
@@ -1917,7 +2052,7 @@ function get_resep(id_pasien){
                 $('#biaya_resep').val(formatNumber(total_resep));
             }
 
-            $('#tabel_resep2 tbody').html($tr+$tr2);
+            $('#tabel_resep2 tbody').html($tr+$tr2+$tr3);
         }
     });
 }
@@ -1985,7 +2120,13 @@ function hitung_total_resep(id){
  var biaya_lab = $('#biaya_lab').val();
  biaya_lab = biaya_lab.split(',').join('');
  var biaya_admin = 10000;
- var biaya_reg = 20000;
+
+ var jenis_pasien = $('#jenis_pasien_rajal').val();
+ if (jenis_pasien == 'Lama') {
+  var biaya_reg = 0;
+} else {
+  var biaya_reg = 25000;
+}
 
  var tambah_setiap_biaya = parseFloat(biaya_poli) + parseFloat(biaya_tindakan) + parseFloat(biaya_resep) + parseFloat(biaya_lab) + parseFloat(biaya_admin) + parseFloat(biaya_reg);
  $('#grandtotal2').val(formatNumber(tambah_setiap_biaya));

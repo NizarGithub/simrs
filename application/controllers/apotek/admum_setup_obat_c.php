@@ -140,15 +140,13 @@ class Admum_setup_obat_c extends CI_Controller {
 		$barcode = $this->input->post('barcode');
 		$nama_obat = $this->input->post('nama_obat');
 		$id_jenis = $this->input->post('id_jenis');
-		$expired = $this->input->post('tanggal_expired');
 		$golongan = $this->input->post('id_golongan');
 		$kategori = $this->input->post('id_kategori');
 		$status_obat = $this->input->post('status_obat');
 		$service = $this->input->post('service');
-		$no_batch = $this->input->post('no_batch');
 		// $merk = $this->input->post('id_merk');
 
-		$this->model->simpan($kode_obat,$barcode,$nama_obat,$id_jenis,$expired,$golongan,$kategori,$status_obat,$service,$no_batch);
+		$this->model->simpan($kode_obat,$barcode,$nama_obat,$id_jenis,$golongan,$kategori,$status_obat,$service);
 		$this->insert_kode_obat();
 
 		$this->session->set_flashdata('sukses','1');
@@ -160,7 +158,6 @@ class Admum_setup_obat_c extends CI_Controller {
 		$barcode = $this->input->post('barcode_ubah');
 		$nama_obat = $this->input->post('nama_obat_ubah');
 		$jenis = $this->input->post('id_jenis_ubah');
-		$expired = $this->input->post('tanggal_expired_ubah');
 		$golongan = $this->input->post('id_golongan_ubah');
 		$kategori = $this->input->post('id_kategori_ubah');
 		$status_racik = "";
@@ -170,24 +167,14 @@ class Admum_setup_obat_c extends CI_Controller {
 			$status_racik = $this->input->post('status_obat_hidden');
 		}
 		$service = "";
-		$service_ubah = $this->input->post('service_ubah'); 
+		$service_ubah = $this->input->post('service_ubah');
 		if ($service_ubah == "") {
 			$service = $this->input->post('service_hidden');
 		}else {
 			$service = $this->input->post('service_ubah');
 		}
-		$no_batch = $this->input->post('no_batch_ubah');
-		// $id_merk_ubah = $this->input->post('id_merk_ubah');
 
-		// $id_merk = "";
-		//
-		// if($id_merk_ubah != ""){
-		// 	$id_merk = $id_merk_ubah;
-		// }else{
-		// 	$id_merk = $this->input->post('id_merk_lama');
-		// }
-
-		$this->model->ubah($id,$barcode,$nama_obat,$jenis,$expired,$golongan,$kategori,$status_racik,$service,$no_batch);
+		$this->model->ubah($id,$barcode,$nama_obat,$jenis,$golongan,$kategori,$status_racik,$service);
 
 		$this->session->set_flashdata('ubah','1');
 		redirect('apotek/admum_setup_obat_c');

@@ -272,6 +272,7 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		$id_rj = $this->input->post('id_rj');
 		$id_pasien = $this->input->post('id_pasien');
 		$id_poli = $this->input->post('id_poli');
+		$id_resep = $this->input->post('id_resep');
 		$id_pegawai = $this->input->post('id_pegawai');
 		$shift = $this->input->post('shift');
 		$tanggal = $this->input->post('tanggal');
@@ -286,12 +287,14 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		$kartu_provider = $this->input->post('kartu_provider');
 		$no_kartu = $this->input->post('no_kartu');
 		$tambahan = str_replace(',', '', $this->input->post('tambahan'));
+		$status_iter = $this->input->post('status_iter');
 
 		$this->model->simpan_pembayaran(
 			$invoice,
 			$id_rj,
 			$id_pasien,
 			$id_poli,
+			$id_resep,
 			$id_pegawai,
 			$shift,
 			$tanggal,
@@ -305,7 +308,8 @@ class Ap_kasir_rajal_c extends CI_Controller {
 			$bayar,
 			$kartu_provider,
 			$no_kartu,
-			$tambahan
+			$tambahan,
+			$status_iter
 		);
 
 		$this->db->query("UPDATE admum_rawat_jalan SET STS_BAYAR = '1' WHERE ID = '$id_rj'");
@@ -329,6 +333,9 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		$tambahan = str_replace(',', '', $this->input->post('tambahan_pj'));
 		$kembali = str_replace(',', '', $this->input->post('b_kembali'));
 		$tipe = $this->input->post('tipe');
+		$id_resep = $this->input->post('id_resep');
+		$id_dokter = $this->input->post('id_dokter');
+		$id_pasien = $this->input->post('id_pasien');
 
 		$this->model->simpan_pembayaran_obat(
 			$invoice,
@@ -344,7 +351,10 @@ class Ap_kasir_rajal_c extends CI_Controller {
 			$no_kartu,
 			$tambahan,
 			$kembali,
-			$tipe
+			$tipe,
+			$id_dokter,
+			$id_pasien,
+			$id_resep
 		);
 
 		if ($tipe == '2') {
@@ -353,6 +363,8 @@ class Ap_kasir_rajal_c extends CI_Controller {
 			$this->db->query("UPDATE ap_penjualan_obat_paket SET STS_BAYAR = '1' WHERE ID = '$id_penjualan'");
 		}elseif ($tipe == '4') {
 			$this->db->query("UPDATE rk_ri_resep SET STS_BAYAR = '1' WHERE ID = '$id_penjualan'");
+		}elseif ($tipe == '5') {
+			$this->db->query("UPDATE ap_iter SET STS_BAYAR = '1' WHERE ID = '$id_penjualan'");
 		}
 
 		$this->insert_kode();
@@ -388,6 +400,34 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		$this->load->view('apotek/pdf/ap_struk_resep_ranap_v',$data);
 	}
 
+	function struk_copy_resep($id_rj){
+		// $id_rj = base64_decode($id);
+		$model = $this->model->struk_copy_resep($id_rj);
+
+		$data = array(
+			'settitle' => 'Struk Copy Resep',
+      'filename' => date('dmY').'_struk_copy_resep',
+			'title' => 'Struk Copy Resep',
+			'row' => $model
+		);
+
+		$this->load->view('apotek/pdf/ap_struk_copy_resep_v',$data);
+	}
+
+	function struk_copy_resep_entry($id_rj){
+		// $id_rj = base64_decode($id);
+		$model = $this->model->struk_copy_resep_entry($id_rj);
+
+		$data = array(
+			'settitle' => 'Struk Copy Entry Resep',
+      'filename' => date('dmY').'_struk_copy_entry_resep',
+			'title' => 'Struk Copy Entry Resep',
+			'row' => $model
+		);
+
+		$this->load->view('apotek/pdf/ap_struk_copy_entry_resep_v',$data);
+	}
+
 	function nota_poli($id_rj){
 		// $id_rj = base64_decode($id);
 		$model = $this->model->nota_poli($id_rj);
@@ -414,6 +454,20 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		);
 
 		$this->load->view('apotek/pdf/ap_struk_pembayaran_pdf_v',$data);
+	}
+
+	function struk_pembayaran_hv($id_rj){
+		// $id_rj = base64_decode($id);
+		$model = $this->model->struk_pembayaran_hv($id_rj);
+
+		$data = array(
+			'settitle' => 'Struk Pembayaran HV',
+      'filename' => date('dmY').'struk_pembayaran_hv',
+			'title' => 'Struk Pembayaran Hv',
+			'row' => $model
+		);
+
+		$this->load->view('apotek/pdf/ap_struk_pembayaran_hv_pdf_v',$data);
 	}
 
 	function struk_pembayaran_ranap($id_rj){
@@ -590,6 +644,26 @@ class Ap_kasir_rajal_c extends CI_Controller {
 			echo "1";
 	}
 
+	function simpan_closing_entry(){
+			$id_semua = $this->input->post('id_entry_resep');
+			$total = $this->input->post('total_entry');
+			$id_pegawai = $this->input->post('id_pegawai');
+			$shift = $this->input->post('shift');
+			$tanggal = date('d-m-Y');
+			$bulan = date('m');
+			$tahun = date('Y');
+			$invoice = $this->input->post('invoice');
+
+			$tz_object = new DateTimeZone('Asia/Jakarta');
+			$datetime = new DateTime();
+			$format = $datetime->setTimezone($tz_object);
+			$pukul = $format->format('H:i:s');
+
+			$id_tutup = $this->input->post('id_tutup');
+			$this->model->simpan_closing_entry($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup, $invoice);
+			echo "1";
+	}
+
 	function data_pembayaran(){
 		$keyword = $this->input->get('keyword');
 		$data = $this->model->data_pembayaran($keyword);
@@ -607,7 +681,7 @@ class Ap_kasir_rajal_c extends CI_Controller {
 	}
 
 	function tanggal_filter(){
-    $tanggal_sekarang = $this->input->post('tanggal_sekarang');		
+    $tanggal_sekarang = $this->input->post('tanggal_sekarang');
     $tanggal_sampai = $this->input->post('tanggal_sampai');
     $data = $this->model->tanggal_filter($tanggal_sekarang, $tanggal_sampai);
     echo json_encode($data);
@@ -670,6 +744,12 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function get_entry_resep_by_id(){
+		$id = $this->input->post('id');
+		$data = $this->model->get_entry_resep_by_id($id);
+		echo json_encode($data);
+	}
+
 	function get_pendapatan(){
 		$tanggal = date('d-m-Y');
 		$shift = $this->input->post('shift');
@@ -678,9 +758,11 @@ class Ap_kasir_rajal_c extends CI_Controller {
 															 FROM
 															 rk_resep_rj a
 															 LEFT JOIN rk_pembayaran_kasir b ON a.ID_PELAYANAN = b.ID_PELAYANAN
+															 LEFT JOIN admum_rawat_jalan c ON a.ID_PELAYANAN = c.ID
 															 WHERE a.TANGGAL = '$tanggal'
 															 AND b.SHIFT = '$shift'
 															 AND b.STATUS_CLOSING = '0'
+															 AND c.STS_BAYAR = '1'
 														  ")->row_array();
 		$resep_ranap = $this->db->query("SELECT
 																		COUNT(a.ID) AS TOTAL_RESEP
@@ -702,16 +784,19 @@ class Ap_kasir_rajal_c extends CI_Controller {
 															(a.HARGA * a.JUMLAH_BELI) AS TOTAL,
 															a.SERVICE,
 															c.SHIFT,
-															c.STATUS_CLOSING
+															c.STATUS_CLOSING,
+															d.STS_BAYAR
 															FROM
 															rk_resep_detail_rj a
 															LEFT JOIN rk_resep_rj b ON a.ID_RESEP = b.ID
 															LEFT JOIN rk_pembayaran_kasir c ON b.ID_PELAYANAN = c.ID_PELAYANAN
+															LEFT JOIN admum_rawat_jalan d ON d.ID = b.ID_PELAYANAN
 															)
 															a
 															WHERE a.TANGGAL = '$tanggal'
 															AND a.SHIFT = '$shift'
 															AND a.STATUS_CLOSING = '0'
+															AND a.STS_BAYAR = '1'
 														 ")->row_array();
 		$obat_ranap = $this->db->query("SELECT
 																		a.*,
@@ -736,6 +821,24 @@ class Ap_kasir_rajal_c extends CI_Controller {
 																		AND a.SHIFT = '$shift'
 																		AND a.STATUS_CLOSING = '0'
 																		")->row_array();
+
+		$resep_entry = $this->db->query("SELECT
+																			COUNT(a.ID) AS TOTAL_RESEP
+																			FROM ap_pembayaran_iter a
+																			LEFT JOIN ap_iter b ON a.ID_ITER = b.ID
+																			WHERE b.TANGGAL = '$tanggal'
+																			AND a.SHIFT = '$shift'
+																			AND b.STATUS_CLOSING = '0'
+																		")->row_array();
+		$entry = $this->db->query("SELECT
+															SUM(a.TOTAL) AS NILAI_ENTRY
+															FROM
+															ap_pembayaran_iter a
+															LEFT JOIN ap_iter b ON a.ID_ITER = b.ID
+															WHERE a.TANGGAL = '$tanggal'
+															AND a.SHIFT = '$shift'
+															AND b.STATUS_CLOSING = '0'
+															")->row_array();
 		$hv = $this->db->query("SELECT
 														COUNT(a.ID) AS LEMBAR_HV,
 														SUM(a.TOTAL) AS NILAI_HV
@@ -750,8 +853,9 @@ class Ap_kasir_rajal_c extends CI_Controller {
 		$nilai_service_rajal = $obat['TOTAL_SERVICE'];
 		$nilai_obat_ranap = $obat_ranap['NILAI_OBAT'];
 		$nilai_service_ranap = $obat_ranap['TOTAL_SERVICE'];
+		$total_entry_resep = $entry['NILAI_ENTRY'];
 
-		$nilai_obat = $nilai_obat_rajal + $nilai_obat_ranap;
+		$nilai_obat = $nilai_obat_rajal + $nilai_obat_ranap + $total_entry_resep;
 		$nilai_service = $nilai_service_rajal + $nilai_service_ranap;
 		$nilai_resep = $nilai_obat + $nilai_service;
 		$nilai_hv = $hv['NILAI_HV'];
@@ -759,7 +863,8 @@ class Ap_kasir_rajal_c extends CI_Controller {
 
 		$resep_rajal = $resep['TOTAL_RESEP'];
 		$resep_ranap = $resep['TOTAL_RESEP'];
-		$total_resep = $resep_rajal + $resep_ranap;
+		$jumlah_entry_resep = $resep_entry['TOTAL_RESEP'];
+		$total_resep = $resep_rajal + $resep_ranap + $jumlah_entry_resep;
 
 		$data['total_resep'] = $total_resep;
 		$data['nilai_obat'] = $nilai_obat;

@@ -57,7 +57,7 @@ class Ap_laporan_m extends CI_Model {
 		$order = "";
 
 		if($urutkan == 'Default'){
-			$order = "ORDER BY OBAT.ID ASC, STR_TO_DATE('%d-%m-%Y',NM_OBT.EXPIRED) ASC";
+			$order = "ORDER BY OBAT.ID ASC, STR_TO_DATE('%d-%m-%Y',OBAT.EXPIRED) ASC";
 		}else if($urutkan == 'Nama Obat'){
 			$order = "ORDER BY NM_OBT.NAMA_OBAT ASC";
 		}else if($urutkan == 'Stok'){
@@ -67,7 +67,7 @@ class Ap_laporan_m extends CI_Model {
 				$order = "ORDER BY OBAT.STOK DESC";
 			}
 		}else if($urutkan == 'Expired'){
-			$order = "ORDER BY STR_TO_DATE('%d-%m-%Y',NM_OBT.EXPIRED) ASC";
+			$order = "ORDER BY STR_TO_DATE('%d-%m-%Y',OBAT.EXPIRED) ASC";
 		}
 
 		if($keyword != ""){
@@ -80,9 +80,9 @@ class Ap_laporan_m extends CI_Model {
 							NM_OBT.BARCODE,
 							NM_OBT.NAMA_OBAT,
 							NM_OBT.ID_JENIS_OBAT,
-							NM_OBT.EXPIRED AS KADALUARSA,
+							OBAT.EXPIRED AS KADALUARSA,
 							OBAT.STOK AS TOTAL,
-							STR_TO_DATE(NM_OBT.EXPIRED,'%d-%m-%Y') AS KADALUARSA_BALIK
+							STR_TO_DATE(OBAT.EXPIRED,'%d-%m-%Y') AS KADALUARSA_BALIK
 						FROM apotek_gudang_obat OBAT
 						LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = OBAT.ID_SETUP_NAMA_OBAT
 						LEFT JOIN obat_supplier SUP ON SUP.ID = NM_OBT.ID_MERK
@@ -98,7 +98,7 @@ class Ap_laporan_m extends CI_Model {
 		$order = "";
 
 		if($urutkan == 'Default'){
-			$order = "ORDER BY OBAT.ID ASC, STR_TO_DATE('%d-%m-%Y',NM_OBT.EXPIRED) ASC";
+			$order = "ORDER BY OBAT.ID ASC, STR_TO_DATE('%d-%m-%Y',OBAT.EXPIRED) ASC";
 		}else if($urutkan == 'Nama Obat'){
 			$order = "ORDER BY NM_OBT.NAMA_OBAT ASC";
 		}else if($urutkan == 'Stok'){
@@ -108,11 +108,11 @@ class Ap_laporan_m extends CI_Model {
 				$order = "ORDER BY OBAT.STOK DESC";
 			}
 		}else if($urutkan == 'Expired'){
-			$order = "ORDER BY STR_TO_DATE('%d-%m-%Y',NM_OBT.EXPIRED) ASC";
+			$order = "ORDER BY STR_TO_DATE('%d-%m-%Y',OBAT.EXPIRED) ASC";
 		}
 
 		if($keyword != ""){
-			$where = $where." AND (NM_OBT.NAMA_OBAT LIKE '%$keyword' OR NM_OBT.BARCODE LIKE '%$keyword%' OR NM_OBT.KODE_OBAT LIKE '%$keyword%')";
+			$where = $where." AND (NM_OBT.NAMA_OBAT LIKE '%$keyword%' OR NM_OBT.BARCODE LIKE '%$keyword%' OR NM_OBT.KODE_OBAT LIKE '%$keyword%')";
 		}
 
 		$sql = "SELECT
@@ -121,8 +121,8 @@ class Ap_laporan_m extends CI_Model {
 							NM_OBT.BARCODE,
 							NM_OBT.NAMA_OBAT,
 							NM_OBT.ID_JENIS_OBAT,
-							NM_OBT.EXPIRED,
-							STR_TO_DATE(NM_OBT.EXPIRED,'%d-%m-%Y') AS KADALUARSA_BALIK,
+							OBAT.EXPIRED,
+							STR_TO_DATE(OBAT.EXPIRED,'%d-%m-%Y') AS KADALUARSA_BALIK,
 							SUP.NAMA_SUPPLIER,
 							OBAT.STOK AS TOTAL
 						FROM apotek_gudang_obat OBAT
@@ -139,7 +139,7 @@ class Ap_laporan_m extends CI_Model {
 		$where = "1 = 1";
 		$order = "";
 		if($urutkan == 'Default'){
-			$order = "ORDER BY OBAT.ID ASC, STR_TO_DATE('%d-%m-%Y',NM_OBT.EXPIRED) ASC";
+			$order = "ORDER BY OBAT.ID ASC, STR_TO_DATE('%d-%m-%Y',OBAT.EXPIRED) ASC";
 		}else if($urutkan == 'Nama Obat'){
 			$order = "ORDER BY NM_OBT.NAMA_OBAT ASC";
 		}else if($urutkan == 'Stok'){
@@ -149,7 +149,7 @@ class Ap_laporan_m extends CI_Model {
 				$order = "ORDER BY OBAT.STOK DESC";
 			}
 		}else if($urutkan == 'Expired'){
-			$order = "ORDER BY STR_TO_DATE('%d-%m-%Y',NM_OBT.EXPIRED) ASC";
+			$order = "ORDER BY STR_TO_DATE('%d-%m-%Y',OBAT.EXPIRED) ASC";
 		}
 		if($keyword != ""){
 			$where = $where." AND (NM_OBT.NAMA_OBAT LIKE '%$keyword' OR NM_OBT.BARCODE LIKE '%$keyword%' OR NM_OBT.KODE_OBAT LIKE '%$keyword%')";
@@ -161,11 +161,11 @@ class Ap_laporan_m extends CI_Model {
 							NM_OBT.NAMA_OBAT,
 							NM_OBT.ID_JENIS_OBAT AS NAMA_JENIS,
 							NM_OBT.SERVICE,
-							NM_OBT.EXPIRED AS KADALUARSA,
+							OBAT.EXPIRED AS KADALUARSA,
 							NM_OBT.STATUS_OBAT AS STATUS_RACIK,
 							NM_OBT.GOLONGAN_OBAT,
 							NM_OBT.KATEGORI_OBAT,
-							STR_TO_DATE(NM_OBT.EXPIRED,'%d-%m-%Y') AS KADALUARSA_BALIK,
+							STR_TO_DATE(OBAT.EXPIRED,'%d-%m-%Y') AS KADALUARSA_BALIK,
 							OBAT.STOK AS TOTAL,
 							OBAT.HARGA_BELI,
 							OBAT.HARGA_BULAT,
@@ -184,7 +184,7 @@ class Ap_laporan_m extends CI_Model {
 		$where = "1 = 1";
 		$order = "";
 		if($urutkan == 'Default'){
-			$order = "ORDER BY OBAT.ID ASC, STR_TO_DATE('%d-%m-%Y',NM_OBT.EXPIRED) ASC";
+			$order = "ORDER BY OBAT.ID ASC, STR_TO_DATE('%d-%m-%Y',OBAT.EXPIRED) ASC";
 		}else if($urutkan == 'Nama Obat'){
 			$order = "ORDER BY NM_OBT.NAMA_OBAT ASC";
 		}else if($urutkan == 'Stok'){
@@ -194,7 +194,7 @@ class Ap_laporan_m extends CI_Model {
 				$order = "ORDER BY OBAT.STOK DESC";
 			}
 		}else if($urutkan == 'Expired'){
-			$order = "ORDER BY STR_TO_DATE('%d-%m-%Y',NM_OBT.EXPIRED) ASC";
+			$order = "ORDER BY STR_TO_DATE('%d-%m-%Y',OBAT.EXPIRED) ASC";
 		}
 		if($keyword != ""){
 			$where = $where." AND (NM_OBT.NAMA_OBAT LIKE '%$keyword' OR NM_OBT.BARCODE LIKE '%$keyword%' OR NM_OBT.KODE_OBAT LIKE '%$keyword%')";
@@ -206,8 +206,8 @@ class Ap_laporan_m extends CI_Model {
 							NM_OBT.NAMA_OBAT,
 							NM_OBT.ID_JENIS_OBAT AS NAMA_JENIS,
 							NM_OBT.SERVICE,
-							NM_OBT.EXPIRED AS KADALUARSA,
-							STR_TO_DATE(NM_OBT.EXPIRED,'%d-%m-%Y') AS KADALUARSA_BALIK,
+							OBAT.EXPIRED AS KADALUARSA,
+							STR_TO_DATE(OBAT.EXPIRED,'%d-%m-%Y') AS KADALUARSA_BALIK,
 							OBAT.STOK AS TOTAL,
 							OBAT.HARGA_BELI,
 							OBAT.HARGA_BULAT,
