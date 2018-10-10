@@ -213,9 +213,24 @@
     background-color: #fff;
 }
 
-@media only screen and (max-width: 600px) {
+.table-hover2{
+    margin-top: 20px;
+}
+
+.table-hover2 thead{
+    background: #4DC47D;
+}
+
+.table-hover2 thead tr th{
+    color: #FFF;
+}
+
+
+/*TABLET*/
+@media only screen and (max-width: 1024px) {
     .window_load{
-        width:100%;
+        /*width:100%;*/
+        top: 15%;
     }
 
     .window_hapus{
@@ -238,14 +253,55 @@
     }
 }
 
-.table-hover2{
-    margin-top: 20px;
+/*MOBILE*/
+@media only screen and (max-width: 640px) {
+    .window_load{
+        /*width:100%;*/
+        top: 30%;
+    }
+
+    .window_hapus{
+        width:100%;
+    }
+
+    .window_hapus_bed{
+        width:100%;
+    }
+
+    .window_hapus_lemari{
+        width:100%;
+    }
+
+    .window_portal{
+        width:100%;
+        margin-left: 5px;
+        width: 90%;
+        margin-top: 10%;
+    }
 }
 
-.table-hover2 thead{
-    background: #4DC47D;
-}
+@media only screen and (max-width: 480px) {
+    .window_load{
+        /*width:100%;*/
+        top: 25%;
+    }
 
-.table-hover2 thead tr th{
-    color: #FFF;
+    .window_hapus{
+        width:100%;
+    }
+
+    .window_hapus_bed{
+        width:100%;
+    }
+
+    .window_hapus_lemari{
+        width:100%;
+    }
+
+    .window_portal{
+        width:100%;
+        margin-left: 5px;
+        width: 90%;
+        margin-top: 10%;
+    }
 }

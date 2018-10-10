@@ -287,7 +287,7 @@ class Admum_pasien_rj_c extends CI_Controller {
 			}
 		}
 
-		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM admum_rawat_jalan WHERE ID_PASIEN = '$id_pasien_new'";
+		$sql_cek = "SELECT COUNT(*) AS TOTAL FROM rk_pasien WHERE ID = '$id_pasien_new'";
 		$qry_cek = $this->db->query($sql_cek)->row();
 		$total = $qry_cek->TOTAL;
 
