@@ -311,7 +311,8 @@ class Admum_pasien_rj_c extends CI_Controller {
 
 	function load_data_pasien(){
 		$keyword = $this->input->get('keyword');
-		$data = $this->model->load_data_pasien($keyword);
+		$offset = $this->input->get('offset');
+		$data = $this->model->load_data_pasien($keyword,$offset);
 		echo json_encode($data);
 	}
 

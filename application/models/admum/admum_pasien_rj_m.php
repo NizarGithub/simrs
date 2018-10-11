@@ -66,8 +66,9 @@ class Admum_pasien_rj_m extends CI_Model {
 		return $query->row();
 	}
 
-	function load_data_pasien($keyword){ 
+	function load_data_pasien($keyword,$offset){
 		$where = "1 = 1";
+		$limit = "LIMIT 25";
 
 		if($keyword != ""){
 			$where = $where." AND (
@@ -81,6 +82,11 @@ class Admum_pasien_rj_m extends CI_Model {
 			";
 		}else{
 			$where = $where;
+		}
+
+		if($offset != ""){
+			$asu = 10 + $offset;
+			$limit = "LIMIT $asu";
 		}
 
 		$sql = "
@@ -97,8 +103,10 @@ class Admum_pasien_rj_m extends CI_Model {
 				ALAMAT,
 				SUBSTR(KODE_PASIEN,4,3) AS KODE,
 				SUBSTR(TANGGAL_DAFTAR,4,2) AS BULAN
-			FROM rk_pasien WHERE $where
+			FROM rk_pasien 
+			WHERE $where
 			ORDER BY ID DESC
+			$limit
 		";
 		$query = $this->db->query($sql);
 		return $query->result();

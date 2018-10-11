@@ -23,6 +23,11 @@
 
 <script type="text/javascript">
 var ajax = "";
+var offset          = 5; //customize this as your need
+var request_ajax    = true;
+var ajax_is_on      = false;
+var objHeight       = $(window).height() - 50; //customize this as your need
+var last_scroll_top = 0;
 
 $(document).ready(function(){
     <?php if($this->session->flashdata('sukses')){?>
@@ -30,6 +35,15 @@ $(document).ready(function(){
     <?php } ?>
 
     get_barcode();
+
+    $('#cari_pasien').off('keyup').keyup(function(){
+        load_data_pasien();
+    });
+
+    $('#scroll_data').scroll(function(event){
+        load_data_pasien();
+    });
+
     // get_kode_pasien();
     
     // $('#baru').click(function(){
@@ -310,13 +324,16 @@ function load_data_pasien(){
     $('.load_tabel').show();
     var keyword = $('#cari_pasien').val();
 
-    if(ajax){
-        ajax.abort();
-    }
+    // if(ajax){
+    //     ajax.abort();
+    // }
 
-    ajax = $.ajax({
+    $.ajax({
         url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/load_data_pasien',
-        data : {keyword:keyword},
+        data : {
+            keyword:keyword,
+            offset: offset
+        },
         type : "GET",
         dataType : "json",
         success : function(result){
@@ -354,11 +371,8 @@ function load_data_pasien(){
 
             $('#tabel_pasien tbody').html($tr);
             $('.load_tabel').hide();
+            offset += 1;
         }
-    });
-
-    $('#cari_pasien').off('keyup').keyup(function(){
-        load_data_pasien();
     });
 }
 
@@ -1105,8 +1119,8 @@ function klik_asuransi(id){
                 <div class="load_tabel">
                     <img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
                 </div>
-                <div class="table-responsive">
-                    <div class="scroll-xy">
+                <div class="table-responsive" style="height: 400px;">
+                    <div id="scroll_data" style="overflow-y: scroll; overflow-x: hidden; height: 400px;">
                         <table class="table table-hover table-bordered" id="tabel_pasien">
                             <thead>
                                 <tr class="merah_popup">
