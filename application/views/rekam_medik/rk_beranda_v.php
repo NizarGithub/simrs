@@ -220,7 +220,7 @@ function klik_approve(id,tipe){
                             <div class="table-responsive">
                                 <table class="table table-hover table-bordered" id="tabel_pasien_rm">
                                     <thead>
-                                        <tr class="biru_popup">
+                                        <tr class="merah">
                                             <th style="color:#fff; text-align:center; vertical-align: middle;">No</th>
                                             <th style="color:#fff; text-align:center; vertical-align: middle;">No. RM</th>
                                             <th style="color:#fff; text-align:center; vertical-align: middle;">Tgl / Waktu</th>

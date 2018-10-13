@@ -73,9 +73,9 @@ class Setup_nama_paket_m extends CI_Model {
 					a.VISITE_PROF,
 					a.JASA_ANASTESI,
 					a.JASA_PENATA_ANASTESI,
-					SUM(b.TARIF) AS TINDAKAN
+					IFNULL(SUM(b.TARIF),0) AS TINDAKAN
 				FROM setup_kamar_paket a
-				JOIN(
+				LEFT JOIN(
 					SELECT
 						a.*,
 						b.NAMA_TINDAKAN,
@@ -149,6 +149,20 @@ class Setup_nama_paket_m extends CI_Model {
 		return $query->result();
 	}
 
+	function get_tindakan_paket_det($id_kamar_paket){
+		$sql = "
+			SELECT
+				a.*,
+				b.NAMA_TINDAKAN,
+				b.TARIF
+			FROM setup_tindakan_paket a
+			JOIN admum_setup_tindakan b ON b.ID = a.ID_TINDAKAN
+			WHERE a.ID_KAMAR_PAKET = '$id_kamar_paket'
+		";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
 	function simpan_kamar(
 		$id_paket,
 		$kelas,
@@ -207,8 +221,38 @@ class Setup_nama_paket_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
+	function ubah_kamar($id,$kelas,$biaya_kamar_bersalin,$biaya_kamar_perawatan,$biaya_kamar_neo,$biaya_pelayanan,$biaya_obat,$buku_paspor,$jasa_operator,$visite_dokter,$visite_prof,$jasa_anastesi,$jasa_penata_anastesi){
+		$sql = "
+			UPDATE setup_kamar_paket SET
+				KELAS = '$kelas',
+				BIAYA_KAMAR_BERSALIN = '$biaya_kamar_bersalin',
+				BIAYA_KAMAR_PERAWATAN = '$biaya_kamar_perawatan',
+				BIAYA_KAMAR_NEO = '$biaya_kamar_neo',
+				BIAYA_PELAYANAN = '$biaya_pelayanan',
+				BIAYA_PAKET_OBAT = '$biaya_obat',
+				BUKU_PASPOR = '$buku_paspor',
+				JASA_OPERATOR = '$jasa_operator',
+				VISITE_DOKTER = '$visite_dokter',
+				VISITE_PROF = '$visite_prof',
+				JASA_ANASTESI = '$jasa_anastesi',
+				JASA_PENATA_ANASTESI = '$jasa_penata_anastesi'
+			WHERE ID = '$id'
+		";
+		$this->db->query($sql);
+	}
+
+	function hapus_kamar($id){
+		$sql = "DELETE FROM setup_kamar_paket WHERE ID = '$id'";
+		$this->db->query($sql);
+	}
+
 	function simpan_tindakan($id_kamar_paket,$id_tindakan){
 		$sql = "INSERT INTO setup_tindakan_paket(ID_KAMAR_PAKET,ID_TINDAKAN) VALUES ('$id_kamar_paket','$id_tindakan')";
+		$this->db->query($sql);
+	}
+
+	function hapus_tindakan($id_kamar_paket){
+		$sql = "DELETE FROM setup_tindakan_paket WHERE ID_KAMAR_PAKET = '$id_kamar_paket'";
 		$this->db->query($sql);
 	}
 

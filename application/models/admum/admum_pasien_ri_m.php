@@ -65,13 +65,19 @@ class Admum_pasien_ri_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
-	function load_data_pasien($keyword){ 
+	function load_data_pasien($keyword,$offset){
 		$where = "1 = 1";
+		$limit = "LIMIT 25";
 
 		if($keyword != ""){
 			$where = $where." AND (NAMA LIKE '%$keyword%' OR NAMA_AYAH LIKE '%$keyword%' OR NAMA_IBU LIKE '%$keyword%')";
 		}else{
 			$where = $where;
+		}
+
+		if($offset != ""){
+			$asu = 10 + $offset;
+			$limit = "LIMIT $asu";
 		}
 
 		$sql = "
@@ -89,6 +95,7 @@ class Admum_pasien_ri_m extends CI_Model {
 			FROM rk_pasien 
 			WHERE $where
 			ORDER BY ID DESC
+			$limit
 		";
 		$query = $this->db->query($sql);
 		return $query->result();

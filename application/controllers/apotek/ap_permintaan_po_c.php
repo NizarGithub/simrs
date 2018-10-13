@@ -1,12 +1,12 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Admum_permintaan_po_c extends CI_Controller {
+class Ap_permintaan_po_c extends CI_Controller {
 
 	function __construct()
 	{
 		parent::__construct();
 		date_default_timezone_set('Asia/Jakarta');
-		$this->load->model('admum/admum_permintaan_po_m','model');
+		$this->load->model('apotek/ap_permintaan_po_m','model');
 		$sess_user = $this->session->userdata('masuk_rs');
 		$sess_lock = $this->session->userdata('lock');
     	$id_user = $sess_user['id'];
@@ -19,15 +19,15 @@ class Admum_permintaan_po_c extends CI_Controller {
 	function index()
 	{
 		$data = array(
-			'page' => 'admum/admum_permintaan_po_v', 
-			'title' => 'Permintaan PO',
-			'subtitle' => 'Permintaan PO',
+			'page' => 'apotek/ap_permintaan_po_v', 
+			'title' => 'Permintaan PO (Pengadaan)',
+			'subtitle' => 'Permintaan PO (Pengadaan)',
 			'childtitle' => 'Umum',
 			'master_menu' => 'permintaan_po',
 			'view' => 'permintaan_po'
 		);
 
-		$this->load->view('admum/admum_home_v',$data);
+		$this->load->view('apotek/ap_home_v',$data);
 	}
 
 	function data_permintaan_barang(){
@@ -90,7 +90,7 @@ class Admum_permintaan_po_c extends CI_Controller {
 	}
 
 	function get_kode_po(){
-		$keterangan = "PO-ADMISSION";
+		$keterangan = "PO-FARMASI";
 		$bulan = date('n');
 		$tahun = date('Y');
 
@@ -109,20 +109,20 @@ class Admum_permintaan_po_c extends CI_Controller {
 		//PO/ADM/001/X/2018
 		if($total == 0){
 			$no = $this->add_leading_zero(1,3);
-			$kode = "PO/ADM/".$no."/".$this->romanic_number($bulan)."/".$tahun;
+			$kode = "PO/IFAR/".$no."/".$this->romanic_number($bulan)."/".$tahun;
 		}else{
 			$s = "SELECT * FROM nomor WHERE KETERANGAN = '$keterangan' AND BULAN = '$bulan' AND TAHUN = '$tahun'";
 			$q = $this->db->query($s)->row();
 			$next = $q->NEXT+1;
 			$no = $this->add_leading_zero($next,3);
-			$kode = "PO/ADM/".$no."/".$this->romanic_number($bulan)."/".$tahun;
+			$kode = "PO/IFAR/".$no."/".$this->romanic_number($bulan)."/".$tahun;
 		}
 
 		echo json_encode($kode);
 	}
 
 	function insert_kode(){
-		$keterangan = "PO-ADMISSION";
+		$keterangan = "PO-FARMASI";
 		$bulan = date('n');
 		$tahun = date('Y');
 
@@ -185,7 +185,7 @@ class Admum_permintaan_po_c extends CI_Controller {
 		$this->insert_kode();
 
 		$this->session->set_flashdata('sukses','1');
-		redirect('admum/admum_permintaan_po_c');
+		redirect('apotek/ap_permintaan_po_c');
 	}
 
 	function dibatalkan(){
@@ -201,7 +201,7 @@ class Admum_permintaan_po_c extends CI_Controller {
 		$this->model->dibatalkan($id,$tanggal,$waktu,$id_user);
 
 		$this->session->set_flashdata('batal','1');
-		redirect('admum/admum_permintaan_po_c');
+		redirect('apotek/ap_permintaan_po_c');
 	}
 
 }

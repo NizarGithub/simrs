@@ -77,7 +77,7 @@
     <body>
         <!-- Navigation Bar-->
         <header id="topnav">
-            <div class="topbar-main" style="background-color:#ff4c4c; height:60px;">
+            <div class="topbar-main" style="background-color:#8baaff; height:60px;">
                 <div class="container">
                     <?PHP 
                         $sess_user = $this->session->userdata('masuk_rs');
@@ -142,7 +142,7 @@
                             $id_user = $sess_user['id'];
                             $user = $this->master_model_m->get_user_info($id_user);
                         ?>
-                        <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#bb1e10; height:60px;">
+                        <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#2164f4; height:60px;">
                             <li>
                                 <form role="search" class="navbar-left app-search pull-left hidden-xs" style="margin-right:0px; margin-top:0px;">
                                     <h5 style="color:#fff;"><b><?php echo strtoupper($user->NAMA);?></b></h5>

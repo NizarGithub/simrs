@@ -14,7 +14,11 @@
 
 <script type="text/javascript">
 var ajax = "";
-
+var offset          = 5; //customize this as your need
+var request_ajax    = true;
+var ajax_is_on      = false;
+var objHeight       = $(window).height() - 50; //customize this as your need
+var last_scroll_top = 0;
 $(document).ready(function(){
     <?php if($this->session->flashdata('sukses')){?>
         notif_simpan();
@@ -110,6 +114,63 @@ $(document).ready(function(){
     //         $('#view_prov2').show();
     //     }
     // });
+
+    $('#cari_pasien').off('keyup').keyup(function(){
+        load_data_pasien();
+    });
+
+    $('#scroll_data').scroll(function(event){
+        $('.load_tabel').show();
+        var keyword = $('#cari_pasien').val();
+        offset += 1;
+        
+        if(ajax){
+            ajax.abort();
+        }
+
+        ajax = $.ajax({
+            url : '<?php echo base_url(); ?>admum/admum_pasien_ri_c/load_data_pasien',
+            data : {
+                keyword:keyword,
+                offset:offset
+            },
+            type : "GET",
+            dataType : "json",
+            success : function(result){
+                $tr = "";
+
+                if(result == "" || result == null){
+                    $tr = "<tr class='active'><td style='text-align:center;' colspan='9'><b>Data Tidak Ada</b></td></tr>";
+                }else{
+                    var no = 0;
+
+                    for(var i=0; i<result.length; i++){
+                        no++; 
+
+                        result[i].TANGGAL_LAHIR = (result[i].TANGGAL_LAHIR==null || result[i].TANGGAL_LAHIR=='')?"-":result[i].TANGGAL_LAHIR;
+                        result[i].NAMA_AYAH = result[i].NAMA_AYAH==null?"-":result[i].NAMA_AYAH;
+                        result[i].NAMA_IBU = result[i].NAMA_IBU==null?"-":result[i].NAMA_IBU;
+                        result[i].ALAMAT = (result[i].ALAMAT==null || result[i].ALAMAT=='')?"-":result[i].ALAMAT;
+
+                        $tr += "<tr style='cursor:pointer;' onclick='klik_pasien("+result[i].ID+");'>"+
+                                    "<td style='text-align:center;'>"+no+"</td>"+
+                                    "<td style='white-space:nowrap;'>"+result[i].KODE_PASIEN+"</td>"+
+                                    "<td style='white-space:nowrap;'>"+result[i].NAMA+"</td>"+
+                                    "<td style='text-align:center;'>"+result[i].JENIS_KELAMIN+"</td>"+
+                                    "<td style='white-space:nowrap;'>"+result[i].TANGGAL_LAHIR+"</td>"+
+                                    "<td style='white-space:nowrap;'>"+result[i].UMUR+" Tahun</td>"+
+                                    "<td style='white-space:nowrap;'>"+result[i].NAMA_AYAH+"</td>"+
+                                    "<td style='white-space:nowrap;'>"+result[i].NAMA_IBU+"</td>"+
+                                    "<td style='white-space:nowrap;'>"+result[i].ALAMAT+"</td>"+
+                                "</tr>";
+                    }
+                }
+
+                $('#tabel_pasien tbody').html($tr);
+                $('.load_tabel').hide();
+            }
+        });
+    });
 
     $('#batal').click(function(){
         window.location = "<?php echo base_url(); ?>admum/admum_pasien_ri_c";
@@ -227,7 +288,10 @@ function load_data_pasien(){
 
     ajax = $.ajax({
         url : '<?php echo base_url(); ?>admum/admum_pasien_ri_c/load_data_pasien',
-        data : {keyword:keyword},
+        data : {
+            keyword:keyword,
+            offset:offset
+        },
         type : "GET",
         dataType : "json",
         success : function(result){
@@ -262,15 +326,13 @@ function load_data_pasien(){
 
             $('#tabel_pasien tbody').html($tr);
             $('.load_tabel').hide();
+            offset += 1;
         }
-    });
-
-    $('#cari_pasien').off('keyup').keyup(function(){
-        load_data_pasien();
     });
 }
 
 function klik_pasien(id){
+    $('#popup_load').show();
     $('#tutup_pasien').click();
 
     $.ajax({
@@ -333,6 +395,7 @@ function klik_pasien(id){
 
             $('#btn_simpan').removeAttr('disabled');
             get_biaya_adm();
+            $('#popup_load').fadeOut();
         }
     });
 }
@@ -963,6 +1026,13 @@ function Search_tgl_RI(tgl){
     });
 }
 </script>
+
+<div id="popup_load">
+    <div class="window_load">
+        <img src="<?=base_url()?>picture/progress.gif" height="100" width="125">
+    </div>
+</div>
+
 <input type="hidden" id="ord_tmp" value="" />
 
 <div class="row">
@@ -1339,8 +1409,8 @@ function Search_tgl_RI(tgl){
                 <div class="load_tabel">
                     <img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
                 </div>
-                <div class="table-responsive">
-                    <div class="scroll-xy">
+                <div class="table-responsive" style="height: 400px;">
+                    <div id="scroll_data" style="overflow-y: scroll; overflow-x: hidden; height: 400px;">
                         <table class="table table-hover table-bordered" id="tabel_pasien">
                             <thead>
                                 <tr class="merah_popup">

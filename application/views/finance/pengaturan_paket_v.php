@@ -1,6 +1,7 @@
 <script type="text/javascript" src="<?php echo base_url(); ?>js-devan/jquery-1.11.1.min.js"></script>
 <style type="text/css">
-#tombol_reset{
+#tombol_reset,
+#view_ubah{
 	display: none;
 }
 
@@ -43,6 +44,10 @@ $(document).ready(function(){
       "hideMethod": "fadeOut"
     }
 
+    $('#batal').click(function(){
+		window.location.reload();
+	});
+
     $('.btn_tindakan').click(function(){
     	$('#cari_tindakan').val("");
 		$('#popup_tindakan').click();
@@ -70,7 +75,7 @@ $(document).ready(function(){
 				data : $('#form_tambah').serialize(),
 				type : "POST",
 				dataType : "json",
-				success : function(row){
+				success : function(res){
 					toastr["success"]("Data berhasil disimpan!", "Notifikasi");
 					setTimeout(function(){
 						$('#popup_load').hide();
@@ -81,8 +86,41 @@ $(document).ready(function(){
 		}
 	});
 
-	$('#batal').click(function(){
-		window.location.reload();
+	$('#simpan_ubah').click(function(){
+		$('#popup_load').show();
+
+		$.ajax({
+			url : '<?php echo base_url(); ?>finance/setup_nama_paket_c/ubah_kamar',
+			data : $('#form_ubah').serialize(),
+			type : "POST",
+			dataType : "json",
+			success : function(res){
+				toastr["success"]("Data berhasil diubah!", "Notifikasi");
+				setTimeout(function(){
+					$('#popup_load').hide();
+					window.location.reload();
+				}, 6000);
+			}
+		});
+	});
+
+	$('#btn_ya_hapus').click(function(){
+		$('#popup_load').show();
+		var id = $('#id_hapus').val();
+
+		$.ajax({
+			url : '<?php echo base_url(); ?>finance/setup_nama_paket_c/hapus_kamar',
+			data : {id:id},
+			type : "POST",
+			dataType : "json",
+			success : function(res){
+				toastr["success"]("Data berhasil dihapus!", "Notifikasi");
+				setTimeout(function(){
+					$('#popup_load').hide();
+					window.location.reload();
+				}, 6000);
+			}
+		});
 	});
 });
 
@@ -229,11 +267,68 @@ function klik_lainnya(id){
 }
 
 function ubah_data(id){
+	$('#view_ubah').show();
+	$('#view_data').hide();
 
+	$.ajax({
+		url : '<?php echo base_url(); ?>finance/setup_nama_paket_c/get_kamar_paket_id',
+		data : {id:id},
+		type : "POST",
+		dataType : "json",
+		success : function(row){
+			$('#id_ubah').val(id);
+
+			if(row['row']['KELAS'] == "SVIP"){
+			  $('#kelas_kamar_ubah option[value="SVIP"]').attr('selected','selected');
+			}else if(row['row']['KELAS'] == "VIP"){
+			  $('#kelas_kamar_ubah option[value="VIP"]').attr('selected','selected');
+			}else if(row['row']['KELAS'] == "1A"){
+			  $('#kelas_kamar_ubah option[value="1A"]').attr('selected','selected');
+			}else if(row['row']['KELAS'] == "1B"){
+			  $('#kelas_kamar_ubah option[value="1B"]').attr('selected','selected');
+			}else if(row['row']['KELAS'] == "2A"){
+			  $('#kelas_kamar_ubah option[value="2A"]').attr('selected','selected');
+			}else if(row['row']['KELAS'] == "2B"){
+			  $('#kelas_kamar_ubah option[value="2B"]').attr('selected','selected');
+			}
+
+			$('#biaya_kamar_bersalin_ubah').val(formatNumber(row['row']['BIAYA_KAMAR_BERSALIN']));
+			$('#biaya_kamar_perawatan_ubah').val(formatNumber(row['row']['BIAYA_KAMAR_PERAWATAN']));
+			$('#biaya_kamar_neo_ubah').val(formatNumber(row['row']['BIAYA_KAMAR_NEO']));
+			$('#biaya_pelayanan_ubah').val(formatNumber(row['row']['BIAYA_PELAYANAN']));
+			$('#biaya_obat_ubah').val(formatNumber(row['row']['BIAYA_PAKET_OBAT']));
+			$('#buku_paspor_ubah').val(formatNumber(row['row']['BUKU_PASPOR']));
+			$('#jasa_operator_ubah').val(formatNumber(row['row']['JASA_OPERATOR']));
+			$('#biaya_visite_ubah').val(formatNumber(row['row']['VISITE_DOKTER']));
+			$('#biaya_visite_prof_ubah').val(formatNumber(row['row']['VISITE_PROF']));
+			$('#jasa_anastesi_ubah').val(formatNumber(row['row']['JASA_ANASTESI']));
+			$('#jasa_penata_anastesi_ubah').val(formatNumber(row['row']['JASA_PENATA_ANASTESI']));
+
+			get_tindakan_paket(id);
+		}
+	});
+
+	$('#batal_ubah').click(function(){
+		$('#view_ubah').hide();
+		$('#view_data').show();
+		$('#id_ubah').val("");
+	});
 }
 
 function hapus_data(id){
+	$('#popup_hps').click();
 
+	$.ajax({
+		url : '<?php echo base_url(); ?>finance/setup_nama_paket_c/get_kamar_paket_id',
+		data : {id:id},
+		type : "POST",
+		dataType : "json",
+		success : function(row){
+			$('#id_hapus').val(id);
+			var t = row['row']['KELAS'];
+			$('#msg').html('Apakah paket kelas <b>'+t+'</b> ingin dihapus?');
+		}
+	});
 }
 
 function load_tindakan(){
@@ -286,6 +381,7 @@ function klik_tindakan(id){
 		dataType : "json",
 		success : function(result){
 			$tr = "";
+			var id_ubah = $('#id_ubah').val();
 
 			for(var i=0; i<result.length; i++){
 				var jumlah_data = $('#tr_'+result[i].ID).length;
@@ -305,9 +401,43 @@ function klik_tindakan(id){
 						  "</tr>";
 				}
 			}
+			
+			if(id_ubah == ""){
+				$('#tabel_tambah_tindakan tbody').append($tr);
+			}else{
+				$('#tabel_tambah_tindakan_ubah tbody').append($tr);
+			}
 
-			$('#tabel_tambah_tindakan tbody').append($tr);
 			$('#popup_load').hide();
+		}
+	});
+}
+
+function get_tindakan_paket(id_kamar_paket){
+	$.ajax({
+		url : '<?php echo base_url(); ?>finance/setup_nama_paket_c/get_tindakan_paket',
+		data : {id_kamar_paket:id_kamar_paket},
+		type : "POST",
+		dataType : "json",
+		success : function(result){
+			$tr = "";
+
+			if(result == null || result == ""){
+				$tr = "<tr><td colspan='3' style='text-align:center;'>Data Tidak Ada</td></tr>";
+			}else{
+				for(var i=0; i<result.length; i++){
+					var aksi = "<button type='button' class='btn waves-light btn-danger btn-sm' onclick='deleteRow(this);'><i class='fa fa-times'></i></button>";
+
+					$tr += "<tr>"+
+							"<input type='hidden' name='id_tindakan[]' value='"+result[i].ID_TINDAKAN+"'>"+
+							"<td style='vertical-align:middle;'>"+result[i].NAMA_TINDAKAN+"</td>"+
+							"<td style='vertical-align:middle; text-align:right;'>"+formatNumber(result[i].TARIF)+"</td>"+
+							"<td align='center'>"+aksi+"</td>"+
+						  "</tr>";
+				}
+			}
+			
+			$('#tabel_tambah_tindakan_ubah tbody').append($tr);
 		}
 	});
 }
@@ -544,7 +674,141 @@ function deleteRow(btn){
 	            </div>
 	        </form>
         </div>
+    </div>
 
+    <div class="col-lg-12" id="view_ubah">
+    	<div class="card-box">
+    		<form class="form-horizontal" role="form" id="form_ubah">
+	            <input type="hidden" name="id_paket" id="id_paket" value="<?php echo $id_paket; ?>">
+	            <input type="hidden" name="id_ubah" id="id_ubah" value="">
+				<div class="form-group">
+                    <label class="col-md-2 control-label">Kelas</label>
+                    <div class="col-md-3">
+                        <select class="form-control" name="kelas_kamar_ubah" id="kelas_kamar_ubah">
+                            <option value="SVIP">SVIP</option>
+	                        <option value="VIP">VIP</option>
+	                        <option value="1A">I A</option>
+	                        <option value="1B">I B</option>
+	                        <option value="2A">II A</option>
+	                        <option value="2B">II B</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Biaya Kamar Bersalin</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="biaya_kamar_bersalin_ubah" id="biaya_kamar_bersalin_ubah" value="" onkeyup="FormatCurrency(this);">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Biaya Kamar Perawatan Ibu</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="biaya_kamar_perawatan_ubah" id="biaya_kamar_perawatan_ubah" value="" onkeyup="FormatCurrency(this);">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Biaya Kamar Neonatus</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="biaya_kamar_neo_ubah" id="biaya_kamar_neo_ubah" value="" onkeyup="FormatCurrency(this);">
+                        <span class="help-block"><small>*jika tidak ada boleh dikosongi</small></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Biaya Pelayanan & Tindakan</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="biaya_pelayanan_ubah" id="biaya_pelayanan_ubah" value="" onkeyup="FormatCurrency(this);">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Biaya Paket Obat & Alkes</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="biaya_obat_ubah" id="biaya_obat_ubah" value="" onkeyup="FormatCurrency(this);">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Buku Paspor</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="buku_paspor_ubah" id="buku_paspor_ubah" value="" onkeyup="FormatCurrency(this);">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Tindakan</label>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <input type="text" class="form-control btn_tindakan" value="" placeholder="Klik disini..." readonly>
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-inverse btn_tindakan"><i class="fa fa-search"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">&nbsp;</label>
+                    <div class="col-md-6">
+                        <div class="table-responsive">
+				            <table id="tabel_tambah_tindakan_ubah" class="table table-bordered">
+				                <thead>
+				                    <tr class="kuning_tr">
+				                        <th style="color:#fff; text-align:center;">Tindakan</th>
+				                        <th style="color:#fff; text-align:center;">Tarif</th>
+				                        <th style="color:#fff; text-align:center;">#</th>
+				                    </tr>
+				                </thead>
+				                <tbody>
+				                    
+				                </tbody>
+				            </table>
+				        </div>
+                    </div>
+                </div>
+                <hr>
+                <h4 class="header-title m-t-0 m-b-20">Dokter Kandungan</h4>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Jasa Operator</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="jasa_operator_ubah" id="jasa_operator_ubah" value="" onkeyup="FormatCurrency(this);" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Visite Dokter</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="biaya_visite_ubah" id="biaya_visite_ubah" value="" onkeyup="FormatCurrency(this);">
+                        <span class="help-block"><small>*jika tidak ada boleh dikosongi</small></span>
+                    </div>
+                </div>
+                <h4 class="header-title m-t-0 m-b-20">Dokter Anak</h4>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Visite Dokter (Profesor)</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="biaya_visite_prof_ubah" id="biaya_visite_prof_ubah" value="" onkeyup="FormatCurrency(this);">
+                        <span class="help-block"><small>*jika tidak ada boleh dikosongi</small></span>
+                    </div>
+                </div>
+                <h4 class="header-title m-t-0 m-b-20">Penata Instrumen</h4>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Jasa Anastesi</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="jasa_anastesi_ubah" id="jasa_anastesi_ubah" value="" onkeyup="FormatCurrency(this);">
+                        <span class="help-block"><small>*jika tidak ada boleh dikosongi</small></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">Jasa Penata Anastesi</label>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="jasa_penata_anastesi_ubah" id="jasa_penata_anastesi_ubah" value="" onkeyup="FormatCurrency(this);">
+                        <span class="help-block"><small>*jika tidak ada boleh dikosongi</small></span>
+                    </div>
+                </div>
+                <hr>
+	            <div class="form-group">
+	            	<label class="col-md-2 control-label">&nbsp;</label>
+	                <div class="col-md-7">
+	                    <button type="button" class="btn btn-success waves-effect w-md waves-light" id="simpan_ubah">Simpan</button>
+	                    <button type="reset" class="btn btn-danger waves-effect w-md waves-light" id="batal_ubah">Batal</button>
+	                </div>
+	            </div>
+	        </form>
+    	</div>
     </div>
 </div>
 
@@ -696,3 +960,24 @@ function deleteRow(btn){
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 <!-- // -->
+
+<button id="popup_hps" class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#custom-width-modal" style="display:none;">Custom width Modal</button>
+<div id="custom-width-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="custom-width-modalLabel">Konfirmasi Hapus</h4>
+            </div>
+            <div class="modal-body">
+                <p id="msg"></p>
+            </div>
+            <div class="modal-footer">
+                <form action="" method="post">
+                    <input type="hidden" name="id_hapus" id="id_hapus" value="">
+                    <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Tidak</button>
+                    <button type="button" class="btn btn-danger waves-effect waves-light" data-dismiss="modal" id="btn_ya_hapus">Ya</button>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

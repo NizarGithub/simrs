@@ -41,7 +41,59 @@ $(document).ready(function(){
     });
 
     $('#scroll_data').scroll(function(event){
-        load_data_pasien();
+        $('.load_tabel').show();
+        var keyword = $('#cari_pasien').val();
+        offset += 1;
+
+        if(ajax){
+            ajax.abort();
+        }
+
+        ajax = $.ajax({
+            url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/load_data_pasien',
+            data : {
+                keyword:keyword,
+                offset: offset
+            },
+            type : "GET",
+            dataType : "json",
+            success : function(result){
+                $tr = "";
+
+                if(result == "" || result == null){
+                    $tr = "<tr><td style='text-align:center;' colspan='9'><b>Data Tidak Ada</b></td></tr>";
+                }else{
+                    var no = 0;
+
+                    for(var i=0; i<result.length; i++){
+                        no++; 
+
+                        result[i].JENIS_KELAMIN = result[i].JENIS_KELAMIN=='L'?"Laki - Laki":'Perempuan';
+                        result[i].TANGGAL_LAHIR = (result[i].TANGGAL_LAHIR==null || result[i].TANGGAL_LAHIR=='')?"-":result[i].TANGGAL_LAHIR;
+                        result[i].NAMA_AYAH = result[i].NAMA_AYAH==null?"-":result[i].NAMA_AYAH;
+                        result[i].NAMA_IBU = result[i].NAMA_IBU==null?"-":result[i].NAMA_IBU;
+                        result[i].ALAMAT = (result[i].ALAMAT==null || result[i].ALAMAT=='')?"-":result[i].ALAMAT;
+
+                        var umur = result[i].UMUR+' Tahun '+result[i].UMUR_BULAN+' Bulan';
+
+                        $tr += "<tr style='cursor:pointer;' onclick='klik_pasien("+result[i].ID+");'>"+
+                                    "<td style='white-space:nowrap; text-align:center;'>"+no+"</td>"+
+                                    "<td style='white-space:nowrap; text-align:center;'>"+result[i].KODE_PASIEN+"</td>"+
+                                    "<td style='white-space:nowrap;'>"+result[i].NAMA+"</td>"+
+                                    "<td style='white-space:nowrap; text-align:center;'>"+result[i].JENIS_KELAMIN+"</td>"+
+                                    "<td style='white-space:nowrap; text-align:center;'>"+result[i].TANGGAL_LAHIR+"</td>"+
+                                    "<td style='white-space:nowrap; text-align:center;'>"+umur+"</td>"+
+                                    "<td style='white-space:nowrap;'>"+result[i].NAMA_AYAH+"</td>"+
+                                    "<td style='white-space:nowrap;'>"+result[i].NAMA_IBU+"</td>"+
+                                    "<td style='white-space:nowrap;'>"+result[i].ALAMAT+"</td>"+
+                                "</tr>";
+                    }
+                }
+
+                $('#tabel_pasien tbody').html($tr);
+                $('.load_tabel').hide();
+            }
+        });
     });
 
     // get_kode_pasien();
@@ -324,11 +376,11 @@ function load_data_pasien(){
     $('.load_tabel').show();
     var keyword = $('#cari_pasien').val();
 
-    // if(ajax){
-    //     ajax.abort();
-    // }
+    if(ajax){
+        ajax.abort();
+    }
 
-    $.ajax({
+    ajax = $.ajax({
         url : '<?php echo base_url(); ?>admum/admum_pasien_rj_c/load_data_pasien',
         data : {
             keyword:keyword,
@@ -371,7 +423,6 @@ function load_data_pasien(){
 
             $('#tabel_pasien tbody').html($tr);
             $('.load_tabel').hide();
-            offset += 1;
         }
     });
 }

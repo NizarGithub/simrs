@@ -109,7 +109,7 @@
                                     <img src="<?php echo base_url(); ?>files/foto_pegawai/<?php echo $user->FOTO;?>" alt="user-img" class="img-circle user-img">
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <?php if($level == null){ ?>
+                                    <?php if($level == null || $level == 'Super Admin'){ ?>
                                     <li><a href="<?php echo base_url(); ?>portal"><i class="fa fa-th m-r-5"></i> Portal Depan</a></li>
                                     <?php } ?>
                                     <li><a href="javascript:void(0)"><i class="ti-user m-r-5"></i> Profile</a></li>
@@ -207,7 +207,7 @@
                             </div>
                             <div class="col-xs-6">
                                 <ul class="pull-right list-inline m-b-0">
-                                    <?php if($level == null){ ?>
+                                    <?php if($level == null || $level == 'Super Admin'){ ?>
                                     <li>
                                         <a href="<?php echo base_url(); ?>portal" style="color:#887d59;"><i class="fa fa-th"></i> Portal Depan</a>
                                     </li>

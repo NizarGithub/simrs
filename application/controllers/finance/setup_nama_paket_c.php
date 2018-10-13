@@ -110,6 +110,12 @@ class Setup_nama_paket_c extends CI_Controller {
 		echo json_encode($data);
 	}
 
+	function get_tindakan_paket(){
+		$id_kamar_paket = $this->input->post('id_kamar_paket');
+		$data = $this->model->get_tindakan_paket_det($id_kamar_paket);
+		echo json_encode($data);
+	}
+
 	function simpan_kamar(){
 		$id_paket = $this->input->post('id_paket');
 		$kelas = $this->input->post('kelas_kamar');
@@ -148,9 +154,49 @@ class Setup_nama_paket_c extends CI_Controller {
 
 		$id_kamar_paket = $this->db->insert_id();
 		$id_tindakan = $this->input->post('id_tindakan');
-		foreach ($id_tindakan as $key => $value) {
-			$this->model->simpan_tindakan($id_kamar_paket,$value);
+		if ($id_tindakan != "") {
+			foreach ($id_tindakan as $key => $value) {
+				$this->model->simpan_tindakan($id_kamar_paket,$value);
+			}
 		}
+
+		echo '1';
+	}
+
+	function ubah_kamar(){
+		$id = $this->input->post('id_ubah');
+		$kelas = $this->input->post('kelas_kamar_ubah');
+		$biaya_kamar_bersalin = str_replace(',', '', $this->input->post('biaya_kamar_bersalin_ubah'));
+		$biaya_kamar_perawatan = str_replace(',', '', $this->input->post('biaya_kamar_perawatan_ubah'));
+		$biaya_kamar_neo = str_replace(',', '', $this->input->post('biaya_kamar_neo_ubah'));
+		$biaya_pelayanan = str_replace(',', '', $this->input->post('biaya_pelayanan_ubah'));
+		$biaya_obat = str_replace(',', '', $this->input->post('biaya_obat_ubah'));
+		$buku_paspor = str_replace(',', '', $this->input->post('buku_paspor_ubah'));
+		$jasa_operator = str_replace(',', '', $this->input->post('jasa_operator_ubah'));
+		$visite_dokter = str_replace(',', '', $this->input->post('biaya_visite_ubah'));
+		$visite_prof = str_replace(',', '', $this->input->post('biaya_visite_prof_ubah'));
+		$jasa_anastesi = str_replace(',', '', $this->input->post('jasa_anastesi_ubah'));
+		$jasa_penata_anastesi = str_replace(',', '', $this->input->post('jasa_penata_anastesi_ubah'));
+
+		$this->model->ubah_kamar($id,$kelas,$biaya_kamar_bersalin,$biaya_kamar_perawatan,$biaya_kamar_neo,$biaya_pelayanan,$biaya_obat,$buku_paspor,$jasa_operator,$visite_dokter,$visite_prof,$jasa_anastesi,$jasa_penata_anastesi);
+
+		$id_kamar_paket = $this->input->post('id_kamar_paket');
+		$id_tindakan = $this->input->post('id_tindakan');
+
+		$this->model->hapus_tindakan($id);
+
+		foreach ($id_tindakan as $key => $value) {
+			$this->model->simpan_tindakan($id,$value);
+		}
+
+		echo '1';
+	}
+
+	function hapus_kamar(){
+		$id = $this->input->post('id');
+
+		$this->model->hapus_tindakan($id);
+		$this->model->hapus_kamar($id);
 
 		echo '1';
 	}

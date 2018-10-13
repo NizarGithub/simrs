@@ -82,6 +82,12 @@ class Admum_pasien_baru_m extends CI_Model {
 		$this->db->query($sql);
 	}
 
+	function default_lokasi(){
+		$sql = "SELECT * FROM admum_lokasi ORDER BY ID DESC LIMIT 1";
+		$query = $this->db->query($sql);
+		return $query->result();
+	}
+
 	function kota_kab(){
 		$sql = "
 			SELECT
@@ -164,12 +170,6 @@ class Admum_pasien_baru_m extends CI_Model {
 		$sql = "SELECT * FROM rk_pasien WHERE ID = '$id'";
 		$query = $this->db->query($sql);
 		return $query->row();
-	}
-
-	function default_lokasi(){
-		$sql = "SELECT * FROM admum_lokasi ORDER BY ID DESC LIMIT 1";
-		$query = $this->db->query($sql);
-		return $query->result();
 	}
 
 	function simpanAntrian($kode_antrian, $jml_antrian, $id_antrian){

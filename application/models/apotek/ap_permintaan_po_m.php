@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Admum_permintaan_po_m extends CI_Model {
+class Ap_permintaan_po_m extends CI_Model {
 
 	function __construct()
 	{
