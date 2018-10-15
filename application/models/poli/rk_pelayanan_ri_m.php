@@ -9,7 +9,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 	}
 
 	function notif_pasien_baru($tanggal){
-		$sql = "SELECT COUNT(*) AS TOTAL FROM admum_rawat_inap WHERE STS_TERIMA = '0'";
+		$sql = "SELECT COUNT(*) AS TOTAL FROM admum_rawat_inap WHERE STS_TERIMA = '0' AND STS_WAITING = '1'";
 		$query = $this->db->query($sql);
 		return $query->row();
 	}
@@ -33,6 +33,7 @@ class Rk_pelayanan_ri_m extends CI_Model {
 			LEFT JOIN admum_kamar_rawat_inap KRI ON KRI.ID = RI.ID_KAMAR
 			LEFT JOIN admum_bed_rawat_inap BED ON BED.ID = RI.ID_BED
 			WHERE RI.STS_TERIMA = '0'
+			AND RI.STS_WAITING = '1'
 			ORDER BY RI.ID DESC
 		";
 		$query = $this->db->query($sql);

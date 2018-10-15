@@ -78,7 +78,7 @@
     <body onload="startTime();">
         <!-- Navigation Bar-->
         <header id="topnav">
-            <div class="topbar-main" style="background-color:#00a4e4; height:60px;">
+            <div class="topbar-main" style="background-color:#71c6c1; height:60px;">
                 <div class="container">
                     <!-- LOGO -->
                     <?php
@@ -128,7 +128,7 @@
                     <!-- END OF LOKET -->
 
                     <div class="menu-extras">
-                        <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#0a4d8c; height:60px;">
+                        <ul class="nav navbar-nav navbar-right pull-right" style="background-color:#099d84; height:60px;">
                             <li>
                                 <form role="search" class="navbar-left app-search pull-left hidden-xs" style="margin-right:0px; margin-top:0px;">
                                 <?php
@@ -168,7 +168,7 @@
                                             <a class="right-bar-toggle" href="javascript:void(0);">
                                                 <i class="fa fa-bell-o"></i>
                                             </a>
-                                            <span class="badge badge-success" id="tot_pasien">0</span>
+                                            <span class="badge badge-danger" id="tot_pasien">0</span>
                                             <div class="noti-dot">
                                                 <span class="dot" id="ketap_ketip"></span>
                                             </div>

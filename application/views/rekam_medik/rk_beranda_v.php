@@ -32,11 +32,8 @@ $(document).ready(function(){
       "hideMethod": "fadeOut"
     }
 
-    $('#aktifkan_notif').click(function(){
-        timer = setInterval(function () {
-            get_notif_pasien();
-        }, 5000);
-        toastr["success"]("Notifikasi Aktif!", "Berhasil");
+    $('#jumlah_tampil').click(function(){
+        get_data_rm();
     });
 });
 
@@ -262,7 +259,6 @@ function klik_approve(id,tipe){
                     </form>
                 </div>
             </div>
-
         </div>
     </div>
 </div>

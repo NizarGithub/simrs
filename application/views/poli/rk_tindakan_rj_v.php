@@ -157,6 +157,7 @@ var Base64 = {
 }
 
 var ajax = '';
+var offset = 5;
 
 $(document).ready(function(){
 	<?php if($this->session->flashdata('sukses')){?>
@@ -375,6 +376,52 @@ $(document).ready(function(){
 	$('.btn_penyakit_dg').click(function(){
 		$('#popup_penyakit_dg').click();
 		load_penyakit_diagnosa();
+	});
+
+	$('#cari_penyakit_dg').off('keyup').keyup(function(){
+		load_penyakit_diagnosa();
+	});
+
+	$('#scroll_data_dg').scroll(function(event){
+		$('.loading_tabel_dg').show();
+		var keyword = $('#cari_penyakit_dg').val();
+		offset += 1;
+
+		if(ajax){
+			ajax.abort();
+		}
+
+		ajax = $.ajax({
+			url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/data_penyakit',
+			data : {
+				keyword:keyword,
+				offset:offset
+			},
+			type : "GET",
+			dataType : "json",
+			success : function(result){
+				$tr = "";
+
+				if(result == "" || result == null){
+					$tr = "<tr><td colspan='3' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+				}else{
+					var no = 0;
+
+					for(var i=0; i<result.length; i++){
+						no++;
+
+						$tr += "<tr style='cursor:pointer;' onclick='klik_penyakit("+result[i].ID+");'>"+
+									"<td style='text-align:center;'>"+no+"</td>"+
+									"<td>"+result[i].URAIAN+"</td>"+
+									"<td>"+result[i].IN_BAHASA+"</td>"+
+								"</tr>";
+					}
+				}
+
+				$('#tb_penyakit_dg tbody').html($tr);
+				$('.loading_tabel_dg').hide();
+			}
+		});
 	});
 
 	$('#simpanDg').click(function(){
@@ -1103,14 +1150,17 @@ function load_penyakit_diagnosa(){
 
 	ajax = $.ajax({
 		url : '<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/data_penyakit',
-		data : {keyword:keyword},
+		data : {
+			keyword:keyword,
+			offset:offset
+		},
 		type : "GET",
 		dataType : "json",
 		success : function(result){
 			$tr = "";
 
 			if(result == "" || result == null){
-				$tr = "<tr><td colspan='2' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+				$tr = "<tr><td colspan='3' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
 				var no = 0;
 
@@ -1120,6 +1170,7 @@ function load_penyakit_diagnosa(){
 					$tr += "<tr style='cursor:pointer;' onclick='klik_penyakit("+result[i].ID+");'>"+
 								"<td style='text-align:center;'>"+no+"</td>"+
 								"<td>"+result[i].URAIAN+"</td>"+
+								"<td>"+result[i].IN_BAHASA+"</td>"+
 							"</tr>";
 				}
 			}
@@ -1127,10 +1178,6 @@ function load_penyakit_diagnosa(){
 			$('#tb_penyakit_dg tbody').html($tr);
 			$('.loading_tabel_dg').hide();
 		}
-	});
-
-	$('#cari_penyakit_dg').off('keyup').keyup(function(){
-		load_penyakit_diagnosa();
 	});
 }
 
@@ -3823,11 +3870,11 @@ function cetak_surat_keterangan(id_pasien){
 <!-- DIAGNOSA -->
 <button id="popup_penyakit_dg" class="btn btn-primary" data-toggle="modal" data-target="#myModal2_hasil_dg" style="display:none;">Standard Modal</button>
 <div id="myModal2_hasil_dg" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog" style="width:45%;">
+    <div class="modal-dialog" style="width:55%;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title" id="myModalLabel">Data Penyakit</h4>
+                <h4 class="modal-title" id="myModalLabel">Master Diagnosa</h4>
             </div>
             <div class="modal-body">
             	<form class="form-horizontal" role="form">
@@ -3847,13 +3894,14 @@ function cetak_surat_keterangan(id_pasien){
 		        <div class="loading_tabel_dg">
 		        	<img src="<?php echo base_url(); ?>picture/processando.gif" style="width: 90px; height: 90px;">
 		        </div>
-            	<div class="table-responsive">
-            		<div class="scroll-y">
+            	<div class="table-responsive" style="height: 400px;">
+                    <div id="scroll_data_dg" style="overflow-y: scroll; overflow-x: hidden; height: 400px;">
 		                <table class="table table-bordered table-hover" id="tb_penyakit_dg">
 		                    <thead>
 		                        <tr class="hijau_popup">
 		                            <th style="text-align:center; color: #fff;" width="50">No</th>
-		                            <th style="text-align:center; color: #fff;">Penyakit</th>
+		                            <th style="text-align:center; color: #fff;">Uraian</th>
+		                            <th style="text-align:center; color: #fff;">In Bahasa</th>
 		                        </tr>
 		                    </thead>
 		                    <tbody>

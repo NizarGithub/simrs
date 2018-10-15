@@ -219,7 +219,7 @@ function data_rawat_inap(){
 					result[i].NAMA_DOKTER = result[i].NAMA_DOKTER==null?"-":result[i].NAMA_DOKTER;
 
 					var encodedString = Base64.encode(result[i].ID);
-					var aksi = '<a href="<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/tindakan_ri/'+encodedString+'" class="btn btn-primary waves-effect waves-light btn-sm"><i class="fa fa-user-md"></i>&nbsp;Tindakan</a>';
+					var aksi = '';
 					var tgl_mrs = result[i].TANGGAL_MRS;
 
 					var tgl_krs = '';
@@ -252,7 +252,9 @@ function data_rawat_inap(){
 						var warna = '';
 						var keterangan = '';
 
-						if(parseFloat(hari) > 0 && parseFloat(hari) <= 2){
+						// console.log(hari);
+
+						if(parseFloat(hari) > 0 && parseFloat(hari) <= 3){
 							warna = "class='deezer_hj'";
 							keterangan = "Sisa Rawat Inap tinggal <b>"+hari+" hari</b>";
 						}else{
@@ -270,9 +272,12 @@ function data_rawat_inap(){
 
 					var bed = '';
 					if(result[i].STATUS_SUDAH == '1'){
-						bed = 'Selesai Ditangani';
+						bed = result[i].KODE_KAMAR+' - '+result[i].KELAS+' / '+result[i].NOMOR_BED;
+						aksi = '<span class="label label-success">Selesai Ditangani</span>';
+						warna = "class='success'";
 					}else{
 						bed = result[i].KODE_KAMAR+' - '+result[i].KELAS+' / '+result[i].NOMOR_BED;
+						aksi = '<a href="<?php echo base_url(); ?>poli/rk_pelayanan_ri_c/tindakan_ri/'+encodedString+'" class="btn btn-primary waves-effect waves-light btn-sm"><i class="fa fa-user-md"></i>&nbsp;Tindakan</a>';
 					}
 
 					// <button data-original-title="Tooltip on top" title="" data-placement="top" data-toggle="tooltip" class="btn btn-default" type="button">Tooltip on top</button>
@@ -402,7 +407,11 @@ function onEnterText(e){
 	                                    </thead>
 	                                    <tbody>
 	                                        <tr>
-	                                            <td class="deezer_hj"><b>Hijau</b></td>
+	                                            <td class="success"><b>Hijau</b></td>
+	                                            <td>Pasien Rawat Inap yang sudah selesai ditangani</td>
+	                                        </tr>
+	                                        <tr>
+	                                            <td class="kuning"><b>Kuning</b></td>
 	                                            <td>Pasien Rawat Inap yang waktu rawat inapnya kurang dari 3 hari dari tanggal KRS</td>
 	                                        </tr>
 	                                    </tbody>

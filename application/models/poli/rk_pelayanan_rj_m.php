@@ -248,14 +248,20 @@ class Rk_pelayanan_rj_m extends CI_Model {
 
 	// DIAGNOSA
 
-	function data_penyakit($keyword){
+	function data_penyakit($keyword,$offset){
 		$where = "1 = 1";
+		$limit = "LIMIT 25";
 
 		if($keyword != ""){
 			$where = $where." AND URAIAN LIKE '%$keyword%'";
 		}
 
-		$sql = "SELECT * FROM admum_jenis_penyakit WHERE $where";
+		if($offset != ""){
+			$asu = 10 + $offset;
+			$limit = "LIMIT $asu";
+		}
+
+		$sql = "SELECT * FROM admum_jenis_penyakit WHERE $where $limit";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}

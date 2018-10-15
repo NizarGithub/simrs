@@ -152,7 +152,8 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 
 	function data_penyakit(){
 		$keyword = $this->input->get('keyword');
-		$data = $this->model->data_penyakit($keyword);
+		$offset = $this->input->get('offset');
+		$data = $this->model->data_penyakit($keyword,$offset);
 		echo json_encode($data);
 	}
 

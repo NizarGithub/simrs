@@ -397,6 +397,10 @@
         <script src="<?php echo base_url(); ?>js-devan/alert.js"></script>
         <script src="<?php echo base_url(); ?>js-devan/js-form.js"></script>
         <script src="<?php echo base_url(); ?>js-devan/pagination.js"></script>
+        <script type="text/javascript">
+            var url = "<?php echo base_url(); ?>";
+        </script>
+        <script src="<?php echo base_url(); ?>datepicker/datetimepicker_css.js"></script>
 
         <!-- Plugins Js -->
         <script src="<?php echo base_url(); ?>assets/plugins/bootstrap-inputmask/bootstrap-inputmask.min.js" type="text/javascript"></script>
@@ -429,7 +433,7 @@
         <script src="http://code.responsivevoice.org/responsivevoice.js"></script>
 
         <script type="text/javascript">
-            var snd = new Audio("<?php echo base_url(); ?>sound/nokia_tune_new.mp3"); // buffers automatically when created
+        var snd = new Audio("<?php echo base_url(); ?>sound/nokia_tune_new.mp3"); // buffers automatically when created
         var timer = 0;
         var level = "<?php echo $level; ?>";
 
