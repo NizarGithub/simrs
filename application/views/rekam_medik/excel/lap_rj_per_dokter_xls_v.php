@@ -41,7 +41,7 @@ $logo = $row->LOGO;
 
 <table align="center">
     <tr>
-        <td align="center" colspan="14">
+        <td align="center" colspan="10">
             <h3>
                 <?php echo $settitle; ?> <br>
                 <?php echo $judul; ?>
@@ -56,11 +56,9 @@ $logo = $row->LOGO;
     <thead>
         <tr>
             <th width="120" style="text-align:center;"> NO</th>
-            <th colspan="2" width="150" style="text-align:center;"> TANGGAL </th>
-            <th colspan="2" width="170" style="text-align:center;"> NO RM </th>
-            <th colspan="5" width="80" style="text-align:center;"> NAMA PASIEN </th>
-            <th colspan="2" width="80" style="text-align:center;"> JENIS KELAMIN </th>
-            <th colspan="2" width="120" style="text-align:center;"> STATUS </th>
+            <th colspan="4" width="150" style="text-align:center;"> NAMA </th>
+            <th colspan="3" width="150" style="text-align:center;"> STATUS </th>
+            <th colspan="2" width="170" style="text-align:center;"> JUMLAH PASIEN </th>
         </tr>
     </thead>
     <tbody>
@@ -69,22 +67,19 @@ $logo = $row->LOGO;
         $total = 0;
         foreach ($dt as $value) {
         	$no++;
-            $total = count($dt);
-            $value->JENIS_KELAMIN = $value->JENIS_KELAMIN=='L'?'Laki - Laki':'Perempuan';
+            $total += $value->JUMLAH_PASIEN;
         ?>
         <tr>
             <td width="120" style="text-align: center;"><?php echo $no; ?></td>
-            <td colspan="2" width="150" style="text-align: center;"><?php echo $value->TANGGAL_DAFTAR; ?></td>
-            <td colspan="2" width="170" style="text-align: center;"><?php echo $value->KODE_PASIEN; ?></td>
-            <td colspan="5" width="150"><?php echo $value->NAMA; ?></td>
-            <td colspan="2" width="80" style="text-align: center;"><?php echo $value->JENIS_KELAMIN; ?></td>
-            <td colspan="2" width="80" style="text-align: center;"><?php echo $value->JENIS_PASIEN; ?></td>
+            <td colspan="4" width="150"><?php echo $value->NAMA; ?></td>
+            <td colspan="3" width="150"><?php echo $value->JABATAN; ?></td>
+            <td colspan="2" width="170" style="text-align: center;"><?php echo $value->JUMLAH_PASIEN; ?></td>
         </tr>
         <?php
             }
         ?>
         <tr>
-        	<td colspan="12" style="text-align: center; font-weight: bold;">TOTAL</td>
+        	<td colspan="8" style="text-align: center; font-weight: bold;">TOTAL</td>
         	<td colspan="2" style="text-align: center; font-weight: bold;"><?php echo number_format($total,0,',','.'); ?></td>
         </tr>
     </tbody>

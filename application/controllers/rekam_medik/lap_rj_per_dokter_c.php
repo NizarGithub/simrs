@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Lap_rj_per_poli_c extends CI_Controller {
+class Lap_rj_per_dokter_c extends CI_Controller {
 
 	function __construct()
 	{
@@ -18,24 +18,24 @@ class Lap_rj_per_poli_c extends CI_Controller {
 	function index()
 	{
 		$data = array(
-			'page' => 'rekam_medik/lap_rj_per_poli_v',
-			'title' => 'Laporan Pasien Per Poli',
-			'subtitle' => 'Laporan Pasien Per Poli',
+			'page' => 'rekam_medik/lap_rj_per_dokter_v',
+			'title' => 'Laporan Pasien Per Dokter',
+			'subtitle' => 'Laporan Pasien Per Dokter',
 			'master_menu' => 'rawat_jalan',
-			'view' => 'per_poli'
+			'view' => 'per_dokter'
 		);
 
 		$this->load->view('rekam_medik/rk_home_v',$data);
 	}
 
-	function query_data($id_poli,$jenis_cetak,$tanggal_awal,$tanggal_akhir,$bulan,$tahun){
-		$where_poli = "1 = 1";
+	function query_data($id_dokter,$jenis_cetak,$tanggal_awal,$tanggal_akhir,$bulan,$tahun){
+		$where_dokter = "1 = 1";
 		$where = "1 = 1";
 
-		if($id_poli == 'Semua'){
-			$where_poli = $where_poli;
+		if($id_dokter == 'Semua'){
+			$where_dokter = $where_dokter;
 		}else{
-			$where_poli = $where_poli." AND a.ID = '$id_poli'";
+			$where_dokter = $where_dokter." AND a.ID = '$id_dokter";
 		}
 
 		if($jenis_cetak == 'Harian'){
@@ -45,28 +45,28 @@ class Lap_rj_per_poli_c extends CI_Controller {
 		}
 
 		$sql = "
-			SELECT
+			SELECT 
 				a.ID,
+				a.ID_JABATAN,
 				a.NAMA,
-				a.`STATUS`,
-				a.KETERANGAN,
-				COUNT(b.ID_PASIEN) AS JUMLAH_PASIEN,
-				b.TANGGAL,
-				b.BULAN,
-				b.TAHUN
-			FROM admum_poli a
+				a.TELPON,
+				b.NAMA AS JABATAN,
+				COUNT(c.ID_PASIEN) AS JUMLAH_PASIEN
+			FROM kepeg_pegawai a
+			JOIN kepeg_kel_jabatan b ON a.ID_JABATAN = b.ID
 			LEFT JOIN (
 				SELECT
 					ID,
-					ID_POLI,
 					ID_PASIEN,
+					ID_DOKTER,
 					TANGGAL,
 					BULAN,
 					TAHUN
 				FROM admum_rawat_jalan
 				WHERE $where
-			) b ON b.ID_POLI = a.ID
-			WHERE $where_poli
+			) c ON c.ID_DOKTER = a.ID
+			WHERE $where_dokter
+			AND b.NAMA LIKE '%Dokter%'
 			GROUP BY a.ID
 			ORDER BY a.ID ASC
 		";
@@ -75,14 +75,14 @@ class Lap_rj_per_poli_c extends CI_Controller {
 	}
 
 	function get_data(){
-		$id_poli = $this->input->post('id_poli');
+		$id_dokter = $this->input->post('id_dokter');
 		$jenis_cetak = $this->input->post('jenis_cetak');
 		$tanggal_awal = $this->input->post('tanggal_awal');
 		$tanggal_akhir = $this->input->post('tanggal_akhir');
 		$bulan = $this->input->post('bulan');
 		$tahun = $this->input->post('tahun');
 
-		$data = $this->query_data($id_poli,$jenis_cetak,$tanggal_awal,$tanggal_akhir,$bulan,$tahun);
+		$data = $this->query_data($id_dokter,$jenis_cetak,$tanggal_awal,$tanggal_akhir,$bulan,$tahun);
 
 		echo json_encode($data);
 	}
@@ -97,7 +97,7 @@ class Lap_rj_per_poli_c extends CI_Controller {
 	}
 
 	function cetak_pdf(){
-		$id_poli = $this->input->post('poli');
+		$id_dokter = $this->input->post('dokter');
 		$jenis_cetak = $this->input->post('jenis_cetak');
 		$tanggal_awal = $this->input->post('tanggal_awal');
 		$tanggal_akhir = $this->input->post('tanggal_akhir');
@@ -118,26 +118,26 @@ class Lap_rj_per_poli_c extends CI_Controller {
 			$judul = 'Bulan '.$bulan_arr[$bulan].' Tahun '.$tahun;
 		}
 
-		if($id_poli == 'Semua'){
-			$settitle = 'Laporan Pasien Semua Poli';
+		if($id_dokter == 'Semua'){
+			$settitle = 'Laporan Pasien Semua Dokter';
 		}else{
-			$settitle = 'Laporan Pasien Per Poli';
+			$settitle = 'Laporan Pasien Per Dokter';
 		}
 
-		$data = $this->query_data($id_poli,$jenis_cetak,$tanggal_awal,$tanggal_akhir,$bulan,$tahun);
+		$data = $this->query_data($id_dokter,$jenis_cetak,$tanggal_awal,$tanggal_akhir,$bulan,$tahun);
 
 		$array = array(
 			'dt' => $data,
 			'judul' => $judul,
 			'settitle' => $settitle,
-			'filename' => date('dmY').'_lap_per_poli'
+			'filename' => date('dmY').'_lap_per_dokter'
 		);
 
-		$this->load->view('rekam_medik/pdf/lap_rj_per_poli_pdf_v',$array);
+		$this->load->view('rekam_medik/pdf/lap_rj_per_dokter_pdf_v',$array);
 	}
 
 	function cetak_excel(){
-		$id_poli = $this->input->post('poli');
+		$id_dokter = $this->input->post('dokter');
 		$jenis_cetak = $this->input->post('jenis_cetak');
 		$tanggal_awal = $this->input->post('tanggal_awal');
 		$tanggal_akhir = $this->input->post('tanggal_akhir');
@@ -158,22 +158,22 @@ class Lap_rj_per_poli_c extends CI_Controller {
 			$judul = 'Bulan '.$bulan_arr[$bulan].' Tahun '.$tahun;
 		}
 
-		if($id_poli == 'Semua'){
-			$settitle = 'Laporan Pasien Semua Poli';
+		if($id_dokter == 'Semua'){
+			$settitle = 'Laporan Pasien Semua Dokter';
 		}else{
-			$settitle = 'Laporan Pasien Per Poli';
+			$settitle = 'Laporan Pasien Per Dokter';
 		}
 
-		$data = $this->query_data($id_poli,$jenis_cetak,$tanggal_awal,$tanggal_akhir,$bulan,$tahun);
+		$data = $this->query_data($id_dokter,$jenis_cetak,$tanggal_awal,$tanggal_akhir,$bulan,$tahun);
 
 		$array = array(
 			'dt' => $data,
 			'judul' => $judul,
 			'settitle' => $settitle,
-			'filename' => date('dmY').'_lap_per_poli'
+			'filename' => date('dmY').'_lap_per_dokter'
 		);
 
-		$this->load->view('rekam_medik/excel/lap_rj_per_poli_xls_v',$array);
+		$this->load->view('rekam_medik/excel/lap_rj_per_dokter_xls_v',$array);
 	}
 
 }

@@ -85,7 +85,7 @@ $logo = $row->LOGO;
         ?>
         <tr>
         	<td colspan="12" style="text-align: center; font-weight: bold;">TOTAL</td>
-        	<td colspan="2" style="text-align: right; font-weight: bold;"><?php echo number_format($total,0,',','.'); ?></td>
+        	<td colspan="2" style="text-align: center; font-weight: bold;"><?php echo number_format($total,0,',','.'); ?></td>
         </tr>
     </tbody>
 </table>
