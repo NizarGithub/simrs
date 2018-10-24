@@ -28,61 +28,51 @@ class Lap_rj_per_jk_c extends CI_Controller {
 		$this->load->view('rekam_medik/rk_home_v',$data);
 	}
 
-	function query_data($id_jk,$jenis_cetak,$tanggal_awal,$tanggal_akhir,$bulan,$tahun){
+	function query_data($jenis_cetak,$jenis_kelamin,$tanggal_awal,$tanggal_akhir,$bulan,$tahun){
 		$where_jk = "1 = 1";
 		$where = "1 = 1";
 
-		if($id_jk == 'Semua'){
+		if($jenis_kelamin == 'Semua'){
 			$where_jk = $where_jk;
 		}else{
-			$where_jk = $where_jk." AND a.ID = '$id_jk";
+			$where_jk = $where_jk." AND a.JENIS_KELAMIN = '$jenis_kelamin'";
 		}
 
 		if($jenis_cetak == 'Harian'){
-			$where = $where." AND STR_TO_DATE(TANGGAL,'%d-%m-%Y') BETWEEN STR_TO_DATE('$tanggal_awal','%d-%m-%Y') AND STR_TO_DATE('$tanggal_akhir','%d-%m-%Y')";
+			$where = $where." AND STR_TO_DATE(a.TANGGAL_DAFTAR,'%d-%m-%Y') BETWEEN STR_TO_DATE('$tanggal_awal','%d-%m-%Y') AND STR_TO_DATE('$tanggal_akhir','%d-%m-%Y')";
 		}else{
-			$where = $where." AND BULAN = '$bulan' AND TAHUN = '$tahun'";
+			$where = $where." AND a.TANGGAL_DAFTAR LIKE '%-$bulan-$tahun%'";
 		}
 
 		$sql = "
-			SELECT 
+			SELECT
 				a.ID,
-				a.ID_JABATAN,
+				a.KODE_PASIEN,
 				a.NAMA,
-				a.TELPON,
-				b.NAMA AS JABATAN,
-				COUNT(c.ID_PASIEN) AS JUMLAH_PASIEN
-			FROM kepeg_pegawai a
-			JOIN kepeg_kel_jabatan b ON a.ID_JABATAN = b.ID
-			LEFT JOIN (
-				SELECT
-					ID,
-					ID_PASIEN,
-					ID_jk,
-					TANGGAL,
-					BULAN,
-					TAHUN
-				FROM admum_rawat_jalan
-				WHERE $where
-			) c ON c.ID_jk = a.ID
-			WHERE $where_jk
-			AND b.NAMA LIKE '%Dokter%'
-			GROUP BY a.ID
-			ORDER BY a.ID ASC
+				a.JENIS_KELAMIN,
+				a.TANGGAL_DAFTAR
+			FROM rk_pasien a
+			WHERE $where
+			AND $where_jk
+			ORDER BY a.ID DESC
 		";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}
 
 	function get_data(){
-		$id_jk = $this->input->post('id_jk');
 		$jenis_cetak = $this->input->post('jenis_cetak');
+		$jenis_kelamin = $this->input->post('jenis_kelamin');
 		$tanggal_awal = $this->input->post('tanggal_awal');
 		$tanggal_akhir = $this->input->post('tanggal_akhir');
 		$bulan = $this->input->post('bulan');
 		$tahun = $this->input->post('tahun');
 
-		$data = $this->query_data($id_jk,$jenis_cetak,$tanggal_awal,$tanggal_akhir,$bulan,$tahun);
+		if($bulan < '10'){
+			$bulan = '0'.$bulan;
+		}
+
+		$data = $this->query_data($jenis_cetak,$jenis_kelamin,$tanggal_awal,$tanggal_akhir,$bulan,$tahun);
 
 		echo json_encode($data);
 	}
@@ -97,12 +87,14 @@ class Lap_rj_per_jk_c extends CI_Controller {
 	}
 
 	function cetak_pdf(){
-		$id_jk = $this->input->post('dokter');
 		$jenis_cetak = $this->input->post('jenis_cetak');
+		$jenis_kelamin = $this->input->post('jenis_kelamin');
 		$tanggal_awal = $this->input->post('tanggal_awal');
 		$tanggal_akhir = $this->input->post('tanggal_akhir');
 		$bulan = $this->input->post('bulan');
 		$tahun = $this->input->post('tahun');
+		$jk = '';
+
 		$settitle = '';
 		$judul = '';
 
@@ -118,13 +110,24 @@ class Lap_rj_per_jk_c extends CI_Controller {
 			$judul = 'Bulan '.$bulan_arr[$bulan].' Tahun '.$tahun;
 		}
 
-		if($id_jk == 'Semua'){
-			$settitle = 'Laporan Pasien Semua Dokter';
+		if($jenis_kelamin == 'Semua'){
+			$settitle = 'Laporan Pasien Semua Jenis Kelamin';
 		}else{
-			$settitle = 'Laporan Pasien Per Dokter';
+			if($jenis_kelamin == 'L'){
+				$jk = 'Laki - Laki';
+			}else if($jenis_kelamin == 'P'){
+				$jk = 'Perempuan';
+			}else{
+				$jk = '';
+			}
+			$settitle = 'Laporan Pasien Jenis Kelamin '.$jk;
 		}
 
-		$data = $this->query_data($id_jk,$jenis_cetak,$tanggal_awal,$tanggal_akhir,$bulan,$tahun);
+		if($bulan < '10'){
+			$bulan = '0'.$bulan;
+		}
+		
+		$data = $this->query_data($jenis_cetak,$jenis_kelamin,$tanggal_awal,$tanggal_akhir,$bulan,$tahun);
 
 		$array = array(
 			'dt' => $data,

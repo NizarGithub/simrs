@@ -35,7 +35,7 @@ class Lap_rj_per_dokter_c extends CI_Controller {
 		if($id_dokter == 'Semua'){
 			$where_dokter = $where_dokter;
 		}else{
-			$where_dokter = $where_dokter." AND a.ID = '$id_dokter";
+			$where_dokter = $where_dokter." AND a.ID = '$id_dokter'";
 		}
 
 		if($jenis_cetak == 'Harian'){

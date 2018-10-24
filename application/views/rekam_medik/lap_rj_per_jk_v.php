@@ -74,8 +74,8 @@ function hitung_tanggal_kurang_dari(){
 function get_data(){
 	$('#popup_load').show();
 
-    var id_dokter = $('#dokter').val();
     var jenis_cetak = $("input[name='jenis_cetak']:checked").val();
+    var jenis_kelamin = $("input[name='jenis_kelamin']:checked").val();
     var tanggal_awal = $('#tanggal_awal').val();
     var tanggal_akhir = $('#tanggal_akhir').val();
     var bulan = $('#bulan').val();
@@ -86,10 +86,10 @@ function get_data(){
     }
 
     ajax = $.ajax({
-        url : '<?php echo base_url(); ?>rekam_medik/lap_rj_per_dokter_c/get_data',
+        url : '<?php echo base_url(); ?>rekam_medik/lap_rj_per_jk_c/get_data',
         data : {
-            id_dokter:id_dokter,
             jenis_cetak:jenis_cetak,
+            jenis_kelamin:jenis_kelamin,
             tanggal_awal:tanggal_awal,
             tanggal_akhir:tanggal_akhir,
             bulan:bulan,
@@ -99,7 +99,6 @@ function get_data(){
         dataType : "json",
         success : function(result){
             $tr = "";
-            var total = 0;
 
             if(result == "" || result == null){
                 $tr = "<tr><td colspan='4' style='text-align:center;'><b>Data tidak ditemukan</b></td></tr>";
@@ -108,19 +107,27 @@ function get_data(){
 
                 for(var i=0; i<result.length; i++){
                     no++;
-                    total += parseInt(result[i].JUMLAH_PASIEN);
+
+                    var jk = '';
+                    if(result[i].JENIS_KELAMIN == 'L'){
+                        jk = 'Laki - Laki'
+                    }else if(result[i].JENIS_KELAMIN == 'P'){
+                        jk = 'Perempuan';
+                    }else{
+                        jk = '-';
+                    }
 
                     $tr += "<tr>"+
                                 "<td style='vertical-align:middle; text-align:center;'>"+no+"</td>"+
+                                "<td style='vertical-align:middle;'>"+result[i].KODE_PASIEN+"</td>"+
                                 "<td style='vertical-align:middle;'>"+result[i].NAMA+"</td>"+
-                                "<td style='vertical-align:middle; text-align:center;'>"+result[i].JABATAN+"</td>"+
-                                "<td style='vertical-align:middle; text-align:center;'>"+formatNumber(result[i].JUMLAH_PASIEN)+"</td>"+
+                                "<td style='vertical-align:middle; text-align:center;'>"+jk+"</td>"+
                             "</tr>";
                 }
             }
 
             $('#tabel_data tbody').html($tr);
-            $('#total_pasien').html(parseInt(total));
+            $('#total_pasien').html(parseInt(result.length));
             $('#popup_load').hide();
         }
     });
@@ -143,10 +150,14 @@ function get_data(){
             </ul>
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane fade in active" id="home1">
-                    <form class="form-horizontal" role="form" method="post" target="_blank" action="<?php echo base_url(); ?>rekam_medik/lap_rj_per_dokter_c/cetak">
+                    <form class="form-horizontal" role="form" method="post" target="_blank" action="<?php echo base_url(); ?>rekam_medik/lap_rj_per_jk_c/cetak">
                         <div class="form-group">
                             <label class="col-sm-1 control-label" style="text-align: left;">Jenis Kelamin</label>
                             <div class="col-md-6">
+                                <div class="radio radio-purple radio-inline">
+                                    <input type="radio" name="jenis_kelamin" value="Semua" id="semua">
+                                    <label for="semua"> Semua </label>
+                                </div>
                                 <div class="radio radio-purple radio-inline">
                                     <input type="radio" name="jenis_kelamin" value="L" id="cowok">
                                     <label for="cowok"> Laki - Laki </label>
@@ -253,9 +264,9 @@ function get_data(){
     	                                    <thead>
     	                                        <tr class="merah">
     	                                            <th style="color:#fff; text-align:center; vertical-align: middle;">No</th>
-                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Dokter</th>
-                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Status</th>
-    	                                            <th style="color:#fff; text-align:center; vertical-align: middle;">Jumlah Pasien</th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">No. RM</th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Nama Pasien</th>
+                                                    <th style="color:#fff; text-align:center; vertical-align: middle;">Jenis Kelamin</th>
     	                                        </tr>
     	                                    </thead>
     	                                    <tbody>
