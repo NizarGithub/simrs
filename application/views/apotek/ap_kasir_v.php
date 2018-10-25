@@ -97,8 +97,13 @@ $user_detail = $this->model->get_user_detail($id_user);
   display: none;
 }
 
+
 #view_tambahan_pj{
   display: none;
+}
+
+#popup_load{
+	display: none;
 }
 </style>
 
@@ -722,7 +727,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                               <div class="col-md-12" style="margin-bottom: 1%;">
                                 <button type="button" id="btn_filter_semua" onclick="get_filter_semua();" style="float: left;" class="btn btn-success">Semua</button>
                                 <button type="button" id="btn_filter_tanggal" onclick="get_filter_tanggal();" style="float: left; margin-left: 1%;" class="btn btn-default">Tanggal</button>
-                                <button type="button" id="btn_filter_poli" onclick="get_filter_poli();" style="float: left; margin-left: 1%;" class="btn btn-default">Poli</button>
+                                <button type="button" id="btn_filter_poli" onclick="get_filter_poli();" style="float: left; margin-left: 1%;" class="btn btn-default">Status</button>
                               </div>
                               <input type="hidden" name="by" id="hidden_filter_semua" value="semua">
                               <input type="hidden" name="by" id="hidden_filter_tanggal" value="tanggal" disabled>
@@ -744,14 +749,10 @@ $user_detail = $this->model->get_user_detail($id_user);
                               <div id="form_poli_filter" style="display: none;">
                                 <div class="col-md-4">
                                   <select class="form-control" name="id_poli" id="result_poli">
-                                    <?php
-                                    $this->db->select('*');
-                                    $this->db->from('admum_poli');
-                                    $result_poli = $this->db->get()->result_array();
-                                    foreach ($result_poli as $rp) {
-                                    ?>
-                                    <option value="<?php echo $rp['ID']; ?>"><?php echo $rp['NAMA']; ?> - <?php echo $rp['STATUS']; ?></option>
-                                    <?php } ?>
+                                    <option value="1">Kasir Rajal</option>
+                                    <option value="2">Penjualan HV / OTC</option>
+                                    <option value="3">Iter Resep</option>
+                                    <option value="4">Kasir Ranap</option>
                                   </select>
                                 </div>
                                 <div class="col-md-1">
@@ -763,8 +764,8 @@ $user_detail = $this->model->get_user_detail($id_user);
                                   <thead>
                                     <tr class="info">
                                       <th>No</th>
+                                      <th>Status</th>
                                       <th>Invoice</th>
-                                      <th>Nama Poli</th>
                                       <th>Tanggal</th>
                                       <th>Total Biaya</th>
                                       <th>Pegawai</th>
@@ -1233,6 +1234,8 @@ $(document).ready(function(){
 
 
     $('#btn_bayar').click(function(){
+      $('#popup_load').show();
+
         $.ajax({
             url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_pembayaran',
             data : $('#form_pembayaran2').serialize(),
@@ -1244,6 +1247,7 @@ $(document).ready(function(){
                 $('#id_pasien').val("");
                 $('#id_poli').val("");
                 $('#jenis_pembayaran').val("");
+                $('#popup_load').fadeOut();
                 var id_rj = $('#id_rj').val();
                 var encodedString = Base64.encode(id_rj);
                 get_invoice();
@@ -1330,8 +1334,8 @@ function data_rekap_pendapatan(){
               no++;
               table += "<tr>"+
                           "<td style='text-align:center;'>"+no+"</td>"+
+                          "<td>"+result[i].STATUS+"</td>"+
                           "<td>"+result[i].INVOICE+"</td>"+
-                          "<td>"+result[i].NAMA_POLI+"</td>"+
                           "<td>"+result[i].TANGGAL+"</td>"+
                           "<td style='text-align:right;'>Rp. "+formatNumber(result[i].TOTAL)+"</td>"+
                           "<td>"+result[i].NAMA_PEGAWAI+"</td>"+
@@ -1351,7 +1355,7 @@ function paging_pendapatan($selector){
     }
     window.tp = new Pagination('#tablePagingpendapatan', {
         itemsCount:$selector.length,
-        pageSize : '10',
+        pageSize : 10,
         onPageSizeChange: function (ps) {
             console.log('changed to ' + ps);
         },
@@ -1464,9 +1468,10 @@ function simpan_closing(){
       var id_tutup = row['id_tutup'];
       simpan_closing_rajal(id_tutup);
       simpan_closing_hv(id_tutup);
-      simpan_closing_paket(id_tutup);
+      // simpan_closing_paket(id_tutup);
       simpan_closing_ranap(id_tutup);
       simpan_closing_entry(id_tutup);
+      window.open('<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/tutup_rekap_pendapatan/'+id_tutup, '_blank', 'location=yes,height=570,width=520,scrollbars=yes,status=yes');
       $('#btn_tutup_closing').click();
       $('#notif_sukses').click();
       snd.pause();
@@ -1546,40 +1551,40 @@ function simpan_closing_hv(id_tutup){
   });
 }
 
-function simpan_closing_paket(id_tutup){
-  var id_pegawai = $('#id_pegawai').val();
-  var shift = $('#shift').val();
-  $("input[name='id_paket[]']").each(function(idx, elm){
-    var id_paket = elm.value;
-    var status_bayar = $('#id_status_bayar_'+id_paket).val();
-    var total_paket = $('#total_semua_'+id_paket).val();
-    var invoice = $('#id_invoice_'+id_paket).val();
-    var tipe = 3;
-
-    if (status_bayar == '1') {
-      $.ajax({
-        url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing_paket',
-        data : {
-          id_paket:id_paket,
-          tipe:tipe,
-          total_paket:total_paket,
-          id_pegawai:id_pegawai,
-          shift:shift,
-          id_tutup:id_tutup,
-          invoice:invoice
-        },
-        type : "POST",
-        dataType : "json",
-        success : function(){
-          console.log();
-        }
-      });
-    }else {
-
-    }
-
-  });
-}
+// function simpan_closing_paket(id_tutup){
+//   var id_pegawai = $('#id_pegawai').val();
+//   var shift = $('#shift').val();
+//   $("input[name='id_paket[]']").each(function(idx, elm){
+//     var id_paket = elm.value;
+//     var status_bayar = $('#id_status_bayar_'+id_paket).val();
+//     var total_paket = $('#total_semua_'+id_paket).val();
+//     var invoice = $('#id_invoice_'+id_paket).val();
+//     var tipe = 3;
+//
+//     if (status_bayar == '1') {
+//       $.ajax({
+//         url : '<?php //echo base_url(); ?>apotek/ap_kasir_rajal_c/simpan_closing_paket',
+//         data : {
+//           id_paket:id_paket,
+//           tipe:tipe,
+//           total_paket:total_paket,
+//           id_pegawai:id_pegawai,
+//           shift:shift,
+//           id_tutup:id_tutup,
+//           invoice:invoice
+//         },
+//         type : "POST",
+//         dataType : "json",
+//         success : function(){
+//           console.log();
+//         }
+//       });
+//     }else {
+//
+//     }
+//
+//   });
+// }
 
 function simpan_closing_ranap(id_tutup){
   var id_pegawai = $('#id_pegawai').val();
@@ -1752,9 +1757,11 @@ function get_pasien(){
                         aksi = "<button class='btn btn-dark btn-transparent' type='button' onclick='klik_pasien("+result[i].ID+","+result[i].ID_PASIEN+","+result[i].TOTAL+");'>"+formatNumber(result[i].TOTAL)+"</button>";
                       }else if (result[i].TIPE == '2') {
                         aksi = "<button class='btn btn-dark btn-transparent' type='button' onclick='klik_invoice("+result[i].ID+","+result[i].TOTAL+","+result[i].TIPE+","+result[i].NAMA+","+result[i].INVOICE+");'>"+formatNumber(result[i].TOTAL)+"</button>";
-                      }else if (result[i].TIPE == '3') {
-                        aksi = "<button class='btn btn-dark btn-transparent' type='button' onclick='klik_invoice("+result[i].ID+","+result[i].TOTAL+","+result[i].TIPE+","+result[i].NAMA+","+result[i].INVOICE+");'>"+formatNumber(result[i].TOTAL)+"</button>";
-                      }else if (result[i].TIPE == '4') {
+                      }
+                      // else if (result[i].TIPE == '3') {
+                      //   aksi = "<button class='btn btn-dark btn-transparent' type='button' onclick='klik_invoice("+result[i].ID+","+result[i].TOTAL+","+result[i].TIPE+","+result[i].NAMA+","+result[i].INVOICE+");'>"+formatNumber(result[i].TOTAL)+"</button>";
+                      // }
+                      else if (result[i].TIPE == '4') {
                         aksi = "<button class='btn btn-dark btn-transparent' type='button' onclick='klik_invoice("+result[i].ID+","+result[i].TOTAL+","+result[i].TIPE+","+result[i].ID_PASIEN+","+result[i].INVOICE+");'>"+formatNumber(result[i].TOTAL)+"</button>";
                       }else if (result[i].TIPE == '5') {
                         aksi = "<button class='btn btn-dark btn-transparent' type='button' onclick='klik_invoice("+result[i].ID+","+result[i].TOTAL+","+result[i].TIPE+",&quot;"+result[i].NAMA+"&quot;,"+result[i].INVOICE+");'>"+formatNumber(result[i].TOTAL)+"</button>";
@@ -1764,9 +1771,11 @@ function get_pasien(){
                         aksi = "<button class='btn btn-success' type='button' onclick='klik_detail_pasien("+result[i].ID+","+result[i].TIPE+");'><i class='fa fa-check-square-o'></i> "+formatNumber(result[i].TOTAL)+"</button>";
                       }else if (result[i].TIPE == '2') {
                         aksi = "<button class='btn btn-success' type='button'><i class='fa fa-check-square-o'></i>"+formatNumber(result[i].TOTAL)+"</button>";
-                      }else if (result[i].TIPE == '3') {
-                        aksi = "<button class='btn btn-success' type='button'><i class='fa fa-check-square-o'></i>"+formatNumber(result[i].TOTAL)+"</button>";
-                      }else if (result[i].TIPE == '4') {
+                      }
+                      // else if (result[i].TIPE == '3') {
+                      //   aksi = "<button class='btn btn-success' type='button'><i class='fa fa-check-square-o'></i>"+formatNumber(result[i].TOTAL)+"</button>";
+                      // }
+                      else if (result[i].TIPE == '4') {
                         aksi = "<button class='btn btn-success' type='button' onclick='klik_detail_pasien("+result[i].ID+","+result[i].TIPE+");'><i class='fa fa-check-square-o'></i> "+formatNumber(result[i].TOTAL)+"</button>";
                       }else if (result[i].TIPE == '5') {
                         aksi = "<button class='btn btn-success' type='button' onclick='klik_detail_pasien("+result[i].ID+","+result[i].TIPE+");'><i class='fa fa-check-square-o'></i> "+formatNumber(result[i].TOTAL)+"</button>";
@@ -1799,9 +1808,11 @@ function get_pasien(){
                       status = "<span class='label label-success'><b>"+result[i].STATUS+"</b></span>";
                     }else if (result[i].STATUS == 'Penjualan HV / OTC') {
                       status = "<span class='label label-info'><b>"+result[i].STATUS+"</b></span>";
-                    }else if (result[i].STATUS == 'Penjualan Paket') {
-                      status = "<span class='label label-warning'><b>"+result[i].STATUS+"</b></span>";
-                    }else if (result[i].STATUS == 'Rawat Inap') {
+                    }
+                    // else if (result[i].STATUS == 'Penjualan Paket') {
+                    //   status = "<span class='label label-warning'><b>"+result[i].STATUS+"</b></span>";
+                    // }
+                    else if (result[i].STATUS == 'Rawat Inap') {
                       status = "<span class='label label-primary'><b>"+result[i].STATUS+"</b></span>";
                     }else if (result[i].STATUS == 'Entry Resep') {
                       status = "<span class='label' style='background-color: #B57EE0;'><b>"+result[i].STATUS+"</b></span>";
@@ -1821,12 +1832,14 @@ function get_pasien(){
                       total_semua = "<input type='hidden' value='"+result[i].TOTAL+"' id='total_semua_"+result[i].ID_HV+"' name='total[]'>";
                       invoice_semua = "<input type='hidden' value='"+result[i].INVOICE+"' id='id_invoice_"+result[i].ID_HV+"' name='invoice[]'>";
                       sts_bayar = "<input type='hidden' value='"+result[i].STS_BAYAR+"' id='id_status_bayar_"+result[i].ID_HV+"'>";
-                    }else if (result[i].TIPE == '3') {
-                      id_semua = "<input type='hidden' value='"+result[i].ID_PAKET+"' name='id_paket[]'>";
-                      total_semua = "<input type='hidden' value='"+result[i].TOTAL+"' id='total_semua_"+result[i].ID_PAKET+"' name='total[]'>";
-                      invoice_semua = "<input type='hidden' value='"+result[i].INVOICE+"' id='id_invoice_"+result[i].ID_PAKET+"' name='invoice[]'>";
-                      sts_bayar = "<input type='hidden' value='"+result[i].STS_BAYAR+"' id='id_status_bayar_"+result[i].ID_PAKET+"'>";
-                    }else if (result[i].TIPE == '4') {
+                    }
+                    // else if (result[i].TIPE == '3') {
+                    //   id_semua = "<input type='hidden' value='"+result[i].ID_PAKET+"' name='id_paket[]'>";
+                    //   total_semua = "<input type='hidden' value='"+result[i].TOTAL+"' id='total_semua_"+result[i].ID_PAKET+"' name='total[]'>";
+                    //   invoice_semua = "<input type='hidden' value='"+result[i].INVOICE+"' id='id_invoice_"+result[i].ID_PAKET+"' name='invoice[]'>";
+                    //   sts_bayar = "<input type='hidden' value='"+result[i].STS_BAYAR+"' id='id_status_bayar_"+result[i].ID_PAKET+"'>";
+                    // }
+                    else if (result[i].TIPE == '4') {
                       id_semua = "<input type='hidden' value='"+result[i].ID_RESEP_RANAP+"' name='id_ranap[]'>";
                       total_semua = "<input type='hidden' value='"+result[i].TOTAL+"' id='total_semua_"+result[i].ID_RESEP_RANAP+"' name='total[]'>";
                       invoice_semua = "<input type='hidden' value='"+result[i].INVOICE+"' id='id_invoice_"+result[i].ID_RESEP_RANAP+"' name='invoice[]'>";
@@ -1956,21 +1969,23 @@ function klik_invoice(id,total,tipe,invoice,inv){
               $('#invoice_text').html(invoice);
           }
       });
-    }else if (tipe == '3') {
-      $.ajax({
-          url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/get_paket_by_id',
-          data : {id:id},
-          type : "POST",
-          dataType : "json",
-          success : function(row){
-              $('#id_pj').val(id);
-              $('#invoice_pj').val(invoice);
-              $('#grandtotal_pj').val(formatNumber(total));
-              $('#tipe_pj').val(tipe);
-              $('#invoice_text').html(invoice);
-          }
-      });
-  }else if (tipe == '4') {
+    }
+  //   else if (tipe == '3') {
+  //     $.ajax({
+  //         url : '<?php //echo base_url(); ?>apotek/ap_kasir_rajal_c/get_paket_by_id',
+  //         data : {id:id},
+  //         type : "POST",
+  //         dataType : "json",
+  //         success : function(row){
+  //             $('#id_pj').val(id);
+  //             $('#invoice_pj').val(invoice);
+  //             $('#grandtotal_pj').val(formatNumber(total));
+  //             $('#tipe_pj').val(tipe);
+  //             $('#invoice_text').html(invoice);
+  //         }
+  //     });
+  // }
+  else if (tipe == '4') {
     $.ajax({
         url : '<?php echo base_url(); ?>apotek/ap_kasir_rajal_c/get_ranap_by_id',
         data : {id:id},
@@ -2048,6 +2063,7 @@ function get_resep(id_pasien){
                                 '<td style="text-align:right;">'+formatNumber(res['det'][i].SUBTOTAL)+'</td>'+
                             '</tr>';
                 }
+
 
                 $('#biaya_resep').val(formatNumber(total_resep));
             }
@@ -2383,8 +2399,8 @@ function tanggal_filter(){
               no++;
               table += "<tr>"+
                           "<td style='text-align:center;'>"+no+"</td>"+
+                          "<td>"+result[i].STATUS+"</td>"+
                           "<td>"+result[i].INVOICE+"</td>"+
-                          "<td>"+result[i].NAMA_POLI+"</td>"+
                           "<td>"+result[i].TANGGAL+"</td>"+
                           "<td style='text-align:right;'>Rp. "+formatNumber(result[i].TOTAL)+"</td>"+
                           "<td>"+result[i].NAMA_PEGAWAI+"</td>"+
@@ -2393,6 +2409,7 @@ function tanggal_filter(){
           }
       }
       $('#tabel_rekap_pendapatan tbody').html(table);
+      paging_pendapatan();
     }
   });
 }
@@ -2416,8 +2433,8 @@ function poli_filter(){
               no++;
               table += "<tr>"+
                           "<td style='text-align:center;'>"+no+"</td>"+
+                          "<td>"+result[i].STATUS+"</td>"+
                           "<td>"+result[i].INVOICE+"</td>"+
-                          "<td>"+result[i].NAMA_POLI+"</td>"+
                           "<td>"+result[i].TANGGAL+"</td>"+
                           "<td style='text-align:right;'>Rp. "+formatNumber(result[i].TOTAL)+"</td>"+
                           "<td>"+result[i].NAMA_PEGAWAI+"</td>"+
@@ -2426,6 +2443,7 @@ function poli_filter(){
           }
       }
       $('#tabel_rekap_pendapatan tbody').html(table);
+      paging_pendapatan();
     }
   });
 }
@@ -2445,8 +2463,8 @@ function semua_filter(){
               no++;
               table += "<tr>"+
                           "<td style='text-align:center;'>"+no+"</td>"+
+                          "<td>"+result[i].STATUS+"</td>"+
                           "<td>"+result[i].INVOICE+"</td>"+
-                          "<td>"+result[i].NAMA_POLI+"</td>"+
                           "<td>"+result[i].TANGGAL+"</td>"+
                           "<td style='text-align:right;'>Rp. "+formatNumber(result[i].TOTAL)+"</td>"+
                           "<td>"+result[i].NAMA_PEGAWAI+"</td>"+
@@ -2455,6 +2473,7 @@ function semua_filter(){
           }
       }
       $('#tabel_rekap_pendapatan tbody').html(table);
+      paging_pendapatan();
     }
   });
 }

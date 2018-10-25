@@ -55,6 +55,16 @@ $user_detail = $this->model->get_user_detail($id_user);
 	display: none;
 	cursor: pointer;
 }
+
+#kunci_obat{
+	background: #fff; z-index: 9999;
+	opacity:0.5;
+	filter:alpha(opacity=80); /* For IE8 and earlier */
+	visibility:visible;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+}
 </style>
 </head>
 <!-- <div id="popup_load">
@@ -111,10 +121,15 @@ $user_detail = $this->model->get_user_detail($id_user);
                 <div id="nama_menu_cari_head">
                     <div class="form-group">
                         <!-- <label class="form-label"><strong>Pencarian</strong> Obat</label> -->
-                        <div class="controls">
+												<div class="controls">
+                            <input type="text" id="cari_nama_pasien" class="glowing form-control" value="" placeholder="Ketikkan pasien yang ingin dicari ...">
+                        </div>
+												<br>
+												<div class="controls">
                             <input type="text" id="cari_nama_menu" class="glowing form-control" value="" placeholder="Ketikkan obat yang ingin dicari ...">
                         </div>
                     </div>
+
                 </div>
             </div>
             </center>
@@ -122,23 +137,26 @@ $user_detail = $this->model->get_user_detail($id_user);
                 <div class="row media-manager">
                     <div class="margin-bottom-30"></div>
 
-										<div class="col-sm-6">
-												<div class="panel panel-default">
-														<div class="panel-heading clearfix pos-rel">
-															<div class="pos-abs top-12 l-15 f-18 c-gray"><i class="fa fa-table"></i></div>
-															<h2 class="panel-title width-100p c-red text-center w-500 f-20 carrois">Data Obat</h2>
-														</div>
-														<div class="panel-body messages">
-															<div class="row">
-																<div class="col-md-12 col-sm-12 col-xs-12">
-																	<div class="scroll-y" style="height: 477px;" id="tabel_obat">
+										<div id="kunci_obat" class="class_kunci_obat">
+											<div class="col-sm-6">
+													<div class="panel panel-default">
+															<div class="panel-heading clearfix pos-rel">
+																<div class="pos-abs top-12 l-15 f-18 c-gray"><i class="fa fa-table"></i></div>
+																<h2 class="panel-title width-100p c-red text-center w-500 f-20 carrois">Data Obat</h2>
+															</div>
+															<div class="panel-body messages">
+																<div class="row">
+																	<div class="col-md-12 col-sm-12 col-xs-12">
+																		<div class="scroll-y" style="height: 477px;" id="tabel_obat">
 
+																		</div>
 																	</div>
 																</div>
 															</div>
-														</div>
-												</div>
+													</div>
+											</div>
 										</div>
+
 										<div class="col-sm-6">
 												<div class="panel panel-default">
 														<div class="panel-heading clearfix pos-rel">
@@ -585,6 +603,14 @@ $(document).ready(function(){
 
 	data_pasien_iter();
 
+	setInterval(function () {
+			data_obat();
+	}, 5000);
+
+	setInterval(function () {
+			data_pasien_iter();
+	}, 5000);
+
 	get_invoice();
 
 	// get_kode_trx();
@@ -665,6 +691,7 @@ function simpan_proses(){
 			// window.open('<?php echo base_url(); ?>apotek/ap_entry_resep_c/cetak/'+id, '_blank', 'location=yes,height=700,width=600,scrollbars=yes,status=yes');
 			data_pasien_iter();
 			data_obat();
+			$('.class_kunci_obat').attr('id','kunci_obat');
 			$('.btn_hapus_row').click();
 			$('#btn_tidak_proses').click();
 			$('#notif_berhasil').click();
@@ -839,7 +866,7 @@ function klik_obat(id, harga_beli, service){
 }
 
 function data_pasien_iter(){
-	var keyword = $('#cari_nama_menu').val();
+	var keyword = $('#cari_nama_pasien').val();
 	var tanggal_sekarang = $('#date_now').val();
 	$.ajax({
 			url : '<?php echo base_url(); ?>apotek/ap_entry_resep_c/data_pasien_iter',
@@ -874,11 +901,12 @@ function data_pasien_iter(){
 															''+gambar_kelamin+''+
 																'<div class="media-body">'+
                                 // ''+kadal+''+
-																'<div class="col-md-3">'+
+																'<small class="pull-right" style="color: black;">Iter : '+result[i].ITER+'</small>'+
+																'<div class="col-md-2">'+
 																	'<h5 class="c-dark"><strong>'+result[i].KODE_RESEP+'</strong></h5>'+
 																	'<h4 class="c-dark">'+result[i].NAMA_PASIEN+'</h4>'+
 																'</div>'+
-                                '<div class="col-md-3">'+
+                                '<div class="col-md-2">'+
 																		'<h5 class="c-dark"><strong>Dokter</strong></h5>'+
 																		'<h4 class="c-dark">'+result[i].NAMA_DOKTER+'</h4>'+
 																'</div>'+
@@ -890,6 +918,10 @@ function data_pasien_iter(){
 																			'<h5 class="c-dark"><strong>Total Harga</strong></h5>'+
 																			'<h4 class="c-dark">Rp. '+NumberToMoney(result[i].TOTAL_DGN_SERVICE)+'</h4>'+
 																'</div>'+
+																// '<div class="col-md-2">'+
+																// 			'<h5 class="c-dark"><strong>Iter</strong></h5>'+
+																// 			'<h4 class="c-dark">'+result[i].ITER+'</h4>'+
+																// '</div>'+
 															'</div>'+
 														'</div>'+
 													'</a>';
@@ -898,12 +930,13 @@ function data_pasien_iter(){
 					$('#tabel_pasien_iter').html($tr);
 			}
 	});
-	// $('#cari_nama_menu').off('keyup').keyup(function(){
-	// 		data_obat();
-	// });
+	$('#cari_nama_pasien').off('keyup').keyup(function(){
+			data_pasien_iter();
+	});
 }
 
 function klik_pasien_iter(id_resep, id_pasien, id_dokter){
+	$('.class_kunci_obat').removeAttr('id','kunci_obat');
 	$.ajax({
 		url : '<?php echo base_url(); ?>apotek/ap_entry_resep_c/get_pasien_iter',
 		data : {

@@ -39,7 +39,8 @@ class Ap_entry_paket_c extends CI_Controller {
   }
 
   function get_data_paket(){
-    $data = $this->model->get_data_paket();
+		$keyword = $this->input->get('keyword');
+    $data = $this->model->get_data_paket($keyword);
     echo json_encode($data);
   }
 
@@ -96,10 +97,11 @@ class Ap_entry_paket_c extends CI_Controller {
     $total_keranjang_name = $this->input->post('total_keranjang_name');
     $jumlah_beli = $this->input->post('jumlah_beli');
     $harga_obat = $this->input->post('harga_obat');
-    $id_dokter = $this->input->post('id_dokter');
-    $id_paket = $this->input->post('id_paket');
-		$id_pasien = $this->input->post('id_pasien');
+		$id_paket = $this->input->post('id_paket');
 		$service = $this->input->post('service');
+		$biaya_paket_obat = $this->input->post('biaya_paket_obat');
+    // $id_dokter = $this->input->post('id_dokter');
+		// $id_pasien = $this->input->post('id_pasien');
 
     $invoice = $this->input->post('invoice');
     $shift = $this->input->post('shift');
@@ -115,23 +117,21 @@ class Ap_entry_paket_c extends CI_Controller {
       'SHIFT' => $shift,
       'ID_PEGAWAI' => $id_pegawai,
       'TOTAL' => $total,
-      'STATUS' => 'Penjualan Paket',
-      'ID_DOKTER' => $id_dokter,
-      'ID_PAKET' => $id_paket,
-			'ID_PASIEN' => $id_pasien,
+			'BIAYA_PAKET_OBAT' => $biaya_paket_obat,
+			'ID_PAKET' => $id_paket,
 			'TANGGAL' => $tanggal,
 			'BULAN' => $bulan,
 			'TAHUN' => $tahun,
 			'WAKTU' => $waktu
     );
-    $this->db->insert('ap_penjualan_obat_paket', $data);
-    $id_penjualan_obat_paket = $this->db->insert_id();
+    $this->db->insert('setup_paket_obat', $data);
+    $id_setup_paket = $this->db->insert_id();
 
     foreach ($id_gudang_obat as $key => $value){
-      $this->model->simpan_proses($value, $total_keranjang_name[$key], $jumlah_beli[$key], $harga_obat[$key], $id_penjualan_obat_paket, $service[$key]);
+      $this->model->simpan_proses($value, $total_keranjang_name[$key], $jumlah_beli[$key], $harga_obat[$key], $id_setup_paket, $service[$key]);
     }
 
-    $sql = $this->db->query("SELECT * FROM ap_penjualan_obat_paket WHERE ID = '$id_penjualan_obat_paket'");
+    $sql = $this->db->query("SELECT * FROM setup_paket_obat WHERE ID = '$id_setup_paket'");
     $back = $sql->row_array();
     echo json_encode($back);
 

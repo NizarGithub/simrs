@@ -77,30 +77,30 @@ class Ap_kasir_rajal_m extends CI_Model {
 
 						UNION ALL
 
-						SELECT
-							a.ID,
-							a.TANGGAL,
-							'' AS ID_PASIEN,
-							a.INVOICE AS NAMA,
-							a.STS_BAYAR,
-							'' AS ID_KASIR_RAJAL,
-							'0' AS TOT_POLI,
-							'0' AS TOT_TDK,
-							'0' AS TOT_RESEP,
-							a.TOTAL AS TOT_TARIF,
-							'0' AS BIAYA_REG,
-							'0' AS BIAYA_ADMIN,
-							a.STATUS,
-							'3' AS TIPE,
-							a.STATUS_CLOSING,
-							'' AS ID_HV,
-							a.ID AS ID_PAKET,
-							'' AS ID_RESEP_RANAP,
-							'' AS ID_ENTRY_RESEP,
-							a.INVOICE
-						FROM ap_penjualan_obat_paket a
-
-						UNION ALL
+						-- SELECT
+						-- 	a.ID,
+						-- 	a.TANGGAL,
+						-- 	'' AS ID_PASIEN,
+						-- 	a.INVOICE AS NAMA,
+						-- 	a.STS_BAYAR,
+						-- 	'' AS ID_KASIR_RAJAL,
+						-- 	'0' AS TOT_POLI,
+						-- 	'0' AS TOT_TDK,
+						-- 	'0' AS TOT_RESEP,
+						-- 	a.TOTAL AS TOT_TARIF,
+						-- 	'0' AS BIAYA_REG,
+						-- 	'0' AS BIAYA_ADMIN,
+						-- 	a.STATUS,
+						-- 	'3' AS TIPE,
+						-- 	a.STATUS_CLOSING,
+						-- 	'' AS ID_HV,
+						-- 	a.ID AS ID_PAKET,
+						-- 	'' AS ID_RESEP_RANAP,
+						-- 	'' AS ID_ENTRY_RESEP,
+						-- 	a.INVOICE
+						-- FROM ap_penjualan_obat_paket a
+						--
+						-- UNION ALL
 
 						SELECT
 							a.ID,
@@ -207,6 +207,7 @@ class Ap_kasir_rajal_m extends CI_Model {
 							DET.HARGA,
 							DET.JUMLAH_BELI,
 							DET.SUBTOTAL
+							-- IFNULL(DET.SUBTOTAL,0) AS SUBTOTAL
 						FROM rk_resep_detail_rj DET
 						LEFT JOIN admum_setup_nama_obat NM_OBT ON NM_OBT.ID = DET.ID_OBAT
 						WHERE DET.ID_RESEP = '$id_resep'
@@ -831,27 +832,27 @@ class Ap_kasir_rajal_m extends CI_Model {
     $this->db->update('ap_penjualan_obat_hv', $data_update);
 	}
 
-	function simpan_closing_paket($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup, $invoice){
-		$data = array(
-			'ID_TUTUP' => $id_tutup,
-			'ID_PAKET' => $id_semua,
-			'TANGGAL' => $tanggal,
-			'WAKTU' => $pukul,
-			'ID_PEGAWAI' => $id_pegawai,
-			'SHIFT' => $shift,
-			'TOTAL' => $total,
-			'INVOICE' => $invoice,
-			'STATUS' => 'Penjualan Paket'
-		);
-
-	  $this->db->insert('ap_tutup_kasir_rajal_detail', $data);
-
-		$data_update = array(
-			'STATUS_CLOSING' => 1
-		);
-		$this->db->where('ID', $id_semua);
-    $this->db->update('ap_penjualan_obat_paket', $data_update);
-	}
+	// function simpan_closing_paket($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup, $invoice){
+	// 	$data = array(
+	// 		'ID_TUTUP' => $id_tutup,
+	// 		'ID_PAKET' => $id_semua,
+	// 		'TANGGAL' => $tanggal,
+	// 		'WAKTU' => $pukul,
+	// 		'ID_PEGAWAI' => $id_pegawai,
+	// 		'SHIFT' => $shift,
+	// 		'TOTAL' => $total,
+	// 		'INVOICE' => $invoice,
+	// 		'STATUS' => 'Penjualan Paket'
+	// 	);
+	//
+	//   $this->db->insert('ap_tutup_kasir_rajal_detail', $data);
+	//
+	// 	$data_update = array(
+	// 		'STATUS_CLOSING' => 1
+	// 	);
+	// 	$this->db->where('ID', $id_semua);
+  //   $this->db->update('ap_penjualan_obat_paket', $data_update);
+	// }
 
 	function simpan_closing_ranap($id_semua, $id_pegawai, $shift, $tanggal, $pukul, $total, $id_tutup, $invoice){
 		$data = array(
@@ -919,15 +920,20 @@ class Ap_kasir_rajal_m extends CI_Model {
 
 	function data_rekap_pendapatan(){
 		$query = $this->db->query("SELECT
+																*
+																FROM
+																(SELECT
 																PEM.ID,
 																PEM.TANGGAL,
 																PEM.SHIFT,
 																PEM.INVOICE,
 																PEM.TOTAL,
-																RAJAL.ID AS ID_RAJAL,
 																PEGAWAI.NAMA AS NAMA_PEGAWAI,
+																'Kasir Rajal' AS STATUS,
+																'1' AS TIPE,
 																RESEP.KODE_RESEP,
-																POLI.NAMA AS NAMA_POLI
+																POLI.NAMA AS NAMA_POLI,
+																RAJAL.ID AS ID_SEMUA
 																FROM
 																rk_pembayaran_kasir AS PEM
 																LEFT JOIN rk_pasien AS PASIEN ON PEM.ID_PASIEN=PASIEN.ID
@@ -935,21 +941,88 @@ class Ap_kasir_rajal_m extends CI_Model {
 																LEFT JOIN rk_resep_rj RESEP ON RESEP.ID_PELAYANAN=RAJAL.ID
 																LEFT JOIN kepeg_pegawai AS PEGAWAI ON PEM.ID_PEGAWAI=PEGAWAI.ID
 																LEFT JOIN admum_poli AS POLI ON PEM.ID_POLI=POLI.ID
+
+																UNION ALL
+
+																SELECT
+																a.ID,
+																a.TANGGAL,
+																a.SHIFT,
+																c.INVOICE,
+																a.TOTAL,
+																b.NAMA AS NAMA_PEGAWAI,
+																c.STATUS,
+																'2' AS TIPE,
+																'' AS KODE_RESEP,
+																'' AS NAMA_POLI,
+																a.ID_PENJUALAN_HV AS ID_SEMUA
+																FROM
+																ap_pembayaran_hv a
+																LEFT JOIN kepeg_pegawai b ON a.ID_PEGAWAI = b.ID
+																LEFT JOIN ap_penjualan_obat_hv c ON a.ID_PENJUALAN_HV = c.ID
+
+																UNION ALL
+
+																SELECT
+																a.ID,
+																a.TANGGAL,
+																a.SHIFT,
+																c.INVOICE,
+																a.TOTAL,
+																b.NAMA AS NAMA_PEGAWAI,
+																'Iter Resep' AS STATUS,
+																'3' AS TIPE,
+																'' AS KODE_RESEP,
+																'' AS NAMA_POLI,
+																a.ID_ITER AS ID_SEMUA
+																FROM
+																ap_pembayaran_iter a
+																LEFT JOIN kepeg_pegawai b ON a.ID_PEGAWAI = b.ID
+																LEFT JOIN ap_iter c ON a.ID_ITER = c.ID
+
+																UNION ALL
+
+																SELECT
+																PEM.ID,
+																PEM.TANGGAL,
+																PEM.SHIFT,
+																RESEP.KODE_RESEP AS INVOICE,
+																PEM.TOTAL,
+																PEGAWAI.NAMA AS NAMA_PEGAWAI,
+																'Kasir Ranap' AS STATUS,
+																'4' AS TIPE,
+																RESEP.KODE_RESEP,
+																POLI.NAMA AS NAMA_POLI,
+																PEM.ID_RESEP_RANAP AS ID_SEMUA
+																FROM
+																rk_pembayaran_resep_ranap AS PEM
+																LEFT JOIN rk_ri_resep RESEP ON RESEP.ID=PEM.ID_RESEP_RANAP
+																LEFT JOIN admum_rawat_inap AS RANAP ON RESEP.ID_PELAYANAN=RANAP.ID
+																LEFT JOIN kepeg_pegawai AS PEGAWAI ON PEM.ID_PEGAWAI=PEGAWAI.ID
+																LEFT JOIN admum_poli AS POLI ON RANAP.ID_POLI=POLI.ID)
+																a
+																ORDER BY
+														    STR_TO_DATE(a.TANGGAL,'%d-%m-%Y') DESC
 		");
 		return $query->result_array();
 	}
 
 	function tanggal_filter($tanggal_sekarang, $tanggal_sampai){
 		$query = $this->db->query("SELECT
+																*
+																FROM
+																(SELECT
 																PEM.ID,
 																PEM.TANGGAL,
 																PEM.SHIFT,
 																PEM.INVOICE,
 																PEM.TOTAL,
-																RAJAL.ID AS ID_RAJAL,
 																PEGAWAI.NAMA AS NAMA_PEGAWAI,
+																'Kasir Rajal' AS STATUS,
+																'1' AS TIPE,
 																RESEP.KODE_RESEP,
-																POLI.NAMA AS NAMA_POLI
+																POLI.NAMA AS NAMA_POLI,
+																RAJAL.ID AS ID_SEMUA
 																FROM
 																rk_pembayaran_kasir AS PEM
 																LEFT JOIN rk_pasien AS PASIEN ON PEM.ID_PASIEN=PASIEN.ID
@@ -957,23 +1030,113 @@ class Ap_kasir_rajal_m extends CI_Model {
 																LEFT JOIN rk_resep_rj RESEP ON RESEP.ID_PELAYANAN=RAJAL.ID
 																LEFT JOIN kepeg_pegawai AS PEGAWAI ON PEM.ID_PEGAWAI=PEGAWAI.ID
 																LEFT JOIN admum_poli AS POLI ON PEM.ID_POLI=POLI.ID
-																WHERE STR_TO_DATE(PEM.TANGGAL,'%d-%m-%Y') >= STR_TO_DATE('$tanggal_sekarang','%d-%m-%Y')
-										            AND STR_TO_DATE(PEM.TANGGAL,'%d-%m-%Y') <= STR_TO_DATE('$tanggal_sampai','%d-%m-%Y')
+
+																UNION ALL
+
+																SELECT
+																a.ID,
+																a.TANGGAL,
+																a.SHIFT,
+																c.INVOICE,
+																a.TOTAL,
+																b.NAMA AS NAMA_PEGAWAI,
+																c.STATUS,
+																'2' AS TIPE,
+																'' AS KODE_RESEP,
+																'' AS NAMA_POLI,
+																a.ID_PENJUALAN_HV AS ID_SEMUA
+																FROM
+																ap_pembayaran_hv a
+																LEFT JOIN kepeg_pegawai b ON a.ID_PEGAWAI = b.ID
+																LEFT JOIN ap_penjualan_obat_hv c ON a.ID_PENJUALAN_HV = c.ID
+
+																UNION ALL
+
+																SELECT
+																a.ID,
+																a.TANGGAL,
+																a.SHIFT,
+																c.INVOICE,
+																a.TOTAL,
+																b.NAMA AS NAMA_PEGAWAI,
+																'Iter Resep' AS STATUS,
+																'3' AS TIPE,
+																'' AS KODE_RESEP,
+																'' AS NAMA_POLI,
+																a.ID_ITER AS ID_SEMUA
+																FROM
+																ap_pembayaran_iter a
+																LEFT JOIN kepeg_pegawai b ON a.ID_PEGAWAI = b.ID
+																LEFT JOIN ap_iter c ON a.ID_ITER = c.ID
+
+																UNION ALL
+
+																SELECT
+																PEM.ID,
+																PEM.TANGGAL,
+																PEM.SHIFT,
+																RESEP.KODE_RESEP AS INVOICE,
+																PEM.TOTAL,
+																PEGAWAI.NAMA AS NAMA_PEGAWAI,
+																'Kasir Ranap' AS STATUS,
+																'4' AS TIPE,
+																RESEP.KODE_RESEP,
+																POLI.NAMA AS NAMA_POLI,
+																PEM.ID_RESEP_RANAP AS ID_SEMUA
+																FROM
+																rk_pembayaran_resep_ranap AS PEM
+																LEFT JOIN rk_ri_resep RESEP ON RESEP.ID=PEM.ID_RESEP_RANAP
+																LEFT JOIN admum_rawat_inap AS RANAP ON RESEP.ID_PELAYANAN=RANAP.ID
+																LEFT JOIN kepeg_pegawai AS PEGAWAI ON PEM.ID_PEGAWAI=PEGAWAI.ID
+																LEFT JOIN admum_poli AS POLI ON RANAP.ID_POLI=POLI.ID)
+																a
+																WHERE STR_TO_DATE(a.TANGGAL,'%d-%m-%Y') >= STR_TO_DATE('$tanggal_sekarang','%d-%m-%Y')
+																AND STR_TO_DATE(a.TANGGAL,'%d-%m-%Y') <= STR_TO_DATE('$tanggal_sampai','%d-%m-%Y')
+																ORDER BY
+														    STR_TO_DATE(a.TANGGAL,'%d-%m-%Y') DESC
 		");
 		return $query->result_array();
 	}
 
+	// function poli_filter($id_poli){
+	// 	$query = $this->db->query("SELECT
+	// 															PEM.ID,
+	// 															PEM.TANGGAL,
+	// 															PEM.SHIFT,
+	// 															PEM.INVOICE,
+	// 															PEM.TOTAL,
+	// 															RAJAL.ID AS ID_RAJAL,
+	// 															PEGAWAI.NAMA AS NAMA_PEGAWAI,
+	// 															RESEP.KODE_RESEP,
+	// 															POLI.NAMA AS NAMA_POLI
+	// 															FROM
+	// 															rk_pembayaran_kasir AS PEM
+	// 															LEFT JOIN rk_pasien AS PASIEN ON PEM.ID_PASIEN=PASIEN.ID
+	// 															LEFT JOIN admum_rawat_jalan AS RAJAL ON PEM.ID_PELAYANAN=RAJAL.ID
+	// 															LEFT JOIN rk_resep_rj RESEP ON RESEP.ID_PELAYANAN=RAJAL.ID
+	// 															LEFT JOIN kepeg_pegawai AS PEGAWAI ON PEM.ID_PEGAWAI=PEGAWAI.ID
+	// 															LEFT JOIN admum_poli AS POLI ON PEM.ID_POLI=POLI.ID
+	// 															WHERE POLI.ID = '$id_poli'
+	// 	");
+	// 	return $query->result_array();
+	// }
+
 	function poli_filter($id_poli){
 		$query = $this->db->query("SELECT
+																*
+																FROM
+																(SELECT
 																PEM.ID,
 																PEM.TANGGAL,
 																PEM.SHIFT,
 																PEM.INVOICE,
 																PEM.TOTAL,
-																RAJAL.ID AS ID_RAJAL,
 																PEGAWAI.NAMA AS NAMA_PEGAWAI,
+																'Kasir Rajal' AS STATUS,
+																'1' AS TIPE,
 																RESEP.KODE_RESEP,
-																POLI.NAMA AS NAMA_POLI
+																POLI.NAMA AS NAMA_POLI,
+																RAJAL.ID AS ID_SEMUA
 																FROM
 																rk_pembayaran_kasir AS PEM
 																LEFT JOIN rk_pasien AS PASIEN ON PEM.ID_PASIEN=PASIEN.ID
@@ -981,7 +1144,69 @@ class Ap_kasir_rajal_m extends CI_Model {
 																LEFT JOIN rk_resep_rj RESEP ON RESEP.ID_PELAYANAN=RAJAL.ID
 																LEFT JOIN kepeg_pegawai AS PEGAWAI ON PEM.ID_PEGAWAI=PEGAWAI.ID
 																LEFT JOIN admum_poli AS POLI ON PEM.ID_POLI=POLI.ID
-																WHERE POLI.ID = '$id_poli'
+
+																UNION ALL
+
+																SELECT
+																a.ID,
+																a.TANGGAL,
+																a.SHIFT,
+																c.INVOICE,
+																a.TOTAL,
+																b.NAMA AS NAMA_PEGAWAI,
+																c.STATUS,
+																'2' AS TIPE,
+																'' AS KODE_RESEP,
+																'' AS NAMA_POLI,
+																a.ID_PENJUALAN_HV AS ID_SEMUA
+																FROM
+																ap_pembayaran_hv a
+																LEFT JOIN kepeg_pegawai b ON a.ID_PEGAWAI = b.ID
+																LEFT JOIN ap_penjualan_obat_hv c ON a.ID_PENJUALAN_HV = c.ID
+
+																UNION ALL
+
+																SELECT
+																a.ID,
+																a.TANGGAL,
+																a.SHIFT,
+																c.INVOICE,
+																a.TOTAL,
+																b.NAMA AS NAMA_PEGAWAI,
+																'Iter Resep' AS STATUS,
+																'3' AS TIPE,
+																'' AS KODE_RESEP,
+																'' AS NAMA_POLI,
+																a.ID_ITER AS ID_SEMUA
+																FROM
+																ap_pembayaran_iter a
+																LEFT JOIN kepeg_pegawai b ON a.ID_PEGAWAI = b.ID
+																LEFT JOIN ap_iter c ON a.ID_ITER = c.ID
+
+																UNION ALL
+
+																SELECT
+																PEM.ID,
+																PEM.TANGGAL,
+																PEM.SHIFT,
+																RESEP.KODE_RESEP AS INVOICE,
+																PEM.TOTAL,
+																PEGAWAI.NAMA AS NAMA_PEGAWAI,
+																'Kasir Ranap' AS STATUS,
+																'4' AS TIPE,
+																RESEP.KODE_RESEP,
+																POLI.NAMA AS NAMA_POLI,
+																PEM.ID_RESEP_RANAP AS ID_SEMUA
+																FROM
+																rk_pembayaran_resep_ranap AS PEM
+																LEFT JOIN rk_ri_resep RESEP ON RESEP.ID=PEM.ID_RESEP_RANAP
+																LEFT JOIN admum_rawat_inap AS RANAP ON RESEP.ID_PELAYANAN=RANAP.ID
+																LEFT JOIN kepeg_pegawai AS PEGAWAI ON PEM.ID_PEGAWAI=PEGAWAI.ID
+																LEFT JOIN admum_poli AS POLI ON RANAP.ID_POLI=POLI.ID)
+																a
+																WHERE a.TIPE = '$id_poli'
+																ORDER BY
+														    STR_TO_DATE(a.TANGGAL,'%d-%m-%Y') DESC
 		");
 		return $query->result_array();
 	}
@@ -1212,5 +1437,93 @@ class Ap_kasir_rajal_m extends CI_Model {
 			");
 
 			return $sql->row_array();
+	}
+
+	function rekap_pendapatan_poli($id_tutup){
+		$sql = $this->db->query("SELECT
+														 *
+														 FROM
+														 ap_tutup_kasir_rajal_detail
+														 WHERE ID_KASIR_RAJAL IS NOT NULL
+														 AND ID_TUTUP = '21'")->result_array();
+		return 	$sql;
+	}
+
+	// function proses_poli($id_kasir_rajal){
+	// 	$sql_rajal = $this->db->query("SELECT
+	// 																	SUM(b.BIAYA) AS TOTAL_BIAYA_POLI
+	// 																	FROM
+	// 																	admum_rawat_jalan a
+	// 																	LEFT JOIN admum_poli b ON a.ID_POLI = b.ID
+	// 																	LEFT JOIN rk_pembayaran_kasir c ON a.ID = c.ID_PELAYANAN
+	// 																	WHERE a.ID = '$id_kasir_rajal'
+	// 																");
+	// 	return $sql_rajal->row_array();
+	// }
+
+	function rekap_pendapatan_obat_hv($id_tutup, $shift, $tanggal){
+		$sql = $this->db->query("SELECT
+															SUM(a.TOTAL) AS TOTAL_HV,
+															(SELECT SUM(a.TOTAL) AS TUNAI FROM ap_penjualan_obat_hv a
+															LEFT JOIN ap_pembayaran_hv b ON a.ID = b.ID_PENJUALAN_HV
+															WHERE b.JENIS_PEMBAYARAN = 'Tunai'
+															AND a.SHIFT = '$shift'
+															AND a.STS_BAYAR = '1'
+															AND a.STATUS_CLOSING = '1'
+															AND a.STATUS_CLOSING = '1'
+															AND a.TANGGAL = '$tanggal'
+															) AS TUNAI,
+															(SELECT SUM(a.TOTAL) AS NON_TUNAI FROM ap_penjualan_obat_hv a
+															LEFT JOIN ap_pembayaran_hv b ON a.ID = b.ID_PENJUALAN_HV
+															WHERE b.JENIS_PEMBAYARAN = 'Non Tunai'
+															AND a.SHIFT = '$shift'
+															AND a.STS_BAYAR = '1'
+															AND a.STATUS_CLOSING = '1'
+															AND a.TANGGAL = '$tanggal'
+															) AS NON_TUNAI
+															FROM
+															ap_penjualan_obat_hv a
+															LEFT JOIN ap_pembayaran_hv b ON a.ID = b.ID_PENJUALAN_HV
+															WHERE a.STATUS_CLOSING = '1'
+															AND a.STS_BAYAR = '1'
+															AND a.SHIFT = '$shift'
+															AND a.TANGGAL = '$tanggal'
+														");
+
+		return $sql->row_array();
+	}
+
+	function rekap_pendapatan_obat_rj($id_tutup, $shift, $tanggal){
+		$sql = $this->db->query("SELECT
+															SUM(b.BIAYA_RESEP) AS TOTAL_RJ,
+															(SELECT
+															SUM(b.BIAYA_RESEP) AS TUNAI
+															FROM admum_rawat_jalan a
+															LEFT JOIN rk_pembayaran_kasir b ON a.ID = b.ID_PELAYANAN
+															WHERE b.JENIS_PEMBAYARAN = 'Tunai'
+															AND b.SHIFT = '$shift'
+															AND a.STS_BAYAR = '1'
+															AND a.STS_CLOSING = '1'
+															AND a.TANGGAL = '$tanggal'
+															) AS TUNAI,
+															(SELECT
+															SUM(b.BIAYA_RESEP) AS NON_TUNAI
+															FROM admum_rawat_jalan a
+															LEFT JOIN rk_pembayaran_kasir b ON a.ID = b.ID_PELAYANAN
+															WHERE b.JENIS_PEMBAYARAN = 'Non Tunai'
+															AND b.SHIFT = '$shift'
+															AND a.STS_BAYAR = '1'
+															AND a.STS_CLOSING = '1'
+															AND a.TANGGAL = '$tanggal'
+															) AS NON_TUNAI
+															FROM admum_rawat_jalan a
+															LEFT JOIN rk_pembayaran_kasir b ON a.ID = b.ID_PELAYANAN
+															WHERE a.STS_CLOSING = '1'
+															AND a.STS_BAYAR = '1'
+															AND b.SHIFT = '$shift'
+															AND a.TANGGAL = '$tanggal'
+														");
+
+		return $sql->row_array();
 	}
 }

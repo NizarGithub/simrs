@@ -52,9 +52,9 @@ class Ap_entry_resep_m extends CI_Model {
 	function data_pasien_iter($keyword){
     $where = "1 = 1";
 
-		// if($keyword != ""){
-		// 	$where = $where." AND (b.NAMA_OBAT LIKE '%$keyword%' OR b.BARCODE LIKE '%$keyword%' OR b.KODE_OBAT LIKE '%$keyword%')";
-		// }
+		if($keyword != ""){
+			$where = $where." AND (a.KODE_RESEP LIKE '%$keyword%' OR a.TANGGAL LIKE '%$keyword%' OR c.NAMA LIKE '%$keyword%' OR d.NAMA LIKE '%$keyword%')";
+		}
 
 		$sql = "SELECT
 						a.ID AS ID_RESEP,
@@ -178,7 +178,7 @@ class Ap_entry_resep_m extends CI_Model {
 															FROM
 															rk_resep_detail_rj a
 															LEFT JOIN admum_setup_nama_obat b ON a.ID_OBAT = b.ID
-															WHERE a.ID_RESEP = '18'
+															WHERE a.ID_RESEP = '$id_resep'
 															");
 		return $sql->result_array();
 	}

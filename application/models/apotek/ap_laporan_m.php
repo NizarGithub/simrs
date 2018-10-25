@@ -13,19 +13,98 @@ class Ap_laporan_m extends CI_Model {
 	function data_laporan($pilihan,$bulan,$now){
 		$where = "1 = 1";
 
-		if($pilihan == 'bulanan'){
-			$where = $where." AND BULAN = '$bulan'";
-		}else{
-			$where = $where." AND STR_TO_DATE(TANGGAL,'%d-%m-%Y') = '$now'";
-		}
+		// if($pilihan == 'bulanan'){
+		// 	$where = $where." AND BULAN = '$bulan'";
+		// }else{
+		// 	$where = $where." AND STR_TO_DATE(a.TANGGAL,'%d-%m-%Y') = '$now'";
+		// }
 
-		$sql = "
-			SELECT
-				*
-			FROM apotek_transaksi
-			WHERE $where
-			ORDER BY ID DESC
-		";
+		$sql = "SELECT
+						*
+						FROM
+						(SELECT
+						PEM.ID,
+						PEM.TANGGAL,
+						PEM.SHIFT,
+						PEM.INVOICE,
+						PEM.TOTAL,
+						PEGAWAI.NAMA AS NAMA_PEGAWAI,
+						'Kasir Rajal' AS STATUS,
+						'1' AS TIPE,
+						RESEP.KODE_RESEP,
+						POLI.NAMA AS NAMA_POLI,
+						RAJAL.ID AS ID_SEMUA
+						FROM
+						rk_pembayaran_kasir AS PEM
+						LEFT JOIN rk_pasien AS PASIEN ON PEM.ID_PASIEN=PASIEN.ID
+						LEFT JOIN admum_rawat_jalan AS RAJAL ON PEM.ID_PELAYANAN=RAJAL.ID
+						LEFT JOIN rk_resep_rj RESEP ON RESEP.ID_PELAYANAN=RAJAL.ID
+						LEFT JOIN kepeg_pegawai AS PEGAWAI ON PEM.ID_PEGAWAI=PEGAWAI.ID
+						LEFT JOIN admum_poli AS POLI ON PEM.ID_POLI=POLI.ID
+
+						UNION ALL
+
+						SELECT
+						a.ID,
+						a.TANGGAL,
+						a.SHIFT,
+						c.INVOICE,
+						a.TOTAL,
+						b.NAMA AS NAMA_PEGAWAI,
+						c.STATUS,
+						'2' AS TIPE,
+						'' AS KODE_RESEP,
+						'' AS NAMA_POLI,
+						a.ID_PENJUALAN_HV AS ID_SEMUA
+						FROM
+						ap_pembayaran_hv a
+						LEFT JOIN kepeg_pegawai b ON a.ID_PEGAWAI = b.ID
+						LEFT JOIN ap_penjualan_obat_hv c ON a.ID_PENJUALAN_HV = c.ID
+
+						UNION ALL
+
+						SELECT
+						a.ID,
+						a.TANGGAL,
+						a.SHIFT,
+						c.INVOICE,
+						a.TOTAL,
+						b.NAMA AS NAMA_PEGAWAI,
+						'Iter Resep' AS STATUS,
+						'3' AS TIPE,
+						'' AS KODE_RESEP,
+						'' AS NAMA_POLI,
+						a.ID_ITER AS ID_SEMUA
+						FROM
+						ap_pembayaran_iter a
+						LEFT JOIN kepeg_pegawai b ON a.ID_PEGAWAI = b.ID
+						LEFT JOIN ap_iter c ON a.ID_ITER = c.ID
+
+						UNION ALL
+
+						SELECT
+						PEM.ID,
+						PEM.TANGGAL,
+						PEM.SHIFT,
+						RESEP.KODE_RESEP AS INVOICE,
+						PEM.TOTAL,
+						PEGAWAI.NAMA AS NAMA_PEGAWAI,
+						'Kasir Ranap' AS STATUS,
+						'4' AS TIPE,
+						RESEP.KODE_RESEP,
+						POLI.NAMA AS NAMA_POLI,
+						PEM.ID_RESEP_RANAP AS ID_SEMUA
+						FROM
+						rk_pembayaran_resep_ranap AS PEM
+						LEFT JOIN rk_ri_resep RESEP ON RESEP.ID=PEM.ID_RESEP_RANAP
+						LEFT JOIN admum_rawat_inap AS RANAP ON RESEP.ID_PELAYANAN=RANAP.ID
+						LEFT JOIN kepeg_pegawai AS PEGAWAI ON PEM.ID_PEGAWAI=PEGAWAI.ID
+						LEFT JOIN admum_poli AS POLI ON RANAP.ID_POLI=POLI.ID)
+						a
+						WHERE $where
+						ORDER BY
+				    STR_TO_DATE(a.TANGGAL,'%d-%m-%Y') DESC
+						";
 		$query = $this->db->query($sql);
 		return $query->result();
 	}

@@ -121,10 +121,10 @@ function data_laporan(){
 
 					$tr += "<tr>"+
 								"<td style='text-align:center;'>"+no+"</td>"+
-								"<td style='text-align:center;'>"+result[i].INVOICE+"</td>"+
+								"<td style='text-align:center;'>"+result[i].STATUS+"</td>"+
 								"<td style='text-align:center;'>"+formatTanggal(result[i].TANGGAL)+"</td>"+
-								"<td style='text-align:center;'>"+result[i].WAKTU+"</td>"+
-								"<td>"+result[i].ATAS_NAMA+"</td>"+
+								"<td style='text-align:center;'>"+result[i].INVOICE+"</td>"+
+								"<td style='text-align:right;'>Rp. "+NumberToMoney(result[i].TOTAL)+"</td>"+
 								"<td align='center'>"+aksi+"</td>"+
 							"</tr>";
 				}
@@ -404,7 +404,7 @@ function onEnterText(e){
 	<div class="card-box">
 		<div class="row">
 			<ul class="nav nav-tabs">
-                <li role="presentation" class="active">
+                <li role="presentation" id="dt_penjualan_obat" class="active">
                     <a href="#home1" role="tab" data-toggle="tab"><i class="fa fa-file-text-o"></i> Data Laporan Penjualan</a>
                 </li>
                 <li role="presentation" id="dt_stok_obat">
@@ -425,29 +425,22 @@ function onEnterText(e){
 	                                <label for="inlineRadio1"> Default </label>
 	                            </div>
 	                            <div class="radio radio-danger radio-inline">
-	                                <input type="radio" id="inlineRadio2" value="bulanan" name="pilihan">
-	                                <label for="inlineRadio2"> Bulanan </label>
+	                                <input type="radio" id="inlineRadio2" value="tanggal" name="pilihan">
+	                                <label for="inlineRadio2"> Tanggal </label>
 	                            </div>
 			                </div>
 			            </div>
-			            <div class="form-group" id="view_bulan">
+			            <div class="form-group" id="view_tanggal">
 			            	<label class="control-label col-md-1" style="text-align:left;">&nbsp;</label>
-			            	<div class="col-md-3">
-			            		<select class="form-control select2" id="bulan" onchange="data_laporan();">
-			            			<option value="0">-- Pilih --</option>
-                                	<option value="1">Januari</option>
-                                	<option value="2">Februari</option>
-                                	<option value="3">Maret</option>
-                                	<option value="4">April</option>
-                                	<option value="5">Mei</option>
-                                	<option value="6">Juni</option>
-                                	<option value="7">Juli</option>
-                                	<option value="8">Agustus</option>
-                                	<option value="9">September</option>
-                                	<option value="10">Oktober</option>
-                                	<option value="11">November</option>
-                                	<option value="12">Desember</option>
-                                </select>
+			            	<div class="col-md-4">
+												<div class="input-daterange input-group">
+				            			<input type="text" name="tanggal_dari" value="" class="form-control" data-mask="99-99-9999">
+													<span class="input-group-addon bg-primary b-0 text-white">Sampai</span>
+													<input type="text" name="tanggal_sampai" value="" class="form-control" data-mask="99-99-9999">
+				            		</div>
+			            	</div>
+										<div class="col-md-3">
+												<button type="button" class="btn btn-primary" name="button">Cari</button>\
 			            	</div>
 			            </div>
                 	</form>
@@ -456,10 +449,10 @@ function onEnterText(e){
 			                <thead>
 			                    <tr class="biru">
 			                        <th style="color:#fff; text-align:center;">No</th>
-			                        <th style="color:#fff; text-align:center;">Invoice</th>
+			                        <th style="color:#fff; text-align:center;">Status</th>
 			                        <th style="color:#fff; text-align:center;">Tgl Transaksi</th>
 			                        <th style="color:#fff; text-align:center;">Waktu</th>
-			                        <th style="color:#fff; text-align:center;">Atas Nama</th>
+			                        <th style="color:#fff; text-align:center;">Total</th>
 			                        <th style="color:#fff; text-align:center;">Aksi</th>
 			                    </tr>
 			                </thead>

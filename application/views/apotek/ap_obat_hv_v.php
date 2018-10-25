@@ -63,6 +63,11 @@ $user_detail = $this->model->get_user_detail($id_user);
     </div>
 </div> -->
 <body data-page="medias" onload="startTime(); startNotifClosing();">
+	<div id="popup_load">
+	    <div class="window_load">
+	        <img src="<?=base_url()?>picture/progress.gif" height="100" width="125">
+	    </div>
+	</div>
     <!-- BEGIN TOP MENU -->
     <input type="hidden" id="sts_edit" value="0" />
     <input type="hidden" id="sts_lunas" value="0" />
@@ -158,7 +163,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                                 <thead>
                                                     <tr class="warning">
                                                         <th style="text-align: center;">No</th>
-																												<th style="text-align: center;">Barcode</th>
+																												<!-- <th style="text-align: center;">Barcode</th> -->
                                                         <th style="text-align: center;">Nama Obat</th>
                                                         <th style="text-align: center;" width="100">Jumlah Beli</th>
                                                         <th style="text-align: center;">Total</th>
@@ -170,7 +175,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                                 </tbody>
                                                 <tfoot>
                                                     <tr class="active">
-                                                        <td colspan="4" style="text-align: center; font-weight: bold;">Total Biaya</td>
+                                                        <td colspan="3" style="text-align: center; font-weight: bold;">Total Biaya</td>
                                                         <td style="text-align: right;"><b id="tot_biaya_keranjang">0</b></td>
 																												<td></td>
                                                     </tr>
@@ -626,6 +631,8 @@ $(document).ready(function(){
 });
 
 function simpan_proses(){
+	$('#popup_load').show();
+
 	$.ajax({
 		url : '<?php echo base_url(); ?>apotek/ap_obat_hv_c/simpan_proses',
 		data : $('#form_pembayaran').serialize(),
@@ -639,6 +646,7 @@ function simpan_proses(){
 			data_keranjang();
 			data_obat();
 			$('#btn_klik_proses').attr('disabled','disabled');
+			$('#popup_load').fadeOut();
 		}
 	});
 }
@@ -776,7 +784,7 @@ function data_keranjang(){
 					$tr = '';
 					var tot = 0;
 					if(res == null || res == ""){
-							$tr = '<tr><td colspan="6" style="text-align:center;">Data Tidak Ada</td></tr>';
+							$tr = '<tr><td colspan="5" style="text-align:center;">Data Tidak Ada</td></tr>';
 					}else{
 							var no = 0;
 							for(var i=0; i<res.length; i++){
@@ -786,7 +794,7 @@ function data_keranjang(){
 
 									$tr += '<tr>'+
 													'<td style="text-align:center;"><input type="hidden" name="id_gudang_obat[]" value="'+res[i].ID_GUDANG_OBAT+'">'+no+'</td>'+
-													'<td style="text-align:center;">'+res[i].BARCODE+'</td>'+
+													// '<td style="text-align:center;">'+res[i].BARCODE+'</td>'+
 													'<td style="text-align:center;">'+res[i].NAMA_OBAT+'</td>'+
 													'<td><input type="text" id="jumlah_beli_'+res[i].ID+'" onkeyup="hitung_jumlah_total('+res[i].ID+'); get_grand_total();" value="1" name="jumlah_beli[]" class="form-control"></td>'+
 													'<td style="text-align:right;" id="harga_beli_'+res[i].ID+'">'+
