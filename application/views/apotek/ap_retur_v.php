@@ -82,6 +82,11 @@ $user_detail = $this->model->get_user_detail($id_user);
     </div>
 </div> -->
 <body data-page="medias" onload="startTime(); startNotifClosing();">
+	<div id="popup_load">
+	    <div class="window_load">
+	        <img src="<?=base_url()?>picture/progress.gif" height="100" width="125">
+	    </div>
+	</div>
     <!-- BEGIN TOP MENU -->
     <input type="hidden" id="sts_edit" value="0" />
     <input type="hidden" id="sts_lunas" value="0" />
@@ -666,6 +671,8 @@ $(document).ready(function(){
 
 	$('#btn_ya_proses').click(function(){
 		simpan_proses();
+		$('#popup_load').show();
+
 	});
 
 	$('#btn_dokter').click(function(){
@@ -684,6 +691,7 @@ $(document).ready(function(){
 			$('#btn_tunai').removeAttr('class');
 			$('#btn_tunai').attr('class','btn btn-primary');
 			$('#btn_non_tunai').removeAttr('class');
+			$('#popup_load').fadeOut();
 			$('#btn_non_tunai').attr('class','btn btn-primary btn-transparent');
 			$('#view_non_tunai').hide();
 			$('#bayar2').removeAttr('readonly');
@@ -730,6 +738,8 @@ $(document).ready(function(){
 });
 
 function simpan_proses(){
+	$('#popup_load').show();
+
 	$.ajax({
 		url : '<?php echo base_url(); ?>apotek/ap_retur_c/simpan_proses',
 		data : $('#form_pembayaran').serialize(),
@@ -748,6 +758,7 @@ function simpan_proses(){
 			$('#kode_resep').val('');
 			$('#luar_shift_input').val('0');
 			$('#btn_klik_proses').attr('disabled','disabled');
+			$('#popup_load').fadeOut();
 		}
 	});
 }

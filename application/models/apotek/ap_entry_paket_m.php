@@ -37,19 +37,38 @@ class Ap_entry_paket_m extends CI_Model {
     return $sql->row_array();
   }
 
-  function get_data_paket(){
-    $this->db->select('*');
-    $this->db->from('ap_paket');
-    $sql = $this->db->get();
+  function get_data_paket($keyword){
+		$where = '1 = 1';
+		if ($keyword != '') {
+			$where = $where." AND b.NAMA_PAKET LIKE '%$keyword%' OR a.KELAS LIKE '%$keyword%'";
+		}
+
+		$sql = $this->db->query("SELECT
+															a.ID,
+															b.NAMA_PAKET,
+															a.KELAS,
+															b.HARI
+															FROM
+															setup_kamar_paket a
+															LEFT JOIN setup_nama_paket b ON a.ID_PAKET = b.ID
+															WHERE $where
+														");
 
     return $sql->result_array();
   }
 
   function klik_paket($id){
-    $this->db->select('*');
-    $this->db->from('ap_paket');
-    $this->db->where('ID', $id);
-    $sql = $this->db->get();
+		$sql = $this->db->query("SELECT
+															a.ID,
+															b.NAMA_PAKET,
+															a.KELAS,
+															b.HARI,
+															a.BIAYA_PAKET_OBAT
+															FROM
+															setup_kamar_paket a
+															LEFT JOIN setup_nama_paket b ON a.ID_PAKET = b.ID
+															WHERE a.ID = '$id'
+														");
 
     return $sql->row_array();
   }
@@ -142,13 +161,13 @@ class Ap_entry_paket_m extends CI_Model {
     $this->db->delete('keranjang_beli_paket');
   }
 
-  function simpan_proses($value, $total_keranjang_name, $jumlah_beli, $harga_obat, $id_penjualan_obat_paket, $service){
+  function simpan_proses($value, $total_keranjang_name, $jumlah_beli, $harga_obat, $id_setup_paket, $service){
     $tanggal = date('d-m-Y');
     $tahun = date('Y');
     $bulan = date('m');
 
     $data_detail = array(
-      'ID_PENJUALAN_OBAT_PAKET' => $id_penjualan_obat_paket,
+      'ID_SETUP_PAKET_OBAT' => $id_setup_paket,
       'ID_GUDANG_OBAT' => $value,
       'JUMLAH_BELI' => $jumlah_beli,
       'TANGGAL' => $tanggal,
@@ -158,7 +177,7 @@ class Ap_entry_paket_m extends CI_Model {
       'HARGA_OBAT' => $harga_obat,
 			'SERVICE' => $service
     );
-    $this->db->insert('ap_penjualan_obat_paket_detail', $data_detail);
+    $this->db->insert('setup_paket_obat_detail', $data_detail);
     $this->db->empty_table('keranjang_beli_paket');
     // $this->db->query("UPDATE apotek_gudang_obat SET STOK = STOK - $jumlah_beli WHERE ID = '$value'");
   }

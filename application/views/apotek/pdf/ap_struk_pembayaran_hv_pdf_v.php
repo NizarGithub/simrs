@@ -116,12 +116,14 @@
             $result_obat = $this->db->get()->result_array();
             foreach ($result_obat as $ro) {
            ?>
-          <tr>
-            <td>-</td>
-            <td style="text-transform: uppercase; width: 25%;"><?php echo $ro['NAMA_OBAT']; ?></td>
-            <td style="width: 2%;">,</td>
-            <td><?php echo $ro['JUMLAH_BELI']; ?></td>
-          </tr>
+           <tr>
+             <td>-</td>
+             <td style="text-transform: uppercase;"><?php echo $ro['NAMA_OBAT']; ?></td>
+             <td style="width: 2%;">,</td>
+             <td><?php echo $ro['JUMLAH_BELI']; ?> X Rp. <?php echo number_format($ro['HARGA_OBAT']); ?></td>
+             <td style="width: 4%;">@ Rp.</td>
+             <td><?php echo number_format($ro['TOTAL']); ?></td>
+           </tr>
           <?php
             }
            ?>

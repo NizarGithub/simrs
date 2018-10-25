@@ -117,7 +117,7 @@
             <td style="text-transform: uppercase;"><?php echo $ro['NAMA_OBAT']; ?>, <?php echo $ro['TAKARAN']; ?></td>
             <td style="width: 2%;">,</td>
             <td><?php echo $ro['JUMLAH_BELI']; ?> X Rp. <?php echo number_format($ro['HARGA']); ?></td>
-            <td style="width: 3%;">, Rp.</td>
+            <td style="width: 4%;">@ Rp.</td>
             <td><?php echo number_format($ro['SUBTOTAL']); ?></td>
           </tr>
           <?php

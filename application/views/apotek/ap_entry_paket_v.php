@@ -63,6 +63,11 @@ $user_detail = $this->model->get_user_detail($id_user);
     </div>
 </div> -->
 <body data-page="medias" onload="startTime(); startNotifClosing();">
+	<div id="popup_load">
+	    <div class="window_load">
+	        <img src="<?=base_url()?>picture/progress.gif" height="100" width="125">
+	    </div>
+	</div>
     <!-- BEGIN TOP MENU -->
     <input type="hidden" id="sts_edit" value="0" />
     <input type="hidden" id="sts_lunas" value="0" />
@@ -107,13 +112,13 @@ $user_detail = $this->model->get_user_detail($id_user);
                     <div class="form-group">
                         <!-- <label class="form-label"><strong>Pencarian</strong> Obat</label> -->
                         <div class="controls">
-                            <div class="input-group">
+                            <!-- <div class="input-group">
                               <input type="text" id="nama_dokter" class="glowing form-control" value="" placeholder="Cari dokter ..." readonly required>
                               <span class="input-group-addon bg-blue" id="tombol_dokter" style="cursor:pointer;">
                                 <i class="fa fa-search"></i>
                               </span>
                             </div>
-                            <br>
+                            <br> -->
                             <div class="input-group">
                               <input type="text" id="nama_paket" class="glowing form-control" value="" placeholder="Cari paket ..." readonly required>
                               <span class="input-group-addon bg-blue" id="tombol_paket" style="cursor:pointer;">
@@ -121,13 +126,13 @@ $user_detail = $this->model->get_user_detail($id_user);
                               </span>
                             </div>
                             <br>
-														<div class="input-group">
+														<!-- <div class="input-group">
                               <input type="text" id="nama_pasien" class="glowing form-control" value="" placeholder="Cari pasien ..." readonly required>
                               <span class="input-group-addon bg-blue" id="tombol_pasien" style="cursor:pointer;">
                                 <i class="fa fa-search"></i>
                               </span>
                             </div>
-                            <br>
+                            <br> -->
                             <input type="text" id="cari_nama_menu" class="glowing form-control" value="" placeholder="Ketikkan obat yang ingin dicari ...">
                         </div>
                     </div>
@@ -147,7 +152,7 @@ $user_detail = $this->model->get_user_detail($id_user);
 														<div class="panel-body messages">
 															<div class="row">
 																<div class="col-md-12 col-sm-12 col-xs-12">
-																	<div class="scroll-y" style="height: 477px;" id="tabel_obat">
+																	<div class="scroll-y" style="height: 550px;" id="tabel_obat">
 
 																	</div>
 																</div>
@@ -168,6 +173,20 @@ $user_detail = $this->model->get_user_detail($id_user);
                             </div>
                             <div class="panel-body messages">
 															<form id="form_pembayaran">
+																<div class="form-group">
+																	<label class="form-label">
+																		<strong>
+																		Biaya Paket Obat
+																		</strong>
+																	</label>
+																	<div class="input-group">
+																		<span class="input-group-addon bg-blue" style="cursor:pointer;">
+																			Rp
+																		</span>
+			                              <input type="text" name="biaya_paket_obat" id="biaya_paket_obat" class="glowing form-control" value="" disabled>
+			                            </div>
+																	<!-- <input type="text" name="biaya_paket_obat" id="biaya_paket_obat" value="" class="form-control" disabled> -->
+																</div>
                                 <input type="hidden" name="id_paket" id="id_paket" value="">
 																<input type="hidden" name="id_pasien" id="id_pasien" value="">
                                 <input type="hidden" name="id_dokter" id="id_dokter" value="">
@@ -182,7 +201,6 @@ $user_detail = $this->model->get_user_detail($id_user);
                                                 <thead>
                                                     <tr class="warning">
                                                         <th style="text-align: center;">No</th>
-																												<th style="text-align: center;">Barcode</th>
                                                         <th style="text-align: center;">Nama Obat</th>
                                                         <th style="text-align: center;" width="100">Jumlah Beli</th>
                                                         <th style="text-align: center;">Total</th>
@@ -194,7 +212,7 @@ $user_detail = $this->model->get_user_detail($id_user);
                                                 </tbody>
                                                 <tfoot>
                                                     <tr class="active">
-                                                        <td colspan="4" style="text-align: center; font-weight: bold;">Total Biaya</td>
+                                                        <td colspan="3" style="text-align: center; font-weight: bold;">Total Biaya</td>
                                                         <td style="text-align: right;"><b id="tot_biaya_keranjang">0</b></td>
 																												<td></td>
                                                     </tr>
@@ -586,11 +604,19 @@ $user_detail = $this->model->get_user_detail($id_user);
                             <center><h3 class="modal-title" id="myModalLabel" style="color: white;"><strong>Data Paket</strong></h3></center>
                         </div>
                         <div class="modal-body">
+													<div class="input-group">
+                            <input type="text" id="keyword_paket" class="glowing form-control" value="" placeholder="Cari paket ...">
+                            <span class="input-group-addon bg-blue">
+                              <i class="fa fa-search"></i>
+                            </span>
+                          </div>
+                          <br>
                           <table class="table table-hover" id="tabel_paket">
                               <thead>
                                   <tr class="info">
-                                      <th style="text-align: center;">Kode</th>
+																			<th style="text-align: center;">No</th>
                                       <th style="text-align: center;">Nama Paket</th>
+																			<th style="text-align: center;">Hari</th>
                                   </tr>
                               </thead>
                               <tbody>
@@ -719,6 +745,8 @@ $(document).ready(function(){
 
 	$('#btn_ya_proses').click(function(){
 		simpan_proses();
+		$('#popup_load').show();
+
 	});
 
 	$('.non_tunai_grp').hide();
@@ -771,7 +799,23 @@ $(document).ready(function(){
 	});
 });
 
+// function cek_biaya(){
+// 	var biaya_paket_obat = $('#biaya_paket_obat').val();
+// 	biaya_paket_obat = biaya_paket_obat.split(',').join('');
+//
+// 	var total_tagihan = $('#total_tagihan').val();
+// 	total_tagihan = total_tagihan.split(',').join('');
+//
+// 	if (parseFloat(total_tagihan) >= parseFloat(biaya_paket_obat)) {
+// 		$('#btn_klik_proses').attr('disabled','disabled');
+// 	}else {
+// 		$('#btn_klik_proses').removeAttr('disabled');
+// 	}
+// }
+
 function simpan_proses(){
+	$('#popup_load').show();
+
 	$.ajax({
 		url : '<?php echo base_url(); ?>apotek/ap_entry_paket_c/simpan_proses',
 		data : $('#form_pembayaran').serialize(),
@@ -784,11 +828,14 @@ function simpan_proses(){
 			$('#notif_berhasil').click();
 			data_keranjang();
 			data_obat();
+			$('#biaya_paket_obat').val('');
       $('#nama_paket').val('');
       $('#id_paket').val('');
       $('#nama_dokter').val('');
       $('#id_dokter').val('');
 			$('#btn_klik_proses').attr('disabled','disabled');
+
+			$('#popup_load').fadeOut();
 		}
 	});
 }
@@ -925,7 +972,7 @@ function data_keranjang(){
 					$tr = '';
 					var tot = 0;
 					if(res == null || res == ""){
-							$tr = '<tr><td colspan="6" style="text-align:center;">Data Tidak Ada</td></tr>';
+							$tr = '<tr><td colspan="5" style="text-align:center;">Data Tidak Ada</td></tr>';
 					}else{
 							var no = 0;
 							for(var i=0; i<res.length; i++){
@@ -935,9 +982,8 @@ function data_keranjang(){
 
 									$tr += '<tr>'+
 													'<td style="text-align:center;"><input type="hidden" name="id_gudang_obat[]" value="'+res[i].ID_GUDANG_OBAT+'">'+no+'</td>'+
-													'<td style="text-align:center;">'+res[i].BARCODE+'</td>'+
 													'<td style="text-align:center;">'+res[i].NAMA_OBAT+'</td>'+
-													'<td><input type="text" id="jumlah_beli_'+res[i].ID+'" onkeyup="hitung_jumlah_total('+res[i].ID+'); get_grand_total();" value="1" name="jumlah_beli[]" class="form-control"></td>'+
+													'<td><input type="text" id="jumlah_beli_'+res[i].ID+'" onkeyup="hitung_jumlah_total('+res[i].ID+'); get_grand_total(); cek_biaya();" value="1" name="jumlah_beli[]" class="form-control"></td>'+
 													'<td style="text-align:right;" id="harga_beli_'+res[i].ID+'">'+
 													''+formatNumber(res[i].HARGA_OBAT)+''+
 													'</td>'+
@@ -1437,9 +1483,11 @@ function semua_filter(){
 }
 
 function get_data_paket(){
+	var keyword = $('#keyword_paket').val();
   $.ajax({
     url : '<?php echo base_url(); ?>apotek/ap_entry_paket_c/get_data_paket',
-    type : "POST",
+		data : {keyword:keyword},
+    type : "GET",
     dataType : "json",
     success : function(result){
       var table = '';
@@ -1450,13 +1498,18 @@ function get_data_paket(){
           for(var i=0; i<result.length; i++){
               no++;
               table += "<tr style='cursor:pointer;' onclick='klik_paket("+result[i].ID+");'>"+
-                          "<td style='text-align:center;'>"+result[i].KODE_PAKET+"</td>"+
-                          "<td style='text-align:center;'>"+result[i].NAMA_PAKET+"</td>"+
+													"<td style='text-align:center;'>"+no+"</td>"+
+                          "<td style=''>"+result[i].NAMA_PAKET+" - "+result[i].KELAS+"</td>"+
+                          "<td style='text-align:center;'>"+result[i].HARI+"</td>"+
                       "</tr>";
           }
       }
       $('#tabel_paket tbody').html(table);
     }
+  });
+
+	$('#keyword_paket').off('keyup').keyup(function(){
+      get_data_paket();
   });
 }
 
@@ -1468,8 +1521,10 @@ function klik_paket(id){
    type : "POST",
    dataType : "json",
    success : function(row){
-     $('#nama_paket').val(row['NAMA_PAKET']);
-     $('#id_paket').val(row['ID'])
+		 var paket = row['NAMA_PAKET']+' - '+row['KELAS'];
+     $('#nama_paket').val(paket);
+     $('#id_paket').val(row['ID']);
+		 $('#biaya_paket_obat').val(NumberToMoney(row['BIAYA_PAKET_OBAT']));
    }
  });
 }
