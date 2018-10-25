@@ -473,6 +473,13 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		$tot_service = $this->input->post('total_biaya_service');
 		$total_biaya_service = $total + $tot_service;
 		$iter = $this->input->post('iter');
+		$status_iter = '';
+
+		if($iter == '' || $iter == '0'){
+			$status_iter = '0';
+		}else{
+			$status_iter = '1';
+		}
 
 		$id_obat = $this->input->post('id_obat_resep');
 		$harga = $this->input->post('harga_obat');
@@ -481,7 +488,7 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		$aturan_minum = $this->input->post('aturan_minum');
 		$diminum_selama = $this->input->post('diminum_selama');
 
-		$this->model->simpan_resep($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$kode_resep,$alergi,$uraian,$banyaknya_resep,$tanggal,$bulan,$tahun,$total,$total_biaya_service,$iter);
+		$this->model->simpan_resep($id_pelayanan,$id_poli,$id_peg_dokter,$id_pasien,$kode_resep,$alergi,$uraian,$banyaknya_resep,$tanggal,$bulan,$tahun,$total,$total_biaya_service,$iter,$status_iter);
 		$id_resep = $this->db->insert_id();
 
 		foreach ($id_obat as $key => $value) {
@@ -754,6 +761,19 @@ class Rk_pelayanan_rj_c extends CI_Controller {
 		$id = $this->input->post('id_hapus_sd');
 		$this->model->hapus_surat_dokter($id);
 		echo '1';
+	}
+
+	function surat_dokter_darurat($id){
+		// $id_pasien = $this->decode($id);
+		$data1 = $this->model->data_surat_dokter_id($id);
+
+		$data = array(
+			'settitle' => 'Surat Dokter',
+			'filename' => 'surat_dokter',
+			'data1' => $data1,
+		);
+
+		$this->load->view('poli/pdf/rk_surat_dokter_rj_pdf_v',$data);
 	}
 
 	//SURAT PENGANTAR RI

@@ -140,14 +140,16 @@ class Lap_rj_per_jk_c extends CI_Controller {
 	}
 
 	function cetak_excel(){
-		$id_jk = $this->input->post('dokter');
 		$jenis_cetak = $this->input->post('jenis_cetak');
+		$jenis_kelamin = $this->input->post('jenis_kelamin');
 		$tanggal_awal = $this->input->post('tanggal_awal');
 		$tanggal_akhir = $this->input->post('tanggal_akhir');
 		$bulan = $this->input->post('bulan');
 		$tahun = $this->input->post('tahun');
-		$judul = '';
+		$jk = '';
+
 		$settitle = '';
+		$judul = '';
 
 		$bulan_arr = array(
 			1 =>	"Januari", 2  =>"Februari", 3  =>"Maret", 4 =>"April",
@@ -161,13 +163,24 @@ class Lap_rj_per_jk_c extends CI_Controller {
 			$judul = 'Bulan '.$bulan_arr[$bulan].' Tahun '.$tahun;
 		}
 
-		if($id_jk == 'Semua'){
-			$settitle = 'Laporan Pasien Semua Dokter';
+		if($jenis_kelamin == 'Semua'){
+			$settitle = 'Laporan Pasien Semua Jenis Kelamin';
 		}else{
-			$settitle = 'Laporan Pasien Per Dokter';
+			if($jenis_kelamin == 'L'){
+				$jk = 'Laki - Laki';
+			}else if($jenis_kelamin == 'P'){
+				$jk = 'Perempuan';
+			}else{
+				$jk = '';
+			}
+			$settitle = 'Laporan Pasien Jenis Kelamin '.$jk;
 		}
 
-		$data = $this->query_data($id_jk,$jenis_cetak,$tanggal_awal,$tanggal_akhir,$bulan,$tahun);
+		if($bulan < '10'){
+			$bulan = '0'.$bulan;
+		}
+		
+		$data = $this->query_data($jenis_cetak,$jenis_kelamin,$tanggal_awal,$tanggal_akhir,$bulan,$tahun);
 
 		$array = array(
 			'dt' => $data,

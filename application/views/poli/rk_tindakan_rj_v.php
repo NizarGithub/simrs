@@ -1737,7 +1737,7 @@ function data_resep(){
 			$tr = "";
 
 			if(result == "" || result == null){
-				$tr = "<tr><td colspan='7' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
+				$tr = "<tr><td colspan='8' style='text-align:center;'><b>Data Tidak Ada</b></td></tr>";
 			}else{
 				var no = 0;
 
@@ -2373,7 +2373,7 @@ function get_data_cetak_darurat(){
 function cetak_surat_keterangan(id_pasien){
 	// var encodedString = atob(id_pasien);
 	// console.log(id_pasien);
-	window.open('<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/surat_dokter/'+id_pasien,'_blank');
+	window.open('<?php echo base_url(); ?>poli/rk_pelayanan_rj_c/surat_dokter_darurat/'+id_pasien,'_blank');
 }
 </script>
 
